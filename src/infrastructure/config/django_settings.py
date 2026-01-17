@@ -465,27 +465,70 @@ SECURITY_ATTEMPT_WINDOW = int(os.environ.get('SECURITY_ATTEMPT_WINDOW', 300))
 # ============================================================================
 # CACHE CONFIGURATION (Requerido para Rate Limiting)
 # ============================================================================
-# En producción, usar Redis o Memcached para mejor rendimiento
-# El cache por defecto de Django es local-memory (suficiente para desarrollo)
+# En producción con múltiples instancias, usar Redis
+# El cache por defecto de Django es local-memory (suficiente para 1 instancia)
 
-CACHES = {
-    'default': {
-        # En desarrollo: cache en memoria
-        'BACKEND': 'django.core.cache.backends.locmem.LocMemCache' if IS_DEVELOPMENT else 'django.core.cache.backends.locmem.LocMemCache',
-        'LOCATION': 'rate-limiting-cache',
-        'OPTIONS': {
-            'MAX_ENTRIES': 10000,  # Máximo de entradas en cache
+def get_cache_config() -> dict:
+    """
+    Configura el cache con soporte para Redis (si está disponible)
+    con fallback a memoria local.
+    
+    Variables de entorno:
+    - REDIS_URL: URL de conexión a Redis (redis://localhost:6379/1)
+    - CACHE_BACKEND: 'redis' o 'memory' (auto-detecta si no se especifica)
+    """
+    redis_url = os.environ.get('REDIS_URL', '').strip()
+    cache_backend = os.environ.get('CACHE_BACKEND', '').strip().lower()
+    
+    # Si se especifica Redis explícitamente o hay REDIS_URL
+    if cache_backend == 'redis' or redis_url:
+        if not redis_url:
+            redis_url = 'redis://localhost:6379/1'
+        
+        return {
+            'default': {
+                'BACKEND': 'django.core.cache.backends.redis.RedisCache',
+                'LOCATION': redis_url,
+                'OPTIONS': {
+                    'CLIENT_CLASS': 'django_redis.client.DefaultClient',
+                },
+                'KEY_PREFIX': 'ecommerce',
+                'TIMEOUT': 300,  # 5 minutos default
+            }
+        }
+    
+    # Fallback: cache en memoria local
+    return {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'rate-limiting-cache',
+            'OPTIONS': {
+                'MAX_ENTRIES': 10000,
+            }
         }
     }
-}
 
-# NOTA: Para producción con múltiples instancias, configurar Redis:
-# CACHES = {
-#     'default': {
-#         'BACKEND': 'django.core.cache.backends.redis.RedisCache',
-#         'LOCATION': os.environ.get('REDIS_URL', 'redis://localhost:6379/1'),
-#     }
-# }
+
+# Intentar configurar Redis, con fallback a memoria
+try:
+    CACHES = get_cache_config()
+    
+    # Detectar backend para logging
+    _cache_backend = 'redis' if 'redis' in CACHES['default']['BACKEND'].lower() else 'memory'
+    
+except Exception as e:
+    # Si falla Redis, usar memoria local
+    print(f"WARNING: Error configurando cache, usando memoria local: {e}", file=sys.stderr)
+    CACHES = {
+        'default': {
+            'BACKEND': 'django.core.cache.backends.locmem.LocMemCache',
+            'LOCATION': 'rate-limiting-cache',
+            'OPTIONS': {
+                'MAX_ENTRIES': 10000,
+            }
+        }
+    }
+    _cache_backend = 'memory'
 
 # ============================================================================
 # SECURITY CHECKS (VALIDACIÓN AL ARRANQUE)
@@ -502,5 +545,7 @@ if not os.environ.get('DJANGO_SETTINGS_SUPPRESS_INFO'):
     print(f"SSL Redirect: {SECURE_SSL_REDIRECT}")
     print(f"Secure Cookies: {SESSION_COOKIE_SECURE}")
     print(f"HSTS Enabled: {SECURE_HSTS_SECONDS > 0}")
+    print(f"Cache Backend: {_cache_backend}")
     print(f"JWT Enabled: True (Access: 15min, Refresh: 1day)")
+    print(f"Statement Timeout: {os.environ.get('DB_STATEMENT_TIMEOUT_MS', '30000')}ms")
     print("=" * 70)

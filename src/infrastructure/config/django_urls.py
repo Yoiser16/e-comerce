@@ -13,7 +13,19 @@ from interfaces.api.rest.views.auth_views import (
     PerfilUsuarioView,
 )
 
+# Importar health checks
+from interfaces.api.rest.views.health_view import (
+    HealthCheckView,
+    ReadinessCheckView,
+    LivenessCheckView,
+)
+
 urlpatterns = [
+    # Health Checks (públicos, sin autenticación)
+    path('health', HealthCheckView.as_view(), name='health-check'),
+    path('ready', ReadinessCheckView.as_view(), name='readiness-check'),
+    path('live', LivenessCheckView.as_view(), name='liveness-check'),
+    
     path('admin/', admin.site.urls),
     
     # Autenticación JWT

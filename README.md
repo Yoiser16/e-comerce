@@ -27,6 +27,7 @@
 - [API REST](#-api-rest)
 - [Modelado de Dominio](#-modelado-de-dominio)
 - [Base de Datos](#-base-de-datos)
+- [Mejoras Operativas para Producción](#-mejoras-operativas-para-producción)
 - [Testing](#-testing)
 
 ---
@@ -542,6 +543,89 @@ python manage.py migrate
 
 # Ver migraciones pendientes
 python manage.py showmigrations
+```
+
+---
+
+## 🏥 Mejoras Operativas para Producción
+
+### Health Check Endpoints
+
+El sistema incluye endpoints de monitoreo para orquestadores (Kubernetes, Docker Swarm, load balancers):
+
+| Endpoint | Propósito | Uso |
+|----------|-----------|-----|
+| `GET /health` | Estado general del sistema | Load balancers |
+| `GET /ready` | Readiness probe | Kubernetes |
+| `GET /live` | Liveness probe | Kubernetes |
+
+```bash
+# Verificar estado
+curl http://localhost:8000/health
+
+# Respuesta esperada
+{
+  "status": "healthy",
+  "timestamp": "2025-01-15T10:30:00Z",
+  "components": {
+    "database": "ok",
+    "cache": "ok"
+  }
+}
+```
+
+### Statement Timeout de PostgreSQL
+
+Consultas se cancelan automáticamente después de 30 segundos para prevenir bloqueos:
+
+```env
+# Configurar en .env (milisegundos)
+DB_STATEMENT_TIMEOUT_MS=30000
+```
+
+### Configuración de Cache
+
+El sistema auto-detecta Redis si está disponible, con fallback a memoria local:
+
+```env
+# Usar Redis (recomendado para multi-instancia)
+REDIS_URL=redis://localhost:6379/1
+CACHE_BACKEND=redis
+
+# O usar memoria local (default si Redis no está configurado)
+CACHE_BACKEND=memory
+```
+
+### Backups de PostgreSQL
+
+Scripts incluidos para backups automáticos:
+
+```bash
+# Linux/Mac
+./scripts/backup_postgres.sh
+
+# Windows
+scripts\backup_postgres.bat
+```
+
+Variables requeridas:
+```env
+PGHOST=localhost
+PGPORT=5432
+PGUSER=postgres
+PGPASSWORD=tu_password
+PGDATABASE=ecommerce
+BACKUP_DIR=/path/to/backups
+```
+
+### Validar Mejoras Operativas
+
+```bash
+# Verificar todas las mejoras
+python scripts/validar_mejoras_operativas.py
+
+# Sin verificar endpoints HTTP (si el servidor no está corriendo)
+python scripts/validar_mejoras_operativas.py --skip-http
 ```
 
 ---

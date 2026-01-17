@@ -110,12 +110,18 @@ class DatabaseConfig:
                     'sslmode': db_ssl_mode,
                     # Optimizaciones de conexión
                     'connect_timeout': 10,
-                    'options': '-c search_path=public',
+                    'options': '-c search_path=public -c statement_timeout=30000',
                 },
                 'CONN_MAX_AGE': int(os.environ.get('DB_CONN_MAX_AGE', '600')),
                 'ATOMIC_REQUESTS': os.environ.get('DB_ATOMIC_REQUESTS', 'True') == 'True',
             }
         }
+        
+        # Statement timeout configurable (default 30 segundos)
+        statement_timeout_ms = int(os.environ.get('DB_STATEMENT_TIMEOUT_MS', '30000'))
+        config['default']['OPTIONS']['options'] = (
+            f'-c search_path=public -c statement_timeout={statement_timeout_ms}'
+        )
         
         # Configuración adicional para pool de conexiones en producción
         environment = os.environ.get('DJANGO_ENVIRONMENT', 'development')
