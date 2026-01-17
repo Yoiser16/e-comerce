@@ -1,8 +1,8 @@
 <div align="center">
 
-# 🛒 E-Commerce - Clean Architecture & DDD
+# Sistema Empresarial de Gestión - Clean Architecture
 
-### Enterprise System with CQRS and Event-Driven Architecture
+### Sistema Empresarial con CQRS y Arquitectura Orientada a Eventos
 
 [![Python](https://img.shields.io/badge/Python-3.14+-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
 [![Django](https://img.shields.io/badge/Django-6.0-092E20?style=flat-square&logo=django&logoColor=white)](https://www.djangoproject.com/)
@@ -14,141 +14,143 @@
 
 ---
 
-## 📋 Overview
+## 📋 Visión General
 
-**E-Commerce** is an enterprise-grade system designed strictly following **Clean Architecture**, **Domain-Driven Design (DDD)**, and **CQRS** patterns. It decouples business logic from external frameworks, ensuring maintainability, testability, and scalability.
+Este proyecto es un sistema empresarial diseñado estrictamente siguiendo **Clean Architecture**, **Domain-Driven Design (DDD)**, y patrones **CQRS**. Desacopla la lógica de negocio de los frameworks externos, asegurando mantenibilidad, testabilidad y escalabilidad.
 
-This project demonstrates how to build complex Python applications where the core business rules are protected from technological changes (like swapping a database or web framework).
+Este proyecto demuestra cómo construir aplicaciones Python complejas donde las reglas de negocio están protegidas de cambios tecnológicos (como cambiar la base de datos o el framework web).
 
 ---
 
-## 🏗️ Architecture
+## 🏗️ Arquitectura
 
-The system is organized into concentric layers, with dependencies pointing **inwards**. The inner layers know nothing about the outer layers.
+Este proyecto implementa **Clean Architecture / Hexagonal Architecture** estrictamente.
+
+### Capas
+
+El sistema está organizado en capas concéntricas, con dependencias apuntando **hacia adentro**. Las capas internas no conocen nada de las externas.
+
+```text
+src/
+├── domain/         # Núcleo de negocio (sin dependencias externas)
+├── application/    # Casos de uso y lógica de aplicación
+├── infrastructure/ # Implementaciones técnicas (DB, logging, etc.)
+├── interfaces/     # APIs y puntos de entrada
+└── shared/         # Componentes compartidos
+```
 
 ```mermaid
 graph TD
-    subgraph Infrastructure [Infrastructure Layer]
+    subgraph Infrastructure [Capa de Infraestructura]
         DB[(PostgreSQL)]
         ORM[Django ORM]
-        RepoImpl[Repository Impl]
-        Auth[Auth Service]
+        RepoImpl[Implementación Repositorios]
+        Auth[Servicio Auth]
     end
 
-    subgraph Interfaces [Interface Layer]
+    subgraph Interfaces [Capa de Interfaces]
         API[FastAPI / Django Views]
-        CLI[Management Commands]
+        CLI[Comandos de Gestión]
     end
 
-    subgraph Application [Application Layer]
-        UC[Use Cases]
+    subgraph Application [Capa de Aplicación]
+        UC[Casos de Uso]
         DTO[DTOs]
-        Ports[Input/Output Ports]
+        Ports[Puertos Entrada/Salida]
     end
 
-    subgraph Domain [Domain Layer]
-        Entity[Entities]
+    subgraph Domain [Capa de Dominio]
+        Entity[Entidades]
         VO[Value Objects]
-        RepoInt[Repository Interfaces]
-        Events[Domain Events]
+        RepoInt[Interfaces Repositorios]
+        Events[Eventos de Dominio]
     end
 
     Interfaces --> Application
     Infrastructure --> Domain
     Application --> Domain
-    RepoImpl -. implements .-> RepoInt
+    RepoImpl -. implementa .-> RepoInt
     
     style Domain fill:#e1f5fe,stroke:#01579b,stroke-width:2px
     style Application fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
 ```
 
-### 🗝️ Key Technical Concepts
+### Principios
 
-This documentation addresses critical architectural decisions often overlooked:
-
-#### 1. The Dependency Rule
-Source code dependencies must only point inward.
-*   **Domain Layer**: Pure Python codes. NO dependencies on frameworks (Django, FastAPI), SQL, or HTTP. This is the heart of the software.
-*   **Application Layer**: Orchestrates data flow. Contains `Use Cases` (e.g., `CreateOrder`). Depends only on the Domain.
-*   **Infrastructure Layer**: Implements details. Here reside the Database adapters, File System I/O, and 3rd party API clients.
-
-#### 2. DTOs vs Entities vs ORM Models
-We strictly separate data structures to prevent coupling:
-*   **Domain Entities**: Rich objects with behavior and business rules (e.g., `cliente.activar()`).
-*   **ORM Models**: Database schema representations (Django Models). Used **only** in the Infrastructure Repository implementations.
-*   **DTOs (Data Transfer Objects)**: Simple data containers used to pass data between the API (Interface) and Use Cases (Application). They have no behavior.
-
-#### 3. Repository Pattern
-We use the Repository pattern to decouple the Domain from the Data Access Layer.
-*   **Interface**: Defined in the Domain (e.g., `IOrderRepository`).
-*   **Implementation**: Defined in Infrastructure (e.g., `DjangoOrderRepository`).
-*   **Benefit**: We can swap Django ORM for SQLAlchemy or raw SQL without touching a single line of business logic.
+*   **Dominio puro**: Sin dependencias a frameworks (Django, FastAPI), SQL o HTTP.
+*   **Inversión de dependencias**: La infraestructura depende del dominio, nunca al revés.
+*   **Separación de responsabilidades**: Cada capa tiene un propósito claro.
+*   **Preparado para escalar**: Arquitectura orientada a eventos (Event-Driven) lista para implementar.
 
 ---
 
-## 🚀 Features
+## 🚀 Características
 
-*   **Clean Architecture Strict Compliance**: No framework leakage into business logic.
-*   **CQRS Ready**: Separate models for Reading (Queries) and Writing (Commands).
-*   **Event-Driven**: Domain events for side effects (e.g., "Email sent when Order Placed").
-*   **Dual Framework Support**: Uses Django for Admin/ORM and FastAPI for high-performance Async APIs.
-*   **Robust Error Handling**: Centralized exception handling mapped to HTTP status codes.
-
----
-
-## 🛠️ Tech Stack
-
-| Component | Technology | Version | Purpose |
-|ops |---|---|---|
-| **Language** | Python | 3.14+ | Core logic and typing |
-| **Framework** | Django | 6.0 | ORM, Admin Panel, Migrations |
-| **API** | FastAPI | 0.128 | High-performance Async REST API |
-| **Database** | PostgreSQL | 18.1 | Primary Data Store |
-| **Linting** | Black / Flake8 | Latest | Code quality and formatting |
+*   **Cumplimiento Estricto de Clean Architecture**: Sin fugas de framework en la lógica de negocio.
+*   **CQRS Ready**: Modelos separados para Lectura (Queries) y Escritura (Commands).
+*   **Event-Driven**: Eventos de dominio para efectos secundarios (ej. "Enviar email cuando se crea orden").
+*   **Soporte Dual de Framework**: Usa Django para Admin/ORM y FastAPI para APIs asíncronas de alto rendimiento.
+*   **Manejo Robusto de Errores**: Manejo de excepciones centralizado mapeado a códigos de estado HTTP.
 
 ---
 
-## 📂 Project Structure
+## 🛠️ Tecnologías Base
+
+| Componente | Tecnología | Versión | Propósito |
+|---|---|---|---|
+| **Lenguaje** | Python | 3.14+ | Lógica principal y tipado |
+| **Framework** | Django | 6.0 | ORM, Panel de Admin, Migraciones |
+| **API** | FastAPI | 0.128 | API REST Async de alto rendimiento |
+| **Base de Datos** | PostgreSQL | 18.1 | Almacenamiento de Datos (Desacoplado por repositorios) |
+| **Linting** | Black / Flake8 | Latest | Calidad de código y formato |
+
+---
+
+## 📂 Estructura del Proyecto
 
 ```bash
 src/
-├── domain/                  # 🧠 CORE BUSINESS LOGIC (Pure Python)
-│   ├── entities/            # Business Objects (User, Order)
-│   ├── value_objects/       # Immutable attributes (Email, Money)
-│   ├── repositories/        # Interfaces only!
-│   └── events/              # Domain Events
+├── domain/                  # 🧠 LÓGICA DE NEGOCIO (Python Puro)
+│   ├── entities/            # Objetos de Negocio (Cliente, Producto, Orden)
+│   ├── value_objects/       # Atributos inmutables (Email, Dinero)
+│   ├── repositories/        # Interfaces solamente!
+│   └── events/              # Eventos de Dominio
 │
-├── application/             # 💼 ORCHESTRATION
-│   ├── use_cases/           # Application specific business rules
-│   └── dto/                 # Data contracts
+├── application/             # 💼 ORQUESTACIÓN
+│   ├── use_cases/           # Reglas de negocio específicas de la aplicación
+│   └── dto/                 # Contratos de datos
 │
-├── infrastructure/          # 🔌 ADAPTERS & IO
-│   ├── persistence/         # Repository Implementations (Django ORM)
-│   ├── logging/             # Logging adapters
-│   └── config/              # Framework settings
+├── infrastructure/          # 🔌 ADAPTADORES & IO
+│   ├── persistence/         # Implementación de Repositorios (Django ORM)
+│   ├── logging/             # Adaptadores de logging
+│   └── config/              # Configuraciones del Framework
 │
-└── interfaces/              # 🗣️ DELIVERY MECHANISMS
-    ├── api/                 # FastAPI Routes
-    └── management/          # CLI Commands
+├── interfaces/              # 🗣️ MECANISMOS DE ENTREGA
+│   ├── api/                 # Rutas FastAPI
+│   └── management/          # Comandos CLI
+│
+└── shared/                  # 🔗 COMPONENTES COMPARTIDOS
+    ├── exceptions/          # Excepciones base
+    └── utils/               # Utilidades generales
 ```
 
 ---
 
-## 💻 Getting Started
+## 💻 Comenzando
 
-### Prerequisites
+### Prerrequisitos
 *   Python 3.14+
 *   PostgreSQL
 
-### Installation
+### Instalación
 
-1.  **Clone the repository**
+1.  **Clonar el repositorio**
     ```bash
-    git clone https://github.com/your-repo/ecommerce.git
+    git clone https://github.com/tu-repo/ecommerce.git
     cd ecommerce
     ```
 
-2.  **Create Virtual Environment**
+2.  **Crear Entorno Virtual**
     ```bash
     python -m venv venv
     # Windows:
@@ -157,55 +159,55 @@ src/
     source venv/bin/activate
     ```
 
-3.  **Install Dependencies**
+3.  **Instalar Dependencias**
     ```bash
     pip install -r requirements.txt
     ```
 
-4.  **Configuration**
-    Copy the example env file and update your DB credentials:
+4.  **Configuración**
+    Copia el archivo de ejemplo y actualiza tus credenciales de BD:
     ```bash
     cp .env.example .env
     ```
 
-5.  **Run Migrations**
+5.  **Ejecutar Migraciones**
     ```bash
     python manage.py migrate
     ```
 
-6.  **Run Development Server**
-    *   **Django (Admin/Commands)**: `python manage.py runserver`
+6.  **Ejecutar Servidor de Desarrollo**
+    *   **Django (Admin/Comandos)**: `python manage.py runserver`
     *   **FastAPI (API)**: `uvicorn src.main:app --reload`
 
 ---
 
-## 🧪 Testing
+## 🧪 Pruebas
 
-We use `pytest` for comprehensive testing.
+Usamos `pytest` para pruebas exhaustivas.
 
 ```bash
-# Run all tests
+# Ejecutar todas las pruebas
 pytest
 
-# Run only domain tests (Fast, no DB)
+# Ejecutar solo pruebas de dominio (Rápidas, sin BD)
 pytest tests/domain/
 
-# Run with coverage
+# Ejecutar con cobertura
 pytest --cov=src --cov-report=html
 ```
 
 ---
 
-## 📚 Documentation & UML
+## 📚 Documentación y UML
 
-This project maintains detailed UML diagrams to visualize the architecture.
-See [**docs/UML_DIAGRAMS.md**](docs/UML_DIAGRAMS.md) for:
-*   Class Diagrams (Domain relationships)
-*   Sequence Diagrams (Request flow)
-*   ER Diagrams (Database Schema)
+Este proyecto mantiene diagramas UML detallados para visualizar la arquitectura.
+Ver [**docs/UML_DIAGRAMS.md**](docs/UML_DIAGRAMS.md) para:
+*   Diagramas de Clases (Relaciones de dominio)
+*   Diagramas de Secuencia (Flujo de peticiones)
+*   Diagramas ER (Esquema de Base de Datos)
 
 ---
 
 <div align="center">
-    <sub>Built with ❤️ using Clean Architecture principles.</sub>
+    <sub>Construido con ❤️ usando principios de Clean Architecture.</sub>
 </div>
