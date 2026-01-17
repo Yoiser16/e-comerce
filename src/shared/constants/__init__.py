@@ -1,0 +1,1 @@
+"""Constants - Constantes del sistema"""
