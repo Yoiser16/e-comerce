@@ -6,7 +6,7 @@ from typing import List
 from uuid import UUID
 from .base import RepositorioBase
 from ..entities.orden import Orden
-from ...shared.enums.estados import EstadoOrden
+from shared.enums.estados import EstadoOrden
 
 
 class OrdenRepository(RepositorioBase[Orden]):

@@ -10,7 +10,7 @@ from .base import EntidadBase
 from ..value_objects.dinero import Dinero
 from ..value_objects.linea_orden import LineaOrden
 from ..exceptions.dominio import ReglaNegocioViolada
-from ...shared.enums.estados import EstadoOrden
+from shared.enums.estados import EstadoOrden
 
 
 class Orden(EntidadBase):

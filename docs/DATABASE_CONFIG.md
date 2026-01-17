@@ -9,19 +9,19 @@ siguiendo los principios de Clean Architecture.
 
 ## ARQUITECTURA
 
-```
-┌─────────────────────────────────────────────────────────────┐
-│                     CLEAN ARCHITECTURE                       │
-├─────────────────────────────────────────────────────────────┤
-│  Domain Layer (entities, value objects, repositories)       │
-│         ↓ NO conoce la infraestructura                      │
-│  Application Layer (use cases, DTOs)                        │
-│         ↓ Depende de abstracciones                          │
-│  Infrastructure Layer                                        │
-│    ├── database_config.py (Configuración centralizada)      │
-│    ├── django_settings.py (Integración Django)              │
-│    └── repositories (Implementaciones concretas)            │
-└─────────────────────────────────────────────────────────────┘
+```mermaid
+graph TD
+    Domain[Domain Layer]
+    App[Application Layer]
+    Infra[Infrastructure Layer]
+    
+    App -->|Depends on| Domain
+    Infra -->|Depends on| Domain
+    Infra -->|at runtime| App
+    
+    style Domain fill:#e1f5fe,stroke:#01579b
+    style App fill:#e8f5e9,stroke:#2e7d32
+    style Infra fill:#fff3e0,stroke:#ef6c00
 ```
 
 ## COMPONENTES

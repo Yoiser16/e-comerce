@@ -1,759 +1,211 @@
 <div align="center">
 
-# 🛒 E-Commerce - Clean Architecture
+# 🛒 E-Commerce - Clean Architecture & DDD
 
-### Sistema Empresarial de Gestión con DDD, CQRS y Event-Driven Architecture
+### Enterprise System with CQRS and Event-Driven Architecture
 
-[![Python](https://img.shields.io/badge/Python-3.14+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://www.python.org/)
-[![Django](https://img.shields.io/badge/Django-6.0-092E20?style=for-the-badge&logo=django&logoColor=white)](https://www.djangoproject.com/)
-[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18.1-4169E1?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
-[![FastAPI](https://img.shields.io/badge/FastAPI-0.128-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
-
-[![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=for-the-badge)](LICENSE)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=for-the-badge)](CONTRIBUTING.md)
-[![Code Style](https://img.shields.io/badge/code%20style-black-000000.svg?style=for-the-badge)](https://github.com/psf/black)
-
----
-
-### 🎯 Clean Architecture • 🔄 CQRS Ready • 📊 Event-Driven • 🚀 Production Ready
+[![Python](https://img.shields.io/badge/Python-3.14+-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![Django](https://img.shields.io/badge/Django-6.0-092E20?style=flat-square&logo=django&logoColor=white)](https://www.djangoproject.com/)
+[![PostgreSQL](https://img.shields.io/badge/PostgreSQL-18.1-4169E1?style=flat-square&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.128-009688?style=flat-square&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com/)
+[![License](https://img.shields.io/badge/License-MIT-yellow.svg?style=flat-square)](LICENSE)
 
 </div>
 
 ---
 
-## 📑 Tabla de Contenidos
+## 📋 Overview
 
-- [🎯 Vision General](#-vision-general)
-- [🏗️ Arquitectura](#️-arquitectura)
-- [📂 Estructura del Proyecto](#-estructura-del-proyecto)
-- [🎨 Diagramas UML](#-diagramas-uml)
-- [⚙️ Tecnologias](#️-tecnologias)
-- [💻 Instalacion](#-instalacion)
-- [🔧 Configuracion](#-configuracion)
-- [🚀 Uso](#-uso)
-- [🧪 Testing](#-testing)
-- [📦 Deployment](#-deployment)
-- [📚 Documentacion](#-documentacion)
-- [🤝 Contribucion](#-contribucion)
+**E-Commerce** is an enterprise-grade system designed strictly following **Clean Architecture**, **Domain-Driven Design (DDD)**, and **CQRS** patterns. It decouples business logic from external frameworks, ensuring maintainability, testability, and scalability.
+
+This project demonstrates how to build complex Python applications where the core business rules are protected from technological changes (like swapping a database or web framework).
 
 ---
 
-## 🎯 Vision General
+## 🏗️ Architecture
 
-**E-Commerce** es un sistema empresarial diseñado siguiendo los principios de **Clean Architecture** (Arquitectura Hexagonal), **Domain-Driven Design (DDD)** y **CQRS**, que garantiza:
+The system is organized into concentric layers, with dependencies pointing **inwards**. The inner layers know nothing about the outer layers.
 
-<table>
-<tr>
-<td width="50%">
+```mermaid
+graph TD
+    subgraph Infrastructure [Infrastructure Layer]
+        DB[(PostgreSQL)]
+        ORM[Django ORM]
+        RepoImpl[Repository Impl]
+        Auth[Auth Service]
+    end
 
-### ✨ Características Principales
+    subgraph Interfaces [Interface Layer]
+        API[FastAPI / Django Views]
+        CLI[Management Commands]
+    end
 
-- 🎯 **Clean Architecture** estricta
-- 🔄 **Domain-Driven Design**
-- 📊 **CQRS Ready**
-- 🚀 **Event-Driven preparado**
-- 🔒 **Seguridad por diseño**
-- 📈 **Altamente escalable**
+    subgraph Application [Application Layer]
+        UC[Use Cases]
+        DTO[DTOs]
+        Ports[Input/Output Ports]
+    end
 
-</td>
-<td width="50%">
+    subgraph Domain [Domain Layer]
+        Entity[Entities]
+        VO[Value Objects]
+        RepoInt[Repository Interfaces]
+        Events[Domain Events]
+    end
 
-### 🛡️ Principios SOLID
-
-- ✅ Single Responsibility
-- ✅ Open/Closed
-- ✅ Liskov Substitution
-- ✅ Interface Segregation
-- ✅ Dependency Inversion
-
-</td>
-</tr>
-</table>
-
-### 📊 Estado del Proyecto
-
-<div align="center">
-
-```
-╔══════════════════════════════════════════════════════════════════╗
-║             PROGRESO DE DESARROLLO - FASE 1                     ║
-╠══════════════════════════════════════════════════════════════════╣
-║  ███████████████████████████████░░░░░░░░   80% Completado       ║
-╚══════════════════════════════════════════════════════════════════╝
+    Interfaces --> Application
+    Infrastructure --> Domain
+    Application --> Domain
+    RepoImpl -. implements .-> RepoInt
+    
+    style Domain fill:#e1f5fe,stroke:#01579b,stroke-width:2px
+    style Application fill:#e8f5e9,stroke:#2e7d32,stroke-width:2px
 ```
 
-| Componente | Estado | Progreso |
-|------------|--------|----------|
-| 🎯 Domain Layer | ✅ Completado | ![100%](https://progress-bar.dev/100?width=120&color=green) |
-| 📋 Application Layer | ✅ Completado | ![100%](https://progress-bar.dev/100?width=120&color=green) |
-| 🔧 Infrastructure Layer | ✅ Completado | ![90%](https://progress-bar.dev/90?width=120&color=blue) |
-| 🗄️ PostgreSQL Integration | ✅ Completado | ![100%](https://progress-bar.dev/100?width=120&color=green) |
-| 📝 Auditoría y Logging | ✅ Completado | ![100%](https://progress-bar.dev/100?width=120&color=green) |
-| 🌐 FastAPI Endpoints | ⏳ En progreso | ![30%](https://progress-bar.dev/30?width=120&color=yellow) |
-| 🔐 Autenticación JWT | ⏳ Pendiente | ![0%](https://progress-bar.dev/0?width=120&color=red) |
-| 🧪 Testing Suite | ⏳ Pendiente | ![0%](https://progress-bar.dev/0?width=120&color=red) |
+### 🗝️ Key Technical Concepts
 
-</div>
+This documentation addresses critical architectural decisions often overlooked:
+
+#### 1. The Dependency Rule
+Source code dependencies must only point inward.
+*   **Domain Layer**: Pure Python codes. NO dependencies on frameworks (Django, FastAPI), SQL, or HTTP. This is the heart of the software.
+*   **Application Layer**: Orchestrates data flow. Contains `Use Cases` (e.g., `CreateOrder`). Depends only on the Domain.
+*   **Infrastructure Layer**: Implements details. Here reside the Database adapters, File System I/O, and 3rd party API clients.
+
+#### 2. DTOs vs Entities vs ORM Models
+We strictly separate data structures to prevent coupling:
+*   **Domain Entities**: Rich objects with behavior and business rules (e.g., `cliente.activar()`).
+*   **ORM Models**: Database schema representations (Django Models). Used **only** in the Infrastructure Repository implementations.
+*   **DTOs (Data Transfer Objects)**: Simple data containers used to pass data between the API (Interface) and Use Cases (Application). They have no behavior.
+
+#### 3. Repository Pattern
+We use the Repository pattern to decouple the Domain from the Data Access Layer.
+*   **Interface**: Defined in the Domain (e.g., `IOrderRepository`).
+*   **Implementation**: Defined in Infrastructure (e.g., `DjangoOrderRepository`).
+*   **Benefit**: We can swap Django ORM for SQLAlchemy or raw SQL without touching a single line of business logic.
 
 ---
 
----
+## 🚀 Features
 
-## 🏗️ Arquitectura
-
-<div align="center">
-
-### Clean Architecture - Diagrama de Capas
-
-```
-╔═══════════════════════════════════════════════════════════════════╗
-║                    🌐 INTERFACES LAYER                            ║
-║  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐           ║
-║  │   FastAPI    │  │    Django    │  │     CLI      │           ║
-║  │   Routers    │  │    Admin     │  │   Commands   │           ║
-║  └──────────────┘  └──────────────┘  └──────────────┘           ║
-╚═══════════════════════════════════╦═══════════════════════════════╝
-                                    ║
-╔═══════════════════════════════════╩═══════════════════════════════╗
-║                    📋 APPLICATION LAYER                           ║
-║  ┌────────────────────────────────────────────────────────────┐  ║
-║  │           Use Cases (Casos de Uso)                         │  ║
-║  │  • CrearClienteUseCase                                     │  ║
-║  │  • ObtenerClienteUseCase                                   │  ║
-║  │  • ActualizarClienteUseCase                                │  ║
-║  └────────────────────────────────────────────────────────────┘  ║
-║  ┌────────────────────────────────────────────────────────────┐  ║
-║  │           DTOs (Data Transfer Objects)                     │  ║
-║  └────────────────────────────────────────────────────────────┘  ║
-╚═══════════════════════════════════╦═══════════════════════════════╝
-                                    ║
-╔═══════════════════════════════════╩═══════════════════════════════╗
-║                    🎯 DOMAIN LAYER (CORE)                         ║
-║  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐           ║
-║  │  Entities    │  │Value Objects │  │ Repositories │           ║
-║  │  • Cliente   │  │  • Email     │  │ (Interfaces) │           ║
-║  │  • Producto  │  │  • Telefono  │  │              │           ║
-║  │  • Orden     │  │  • Dinero    │  │              │           ║
-║  └──────────────┘  └──────────────┘  └──────────────┘           ║
-║  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐           ║
-║  │    Events    │  │  Exceptions  │  │   Policies   │           ║
-║  └──────────────┘  └──────────────┘  └──────────────┘           ║
-╚═══════════════════════════════════╦═══════════════════════════════╝
-                                    ║
-╔═══════════════════════════════════╩═══════════════════════════════╗
-║                    🔧 INFRASTRUCTURE LAYER                        ║
-║  ┌──────────────┐  ┌──────────────┐  ┌──────────────┐           ║
-║  │ Repositories │  │  PostgreSQL  │  │   Logging    │           ║
-║  │  (Impl)      │  │  Django ORM  │  │  Auditing    │           ║
-║  └──────────────┘  └──────────────┘  └──────────────┘           ║
-╚═══════════════════════════════════════════════════════════════════╝
-```
-
-### 🔄 Flujo de Dependencias
-
-```
-┌─────────────┐       ┌─────────────┐       ┌─────────────┐
-│  Interface  │ ────▶ │ Application │ ────▶ │   Domain    │
-│   Layer     │       │    Layer    │       │    Layer    │
-└─────────────┘       └─────────────┘       └─────────────┘
-                               ▲                     ▲
-                               │                     │
-                      ┌────────┴─────────┐          │
-                      │ Infrastructure   │──────────┘
-                      │     Layer        │
-                      └──────────────────┘
-```
-
-> **⚠️ REGLA DE ORO**: Las dependencias SIEMPRE apuntan hacia el dominio
-
-</div>
-┌─────────────┐       ┌─────────────┐       ┌─────────────┐
-│  Interface  │ ────> │ Application │ ────> │   Domain    │
-└─────────────┘       └─────────────┘       └─────────────┘
-                             ▲                      ▲
-                             │                      │
-                      ┌──────┴──────┐              │
-                      │Infrastructure│──────────────┘
-                      └─────────────┘
-```
-
-**Regla de Oro**: Las dependencias SIEMPRE apuntan hacia el dominio.
+*   **Clean Architecture Strict Compliance**: No framework leakage into business logic.
+*   **CQRS Ready**: Separate models for Reading (Queries) and Writing (Commands).
+*   **Event-Driven**: Domain events for side effects (e.g., "Email sent when Order Placed").
+*   **Dual Framework Support**: Uses Django for Admin/ORM and FastAPI for high-performance Async APIs.
+*   **Robust Error Handling**: Centralized exception handling mapped to HTTP status codes.
 
 ---
 
-## Estructura del Proyecto
+## 🛠️ Tech Stack
 
-```
-e-comerce/
-├── src/
-│   ├── domain/                    # ⭐ NUCLEO DE NEGOCIO
-│   │   ├── entities/              # Entidades del dominio
-│   │   │   ├── base.py
-│   │   │   ├── cliente.py         # ✅ Implementado
-│   │   │   ├── orden.py
-│   │   │   └── producto.py
-│   │   ├── value_objects/         # Objetos de valor
-│   │   │   ├── email.py           # ✅ Implementado
-│   │   │   ├── telefono.py        # ✅ Implementado
-│   │   │   ├── documento_identidad.py  # ✅ Implementado
-│   │   │   ├── dinero.py
-│   │   │   └── linea_orden.py
-│   │   ├── repositories/          # Interfaces de repositorios
-│   │   │   ├── cliente_repository.py  # ✅ Interface
-│   │   │   ├── orden_repository.py
-│   │   │   └── producto_repository.py
-│   │   ├── events/                # Eventos de dominio
-│   │   ├── exceptions/            # Excepciones de dominio
-│   │   └── policies/              # Politicas de negocio
-│   │
-│   ├── application/               # ⚙️ CASOS DE USO
-│   │   ├── use_cases/
-│   │   │   ├── cliente_use_cases.py   # ✅ Implementado
-│   │   │   └── orden_use_cases.py
-│   │   ├── dto/                   # Data Transfer Objects
-│   │   │   ├── cliente_dto.py     # ✅ Implementado
-│   │   │   └── orden_dto.py
-│   │   ├── commands/              # Comandos CQRS
-│   │   └── queries/               # Queries CQRS
-│   │
-│   ├── infrastructure/            # 🔧 IMPLEMENTACIONES TECNICAS
-│   │   ├── persistence/
-│   │   │   ├── django/
-│   │   │   │   ├── models.py      # ✅ ClienteModel
-│   │   │   │   ├── migrations/    # ✅ 0001_initial
-│   │   │   │   └── admin.py
-│   │   │   └── repositories/
-│   │   │       └── cliente_repository_impl.py  # ✅ Implementado
-│   │   ├── config/
-│   │   │   ├── django_settings.py     # ✅ Configuracion Django
-│   │   │   └── database_config.py     # ✅ Config PostgreSQL
-│   │   ├── logging/
-│   │   │   └── logger_service.py      # ✅ Logging estructurado
-│   │   ├── auditing/
-│   │   │   └── servicio_auditoria.py  # ✅ Sistema de auditoria
-│   │   └── management/
-│   │       └── commands/
-│   │           ├── validar_sistema.py     # ✅ Comando validacion
-│   │           └── check_database.py      # ✅ Comando DB check
-│   │
-│   ├── interfaces/                # 🌐 PUNTOS DE ENTRADA
-│   │   ├── api/
-│   │   │   └── fastapi/
-│   │   │       ├── app.py
-│   │   │       └── cliente_router.py
-│   │   └── permissions/
-│   │
-│   ├── shared/                    # 🔄 COMPARTIDO
-│   │   ├── enums/
-│   │   ├── constants/
-│   │   ├── errors/
-│   │   └── utils/
-│   │
-│   └── main.py                    # 🚀 Punto de entrada
+| Component | Technology | Version | Purpose |
+|ops |---|---|---|
+| **Language** | Python | 3.14+ | Core logic and typing |
+| **Framework** | Django | 6.0 | ORM, Admin Panel, Migrations |
+| **API** | FastAPI | 0.128 | High-performance Async REST API |
+| **Database** | PostgreSQL | 18.1 | Primary Data Store |
+| **Linting** | Black / Flake8 | Latest | Code quality and formatting |
+
+---
+
+## 📂 Project Structure
+
+```bash
+src/
+├── domain/                  # 🧠 CORE BUSINESS LOGIC (Pure Python)
+│   ├── entities/            # Business Objects (User, Order)
+│   ├── value_objects/       # Immutable attributes (Email, Money)
+│   ├── repositories/        # Interfaces only!
+│   └── events/              # Domain Events
 │
-├── docs/                          # 📚 DOCUMENTACION
-│   ├── ESQUEMA_DATABASE.md        # ✅ Esquema PostgreSQL
-│   ├── DATABASE_CONFIG.md         # ✅ Configuracion BD
-│   └── DEPLOYMENT_HOSTINGER.md    # Guia deployment
+├── application/             # 💼 ORCHESTRATION
+│   ├── use_cases/           # Application specific business rules
+│   └── dto/                 # Data contracts
 │
-├── scripts/                       # 🛠️ UTILIDADES
-│   ├── validar_sistema.py
-│   └── shell_commands.py
+├── infrastructure/          # 🔌 ADAPTERS & IO
+│   ├── persistence/         # Repository Implementations (Django ORM)
+│   ├── logging/             # Logging adapters
+│   └── config/              # Framework settings
 │
-├── requirements.txt               # ✅ Dependencias
-├── requirements-prod.txt
-├── manage.py                      # ✅ Django CLI
-├── .env.example                   # ✅ Variables de entorno
-└── README.md                      # ✅ Este archivo
+└── interfaces/              # 🗣️ DELIVERY MECHANISMS
+    ├── api/                 # FastAPI Routes
+    └── management/          # CLI Commands
 ```
 
 ---
 
-## Diagramas UML
+## 💻 Getting Started
 
-Para ver los diagramas completos consulta: **[docs/UML_DIAGRAMS.md](docs/UML_DIAGRAMS.md)**
+### Prerequisites
+*   Python 3.14+
+*   PostgreSQL
 
-### Preview: Diagrama de Secuencia - Crear Cliente
+### Installation
 
-```
-FastAPI -> UseCase -> Repository -> Django ORM -> PostgreSQL
-  │          │           │              │             │
-  │ POST     │ validar   │ guardar()    │ INSERT      │
-  │─────────>│──────────>│─────────────>│────────────>│
-  │          │           │              │             │
-  │<─────────│<──────────│<─────────────│<────────────│
-  │ DTO      │ Domain    │ Auditoria    │ Commit      │
-```
+1.  **Clone the repository**
+    ```bash
+    git clone https://github.com/your-repo/ecommerce.git
+    cd ecommerce
+    ```
 
-**Incluye:**
-- Diagrama de Clases (Domain Layer)
-- Diagramas de Secuencia (Use Cases)
-- Diagrama de Componentes
-- Diagrama ER (Base de Datos)
-- Diagrama de Estados (Orden)
-- Flujo de Datos por Capas
+2.  **Create Virtual Environment**
+    ```bash
+    python -m venv venv
+    # Windows:
+    .\venv\Scripts\activate
+    # Linux/Mac:
+    source venv/bin/activate
+    ```
 
----
+3.  **Install Dependencies**
+    ```bash
+    pip install -r requirements.txt
+    ```
 
-## Tecnologias
+4.  **Configuration**
+    Copy the example env file and update your DB credentials:
+    ```bash
+    cp .env.example .env
+    ```
 
-### Core
+5.  **Run Migrations**
+    ```bash
+    python manage.py migrate
+    ```
 
-| Tecnologia | Version | Proposito |
-|------------|---------|-----------|
-| Python | 3.14+ | Lenguaje principal |
-| Django | 6.0.1 | ORM, Admin, Migraciones |
-| PostgreSQL | 18.1 | Base de datos produccion |
-| FastAPI | 0.128.0 | API REST de alto rendimiento |
-
-### Librerias Principales
-
-```python
-# requirements.txt
-django>=6.0.0              # Framework web, ORM
-psycopg[binary]>=3.2.0     # Driver PostgreSQL
-fastapi>=0.115.0           # API framework
-uvicorn[standard]>=0.32.0  # ASGI server
-pydantic>=2.10.0           # Validacion de datos
-python-dotenv>=1.0.0       # Variables de entorno
-```
-
-### Herramientas de Desarrollo
-
-- **Black**: Formateo de codigo
-- **Flake8**: Linting
-- **MyPy**: Type checking
-- **Pytest**: Testing framework
-- **Coverage**: Code coverage
+6.  **Run Development Server**
+    *   **Django (Admin/Commands)**: `python manage.py runserver`
+    *   **FastAPI (API)**: `uvicorn src.main:app --reload`
 
 ---
 
-## Instalacion
+## 🧪 Testing
 
-### Prerequisitos
-
-- Python 3.14 o superior
-- PostgreSQL 14+ (instalado y corriendo)
-- Git
-- pip y venv
-
-### Paso 1: Clonar Repositorio
+We use `pytest` for comprehensive testing.
 
 ```bash
-git clone https://github.com/tu-usuario/e-comerce.git
-cd e-comerce
-```
-
-### Paso 2: Crear Entorno Virtual
-
-```bash
-# Windows
-python -m venv venv
-venv\\Scripts\\activate
-
-# Linux/Mac
-python3 -m venv venv
-source venv/bin/activate
-```
-
-### Paso 3: Instalar Dependencias
-
-```bash
-# Desarrollo
-pip install -r requirements.txt
-
-# Produccion
-pip install -r requirements-prod.txt
-```
-
-### Paso 4: Configurar Variables de Entorno
-
-```bash
-# Copiar archivo de ejemplo
-cp .env.example .env
-
-# Editar .env con tus credenciales
-nano .env
-```
-
-**Variables requeridas:**
-
-```env
-# Base de datos
-DB_ENGINE=postgresql
-DB_NAME=ecomerce_db
-DB_USER=postgres
-DB_PASSWORD=tu_password
-DB_HOST=localhost
-DB_PORT=5432
-DB_SSL_MODE=disable
-
-# Django
-DJANGO_SECRET_KEY=genera-una-clave-segura
-DJANGO_DEBUG=True
-DJANGO_ALLOWED_HOSTS=localhost,127.0.0.1
-```
-
-### Paso 5: Crear Base de Datos PostgreSQL
-
-```sql
--- Conectar a PostgreSQL
-psql -U postgres
-
--- Crear base de datos
-CREATE DATABASE ecomerce_db;
-
--- Crear usuario (si es necesario)
-CREATE USER ecomerce_user WITH PASSWORD 'tu_password';
-GRANT ALL PRIVILEGES ON DATABASE ecomerce_db TO ecomerce_user;
-
--- Salir
-\\q
-```
-
-### Paso 6: Ejecutar Migraciones
-
-```bash
-python manage.py migrate
-```
-
-### Paso 7: Verificar Instalacion
-
-```bash
-# Verificar conexion a BD
-python manage.py check_database
-
-# Validar sistema completo
-python manage.py validar_sistema
-
-# Verificar Django
-python manage.py check
-```
-
-**Salida esperada:**
-```
-================================================================================
-VERIFICACION DE CONFIGURACION DE BASE DE DATOS
-================================================================================
-✅ Conexion exitosa
-   Version PostgreSQL: PostgreSQL 18.1
-📊 Tablas en la base de datos: 11
-================================================================================
-```
-
----
-
-## Configuracion
-
-### Configuracion de Base de Datos
-
-Consulta la guia completa: **[docs/DATABASE_CONFIG.md](docs/DATABASE_CONFIG.md)**
-
-**Configuracion por ambiente:**
-
-- **Desarrollo**: SQLite o PostgreSQL local
-- **Staging**: PostgreSQL con SSL
-- **Produccion**: PostgreSQL con SSL verify-full
-
-### Configuracion de Logging
-
-```python
-# src/infrastructure/config/django_settings.py
-LOGGING = {
-    'version': 1,
-    'disable_existing_loggers': False,
-    'formatters': {
-        'json': {
-            '()': 'pythonjsonlogger.jsonlogger.JsonFormatter',
-        },
-    },
-    'handlers': {
-        'console': {
-            'class': 'logging.StreamHandler',
-            'formatter': 'json',
-        },
-    },
-    'root': {
-        'handlers': ['console'],
-        'level': 'INFO',
-    },
-}
-```
-
----
-
-## Uso
-
-### Comandos Django Management
-
-```bash
-# Validar sistema completo
-python manage.py validar_sistema
-
-# Verificar configuracion de BD
-python manage.py check_database
-
-# Crear superusuario para Django Admin
-python manage.py createsuperuser
-
-# Crear nuevas migraciones
-python manage.py makemigrations
-
-# Aplicar migraciones
-python manage.py migrate
-
-# Shell interactivo
-python manage.py shell
-```
-
-### Usar el Sistema en Python
-
-```python
-# Importar casos de uso
-from application.use_cases.cliente_use_cases import CrearClienteUseCase
-from application.dto.cliente_dto import CrearClienteDTO
-from infrastructure.persistence.repositories.cliente_repository_impl import ClienteRepositoryImpl
-from shared.enums.tipos_documento import TipoDocumento
-
-# Inicializar
-repo = ClienteRepositoryImpl()
-use_case = CrearClienteUseCase(repo)
-
-# Crear cliente
-dto = CrearClienteDTO(
-    nombre="Juan",
-    apellido="Perez",
-    email="juan.perez@example.com",
-    tipo_documento=TipoDocumento.DNI,
-    numero_documento="12345678",
-    telefono="555-1234"
-)
-
-cliente = use_case.ejecutar(dto)
-print(f"Cliente creado: {cliente.id}")
-```
-
-### FastAPI (Proximo)
-
-```bash
-# Ejecutar servidor de desarrollo
-uvicorn src.main:app --reload --port 8000
-
-# Documentacion interactiva
-http://localhost:8000/docs
-```
-
----
-
-## Testing
-
-### Ejecutar Tests
-
-```bash
-# Todos los tests
+# Run all tests
 pytest
 
-# Con coverage
-pytest --cov=src --cov-report=html
-
-# Solo tests de dominio
+# Run only domain tests (Fast, no DB)
 pytest tests/domain/
 
-# Tests especificos
-pytest tests/domain/entities/test_cliente.py -v
-```
-
-### Estructura de Tests
-
-```
-tests/
-├── domain/
-│   ├── entities/
-│   │   ├── test_cliente.py
-│   │   ├── test_producto.py
-│   │   └── test_orden.py
-│   ├── value_objects/
-│   │   ├── test_email.py
-│   │   ├── test_telefono.py
-│   │   └── test_documento_identidad.py
-│   └── repositories/
-├── application/
-│   └── use_cases/
-│       └── test_cliente_use_cases.py
-├── infrastructure/
-│   └── persistence/
-│       └── test_cliente_repository_impl.py
-└── integration/
-    └── test_cliente_flow.py
+# Run with coverage
+pytest --cov=src --cov-report=html
 ```
 
 ---
 
-## Deployment
+## 📚 Documentation & UML
 
-### Deployment en Hostinger VPS
-
-Consulta la guia completa: **[docs/DEPLOYMENT_HOSTINGER.md](docs/DEPLOYMENT_HOSTINGER.md)**
-
-**Resumen:**
-
-1. Conectar por SSH al VPS
-2. Instalar dependencias (Python, PostgreSQL, Nginx)
-3. Clonar repositorio
-4. Configurar variables de entorno
-5. Ejecutar migraciones
-6. Configurar Supervisor (process manager)
-7. Configurar Nginx (reverse proxy)
-8. Activar SSL con Let's Encrypt
-
-### Docker (Opcional)
-
-```bash
-# Construir imagen
-docker build -t ecommerce:latest .
-
-# Ejecutar contenedor
-docker run -p 8000:8000 ecommerce:latest
-
-# Docker Compose
-docker-compose up -d
-```
-
----
-
-## Documentacion
-
-### Documentos Disponibles
-
-| Documento | Descripcion |
-|-----------|-------------|
-| [README.md](README.md) | Este archivo - Documentacion principal |
-| [docs/UML_DIAGRAMS.md](docs/UML_DIAGRAMS.md) | Diagramas UML completos |
-| [docs/ESQUEMA_DATABASE.md](docs/ESQUEMA_DATABASE.md) | Esquema detallado de PostgreSQL |
-| [docs/DATABASE_CONFIG.md](docs/DATABASE_CONFIG.md) | Configuracion de base de datos |
-| [docs/DEPLOYMENT_HOSTINGER.md](docs/DEPLOYMENT_HOSTINGER.md) | Guia de deployment |
-
-### Generar Documentacion API
-
-```bash
-# Con Sphinx
-cd docs
-make html
-
-# Ver en navegador
-open _build/html/index.html
-```
-
----
-
-## Contribucion
-
-### Workflow de Desarrollo
-
-1. Fork del repositorio
-2. Crear rama feature (`git checkout -b feature/nueva-funcionalidad`)
-3. Commit cambios (`git commit -m 'feat: agregar nueva funcionalidad'`)
-4. Push a la rama (`git push origin feature/nueva-funcionalidad`)
-5. Abrir Pull Request
-
-### Convenciones de Commits
-
-Seguimos [Conventional Commits](https://www.conventionalcommits.org/):
-
-```
-feat: nueva funcionalidad
-fix: correccion de bug
-docs: cambios en documentacion
-style: formateo, puntos y comas
-refactor: refactorizacion de codigo
-test: agregar tests
-chore: mantenimiento
-```
-
-### Code Style
-
-```bash
-# Formatear codigo
-black src/
-
-# Linting
-flake8 src/
-
-# Type checking
-mypy src/
-```
-
----
-
-## Roadmap
-
-### Fase 1: Persistencia (ACTUAL) - 80% Completo
-
-- [x] Domain Layer completo
-- [x] Application Layer (Use Cases + DTOs)
-- [x] Infrastructure Layer (Repositories + ORM)
-- [x] PostgreSQL configurado y validado
-- [x] Sistema de auditoria y logging
-- [ ] Completar entidades Producto y Orden
-
-### Fase 2: API REST - Proximo
-
-- [ ] Endpoints FastAPI para Cliente
-- [ ] Autenticacion JWT
-- [ ] Autorizacion basada en roles
-- [ ] Documentacion OpenAPI
-- [ ] Rate limiting
-
-### Fase 3: Testing
-
-- [ ] Tests unitarios (100% coverage Domain)
-- [ ] Tests de integracion
-- [ ] Tests end-to-end
-- [ ] Performance testing
-
-### Fase 4: Event-Driven Architecture
-
-- [ ] Domain Events
-- [ ] Event Bus
-- [ ] Event Sourcing (opcional)
-- [ ] CQRS completo
-
-### Fase 5: Deployment y Monitoring
-
-- [ ] CI/CD con GitHub Actions
-- [ ] Docker containers
-- [ ] Kubernetes (opcional)
-- [ ] Monitoring con Prometheus
-- [ ] Logging centralizado (ELK)
-
----
-
-## Licencia
-
-Este proyecto esta licenciado bajo la Licencia MIT - ver el archivo [LICENSE](LICENSE) para detalles.
-
----
-
-## Contacto
-
-**Equipo de Desarrollo**
-- Email: contacto@ecommerce.com
-- GitHub: [@tu-usuario](https://github.com/tu-usuario)
-
----
-
-## Agradecimientos
-
-- Clean Architecture de Robert C. Martin
-- Domain-Driven Design de Eric Evans
-- Comunidad de Python y Django
+This project maintains detailed UML diagrams to visualize the architecture.
+See [**docs/UML_DIAGRAMS.md**](docs/UML_DIAGRAMS.md) for:
+*   Class Diagrams (Domain relationships)
+*   Sequence Diagrams (Request flow)
+*   ER Diagrams (Database Schema)
 
 ---
 
 <div align="center">
-
-**[⬆ Volver arriba](#e-commerce---clean-architecture)**
-
-Hecho con ❤️ usando Clean Architecture
-
+    <sub>Built with ❤️ using Clean Architecture principles.</sub>
 </div>

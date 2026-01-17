@@ -70,17 +70,16 @@ Tablas estandar de Django para autenticacion, permisos y administracion:
 
 ### Mapeo Domain a ORM
 
-```
-Domain Layer (Cliente)
-    |
-    v
-Application Layer (ClienteDTO)
-    |
-    v
-Infrastructure Layer (ClienteModel)
-    |
-    v
-PostgreSQL (tabla clientes)
+```mermaid
+graph TD
+    Domain[Domain Layer<br>(Cliente)]
+    App[Application Layer<br>(ClienteDTO)]
+    Infra[Infrastructure Layer<br>(ClienteModel)]
+    DB[(PostgreSQL<br>table: clientes)]
+    
+    Domain -->|Mapped to| App
+    App -->|Mapped to| Infra
+    Infra -->|Persisted in| DB
 ```
 
 ### Value Objects Mapeados
