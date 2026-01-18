@@ -192,6 +192,37 @@ class CarritoRepositoryDjango(CarritoRepository):
         
         return [self._modelo_a_entidad(m) for m in queryset]
     
+    def obtener_carritos_por_estado(self, estado: EstadoCarrito) -> List[Carrito]:
+        """Obtiene todos los carritos en un estado específico."""
+        modelos = CarritoModel.objects.prefetch_related('items').filter(estado=estado.value)
+        return [self._modelo_a_entidad(m) for m in modelos]
+    
+    def obtener_historial_usuario(
+        self, 
+        usuario_id: UUID, 
+        incluir_expirados: bool = False
+    ) -> List[Carrito]:
+        """Obtiene el historial de carritos de un usuario."""
+        queryset = CarritoModel.objects.prefetch_related('items').filter(usuario_id=usuario_id)
+        
+        if not incluir_expirados:
+            queryset = queryset.exclude(estado='EXPIRADO')
+        
+        return [self._modelo_a_entidad(m) for m in queryset.order_by('-fecha_creacion')]
+    
+    def existe(self, id: UUID) -> bool:
+        """Verifica si existe un carrito con el ID dado."""
+        return CarritoModel.objects.filter(id=id).exists()
+    
+    def contar_por_estado(self, estado: EstadoCarrito) -> int:
+        """Cuenta carritos por estado."""
+        return CarritoModel.objects.filter(estado=estado.value).count()
+    
+    def obtener_todos(self, limite: int = 100, offset: int = 0) -> List[Carrito]:
+        """Obtiene todos los carritos con paginación."""
+        modelos = CarritoModel.objects.prefetch_related('items').all()[offset:offset + limite]
+        return [self._modelo_a_entidad(m) for m in modelos]
+    
     # ===== MÉTODOS PRIVADOS DE MAPEO =====
     
     def _modelo_a_entidad(self, modelo: CarritoModel) -> Carrito:

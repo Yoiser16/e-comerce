@@ -205,8 +205,13 @@ export default {
         
         console.log('Login exitoso:', user)
         
-        // Redirigir al home
-        router.push('/')
+        // Redirigir según el rol del usuario
+        if (user.rol === 'ADMIN' || user.rol === 'OPERADOR') {
+          // Usar window.location para forzar navegación completa al admin
+          window.location.href = '/admin'
+        } else {
+          router.push('/')
+        }
         
       } catch (err) {
         console.error('Error de login:', err)

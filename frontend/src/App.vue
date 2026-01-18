@@ -1,10 +1,14 @@
 <template>
   <div id="app">
-    <!-- Home siempre visible como fondo -->
-    <Home />
+    <!-- Mostrar Home solo si NO estamos en rutas de admin -->
+    <template v-if="!isAdminRoute">
+      <Home />
+      <!-- Login como overlay modal cuando está en /login -->
+      <Login v-if="isLoginRoute" />
+    </template>
     
-    <!-- Login como overlay modal cuando está en /login -->
-    <Login v-if="isLoginRoute" />
+    <!-- Para rutas de admin, usar router-view -->
+    <router-view v-else />
   </div>
 </template>
 
@@ -24,9 +28,11 @@ export default {
     const route = useRoute()
     
     const isLoginRoute = computed(() => route.path === '/login')
+    const isAdminRoute = computed(() => route.path.startsWith('/admin'))
     
     return {
-      isLoginRoute
+      isLoginRoute,
+      isAdminRoute
     }
   }
 }

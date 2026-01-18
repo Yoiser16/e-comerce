@@ -3,6 +3,8 @@ Aplicación principal de FastAPI
 """
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.wsgi import WSGIMiddleware
+from django.core.wsgi import get_wsgi_application
 
 from .cliente_router import router as cliente_router
 from .producto_router import router as producto_router
@@ -48,5 +50,9 @@ def crear_app(config: AppConfig) -> FastAPI:
     app.include_router(busqueda_router)   # Primero: /productos/destacados, /productos/buscar
     app.include_router(producto_router)   # Después: /productos/{producto_id}
     app.include_router(carrito_router)
+    
+    # Montar Django para rutas de autenticación y admin
+    django_app = get_wsgi_application()
+    app.mount("/", WSGIMiddleware(django_app))
     
     return app
