@@ -77,7 +77,59 @@ body {
   font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
 }
 
-/* Glassmorphism para navbar */
+/* ========================================
+   HEADER LUXURY - Ultra-Minimal Glassmorphism
+   ======================================== */
+
+/* Header base - Transparente con blur sutil */
+.header-luxury {
+  background: rgba(255, 255, 255, 0.90);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.03);
+}
+
+/* Header al hacer scroll - Más sólido pero elegante */
+.header-luxury-scrolled {
+  background: rgba(255, 255, 255, 0.95);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 1px 0 rgba(0, 0, 0, 0.04);
+  border-bottom: none;
+}
+
+/* Links de navegación estilo lujo - Mayúsculas, kerning amplio, más legibles */
+.nav-link-luxury {
+  font-size: 12px;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  color: rgba(26, 26, 26, 0.75);
+  transition: color 0.3s ease;
+  padding: 0.375rem 0;
+  position: relative;
+}
+
+.nav-link-luxury:hover {
+  color: rgba(26, 26, 26, 1);
+}
+
+/* Línea sutil bajo el link activo/hover */
+.nav-link-luxury::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 1px;
+  background: rgba(26, 26, 26, 0.3);
+  transition: width 0.3s ease;
+}
+
+.nav-link-luxury:hover::after {
+  width: 100%;
+}
+
+/* Legacy - Mantener compatibilidad */
 .glass-navbar {
   background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);

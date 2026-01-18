@@ -43,10 +43,12 @@
 
           <!-- Título elegante -->
           <h2 class="text-center font-luxury text-2xl text-text-dark mb-2">
-            Bienvenido de <em class="not-italic text-brand-600">nuevo</em>
+            <span v-if="!isRegistering">Bienvenido de <em class="not-italic text-brand-600">nuevo</em></span>
+            <span v-else>Crea tu <em class="not-italic text-brand-600">cuenta</em></span>
           </h2>
           <p class="text-center text-sm text-text-light mb-8">
-            ¿Cómo quieres iniciar sesión?
+            <span v-if="!isRegistering">¿Cómo quieres iniciar sesión?</span>
+            <span v-else>Regístrate para comenzar</span>
           </p>
 
           <!-- Opciones de Login -->
@@ -89,8 +91,19 @@
             leave-from-class="opacity-100 translate-y-0 max-h-96"
             leave-to-class="opacity-0 -translate-y-2 max-h-0"
           >
-            <form v-if="showEmailForm" @submit.prevent="handleLogin" class="mt-6 space-y-4 overflow-hidden">
+            <form v-if="showEmailForm" @submit.prevent="isRegistering ? handleRegister() : handleLogin()" class="mt-6 space-y-4 overflow-hidden">
               
+              <!-- Nombre (solo registro) -->
+              <div v-if="isRegistering">
+                <input 
+                  type="text" 
+                  v-model="form.nombre"
+                  required
+                  placeholder="Tu nombre completo"
+                  class="w-full px-4 py-4 bg-nude-50 border border-nude-200 rounded-xl text-text-dark placeholder-text-light focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
+                >
+              </div>
+
               <!-- Email -->
               <div>
                 <input 
@@ -108,7 +121,7 @@
                   type="password" 
                   v-model="form.password"
                   required
-                  placeholder="Contraseña"
+                  :placeholder="isRegistering ? 'Contraseña (mínimo 6 caracteres)' : 'Contraseña'"
                   class="w-full px-4 py-4 bg-nude-50 border border-nude-200 rounded-xl text-text-dark placeholder-text-light focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
                 >
               </div>
@@ -124,18 +137,18 @@
                 :disabled="loading"
                 class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-4 px-6 rounded-xl transition-all disabled:opacity-70"
               >
-                <span v-if="!loading">Ingresar</span>
+                <span v-if="!loading">{{ isRegistering ? 'Crear Cuenta' : 'Ingresar' }}</span>
                 <span v-else class="flex items-center justify-center gap-2">
                   <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  Ingresando...
+                  {{ isRegistering ? 'Creando cuenta...' : 'Ingresando...' }}
                 </span>
               </button>
 
-              <!-- Forgot Password -->
-              <p class="text-center">
+              <!-- Forgot Password (solo login) -->
+              <p v-if="!isRegistering" class="text-center">
                 <a href="#" class="text-sm text-text-light hover:text-brand-600 transition-colors">
                   ¿Olvidaste tu contraseña?
                 </a>
@@ -147,12 +160,20 @@
           <!-- Divider -->
           <div class="my-8 border-t border-nude-200"></div>
 
-          <!-- Register -->
+          <!-- Toggle Login/Register -->
           <p class="text-center text-sm text-text-medium">
-            ¿No tienes cuenta? 
-            <a href="#" class="text-brand-600 hover:text-brand-700 font-semibold transition-colors">
-              Regístrate
-            </a>
+            <span v-if="!isRegistering">
+              ¿No tienes cuenta? 
+              <button @click="toggleMode" class="text-brand-600 hover:text-brand-700 font-semibold transition-colors">
+                Regístrate
+              </button>
+            </span>
+            <span v-else>
+              ¿Ya tienes cuenta? 
+              <button @click="toggleMode" class="text-brand-600 hover:text-brand-700 font-semibold transition-colors">
+                Inicia sesión
+              </button>
+            </span>
           </p>
 
         </div>
@@ -174,11 +195,13 @@ export default {
     const router = useRouter()
     
     const form = reactive({
+      nombre: '',
       email: '',
       password: ''
     })
     
     const showEmailForm = ref(false)
+    const isRegistering = ref(false)
     const loading = ref(false)
     const error = ref(null)
 
@@ -197,20 +220,32 @@ export default {
           password: form.password
         })
         
-        // Guardar tokens en localStorage
         const { access, refresh, user } = response.data
-        localStorage.setItem('access_token', access)
-        localStorage.setItem('refresh_token', refresh)
-        localStorage.setItem('user', JSON.stringify(user))
         
         console.log('Login exitoso:', user)
         
         // Redirigir según el rol del usuario
         if (user.rol === 'ADMIN' || user.rol === 'OPERADOR') {
-          // Usar window.location para forzar navegación completa al admin
-          window.location.href = '/admin'
+          // ADMIN: NO guardar sesión en el ecommerce
+          // Solo abrir ventana admin con los tokens en la URL (para que admin los capture)
+          // El ecommerce queda como visitante anónimo
+          const adminUrl = `/admin?token=${access}&refresh=${refresh}`
+          window.open(adminUrl, '_blank')
+          closeModal()
+          // NO emitir evento - el admin no debe verse logueado en la tienda
         } else {
-          router.push('/')
+          // CLIENTE: Guardar tokens en localStorage
+          localStorage.setItem('access_token', access)
+          localStorage.setItem('refresh_token', refresh)
+          localStorage.setItem('user', JSON.stringify(user))
+          
+          // Emitir evento ANTES de cerrar el modal
+          window.dispatchEvent(new CustomEvent('user-logged-in', { detail: user }))
+          
+          // Pequeño delay para asegurar que el estado se actualice
+          setTimeout(() => {
+            closeModal()
+          }, 100)
         }
         
       } catch (err) {
@@ -229,14 +264,71 @@ export default {
         loading.value = false
       }
     }
+    
+    const handleRegister = async () => {
+      error.value = ''
+      loading.value = true
+
+      try {
+        const response = await apiClient.post('/auth/register', {
+          nombre: form.nombre,
+          email: form.email,
+          password: form.password
+        })
+        
+        const { access, refresh, user } = response.data
+        
+        console.log('Registro exitoso:', user)
+        
+        // Guardar tokens en localStorage
+        localStorage.setItem('access_token', access)
+        localStorage.setItem('refresh_token', refresh)
+        localStorage.setItem('user', JSON.stringify(user))
+        
+        // Emitir evento ANTES de cerrar el modal
+        window.dispatchEvent(new CustomEvent('user-logged-in', { detail: user }))
+        
+        // Pequeño delay para asegurar que el estado se actualice
+        setTimeout(() => {
+          closeModal()
+        }, 100)
+        
+      } catch (err) {
+        console.error('Error de registro:', err)
+        
+        if (err.response?.status === 400) {
+          error.value = err.response.data.error || 'Verifica los datos ingresados'
+        } else if (err.response?.data?.error) {
+          error.value = err.response.data.error
+        } else {
+          error.value = 'Error al crear la cuenta. Intenta de nuevo.'
+        }
+      } finally {
+        loading.value = false
+      }
+    }
+    
+    const toggleMode = () => {
+      isRegistering.value = !isRegistering.value
+      error.value = ''
+      form.nombre = ''
+      form.email = ''
+      form.password = ''
+      if (!showEmailForm.value) {
+        showEmailForm.value = true
+      }
+    }
 
     return {
       form,
       showEmailForm,
+      isRegistering,
       loading,
       error,
       closeModal,
-      handleLogin
+      handleLogin,
+      handleRegister,
+      toggleMode
     }
   }
 }

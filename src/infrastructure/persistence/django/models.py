@@ -519,3 +519,29 @@ class ItemCarritoModel(models.Model):
         self.subtotal_monto = self.precio_unitario_monto * self.cantidad
         self.subtotal_moneda = self.precio_unitario_moneda
         super().save(*args, **kwargs)
+
+
+class FavoritoModel(models.Model):
+    """
+    Modelo para productos favoritos de usuarios.
+    Permite a los clientes guardar productos para ver después.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    usuario_id = models.UUIDField(db_index=True)  # ID del Usuario autenticado
+    producto = models.ForeignKey(ProductoModel, on_delete=models.CASCADE, related_name='favoritos')
+    fecha_agregado = models.DateTimeField(auto_now_add=True)
+    
+    class Meta:
+        db_table = 'favoritos'
+        verbose_name = 'Favorito'
+        verbose_name_plural = 'Favoritos'
+        ordering = ['-fecha_agregado']
+        constraints = [
+            models.UniqueConstraint(
+                fields=['usuario_id', 'producto'],
+                name='unique_favorito_por_usuario'
+            ),
+        ]
+    
+    def __str__(self) -> str:
+        return f"Favorito: {self.producto.nombre} - Usuario {self.usuario_id}"

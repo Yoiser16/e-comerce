@@ -61,3 +61,59 @@ class ListarProductosUseCase(CasoUsoBase[None, List[ProductoDTO]]):
     def ejecutar(self, request: None = None) -> List[ProductoDTO]:
         productos = self._repo.obtener_disponibles()
         return [ProductoDTO.desde_entidad(p) for p in productos]
+
+
+class ListarTodosProductosUseCase(CasoUsoBase[dict, List[ProductoDTO]]):
+    """Caso de uso: Listar TODOS los productos (para admin)"""
+    
+    def __init__(self, producto_repository: ProductoRepository):
+        self._repo = producto_repository
+        
+    def ejecutar(self, request: dict = None) -> List[ProductoDTO]:
+        request = request or {}
+        limite = request.get('limite', 100)
+        offset = request.get('offset', 0)
+        productos = self._repo.obtener_todos(limite=limite, offset=offset)
+        return [ProductoDTO.desde_entidad(p) for p in productos]
+
+
+class ActualizarProductoUseCase(CasoUsoBase[ActualizarProductoDTO, ProductoDTO]):
+    """Caso de uso: Actualizar un producto existente"""
+    
+    def __init__(self, producto_repository: ProductoRepository):
+        self._repo = producto_repository
+    
+    def ejecutar(self, request: ActualizarProductoDTO) -> ProductoDTO:
+        # Obtener producto existente
+        producto = self._repo.obtener_por_id(request.id)
+        if not producto:
+            raise EntidadNoEncontrada(f"Producto {request.id} no encontrado")
+        
+        # Actualizar campos si se proporcionaron
+        if request.nombre is not None:
+            producto.nombre = request.nombre
+        if request.descripcion is not None:
+            producto.descripcion = request.descripcion
+        if request.precio_monto is not None:
+            producto.precio = Dinero(request.precio_monto, producto.precio.moneda)
+        if request.stock_actual is not None:
+            producto.stock_actual = request.stock_actual
+        if request.stock_minimo is not None:
+            producto.stock_minimo = request.stock_minimo
+        
+        guardado = self._repo.guardar(producto)
+        return ProductoDTO.desde_entidad(guardado)
+
+
+class EliminarProductoUseCase(CasoUsoBase[UUID, bool]):
+    """Caso de uso: Eliminar (desactivar) un producto"""
+    
+    def __init__(self, producto_repository: ProductoRepository):
+        self._repo = producto_repository
+    
+    def ejecutar(self, request: UUID) -> bool:
+        producto = self._repo.obtener_por_id(request)
+        if not producto:
+            raise EntidadNoEncontrada(f"Producto {request} no encontrado")
+        
+        return self._repo.eliminar(request)

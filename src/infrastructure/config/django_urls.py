@@ -11,6 +11,7 @@ from interfaces.api.rest.views.auth_views import (
     RefreshTokenView,
     VerifyTokenView,
     PerfilUsuarioView,
+    RegisterView,
 )
 
 # Importar health checks
@@ -29,6 +30,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     
     # Autenticación JWT
+    path('api/v1/auth/register', RegisterView.as_view(), name='auth-register'),
     path('api/v1/auth/login', LoginView.as_view(), name='auth-login'),
     path('api/v1/auth/logout', LogoutView.as_view(), name='auth-logout'),
     path('api/v1/auth/refresh', RefreshTokenView.as_view(), name='auth-refresh'),

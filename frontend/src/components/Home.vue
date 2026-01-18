@@ -2,19 +2,19 @@
   <div class="min-h-screen bg-[#FAFAFA]">
     
     <!-- ========================================
-         NAVBAR - Glassmorphism Floating
+         NAVBAR - Ultra-Minimal Luxury Glassmorphism
          ======================================== -->
     <header 
       :class="[
         'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
-        isScrolled ? 'glass-navbar-scrolled py-3' : 'glass-navbar py-5'
+        isScrolled ? 'header-luxury-scrolled py-2.5' : 'header-luxury py-3.5'
       ]"
     >
       <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
         <div class="flex items-center justify-between">
-          <!-- Logo -->
-          <a href="#" class="flex items-center gap-2 group flex-shrink-0">
-            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-white/80 shadow-lg transition-transform duration-300 group-hover:scale-105">
+          <!-- Logo compacto -->
+          <a href="#" class="flex items-center gap-3 group flex-shrink-0">
+            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden border border-white/60 shadow-md transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg">
               <img 
                 src="/logo.jpeg" 
                 alt="Kharis Distribuidora" 
@@ -24,17 +24,17 @@
           </a>
 
           <!-- Buscador Desktop -->
-          <div class="hidden lg:flex flex-1 max-w-md mx-8">
+          <div class="hidden lg:flex flex-1 max-w-xs mx-8">
             <div class="relative w-full">
               <input 
                 type="text"
                 v-model="searchQuery"
                 @keyup.enter="handleSearch"
                 placeholder="Buscar extensiones, pelucas..."
-                class="w-full pl-11 pr-4 py-2.5 bg-white/80 border border-nude-200 rounded-full text-sm text-text-dark placeholder-text-light focus:outline-none focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-400/20 transition-all duration-300"
+                class="w-full pl-10 pr-4 py-2 bg-white/70 backdrop-blur-sm border border-nude-200/60 rounded-full text-xs text-text-dark placeholder-text-light/70 focus:outline-none focus:border-text-dark/20 focus:bg-white/90 focus:ring-1 focus:ring-text-dark/10 transition-all duration-300"
               />
               <svg 
-                class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light"
+                class="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-light/60"
                 fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
               >
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
@@ -42,45 +42,89 @@
             </div>
           </div>
 
-          <!-- Navegación Desktop - Centrada -->
-          <nav class="hidden lg:flex items-center gap-10">
-            <a href="#categorias" class="text-text-medium hover:text-brand-600 font-medium text-sm tracking-wide transition-colors duration-300">Categorías</a>
-            <a href="#productos" class="text-text-medium hover:text-brand-600 font-medium text-sm tracking-wide transition-colors duration-300">Productos</a>
-            <a href="#mayoreo" class="text-text-medium hover:text-brand-600 font-medium text-sm tracking-wide transition-colors duration-300">Mayoreo</a>
-            <a href="#testimonios" class="text-text-medium hover:text-brand-600 font-medium text-sm tracking-wide transition-colors duration-300">Reseñas</a>
-            <a href="#contacto" class="text-text-medium hover:text-brand-600 font-medium text-sm tracking-wide transition-colors duration-300">Contacto</a>
+          <!-- Navegación Desktop - Más legible -->
+          <nav class="hidden lg:flex items-center gap-7">
+            <a href="#categorias" class="nav-link-luxury">CATEGORÍAS</a>
+            <a href="#productos" class="nav-link-luxury">PRODUCTOS</a>
+            <a href="#mayoreo" class="nav-link-luxury">MAYOREO</a>
+            <a href="#testimonios" class="nav-link-luxury">RESEÑAS</a>
+            <a href="#contacto" class="nav-link-luxury">CONTACTO</a>
           </nav>
 
-          <!-- Acciones - Derecha -->
-          <div class="flex items-center gap-2 sm:gap-3">
+          <!-- Acciones - Iconos compactos -->
+          <div class="flex items-center gap-0.5 sm:gap-1">
             <!-- Buscador Mobile -->
             <button 
               @click="mobileSearchOpen = !mobileSearchOpen"
-              class="lg:hidden w-11 h-11 rounded-full flex items-center justify-center hover:bg-nude-200/60 transition-colors duration-300 touch-target"
+              class="lg:hidden w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors duration-300 touch-target"
             >
-              <svg class="w-5 h-5 text-text-medium" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-text-dark/70" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
             </button>
             
-            <!-- Usuario -->
-            <router-link to="/login" class="w-11 h-11 rounded-full flex items-center justify-center hover:bg-nude-200/60 transition-colors duration-300 touch-target">
-              <svg class="w-5 h-5 text-text-medium" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-              </svg>
-            </router-link>
+            <!-- Usuario con dropdown -->
+            <div class="relative" ref="userMenuRef">
+              <button 
+                @click="toggleUserMenu"
+                class="w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target"
+                :class="isLoggedIn ? 'border border-text-dark/20 hover:border-text-dark/40' : 'hover:bg-black/5'"
+              >
+                <!-- Si está logueado, mostrar inicial con estilo sutil -->
+                <span v-if="isLoggedIn" class="text-text-dark text-xs font-medium">
+                  {{ userInitial }}
+                </span>
+                <!-- Si no está logueado, mostrar icono -->
+                <svg v-else class="w-4 h-4 text-text-dark/70" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+              </button>
+              
+              <!-- Dropdown Menu -->
+              <transition
+                enter-active-class="transition duration-150 ease-out"
+                enter-from-class="opacity-0 scale-95"
+                enter-to-class="opacity-100 scale-100"
+                leave-active-class="transition duration-100 ease-in"
+                leave-from-class="opacity-100 scale-100"
+                leave-to-class="opacity-0 scale-95"
+              >
+                <div 
+                  v-if="showUserMenu && isLoggedIn"
+                  class="absolute right-0 mt-2 w-48 bg-white border border-black/5 shadow-lg py-1 z-50"
+                >
+                  <div class="px-4 py-2 border-b border-black/5">
+                    <p class="text-xs text-text-dark/50">Hola,</p>
+                    <p class="text-sm text-text-dark font-medium truncate">{{ currentUser?.nombre || currentUser?.email }}</p>
+                  </div>
+                  <router-link 
+                    to="/mi-cuenta"
+                    class="block px-4 py-2 text-sm text-text-dark hover:bg-black/5 transition-colors"
+                    @click="showUserMenu = false"
+                  >
+                    Mi Cuenta
+                  </router-link>
+                  <button 
+                    @click="cerrarSesion"
+                    class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
+                  >
+                    Cerrar Sesión
+                  </button>
+                </div>
+              </transition>
+            </div>
             
             <!-- Carrito -->
             <button 
-              class="relative w-11 h-11 rounded-full flex items-center justify-center hover:bg-nude-200/60 transition-colors duration-300 touch-target"
-              @click="$emit('open-cart')"
+              class="relative w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors duration-300 touch-target"
+              @click="openCartDrawer"
             >
-              <svg class="w-5 h-5 text-text-medium" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-text-dark/70" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
               </svg>
               <span 
                 v-if="cartCount > 0"
-                class="absolute -top-0.5 -right-0.5 w-5 h-5 bg-brand-600 text-white text-[10px] font-bold rounded-full flex items-center justify-center shadow-sm"
+                class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-text-dark text-white text-[9px] font-medium rounded-full flex items-center justify-center"
               >
                 {{ cartCount }}
               </span>
@@ -89,9 +133,9 @@
             <!-- Menu Mobile -->
             <button 
               @click="mobileMenuOpen = !mobileMenuOpen"
-              class="lg:hidden w-11 h-11 rounded-full flex items-center justify-center hover:bg-nude-200/60 transition-colors duration-300 touch-target"
+              class="lg:hidden w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors duration-300 touch-target"
             >
-              <svg class="w-5 h-5 text-text-medium" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-text-dark/70" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path v-if="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
                 <path v-else stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -99,7 +143,7 @@
           </div>
         </div>
 
-        <!-- Mobile Search Bar -->
+        <!-- Mobile Search Bar - Estilo luxury -->
         <transition
           enter-active-class="transition duration-200 ease-out"
           enter-from-class="opacity-0 -translate-y-2"
@@ -115,11 +159,11 @@
                 v-model="searchQuery"
                 @keyup.enter="handleSearch"
                 placeholder="Buscar productos..."
-                class="w-full pl-11 pr-4 py-3 bg-white border border-nude-200 rounded-xl text-sm text-text-dark placeholder-text-light focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-all"
+                class="w-full pl-11 pr-4 py-3 bg-white/80 backdrop-blur-sm border border-nude-200/50 rounded-full text-[11px] tracking-wider text-text-dark placeholder-text-light/60 focus:outline-none focus:border-text-dark/20 focus:ring-1 focus:ring-text-dark/5 transition-all"
               />
               <svg 
-                class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light"
-                fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
+                class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light/50"
+                fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"
               >
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
@@ -127,7 +171,7 @@
           </div>
         </transition>
 
-        <!-- Mobile Menu -->
+        <!-- Mobile Menu - Estilo luxury minimalista -->
         <transition
           enter-active-class="transition duration-300 ease-out"
           enter-from-class="opacity-0 -translate-y-4"
@@ -137,12 +181,12 @@
           leave-to-class="opacity-0 -translate-y-4"
         >
           <nav v-if="mobileMenuOpen" class="lg:hidden mt-6 pb-4">
-            <div class="flex flex-col gap-1 bg-white/80 backdrop-blur-lg rounded-2xl p-4 shadow-soft">
-              <a href="#categorias" @click="mobileMenuOpen = false" class="py-3 px-4 text-text-medium hover:text-brand-600 hover:bg-brand-50 rounded-xl font-medium transition-all">Categorías</a>
-              <a href="#productos" @click="mobileMenuOpen = false" class="py-3 px-4 text-text-medium hover:text-brand-600 hover:bg-brand-50 rounded-xl font-medium transition-all">Productos</a>
-              <a href="#mayoreo" @click="mobileMenuOpen = false" class="py-3 px-4 text-text-medium hover:text-brand-600 hover:bg-brand-50 rounded-xl font-medium transition-all">Mayoreo</a>
-              <a href="#testimonios" @click="mobileMenuOpen = false" class="py-3 px-4 text-text-medium hover:text-brand-600 hover:bg-brand-50 rounded-xl font-medium transition-all">Reseñas</a>
-              <a href="#contacto" @click="mobileMenuOpen = false" class="py-3 px-4 text-text-medium hover:text-brand-600 hover:bg-brand-50 rounded-xl font-medium transition-all">Contacto</a>
+            <div class="flex flex-col gap-0.5 bg-white/90 backdrop-blur-xl rounded-2xl p-3 shadow-soft border border-nude-200/30">
+              <a href="#categorias" @click="mobileMenuOpen = false" class="py-3.5 px-5 text-[11px] tracking-[0.2em] uppercase text-text-dark/80 hover:text-text-dark hover:bg-nude-100/50 rounded-xl font-medium transition-all">CATEGORÍAS</a>
+              <a href="#productos" @click="mobileMenuOpen = false" class="py-3.5 px-5 text-[11px] tracking-[0.2em] uppercase text-text-dark/80 hover:text-text-dark hover:bg-nude-100/50 rounded-xl font-medium transition-all">PRODUCTOS</a>
+              <a href="#mayoreo" @click="mobileMenuOpen = false" class="py-3.5 px-5 text-[11px] tracking-[0.2em] uppercase text-text-dark/80 hover:text-text-dark hover:bg-nude-100/50 rounded-xl font-medium transition-all">MAYOREO</a>
+              <a href="#testimonios" @click="mobileMenuOpen = false" class="py-3.5 px-5 text-[11px] tracking-[0.2em] uppercase text-text-dark/80 hover:text-text-dark hover:bg-nude-100/50 rounded-xl font-medium transition-all">RESEÑAS</a>
+              <a href="#contacto" @click="mobileMenuOpen = false" class="py-3.5 px-5 text-[11px] tracking-[0.2em] uppercase text-text-dark/80 hover:text-text-dark hover:bg-nude-100/50 rounded-xl font-medium transition-all">CONTACTO</a>
             </div>
           </nav>
         </transition>
@@ -198,35 +242,35 @@
           </div>
 
           <!-- Title -->
-          <h1 class="font-luxury text-5xl sm:text-6xl lg:text-7xl xl:text-8xl text-white leading-[1.05] mb-8 drop-shadow-2xl animate-fade-in-up delay-100">
-            Tu Socio Experto en <br />
-            <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-gold-200 to-gold-400 font-bold italic">
+          <h1 class="font-luxury text-white leading-[1.1] mb-8 drop-shadow-2xl animate-fade-in-up delay-100">
+            <span class="block text-2xl sm:text-3xl lg:text-4xl font-normal mb-2">Tu Socio Experto en</span>
+            <span class="block text-5xl sm:text-6xl lg:text-7xl xl:text-8xl text-transparent bg-clip-text bg-gradient-to-r from-white via-gold-200 to-gold-400 font-bold italic">
               Belleza Profesional
             </span>
           </h1>
 
           <!-- Subtitle -->
-          <p class="text-lg sm:text-xl text-gray-100 leading-relaxed mb-12 max-w-xl font-light animate-fade-in-up delay-200 antialiased">
+          <p class="text-base sm:text-lg lg:text-xl text-gray-100 leading-relaxed mb-8 sm:mb-12 max-w-xl font-light animate-fade-in-up delay-200 antialiased">
             Elevamos tu negocio con extensiones 100% naturales, pelucas premium y cosméticos de clase mundial.
           </p>
 
-          <!-- CTAs -->
-          <div class="flex flex-col sm:flex-row gap-5 mb-16 animate-fade-in-up delay-300">
+          <!-- CTAs - Más compactos en móvil -->
+          <div class="flex flex-col sm:flex-row gap-3 sm:gap-5 mb-12 sm:mb-16 animate-fade-in-up delay-300">
             <a 
               href="#productos" 
-              class="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 font-bold text-lg rounded-full shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 touch-target"
+              class="inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 bg-white text-gray-900 font-semibold text-sm sm:text-base rounded-full shadow-lg hover:shadow-xl hover:bg-gray-100 transition-all duration-300 touch-target"
             >
               Ver Catálogo
-              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 ml-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
               </svg>
             </a>
             
             <a 
               href="#mayoreo" 
-              class="inline-flex items-center justify-center px-8 py-4 bg-transparent border border-white/50 text-white font-semibold text-lg rounded-full hover:bg-white hover:text-gray-900 transition-all duration-300 backdrop-blur-sm transform hover:-translate-y-1 touch-target"
+              class="inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 bg-transparent border border-white/50 text-white font-medium text-sm sm:text-base rounded-full hover:bg-white hover:text-gray-900 transition-all duration-300 backdrop-blur-sm touch-target"
             >
-              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
               </svg>
               Portal Mayorista
@@ -450,13 +494,13 @@
           </a>
         </div>
 
-        <!-- Loading State -->
+        <!-- Loading State - Skeleton dinámico -->
         <div v-if="loading" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-          <div v-for="i in 4" :key="i" class="animate-pulse">
-            <div class="bg-nude-200 rounded-3xl aspect-[3/4] mb-5"></div>
-            <div class="h-4 bg-nude-200 rounded-full w-1/3 mb-3"></div>
-            <div class="h-5 bg-nude-200 rounded-full w-3/4 mb-3"></div>
-            <div class="h-5 bg-nude-200 rounded-full w-1/4"></div>
+          <div class="animate-pulse col-span-full flex items-center justify-center py-12">
+            <div class="flex flex-col items-center gap-4">
+              <div class="w-12 h-12 border-4 border-brand-200 border-t-brand-600 rounded-full animate-spin"></div>
+              <p class="text-text-light text-sm">Cargando productos...</p>
+            </div>
           </div>
         </div>
 
@@ -476,7 +520,10 @@
               </div>
               
               <!-- Wishlist Button -->
-              <button class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:bg-brand-50 transition-colors touch-target">
+              <button 
+                @click.stop="toggleFavorito(producto)"
+                class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:bg-brand-50 transition-colors touch-target"
+              >
                 <svg class="w-5 h-5 text-text-light hover:text-brand-600 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                 </svg>
@@ -485,7 +532,7 @@
               <!-- Image -->
               <div class="aspect-[3/4] overflow-hidden bg-nude-100">
                 <img
-                  :src="producto.imagen || 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=500&fit=crop'"
+                  :src="producto.imagen_principal || producto.imagen || 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=500&fit=crop'"
                   :alt="producto.nombre"
                   class="w-full h-full object-cover img-zoom"
                 >
@@ -502,9 +549,9 @@
 
             <!-- Product Info -->
             <div class="px-1">
-              <p class="text-xs text-text-light uppercase tracking-wider mb-1">{{ producto.categoria || 'Extensiones' }}</p>
+              <p class="text-xs text-text-light uppercase tracking-wider mb-1">{{ producto.categoria || producto.metodo || 'Extensiones' }}</p>
               <h3 class="font-medium text-text-dark mb-2 line-clamp-2 group-hover:text-brand-600 transition-colors">{{ producto.nombre }}</h3>
-              <p class="text-lg font-semibold text-brand-600">${{ formatPrice(producto.precio) }} <span class="text-xs text-text-light font-normal">MXN</span></p>
+              <p class="text-lg font-semibold text-brand-600">${{ formatPrice(producto.precio_monto || producto.precio) }} <span class="text-xs text-text-light font-normal">{{ producto.precio_moneda || 'MXN' }}</span></p>
             </div>
           </div>
         </div>
@@ -535,44 +582,47 @@
     </section>
 
     <!-- ========================================
-         VIDEO KANEKALON - Sección Inmersiva
+         VIDEO KANEKALON - Sección Inmersiva Optimizada
          ======================================== -->
     <section class="relative bg-black overflow-hidden">
-      <!-- Video Background -->
-      <div class="relative w-full">
+      <!-- Video Background con altura mínima para móvil -->
+      <div class="relative w-full min-h-[50vh] sm:min-h-[60vh] lg:min-h-0">
         <video 
-          class="w-full h-auto max-h-[80vh] object-cover"
+          ref="kanekalonVideo"
+          class="w-full h-full min-h-[50vh] sm:min-h-[60vh] lg:min-h-0 lg:h-auto lg:max-h-[80vh] object-cover"
           autoplay 
           loop 
           muted 
           playsinline
+          preload="auto"
         >
+          <!-- Video local de alta calidad -->
           <source src="/kanekalon-video.mp4" type="video/mp4">
           Tu navegador no soporta videos HTML5.
         </video>
         
-        <!-- Overlay con gradiente -->
-        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30"></div>
+        <!-- Overlay con gradiente optimizado para legibilidad -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40"></div>
         
-        <!-- Contenido sobre el video -->
-        <div class="absolute inset-0 flex items-end justify-center pb-12 lg:pb-20">
-          <div class="text-center px-6">
-            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-5 py-2 mb-6">
-              <span class="text-white/90 text-sm font-medium uppercase tracking-wider">Tecnología Japonesa</span>
+        <!-- Contenido sobre el video - Mejor posicionado en móvil -->
+        <div class="absolute inset-0 flex items-center lg:items-end justify-center pb-8 sm:pb-12 lg:pb-20">
+          <div class="text-center px-5 sm:px-6">
+            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 sm:px-5 sm:py-2 mb-4 sm:mb-6">
+              <span class="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider">Tecnología Japonesa</span>
             </div>
-            <h2 class="font-luxury text-3xl sm:text-4xl lg:text-5xl text-white mb-4 drop-shadow-2xl">
+            <h2 class="font-luxury text-2xl sm:text-3xl lg:text-5xl text-white mb-3 sm:mb-4 drop-shadow-2xl">
               Fibras <span class="text-brand-400">KANEKALON</span>
             </h2>
-            <p class="text-white/80 text-lg max-w-2xl mx-auto mb-8">
+            <p class="text-white/80 text-sm sm:text-base lg:text-lg max-w-md sm:max-w-xl lg:max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed">
               Más de 65 años de innovación. La marca que cambia tu futuro a través del cabello.
             </p>
             <a 
               href="https://www.kanekalon.com" 
               target="_blank"
-              class="inline-flex items-center gap-2 bg-white hover:bg-nude-100 text-text-dark font-semibold px-8 py-4 rounded-full transition-all shadow-xl hover:scale-105"
+              class="inline-flex items-center gap-2 bg-white hover:bg-nude-100 text-text-dark font-medium text-sm sm:text-base px-5 py-2.5 sm:px-7 sm:py-3.5 rounded-full transition-all shadow-lg hover:shadow-xl"
             >
               Conoce más sobre Kanekalon
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
               </svg>
             </a>
@@ -584,12 +634,12 @@
     <!-- ========================================
          SECCIÓN MAYORISTA - Diseño Premium
          ======================================== -->
-    <section id="mayoreo" class="py-20 lg:py-32 relative overflow-hidden bg-gradient-to-br from-[#F5EDE4] via-[#FBF7F3] to-[#F0E6DC]">
+    <section id="mayoreo" class="py-14 sm:py-20 lg:py-32 relative overflow-hidden bg-gradient-to-br from-[#F5EDE4] via-[#FBF7F3] to-[#F0E6DC]">
       <!-- Decorative Pattern -->
       <div class="absolute inset-0 opacity-[0.03]" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
       
       <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 relative z-10">
-        <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+        <div class="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
           
           <!-- Image First -->
           <div class="relative order-2 lg:order-1">
@@ -635,56 +685,56 @@
               Únete a más de 2,000 profesionales que confían en Kharis para surtir sus salones, tiendas y negocios de belleza.
             </p>
 
-            <!-- Benefits -->
-            <ul class="space-y-5 mb-10">
-              <li class="flex items-start gap-4">
-                <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+            <!-- Benefits - Más compactos en móvil -->
+            <ul class="space-y-3 sm:space-y-5 mb-8 sm:mb-10">
+              <li class="flex items-start gap-3 sm:gap-4">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-green-50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                   </svg>
                 </div>
                 <div>
-                  <p class="text-text-dark font-semibold text-base mb-0.5">Descuentos desde 25% en adelante</p>
-                  <p class="text-text-light text-sm">Precios escalonados según volumen de compra</p>
+                  <p class="text-text-dark font-semibold text-sm sm:text-base mb-0.5">Descuentos desde 25% en adelante</p>
+                  <p class="text-text-light text-xs sm:text-sm">Precios escalonados según volumen de compra</p>
                 </div>
               </li>
-              <li class="flex items-start gap-4">
-                <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <li class="flex items-start gap-3 sm:gap-4">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-green-50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                   </svg>
                 </div>
                 <div>
-                  <p class="text-text-dark font-semibold text-base mb-0.5">Asesor de cuenta dedicado</p>
-                  <p class="text-text-light text-sm">Atención personalizada vía WhatsApp</p>
+                  <p class="text-text-dark font-semibold text-sm sm:text-base mb-0.5">Asesor de cuenta dedicado</p>
+                  <p class="text-text-light text-xs sm:text-sm">Atención personalizada vía WhatsApp</p>
                 </div>
               </li>
-              <li class="flex items-start gap-4">
-                <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <li class="flex items-start gap-3 sm:gap-4">
+                <div class="w-8 h-8 sm:w-10 sm:h-10 bg-green-50 rounded-lg sm:rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-4 h-4 sm:w-5 sm:h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                   </svg>
                 </div>
                 <div>
-                  <p class="text-text-dark font-semibold text-base mb-0.5">Envío gratis en pedidos +$5,000 MXN</p>
-                  <p class="text-text-light text-sm">Entregas prioritarias a todo México</p>
+                  <p class="text-text-dark font-semibold text-sm sm:text-base mb-0.5">Envío gratis en pedidos +$5,000 MXN</p>
+                  <p class="text-text-light text-xs sm:text-sm">Entregas prioritarias a todo México</p>
                 </div>
               </li>
             </ul>
 
-            <!-- CTAs -->
-            <div class="flex flex-col sm:flex-row gap-4">
+            <!-- CTAs - Más compactos en móvil -->
+            <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
               <a 
                 href="https://wa.me/525512345678?text=Hola,%20me%20interesa%20el%20programa%20de%20mayoristas"
                 target="_blank"
-                class="inline-flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-4 rounded-full transition-all shadow-lg hover:shadow-green-500/30 hover:scale-105 touch-target"
+                class="inline-flex items-center justify-center gap-2 sm:gap-3 bg-green-500 hover:bg-green-600 text-white font-semibold text-sm sm:text-base px-5 py-3 sm:px-7 sm:py-3.5 rounded-full transition-all shadow-lg touch-target"
               >
-                <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                 </svg>
                 Contactar por WhatsApp
               </a>
-              <button class="inline-flex items-center justify-center gap-3 bg-white hover:bg-nude-50 border-2 border-nude-300 text-text-dark font-semibold px-8 py-4 rounded-full transition-all hover:border-brand-400 touch-target">
+              <button class="inline-flex items-center justify-center gap-2 sm:gap-3 bg-white hover:bg-nude-50 border-2 border-nude-300 text-text-dark font-medium text-sm sm:text-base px-5 py-3 sm:px-7 sm:py-3.5 rounded-full transition-all hover:border-brand-400 touch-target">
                 Solicitar catálogo
               </button>
             </div>
@@ -746,87 +796,81 @@
     </section>
 
     <!-- ========================================
-         OFERTAS IRRESISTIBLES - Diseño Optimizado
+         OFERTAS IRRESISTIBLES - Editorial Premium Design
          ======================================== -->
-    <section class="relative bg-gradient-to-br from-pink-50 via-purple-50 to-white overflow-hidden">
-      <!-- Badge PROMO del Mes -->
-      <div class="absolute top-0 left-0 z-20">
-        <div class="relative">
-          <svg class="w-32 h-32 sm:w-40 sm:h-40" viewBox="0 0 100 100" fill="none">
-            <path d="M0 0 L100 0 L100 80 L50 100 L0 80 Z" fill="#D81B60"/>
-          </svg>
-          <div class="absolute inset-0 flex flex-col items-center justify-center text-white pt-2">
-            <p class="text-xs sm:text-sm font-bold uppercase tracking-wide">PROMO</p>
-            <p class="text-lg sm:text-xl font-black leading-none">del Mes</p>
-          </div>
-        </div>
-      </div>
+    <section class="relative bg-gradient-to-br from-[#FDFBFA] via-[#FAF7F5] to-[#FDFBFA] overflow-hidden py-20 lg:py-28">
+      <!-- Líneas decorativas sutiles -->
+      <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4B9A9]/30 to-transparent"></div>
+      <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4B9A9]/30 to-transparent"></div>
 
-      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-16 lg:py-20">
-        <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+        <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
           
-          <!-- Imagen Principal -->
+          <!-- Imagen Principal - Más cerca del texto -->
           <div class="relative order-2 lg:order-1">
             <div class="relative">
               <img 
                 src="/promocion.webp" 
                 alt="Promociones especiales" 
-                class="w-full h-auto rounded-3xl shadow-2xl"
+                class="w-full h-auto rounded-2xl shadow-xl"
               />
+              <!-- Decorative frame -->
+              <div class="absolute -inset-3 border border-[#D4B9A9]/20 rounded-3xl pointer-events-none"></div>
             </div>
           </div>
 
-          <!-- Contenido -->
-          <div class="order-1 lg:order-2 text-center lg:text-left">
-            <!-- Subtítulo Rosado -->
-            <div class="inline-block bg-pink-100 border-2 border-pink-300 rounded-full px-6 py-2 mb-6">
-              <p class="text-pink-700 font-bold text-sm uppercase tracking-wide">
-                ¡Productos de belleza de calidad excepcional!
-              </p>
+          <!-- Contenido - Diseño editorial integrado -->
+          <div class="order-1 lg:order-2 lg:pl-4">
+            
+            <!-- Badge flotante minimalista con borde dorado -->
+            <div class="inline-flex items-center gap-2 border border-[#C9A962]/50 rounded-sm px-4 py-1.5 mb-8">
+              <span class="w-1.5 h-1.5 bg-[#C9A962] rounded-full"></span>
+              <span class="text-[10px] tracking-[0.25em] uppercase text-[#8B7355] font-medium">EDICIÓN LIMITADA</span>
             </div>
 
-            <!-- Título Principal -->
-            <h2 class="font-luxury text-4xl sm:text-5xl lg:text-6xl text-text-dark leading-tight mb-6">
-              ¡<span class="text-brand-600">OFERTAS</span> irresistibles!
+            <!-- Título Principal - Cerca de la imagen -->
+            <h2 class="font-luxury text-4xl sm:text-5xl lg:text-6xl text-text-dark leading-[1.1] mb-5">
+              ¡<span class="text-brand-600">OFERTAS</span><br>
+              <span class="font-luxury italic font-normal">irresistibles</span>!
             </h2>
 
             <!-- Descripción -->
-            <p class="text-text-dark text-lg sm:text-xl mb-8 leading-relaxed font-medium">
+            <p class="text-text-medium text-base sm:text-lg mb-8 leading-relaxed max-w-md">
               Disfruta de los mejores precios en cosméticos y productos de belleza por tiempo limitado, ¡aprovecha!
             </p>
 
-            <!-- CTA Button -->
+            <!-- BENEFICIOS INTEGRADOS - Lista vertical con checkmarks elegantes -->
+            <ul class="space-y-3 mb-10">
+              <li class="flex items-center gap-3">
+                <svg class="w-4 h-4 text-[#C9A962] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+                </svg>
+                <span class="text-sm text-text-dark/80">Hasta <span class="font-semibold text-text-dark">40% de descuento</span></span>
+              </li>
+              <li class="flex items-center gap-3">
+                <svg class="w-4 h-4 text-[#C9A962] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25m0 0V4.5m0 0H8.25m6 0V4.5m0 0H8.25" />
+                </svg>
+                <span class="text-sm text-text-dark/80">Envío <span class="font-semibold text-text-dark">gratis</span> en compras +$999</span>
+              </li>
+              <li class="flex items-center gap-3">
+                <svg class="w-4 h-4 text-[#C9A962] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>
+                <span class="text-sm text-text-dark/80">Garantía de <span class="font-semibold text-text-dark">30 días</span></span>
+              </li>
+            </ul>
+
+            <!-- CTA Button - Negro sólido elegante -->
             <a 
               href="#productos"
-              class="inline-flex items-center justify-center gap-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg px-10 py-5 rounded-full transition-all shadow-2xl hover:shadow-brand-600/40 hover:scale-105 touch-target mb-8"
+              class="inline-flex items-center justify-center gap-3 bg-text-dark hover:bg-black text-white font-medium text-sm tracking-wide px-8 py-4 rounded-sm transition-all hover:shadow-lg touch-target"
             >
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
+              <span>VER COLECCIÓN</span>
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
               </svg>
-              Ver promociones
             </a>
-
-            <!-- Beneficios compactos -->
-            <div class="flex flex-wrap gap-4 justify-center lg:justify-start text-sm">
-              <div class="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full">
-                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
-                </svg>
-                <span class="font-semibold text-green-700">Hasta 40% OFF</span>
-              </div>
-              <div class="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full">
-                <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
-                </svg>
-                <span class="font-semibold text-blue-700">Envío gratis +$999</span>
-              </div>
-              <div class="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full">
-                <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
-                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
-                </svg>
-                <span class="font-semibold text-purple-700">Garantía 30 días</span>
-              </div>
-            </div>
           </div>
 
         </div>
@@ -1036,19 +1080,19 @@
     </footer>
 
     <!-- ========================================
-         FLOATING SOCIAL BUTTONS (Right Side)
+         FLOATING SOCIAL BUTTONS (Right Side) - Compactos en móvil
          ======================================== -->
     <!-- Instagram Button -->
     <a 
       href="https://instagram.com/kharisdistribuidora"
       target="_blank"
-      class="fixed bottom-28 right-6 w-16 h-16 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 text-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all duration-300 z-40 group touch-target"
+      class="fixed bottom-24 sm:bottom-28 right-4 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 text-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all duration-300 z-40 group touch-target"
     >
-      <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+      <svg class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
       </svg>
-      <!-- Tooltip -->
-      <span class="absolute right-full mr-3 bg-white text-text-dark text-sm font-medium px-4 py-2 rounded-xl shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+      <!-- Tooltip - Solo desktop -->
+      <span class="hidden lg:block absolute right-full mr-3 bg-white text-text-dark text-sm font-medium px-4 py-2 rounded-xl shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
         Síguenos en Instagram
       </span>
     </a>
@@ -1057,44 +1101,341 @@
     <a 
       href="https://wa.me/525512345678?text=Hola,%20me%20interesa%20información%20sobre%20sus%20productos"
       target="_blank"
-      class="fixed bottom-6 right-6 w-16 h-16 bg-green-500 text-white rounded-full flex items-center justify-center shadow-xl hover:bg-green-600 hover:scale-110 transition-all duration-300 z-40 group touch-target"
+      class="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-green-500 text-white rounded-full flex items-center justify-center shadow-xl hover:bg-green-600 hover:scale-110 transition-all duration-300 z-40 group touch-target"
     >
-      <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+      <svg class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8" fill="currentColor" viewBox="0 0 24 24">
         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
       </svg>
-      <!-- Tooltip -->
-      <span class="absolute right-full mr-3 bg-white text-text-dark text-sm font-medium px-4 py-2 rounded-xl shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+      <!-- Tooltip - Solo desktop -->
+      <span class="hidden lg:block absolute right-full mr-3 bg-white text-text-dark text-sm font-medium px-4 py-2 rounded-xl shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
         ¿Necesitas ayuda?
       </span>
     </a>
 
     <!-- ========================================
-         SCROLL TO TOP BUTTON (Left Side)
+         SCROLL TO TOP BUTTON (Left Side) - Compacto en móvil
          ======================================== -->
     <button 
       v-show="isScrolled"
       @click="scrollToTop"
-      class="fixed bottom-6 left-6 w-14 h-14 bg-brand-600 hover:bg-brand-700 text-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all duration-300 z-40 group touch-target"
+      class="fixed bottom-4 sm:bottom-6 left-4 sm:left-6 w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-brand-600 hover:bg-brand-700 text-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all duration-300 z-40 group touch-target"
     >
-      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <svg class="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
       </svg>
-      <!-- Tooltip -->
-      <span class="absolute left-full ml-3 bg-white text-text-dark text-sm font-medium px-4 py-2 rounded-xl shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+      <!-- Tooltip - Solo desktop -->
+      <span class="hidden lg:block absolute left-full ml-3 bg-white text-text-dark text-sm font-medium px-4 py-2 rounded-xl shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
         Subir
       </span>
     </button>
+
+    <!-- ========================================
+         TOAST NOTIFICATION - Estilo Premium Shopping (tipo Instagram)
+         ======================================== -->
+    <transition
+      enter-active-class="transition-all duration-400 ease-out"
+      leave-active-class="transition-all duration-300 ease-in"
+      enter-from-class="opacity-0 translate-y-[-20px] scale-95"
+      enter-to-class="opacity-100 translate-y-0 scale-100"
+      leave-from-class="opacity-100 translate-y-0 scale-100"
+      leave-to-class="opacity-0 translate-y-[-10px] scale-95"
+    >
+      <div 
+        v-if="toast.show"
+        class="fixed top-20 right-4 sm:right-6 z-[100] max-w-[360px] w-full sm:w-auto"
+      >
+        <!-- Toast para producto agregado (con imagen) -->
+        <div 
+          v-if="toast.type === 'cart' && toast.product"
+          class="bg-white/95 rounded-2xl shadow-2xl overflow-hidden border border-nude-100"
+          style="box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15), 0 0 0 1px rgba(0,0,0,0.02);"
+        >
+          <!-- Contenido principal -->
+          <div class="flex items-center gap-4 p-4">
+            <!-- Thumbnail del producto -->
+            <div class="w-16 h-16 rounded-xl bg-gradient-to-br from-nude-50 to-nude-100 flex-shrink-0 overflow-hidden flex items-center justify-center">
+              <img 
+                v-if="toast.product.imagen_url" 
+                :src="toast.product.imagen_url" 
+                :alt="toast.product.nombre"
+                class="w-full h-full object-cover"
+              />
+              <svg v-else class="w-7 h-7 text-brand-300" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+              </svg>
+            </div>
+            
+            <!-- Info -->
+            <div class="flex-1 min-w-0">
+              <h4 class="font-luxury text-sm text-text-dark">¡Excelente elección!</h4>
+              <p class="text-xs text-text-medium mt-0.5 truncate">{{ toast.product.nombre }}</p>
+            </div>
+            
+            <!-- CTA Ver Bolsa -->
+            <button 
+              @click="openCartDrawer(); toast.show = false"
+              class="flex-shrink-0 text-xs font-semibold text-brand-600 hover:text-brand-700 uppercase tracking-wide transition-colors"
+            >
+              Ver bolsa
+            </button>
+          </div>
+          
+          <!-- Barra de progreso envío gratis -->
+          <div class="px-4 pb-3">
+            <div class="flex items-center gap-2">
+              <div class="flex-1 h-1 bg-nude-100 rounded-full overflow-hidden">
+                <div 
+                  class="h-full bg-gradient-to-r from-brand-400 to-brand-600 rounded-full transition-all duration-500"
+                  :style="{ width: Math.min(100, (getCartSubtotal() / 500) * 100) + '%' }"
+                ></div>
+              </div>
+              <span class="text-[10px] text-text-medium whitespace-nowrap">
+                {{ getCartSubtotal() >= 500 ? '¡Envío gratis!' : `$${formatPrice(500 - getCartSubtotal())} para envío gratis` }}
+              </span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Toast genérico (info, error, success sin producto) -->
+        <div 
+          v-else
+          class="bg-white/95 rounded-2xl shadow-2xl overflow-hidden"
+          style="box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15);"
+        >
+          <div class="flex items-center gap-3 px-5 py-4">
+            <!-- Icono según tipo -->
+            <div 
+              :class="[
+                'w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0',
+                toast.type === 'success' ? 'bg-green-50' : toast.type === 'error' ? 'bg-red-50' : 'bg-brand-50'
+              ]"
+            >
+              <svg v-if="toast.type === 'success'" class="w-5 h-5 text-green-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              <svg v-else-if="toast.type === 'error'" class="w-5 h-5 text-red-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              <svg v-else class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+            </div>
+            <span class="text-sm font-medium text-text-dark">{{ toast.message }}</span>
+          </div>
+        </div>
+      </div>
+    </transition>
+
+    <!-- ========================================
+         CART DRAWER - Sidebar derecha (Estilo Soft Beauty)
+         ======================================== -->
+    <!-- Overlay oscuro sin blur para rendimiento -->
+    <transition
+      enter-active-class="transition-opacity duration-300 ease-out"
+      leave-active-class="transition-opacity duration-200 ease-in"
+      enter-from-class="opacity-0"
+      enter-to-class="opacity-100"
+      leave-from-class="opacity-100"
+      leave-to-class="opacity-0"
+    >
+      <div 
+        v-if="showCartDrawer"
+        class="fixed inset-0 bg-black/40 z-50"
+        @click="closeCartDrawer"
+      ></div>
+    </transition>
+    
+    <!-- Panel del Carrito - Soft Beauty Style -->
+    <transition
+      enter-active-class="transition-transform duration-300 ease-out"
+      leave-active-class="transition-transform duration-200 ease-in"
+      enter-from-class="translate-x-full"
+      enter-to-class="translate-x-0"
+      leave-from-class="translate-x-0"
+      leave-to-class="translate-x-full"
+    >
+      <div 
+        v-if="showCartDrawer"
+        class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-[60] flex flex-col"
+        style="box-shadow: -20px 0 60px -15px rgba(0, 0, 0, 0.15);"
+        @click.stop
+      >
+        <!-- Header - Elegante con Serif -->
+        <div class="flex items-center justify-between px-6 py-5 border-b border-nude-200/50">
+          <h2 class="font-luxury text-xl text-text-dark tracking-wide">Tu Selección</h2>
+          <button 
+            @click="closeCartDrawer"
+            class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-nude-100 transition-colors"
+          >
+            <svg class="w-4 h-4 text-text-medium" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Barra de Progreso Envío Gratis - Minimalista -->
+        <div class="px-6 py-4 bg-gradient-to-r from-nude-50 to-white">
+          <div class="flex items-center justify-between mb-2">
+            <span class="text-xs text-text-medium">
+              {{ getCartSubtotal() >= 500 ? '¡Envío gratis desbloqueado! 🎉' : `Te faltan $${formatPrice(500 - getCartSubtotal())} para envío gratis` }}
+            </span>
+            <span class="text-xs text-brand-600 font-medium">{{ Math.min(100, Math.round((getCartSubtotal() / 500) * 100)) }}%</span>
+          </div>
+          <div class="h-1 bg-nude-200 rounded-full overflow-hidden">
+            <div 
+              class="h-full bg-gradient-to-r from-brand-500 to-brand-600 rounded-full transition-all duration-500"
+              :style="{ width: Math.min(100, (getCartSubtotal() / 500) * 100) + '%' }"
+            ></div>
+          </div>
+        </div>
+        
+        <!-- Contenido del Carrito -->
+        <div class="flex-1 overflow-y-auto px-4">
+          <!-- Loading -->
+          <div v-if="cartLoading" class="flex items-center justify-center h-32">
+            <div class="w-8 h-8 border-2 border-brand-400 border-t-transparent rounded-full animate-spin"></div>
+          </div>
+          
+          <!-- Carrito vacío - Femenino -->
+          <div v-else-if="cartItems.length === 0" class="flex flex-col items-center justify-center h-72 text-center px-4">
+            <div class="w-24 h-24 rounded-full bg-gradient-to-br from-nude-100 to-nude-200 flex items-center justify-center mb-5">
+              <svg class="w-10 h-10 text-brand-400" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+              </svg>
+            </div>
+            <h3 class="font-luxury text-lg text-text-dark mb-2">Tu selección está vacía</h3>
+            <p class="text-text-medium text-sm mb-6">Descubre productos increíbles para ti</p>
+            <button 
+              @click="closeCartDrawer"
+              class="bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm px-8 py-3 rounded-full transition-all hover:shadow-lg hover:shadow-brand-600/25"
+            >
+              Explorar colección
+            </button>
+          </div>
+          
+          <!-- Items del carrito - Soft Beauty -->
+          <div v-else class="py-4 space-y-4">
+            <div 
+              v-for="item in cartItems" 
+              :key="item.producto_id"
+              class="flex gap-4 p-3 bg-white rounded-xl border border-nude-100 hover:border-nude-200 transition-colors"
+            >
+              <!-- Imagen del producto - Más grande y redondeada -->
+              <div class="w-[90px] h-[90px] bg-gradient-to-br from-nude-50 to-nude-100 rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center">
+                <img 
+                  v-if="item.imagen_url" 
+                  :src="item.imagen_url" 
+                  :alt="item.nombre"
+                  class="w-full h-full object-cover"
+                />
+                <svg v-else class="w-8 h-8 text-nude-300" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
+                </svg>
+              </div>
+              
+              <!-- Info del producto -->
+              <div class="flex-1 min-w-0 flex flex-col justify-between py-1">
+                <div>
+                  <h3 class="text-sm font-medium text-text-dark leading-snug line-clamp-2 mb-1">
+                    {{ item.nombre || 'Producto' }}
+                  </h3>
+                  
+                  <!-- Selector de Cantidad - Estilo Píldora -->
+                  <div class="flex items-center gap-2 mt-2">
+                    <div class="inline-flex items-center border border-nude-200 rounded-full">
+                      <button 
+                        @click="updateQuantity(item.producto_id, (item.cantidad || 1) - 1)"
+                        class="w-7 h-7 flex items-center justify-center text-text-medium hover:text-text-dark transition-colors"
+                        :disabled="(item.cantidad || 1) <= 1"
+                      >
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" d="M5 12h14" />
+                        </svg>
+                      </button>
+                      <span class="w-8 text-center text-sm font-medium text-text-dark">{{ item.cantidad || 1 }}</span>
+                      <button 
+                        @click="updateQuantity(item.producto_id, (item.cantidad || 1) + 1)"
+                        class="w-7 h-7 flex items-center justify-center text-text-medium hover:text-text-dark transition-colors"
+                      >
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" d="M12 5v14m-7-7h14" />
+                        </svg>
+                      </button>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Precio -->
+                <p class="text-base font-semibold text-text-dark mt-1">
+                  ${{ formatPrice(getItemPrice(item)) }}
+                </p>
+              </div>
+              
+              <!-- Eliminar - Más visible -->
+              <button 
+                @click.stop="removeFromCart(item.producto_id)"
+                class="self-start mt-1 w-8 h-8 rounded-full flex items-center justify-center bg-red-50 hover:bg-red-100 transition-colors group"
+                title="Eliminar producto"
+              >
+                <svg class="w-4 h-4 text-red-400 group-hover:text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                </svg>
+              </button>
+            </div>
+            
+            <!-- Espacio adicional al final de la lista -->
+          </div>
+        </div>
+        
+        <!-- Footer - Fondo Nude, Botón Pill con Glow -->
+        <div v-if="cartItems.length > 0" class="border-t border-nude-200" style="background: #FDFBF7;">
+          <!-- Resumen de precios -->
+          <div class="px-6 py-4 space-y-2">
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-text-medium">Subtotal</span>
+              <span class="text-text-dark">${{ formatPrice(getCartSubtotal()) }}</span>
+            </div>
+            <div class="flex items-center justify-between text-sm">
+              <span class="text-text-medium">Envío</span>
+              <span class="text-text-medium italic">Por calcular</span>
+            </div>
+            <div class="flex items-center justify-between pt-3 border-t border-nude-200">
+              <span class="text-text-dark font-medium">Total</span>
+              <span class="font-luxury text-2xl font-bold text-text-dark">${{ formatPrice(getCartSubtotal()) }}</span>
+            </div>
+          </div>
+          
+          <!-- Botones -->
+          <div class="px-6 pb-6 space-y-3">
+            <button 
+              @click="irACheckout"
+              class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm py-4 rounded-full transition-all uppercase tracking-wider hover:shadow-xl hover:shadow-brand-600/30"
+            >
+              Finalizar Compra
+            </button>
+            <button 
+              @click="closeCartDrawer"
+              class="w-full text-sm text-text-medium hover:text-text-dark transition-colors py-2"
+            >
+              Seguir comprando
+            </button>
+          </div>
+        </div>
+      </div>
+    </transition>
 
   </div>
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted } from 'vue'
-import { productosService, carritoService } from '../services/productos'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
+import { productosService, carritoService, authService, favoritosService } from '../services/productos'
 
 export default {
   name: 'Home',
   setup() {
+    const router = useRouter()
     const productos = ref([])
     const loading = ref(true)
     const error = ref(null)
@@ -1103,6 +1444,242 @@ export default {
     const mobileMenuOpen = ref(false)
     const mobileSearchOpen = ref(false)
     const searchQuery = ref('')
+    
+    // Estado de usuario - usando ref para reactividad inmediata
+    const isLoggedIn = ref(authService.isAuthenticated())
+    const currentUser = ref(JSON.parse(localStorage.getItem('user') || 'null'))
+    const userInitial = computed(() => {
+      if (!currentUser.value) return ''
+      return (currentUser.value.nombre || currentUser.value.email || 'U')[0].toUpperCase()
+    })
+    
+    // ===== TOAST NOTIFICATION SYSTEM =====
+    const toast = ref({
+      show: false,
+      message: '',
+      type: 'success', // 'success', 'error', 'info', 'cart'
+      product: null // Para mostrar info del producto en el toast
+    })
+    let toastTimeout = null
+    
+    const showToast = (message, type = 'success', product = null) => {
+      if (toastTimeout) clearTimeout(toastTimeout)
+      toast.value = { show: true, message, type, product }
+      toastTimeout = setTimeout(() => {
+        toast.value.show = false
+      }, 4000) // 4 segundos para el toast con producto
+    }
+    
+    // Toast especial para carrito con producto
+    const showCartToast = (product) => {
+      if (toastTimeout) clearTimeout(toastTimeout)
+      toast.value = { 
+        show: true, 
+        message: '¡Agregado a tu bolsa!', 
+        type: 'cart', 
+        product: {
+          nombre: product.nombre || 'Producto',
+          imagen_url: product.imagen_url || product.imagenes?.[0] || null,
+          precio: product.precio_final || product.precio || 0
+        }
+      }
+      toastTimeout = setTimeout(() => {
+        toast.value.show = false
+      }, 5000) // 5 segundos para ver bien el producto
+    }
+    
+    // ===== CART DRAWER =====
+    const showCartDrawer = ref(false)
+    const cartItems = ref([])
+    const cartTotal = ref(0)
+    const cartLoading = ref(false)
+    
+    // ===== PERSISTENCIA LOCAL DEL CARRITO =====
+    const CART_STORAGE_KEY = 'kharis_cart_cache'
+    const CART_COUNT_KEY = 'kharis_cart_count'
+    
+    const saveCartToLocal = (items, total, count) => {
+      try {
+        localStorage.setItem(CART_STORAGE_KEY, JSON.stringify({ items, total, timestamp: Date.now() }))
+        localStorage.setItem(CART_COUNT_KEY, String(count))
+      } catch (e) {
+        console.warn('No se pudo guardar carrito en localStorage:', e)
+      }
+    }
+    
+    const loadCartFromLocal = () => {
+      try {
+        const cached = localStorage.getItem(CART_STORAGE_KEY)
+        const count = localStorage.getItem(CART_COUNT_KEY)
+        if (cached) {
+          const data = JSON.parse(cached)
+          // Solo usar cache si tiene menos de 30 minutos
+          if (Date.now() - data.timestamp < 30 * 60 * 1000) {
+            return { items: data.items || [], total: data.total || 0, count: parseInt(count) || 0 }
+          }
+        }
+      } catch (e) {
+        console.warn('Error leyendo carrito de localStorage:', e)
+      }
+      return null
+    }
+    
+    const clearCartLocal = () => {
+      localStorage.removeItem(CART_STORAGE_KEY)
+      localStorage.removeItem(CART_COUNT_KEY)
+    }
+    
+    const openCartDrawer = async () => {
+      showCartDrawer.value = true
+      // Bloquear scroll del body
+      document.body.style.overflow = 'hidden'
+      await loadCartItems()
+    }
+    
+    const closeCartDrawer = () => {
+      showCartDrawer.value = false
+      // Restaurar scroll del body
+      document.body.style.overflow = ''
+    }
+    
+    // Actualizar cantidad de un producto
+    const updateQuantity = async (productoId, nuevaCantidad) => {
+      if (nuevaCantidad < 1) {
+        // Si la cantidad es 0 o menos, eliminar el producto
+        await removeFromCart(productoId)
+        return
+      }
+      
+      try {
+        // Actualizar localmente primero para feedback inmediato
+        const itemIndex = cartItems.value.findIndex(i => i.producto_id === productoId)
+        if (itemIndex >= 0) {
+          cartItems.value[itemIndex].cantidad = nuevaCantidad
+          // Recalcular subtotal local
+          const item = cartItems.value[itemIndex]
+          item.subtotal = (item.precio_unitario || item.precio || 0) * nuevaCantidad
+          
+          // Actualizar cache
+          const newCount = cartItems.value.reduce((sum, i) => sum + i.cantidad, 0)
+          const newTotal = getCartSubtotal()
+          saveCartToLocal(cartItems.value, newTotal, newCount)
+          cartCount.value = newCount
+        }
+        
+        // Sincronizar con backend si está logueado
+        if (isLoggedIn.value) {
+          await carritoService.actualizarCantidad(productoId, nuevaCantidad)
+        }
+      } catch (err) {
+        console.error('Error actualizando cantidad:', err)
+        // Recargar del servidor en caso de error
+        await loadCartItems()
+      }
+    }
+    
+    const loadCartItems = async () => {
+      cartLoading.value = true
+      
+      // Primero cargar desde cache local para respuesta inmediata
+      const cachedCart = loadCartFromLocal()
+      if (cachedCart && cachedCart.items.length > 0) {
+        cartItems.value = cachedCart.items
+        cartTotal.value = cachedCart.total
+        cartCount.value = cachedCart.count || cachedCart.items.reduce((sum, item) => sum + item.cantidad, 0)
+      }
+      
+      // Si no está logueado, solo usar cache
+      if (!isLoggedIn.value) {
+        cartLoading.value = false
+        return
+      }
+      
+      try {
+        console.log('Cargando carrito desde backend...')
+        const data = await carritoService.getCarrito()
+        console.log('Respuesta del carrito:', data)
+        
+        // El carrito puede ser null si no existe todavía
+        if (data && data.items && data.items.length > 0) {
+          cartItems.value = data.items
+          cartTotal.value = data.total_final || 0
+          cartCount.value = data.items.reduce((sum, item) => sum + item.cantidad, 0)
+          // Guardar en cache local
+          saveCartToLocal(data.items, data.total_final || 0, cartCount.value)
+          console.log('Carrito cargado:', cartItems.value.length, 'items, total:', cartCount.value)
+        } else if (data === null) {
+          // Backend dice que no hay carrito - pero mantener cache si existe
+          console.log('Backend devolvió null, usando cache si existe')
+        } else {
+          console.log('Carrito vacío del backend')
+          // Solo limpiar si realmente está vacío
+          if (!cachedCart || cachedCart.items.length === 0) {
+            cartItems.value = []
+            cartTotal.value = 0
+            cartCount.value = 0
+          }
+        }
+      } catch (err) {
+        // 404 es normal si no hay carrito creado
+        if (err.response?.status === 404) {
+          console.log('No existe carrito (404), usando cache')
+        } else if (err.response?.status !== 401) {
+          console.error('Error cargando carrito:', err)
+        }
+      } finally {
+        cartLoading.value = false
+      }
+    }
+    
+    const removeFromCart = async (itemId) => {
+      try {
+        // Primero actualizar UI localmente para feedback inmediato
+        const itemIndex = cartItems.value.findIndex(i => i.producto_id === itemId)
+        if (itemIndex >= 0) {
+          cartItems.value.splice(itemIndex, 1)
+          cartCount.value = Math.max(0, cartCount.value - 1)
+          
+          // Actualizar cache local
+          if (cartItems.value.length === 0) {
+            clearCartLocal()
+            cartTotal.value = 0
+          } else {
+            const newTotal = getCartSubtotal()
+            saveCartToLocal(cartItems.value, newTotal, cartCount.value)
+            cartTotal.value = newTotal
+          }
+        }
+        
+        // Sincronizar con backend si está logueado
+        if (isLoggedIn.value) {
+          try {
+            await carritoService.eliminarProducto(itemId)
+          } catch (backendErr) {
+            // Si falla el backend pero ya actualizamos localmente, no pasa nada grave
+            console.warn('Error sync eliminar con backend:', backendErr)
+          }
+        }
+        
+        showToast('Producto eliminado', 'info')
+      } catch (err) {
+        console.error('Error eliminando del carrito:', err)
+        showToast('Error al eliminar producto', 'error')
+        // Recargar para sincronizar
+        await loadCartItems()
+      }
+    }
+    
+    const irACheckout = () => {
+      // Desbloquear scroll ANTES de navegar
+      document.body.style.overflow = ''
+      document.body.style.paddingRight = ''
+      showCartDrawer.value = false
+      router.push('/checkout')
+    }
+    
+    // User menu dropdown
+    const showUserMenu = ref(false)
+    const userMenuRef = ref(null)
 
     // ===== HERO CAROUSEL =====
     const currentSlide = ref(0)
@@ -1162,7 +1739,31 @@ export default {
     }
 
     const formatPrice = (price) => {
-      return new Intl.NumberFormat('es-MX').format(price)
+      // Manejar casos de NaN, null, undefined
+      const numPrice = Number(price)
+      if (isNaN(numPrice) || numPrice === null || numPrice === undefined) {
+        return '0'
+      }
+      return new Intl.NumberFormat('es-MX').format(numPrice)
+    }
+    
+    // Helper para obtener precio del item del carrito
+    const getItemPrice = (item) => {
+      // Intentar diferentes propiedades donde puede estar el precio
+      const price = item.subtotal || item.precio_unitario || item.precio || item.precio_final || 0
+      const cantidad = item.cantidad || 1
+      // Si el subtotal ya incluye la cantidad, usarlo directo
+      if (item.subtotal) return item.subtotal
+      // Si no, calcular
+      return price * cantidad
+    }
+    
+    // Helper para calcular el subtotal del carrito
+    const getCartSubtotal = () => {
+      if (!cartItems.value || cartItems.value.length === 0) return 0
+      return cartItems.value.reduce((total, item) => {
+        return total + getItemPrice(item)
+      }, 0)
     }
 
     const handleScroll = () => {
@@ -1180,8 +1781,18 @@ export default {
       loading.value = true
       error.value = null
       try {
-        const data = await productosService.getDestacados()
-        productos.value = data.productos || data.results || data || []
+        // Primero intentar obtener productos destacados
+        let data = await productosService.getDestacados()
+        let productosData = data.productos || data.results || data || []
+        
+        // Si no hay destacados, obtener todos los productos disponibles
+        if (productosData.length === 0) {
+          console.log('No hay productos destacados, cargando todos los disponibles...')
+          data = await productosService.getProductos()
+          productosData = data.productos || data.results || data || []
+        }
+        
+        productos.value = productosData
       } catch (err) {
         if (err.response?.status !== 401) {
           error.value = 'Error al cargar productos: ' + (err.response?.data?.detail || err.message)
@@ -1194,40 +1805,172 @@ export default {
     }
 
     const agregarAlCarrito = async (producto) => {
+      // Verificar si está logueado
+      if (!isLoggedIn.value) {
+        showToast('Debes iniciar sesión para agregar productos', 'info')
+        setTimeout(() => router.push('/login'), 1500)
+        return
+      }
+      
       try {
-        await carritoService.agregarProducto(producto.id, 1)
-        cartCount.value++
-        console.log('Producto agregado al carrito')
+        console.log('Agregando producto al carrito:', producto.id)
+        const resultado = await carritoService.agregarProducto(producto.id, 1)
+        console.log('Resultado de agregar al carrito:', resultado)
+        
+        // Verificar que realmente se agregó
+        if (resultado) {
+          // Incrementar contador inmediatamente para feedback visual
+          cartCount.value++
+          
+          // Guardar en cache local inmediatamente
+          const currentItems = [...cartItems.value]
+          const existingIndex = currentItems.findIndex(i => i.producto_id === producto.id)
+          if (existingIndex >= 0) {
+            currentItems[existingIndex].cantidad++
+          } else {
+            currentItems.push({
+              producto_id: producto.id,
+              nombre: producto.nombre,
+              imagen_url: producto.imagen_url || producto.imagenes?.[0] || null,
+              precio_unitario: producto.precio_final || producto.precio,
+              cantidad: 1,
+              subtotal: producto.precio_final || producto.precio
+            })
+          }
+          const newTotal = currentItems.reduce((sum, item) => sum + (item.subtotal || item.precio_unitario * item.cantidad), 0)
+          saveCartToLocal(currentItems, newTotal, cartCount.value)
+          cartItems.value = currentItems
+          cartTotal.value = newTotal
+          
+          // Mostrar toast premium con info del producto
+          showCartToast(producto)
+          
+          // Sincronizar con backend en segundo plano (sin esperar)
+          cargarResumenCarrito().catch(e => console.warn('Error sync resumen:', e))
+        }
       } catch (err) {
         console.error('Error agregando al carrito:', err)
-        if (err.response?.status !== 401) {
-          alert('Error al agregar al carrito: ' + (err.response?.data?.detail || err.message))
+        const errorMsg = err.response?.data?.detail || err.message || 'Error desconocido'
+        if (err.response?.status === 401) {
+          showToast('Tu sesión ha expirado', 'error')
+          setTimeout(() => router.push('/login'), 1500)
+        } else if (err.response?.status === 422) {
+          showToast('Error de validación. Intenta de nuevo.', 'error')
+        } else {
+          showToast('Error al agregar: ' + errorMsg, 'error')
         }
+      }
+    }
+    
+    const toggleFavorito = async (producto) => {
+      // Verificar si está logueado - redirigir directo a login
+      if (!isLoggedIn.value) {
+        router.push('/login')
+        return
+      }
+      
+      try {
+        await favoritosService.toggle(producto.id)
+        // Podrías actualizar un estado local de favoritos aquí
+      } catch (err) {
+        console.error('Error toggling favorito:', err)
+      }
+    }
+    
+    // User menu functions
+    const toggleUserMenu = () => {
+      if (!isLoggedIn.value) {
+        router.push('/login')
+        return
+      }
+      showUserMenu.value = !showUserMenu.value
+    }
+    
+    const cerrarSesion = () => {
+      localStorage.removeItem('access_token')
+      localStorage.removeItem('refresh_token')
+      localStorage.removeItem('user')
+      // Limpiar cache del carrito
+      clearCartLocal()
+      currentUser.value = null
+      isLoggedIn.value = false // Actualizar estado de login inmediatamente
+      showUserMenu.value = false
+      cartCount.value = 0
+      cartItems.value = []
+      cartTotal.value = 0
+      showToast('Sesión cerrada correctamente', 'info')
+    }
+    
+    // Cerrar menú al hacer clic fuera
+    const handleClickOutside = (event) => {
+      if (userMenuRef.value && !userMenuRef.value.contains(event.target)) {
+        showUserMenu.value = false
       }
     }
 
     const cargarResumenCarrito = async () => {
+      // Primero cargar desde cache local para respuesta inmediata
+      const cachedCart = loadCartFromLocal()
+      if (cachedCart && cachedCart.count > 0) {
+        cartCount.value = cachedCart.count
+        console.log('Contador del cache:', cachedCart.count)
+      }
+      
+      // Si no está logueado, no intentar cargar del servidor
+      if (!isLoggedIn.value) {
+        console.log('Usuario no logueado, no cargando resumen')
+        return
+      }
+      
       try {
+        console.log('Cargando resumen del carrito...')
         const resumen = await carritoService.getResumen()
-        cartCount.value = resumen.total_items || 0
+        console.log('Resumen recibido:', resumen)
+        
+        // El resumen puede ser null si no hay carrito
+        if (resumen !== null) {
+          const count = resumen?.total_items || 0
+          cartCount.value = count
+          // Actualizar el count en localStorage
+          localStorage.setItem(CART_COUNT_KEY, String(count))
+          console.log('Contador actualizado:', count)
+        } else {
+          // Resumen es null - mantener cache si existe
+          console.log('Resumen es null, manteniendo cache')
+        }
       } catch (err) {
-        if (err.response?.status !== 401) {
+        // Solo mostrar error si no es 401 (no autenticado) o 404 (no hay carrito)
+        if (err.response?.status !== 401 && err.response?.status !== 404) {
           console.error('Error cargando resumen del carrito:', err)
         }
-        cartCount.value = 0
+        // Mantener el valor del cache
+        console.log('Error en resumen, manteniendo cache:', cartCount.value)
       }
+    }
+
+    // Listener para actualizar usuario cuando inicia sesión
+    const handleUserLoggedIn = (event) => {
+      console.log('Login event received:', event.detail)
+      currentUser.value = event.detail
+      isLoggedIn.value = true // Actualizar estado de login inmediatamente
+      cargarResumenCarrito()
+      showToast('¡Bienvenido/a ' + (event.detail?.nombre || '') + '!', 'success')
     }
 
     onMounted(() => {
       cargarProductos()
       cargarResumenCarrito()
       window.addEventListener('scroll', handleScroll)
+      window.addEventListener('user-logged-in', handleUserLoggedIn)
+      document.addEventListener('click', handleClickOutside)
       handleScroll()
       startSlideshow()
     })
 
     onUnmounted(() => {
       window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('user-logged-in', handleUserLoggedIn)
+      document.removeEventListener('click', handleClickOutside)
       if (slideInterval) clearInterval(slideInterval)
     })
 
@@ -1246,8 +1989,32 @@ export default {
       handleSearch,
       scrollToTop,
       formatPrice,
+      getItemPrice,
+      getCartSubtotal,
       cargarProductos,
-      agregarAlCarrito
+      agregarAlCarrito,
+      toggleFavorito,
+      toggleUserMenu,
+      cerrarSesion,
+      showUserMenu,
+      userMenuRef,
+      isLoggedIn,
+      currentUser,
+      userInitial,
+      // Toast
+      toast,
+      showToast,
+      showCartToast,
+      // Cart Drawer
+      showCartDrawer,
+      cartItems,
+      cartTotal,
+      cartLoading,
+      openCartDrawer,
+      closeCartDrawer,
+      removeFromCart,
+      updateQuantity,
+      irACheckout
     }
   }
 }

@@ -1,13 +1,17 @@
 <template>
   <div id="app">
-    <!-- Mostrar Home solo si NO estamos en rutas de admin -->
-    <template v-if="!isAdminRoute">
+    <!-- Mostrar Home solo si estamos en la ruta raíz -->
+    <template v-if="isHomeRoute">
       <Home />
-      <!-- Login como overlay modal cuando está en /login -->
-      <Login v-if="isLoginRoute" />
     </template>
     
-    <!-- Para rutas de admin, usar router-view -->
+    <!-- Login como overlay modal cuando está en /login -->
+    <template v-else-if="isLoginRoute">
+      <Home />
+      <Login />
+    </template>
+    
+    <!-- Para todas las demás rutas, usar router-view -->
     <router-view v-else />
   </div>
 </template>
@@ -27,12 +31,12 @@ export default {
   setup() {
     const route = useRoute()
     
+    const isHomeRoute = computed(() => route.path === '/')
     const isLoginRoute = computed(() => route.path === '/login')
-    const isAdminRoute = computed(() => route.path.startsWith('/admin'))
     
     return {
-      isLoginRoute,
-      isAdminRoute
+      isHomeRoute,
+      isLoginRoute
     }
   }
 }

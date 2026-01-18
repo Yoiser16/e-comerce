@@ -119,3 +119,8 @@ class ProductoRepository(RepositorioBase[Producto]):
     def obtener_nuevos(self, limite: int = 8) -> List[Producto]:
         """Obtiene productos más recientes"""
         pass
+    
+    @abstractmethod
+    def obtener_todos(self, limite: int = 100, offset: int = 0) -> List[Producto]:
+        """Obtiene TODOS los productos (incluyendo inactivos) para administración"""
+        pass

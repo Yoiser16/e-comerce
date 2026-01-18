@@ -2,10 +2,15 @@ import { createRouter, createWebHistory } from 'vue-router'
 import Home from '../components/Home.vue'
 import Login from '../components/Login.vue'
 
+// Cliente imports (lazy loaded)
+const MiCuenta = () => import('../components/MiCuenta.vue')
+const Checkout = () => import('../components/Checkout.vue')
+
 // Admin imports (lazy loaded)
 const AdminLayout = () => import('../components/admin/AdminLayout.vue')
 const AdminDashboard = () => import('../components/admin/AdminDashboard.vue')
 const AdminProductos = () => import('../components/admin/AdminProductos.vue')
+const ProductoForm = () => import('../components/admin/ProductoForm.vue')
 const AdminOrdenes = () => import('../components/admin/AdminOrdenes.vue')
 const AdminClientes = () => import('../components/admin/AdminClientes.vue')
 const AdminInventario = () => import('../components/admin/AdminInventario.vue')
@@ -22,6 +27,17 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: Login
+  },
+  {
+    path: '/mi-cuenta',
+    name: 'MiCuenta',
+    component: MiCuenta,
+    meta: { requiresAuth: true }
+  },
+  {
+    path: '/checkout',
+    name: 'Checkout',
+    component: Checkout
   },
   // Admin routes
   {
@@ -40,6 +56,18 @@ const routes = [
         name: 'AdminProductos',
         component: AdminProductos,
         meta: { title: 'Productos' }
+      },
+      {
+        path: 'productos/nuevo',
+        name: 'ProductoNuevo',
+        component: ProductoForm,
+        meta: { title: 'Nuevo Producto' }
+      },
+      {
+        path: 'productos/:id/editar',
+        name: 'ProductoEditar',
+        component: ProductoForm,
+        meta: { title: 'Editar Producto' }
       },
       {
         path: 'ordenes',

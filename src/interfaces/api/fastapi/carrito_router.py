@@ -58,12 +58,26 @@ from application.dto.carrito_dto import (
     CarritoResumenDTO,
     OperacionCarritoResultadoDTO
 )
+from pydantic import BaseModel
 
 router = APIRouter(prefix="/api/v1/carrito", tags=["carrito"])
 
 
+# ===== Request Body Models =====
+class AgregarProductoRequest(BaseModel):
+    """Request body para agregar producto al carrito"""
+    producto_id: UUID
+    cantidad: int = 1
+
+
+class ActualizarCantidadRequest(BaseModel):
+    """Request body para actualizar cantidad"""
+    cantidad: int
+
+
 # ===== ENDPOINTS =====
 
+@router.get("", response_model=Optional[CarritoDTO])
 @router.get("/", response_model=Optional[CarritoDTO])
 def obtener_carrito_activo(
     usuario_id: UUID = Depends(get_current_user_id),
@@ -81,6 +95,7 @@ def obtener_carrito_activo(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.post("", response_model=CarritoDTO, status_code=status.HTTP_201_CREATED)
 @router.post("/", response_model=CarritoDTO, status_code=status.HTTP_201_CREATED)
 def crear_u_obtener_carrito(
     usuario_id: UUID = Depends(get_current_user_id),
@@ -119,7 +134,7 @@ def obtener_resumen_carrito(
 
 @router.post("/items", response_model=OperacionCarritoResultadoDTO)
 def agregar_producto_al_carrito(
-    datos: AgregarProductoAlCarritoActivoDTO,
+    request: AgregarProductoRequest,
     usuario_id: UUID = Depends(get_current_user_id),
     carrito_repo: CarritoRepository = Depends(get_carrito_repository),
     producto_repo: ProductoRepository = Depends(get_producto_repository)
@@ -133,8 +148,12 @@ def agregar_producto_al_carrito(
     - No permite productos duplicados (usar actualizar cantidad)
     """
     try:
-        # Inyectar usuario_id del token
-        datos.usuario_id = usuario_id
+        # Crear DTO con usuario_id del token
+        datos = AgregarProductoAlCarritoActivoDTO(
+            usuario_id=usuario_id,
+            producto_id=request.producto_id,
+            cantidad=request.cantidad
+        )
         
         use_case = AgregarProductoAlCarritoUseCase(carrito_repo, producto_repo)
         return use_case.ejecutar(datos)

@@ -10,6 +10,7 @@ from .cliente_router import router as cliente_router
 from .producto_router import router as producto_router
 from .carrito_router import router as carrito_router
 from .busqueda_router import router as busqueda_router
+from .favoritos_router import router as favoritos_router
 from .exception_handlers import exception_handler_dominio
 from domain.exceptions.dominio import ExcepcionDominio
 from infrastructure.config.app_config import AppConfig
@@ -30,7 +31,8 @@ def crear_app(config: AppConfig) -> FastAPI:
         title="E-Commerce Extensiones de Cabello",
         description="API REST para e-commerce de extensiones de cabello humano con Clean Architecture",
         version="1.0.0",
-        debug=config.debug
+        debug=config.debug,
+        redirect_slashes=False  # Importante: evita redirecciones automáticas que causan 307
     )
     
     # Middleware
@@ -45,13 +47,17 @@ def crear_app(config: AppConfig) -> FastAPI:
     # Exception handlers
     app.add_exception_handler(ExcepcionDominio, exception_handler_dominio)
     
-    # Routers - ORDEN IMPORTANTE: rutas específicas antes que rutas con parámetros
+    # IMPORTANTE: Routers de FastAPI - paths específicos antes que dinámicos
     app.include_router(cliente_router)
-    app.include_router(busqueda_router)   # Primero: /productos/destacados, /productos/buscar
-    app.include_router(producto_router)   # Después: /productos/{producto_id}
+    app.include_router(busqueda_router)   # /productos/buscar, /destacados (específicos)
+    app.include_router(producto_router)   # /productos/{id} (dinámico)
     app.include_router(carrito_router)
+    app.include_router(favoritos_router)
     
-    # Montar Django para rutas de autenticación y admin
+    # Montar Django como fallback en "/"
+    # FastAPI procesa primero, Django solo maneja lo que no matcheó
+    from django.core.wsgi import get_wsgi_application
+    from starlette.middleware.wsgi import WSGIMiddleware
     django_app = get_wsgi_application()
     app.mount("/", WSGIMiddleware(django_app))
     

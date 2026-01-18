@@ -263,3 +263,90 @@ class PerfilUsuarioView(APIView):
             'puede_eliminar': user.puede_eliminar,
             'fecha_creacion': user.fecha_creacion,
         }, status=status.HTTP_200_OK)
+
+
+class RegisterView(APIView):
+    """
+    POST /api/v1/auth/register
+    
+    Registro de nuevos usuarios (clientes).
+    Los nuevos usuarios se crean con rol LECTURA por defecto.
+    
+    Permisos: Público
+    """
+    permission_classes = [AllowAny]
+    throttle_classes = [LoginRateThrottle]  # Mismo rate limit que login
+    
+    def post(self, request):
+        try:
+            email = request.data.get('email', '').strip().lower()
+            password = request.data.get('password', '')
+            nombre = request.data.get('nombre', '').strip()
+            
+            # Validaciones
+            if not email or not password or not nombre:
+                return Response(
+                    {'error': 'Email, contraseña y nombre son requeridos'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            if len(password) < 6:
+                return Response(
+                    {'error': 'La contraseña debe tener al menos 6 caracteres'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Verificar si el email ya existe
+            if User.objects.filter(email=email).exists():
+                return Response(
+                    {'error': 'El email ya está registrado'},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
+            
+            # Crear usuario
+            user = User.objects.create_user(
+                email=email,
+                password=password,
+                nombre=nombre,
+                rol='LECTURA'  # Rol por defecto para clientes
+            )
+            
+            # Generar tokens
+            refresh = RefreshToken.for_user(user)
+            
+            # Auditar registro exitoso
+            ServicioAuditoria.registrar_acceso_api(
+                usuario_id=str(user.id),
+                endpoint='/api/v1/auth/register',
+                metodo='POST',
+                ip=self._get_client_ip(request),
+                user_agent=request.META.get('HTTP_USER_AGENT', 'unknown')[:200],
+                resultado_exitoso=True,
+                codigo_estado=201
+            )
+            
+            return Response({
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+                'user': {
+                    'id': str(user.id),
+                    'email': user.email,
+                    'nombre': user.nombre,
+                    'rol': user.rol,
+                }
+            }, status=status.HTTP_201_CREATED)
+            
+        except Exception as e:
+            return Response(
+                {'error': f'Error al registrar usuario: {str(e)}'},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
+    
+    def _get_client_ip(self, request) -> str:
+        """Obtiene la IP real del cliente."""
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0].strip()
+        else:
+            ip = request.META.get('REMOTE_ADDR', 'unknown')
+        return ip[:45]

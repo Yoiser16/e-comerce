@@ -1,9 +1,11 @@
 import apiClient from './api'
 
 export const productosService = {
-  // Listar productos
+  // ===== MÉTODOS PÚBLICOS =====
+  
+  // Listar productos disponibles (para tienda)
   async getProductos(params = {}) {
-    const response = await apiClient.get('/productos', { params })
+    const response = await apiClient.get('/productos/', { params })
     return response.data
   },
 
@@ -29,6 +31,47 @@ export const productosService = {
   async autocompletar(termino) {
     const response = await apiClient.get('/productos/autocompletar', {
       params: { termino }
+    })
+    return response.data
+  },
+
+  // ===== MÉTODOS ADMIN (CRUD) =====
+  
+  // Listar TODOS los productos (para admin)
+  async listarTodos(params = {}) {
+    const { limite = 100, offset = 0 } = params
+    const response = await apiClient.get('/productos/admin/todos', {
+      params: { limite, offset }
+    })
+    return response.data
+  },
+
+  // Crear producto
+  async crear(producto) {
+    const response = await apiClient.post('/productos/', producto)
+    return response.data
+  },
+
+  // Actualizar producto
+  async actualizar(id, datos) {
+    const response = await apiClient.put(`/productos/${id}`, datos)
+    return response.data
+  },
+
+  // Eliminar producto (soft delete)
+  async eliminar(id) {
+    await apiClient.delete(`/productos/${id}`)
+    return true
+  },
+
+  // Subir imagen de producto
+  async subirImagen(file) {
+    const formData = new FormData()
+    formData.append('file', file)
+    const response = await apiClient.post('/upload/imagen', formData, {
+      headers: {
+        'Content-Type': 'multipart/form-data'
+      }
     })
     return response.data
   }
@@ -91,9 +134,49 @@ export const carritoService = {
     return response.data
   },
 
+  // Alias para eliminar producto (mismo que quitar)
+  async eliminarProducto(productoId) {
+    return this.quitarProducto(productoId)
+  },
+
   // Resumen del carrito (para el badge)
   async getResumen() {
     const response = await apiClient.get('/carrito/resumen')
     return response.data
+  }
+}
+
+// ===== SERVICIO DE FAVORITOS =====
+export const favoritosService = {
+  // Listar favoritos del usuario
+  async listar() {
+    const response = await apiClient.get('/favoritos')
+    return response.data
+  },
+
+  // Agregar a favoritos
+  async agregar(productoId) {
+    const response = await apiClient.post('/favoritos', {
+      producto_id: productoId
+    })
+    return response.data
+  },
+
+  // Eliminar de favoritos
+  async eliminar(productoId) {
+    const response = await apiClient.delete(`/favoritos/${productoId}`)
+    return response.data
+  },
+
+  // Toggle favorito (agregar/quitar)
+  async toggle(productoId) {
+    const response = await apiClient.post(`/favoritos/toggle/${productoId}`)
+    return response.data
+  },
+
+  // Verificar si es favorito
+  async verificar(productoId) {
+    const response = await apiClient.get(`/favoritos/check/${productoId}`)
+    return response.data.es_favorito
   }
 }

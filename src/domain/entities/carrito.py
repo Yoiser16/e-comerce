@@ -62,7 +62,13 @@ class Carrito(EntidadBase):
         id: Optional[UUID] = None,
         fecha_creacion: Optional[datetime] = None,
         fecha_modificacion: Optional[datetime] = None,
-        activo: bool = True
+        activo: bool = True,
+        # Campos adicionales para persistencia
+        fecha_bloqueo: Optional[datetime] = None,
+        fecha_confirmacion: Optional[datetime] = None,
+        motivo_bloqueo: Optional[str] = None,
+        motivo_expiracion: Optional[str] = None,
+        orden_generada_id: Optional[UUID] = None
     ):
         super().__init__(id, fecha_creacion, fecha_modificacion, activo)
         self._usuario_id = usuario_id
@@ -72,6 +78,12 @@ class Carrito(EntidadBase):
         self._moneda = moneda
         self._version = version
         self._expira_en = expira_en or (datetime.now() + timedelta(hours=TIEMPO_EXPIRACION_HORAS))
+        # Campos adicionales
+        self._fecha_bloqueo = fecha_bloqueo
+        self._fecha_confirmacion = fecha_confirmacion
+        self._motivo_bloqueo = motivo_bloqueo
+        self._motivo_expiracion = motivo_expiracion
+        self._orden_generada_id = orden_generada_id
         
         # Validar unicidad de productos
         self._validar_no_duplicados()
@@ -104,6 +116,31 @@ class Carrito(EntidadBase):
     @property
     def expira_en(self) -> datetime:
         return self._expira_en
+    
+    @property
+    def fecha_expiracion(self) -> datetime:
+        """Alias para compatibilidad con repositorio"""
+        return self._expira_en
+    
+    @property
+    def fecha_bloqueo(self) -> Optional[datetime]:
+        return self._fecha_bloqueo
+    
+    @property
+    def fecha_confirmacion(self) -> Optional[datetime]:
+        return self._fecha_confirmacion
+    
+    @property
+    def motivo_bloqueo(self) -> Optional[str]:
+        return self._motivo_bloqueo
+    
+    @property
+    def motivo_expiracion(self) -> Optional[str]:
+        return self._motivo_expiracion
+    
+    @property
+    def orden_generada_id(self) -> Optional[UUID]:
+        return self._orden_generada_id
     
     @property
     def esta_expirado(self) -> bool:
