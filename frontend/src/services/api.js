@@ -43,7 +43,7 @@ apiClient.interceptors.response.use(
       isRefreshing = true
 
       try {
-        const response = await axios.post('http://localhost:8000/api/v1/auth/token/refresh', {
+        const response = await axios.post('http://localhost:8000/api/v1/auth/refresh', {
           refresh: refreshToken
         })
 

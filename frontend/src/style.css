@@ -79,17 +79,18 @@ body {
 
 /* Glassmorphism para navbar */
 .glass-navbar {
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.95);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 }
 
 .glass-navbar-scrolled {
-  background: rgba(255, 255, 255, 0.92);
+  background: rgba(255, 255, 255, 0.98);
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.06);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 
 /* Sombras suaves - Soft shadows */
@@ -153,7 +154,60 @@ body {
   background: rgba(216, 27, 96, 0.04);
 }
 
-/* Trust bar con fondo nude */
+/* ========================================
+   TRUST RIBBON - Premium Editorial Style
+   ======================================== */
+.trust-ribbon-premium {
+  /* Elegant blush background */
+  background: linear-gradient(180deg, #FAF7F5 0%, #FDF9F7 100%);
+}
+
+/* Mobile grid dividers for premium ribbon */
+@media (max-width: 1023px) {
+  .trust-ribbon-premium .trust-item-premium:nth-child(1),
+  .trust-ribbon-premium .trust-item-premium:nth-child(2) {
+    border-bottom: 1px solid rgba(212, 185, 169, 0.3);
+  }
+  
+  .trust-ribbon-premium .trust-item-premium:nth-child(odd) {
+    border-right: 1px solid rgba(212, 185, 169, 0.3);
+  }
+}
+
+/* Legacy styles for backwards compatibility */
+.trust-ribbon {
+  background: linear-gradient(180deg, #FDF8F6 0%, #FAF5F2 100%);
+}
+
+.trust-item {
+  transition: all 0.3s ease;
+}
+
+.trust-item:hover {
+  background: rgba(255, 255, 255, 0.5);
+}
+
+.trust-item svg {
+  transition: transform 0.3s ease, color 0.3s ease;
+}
+
+.trust-item:hover svg {
+  transform: translateY(-2px);
+  color: #D81B60;
+}
+
+.trust-item h4 {
+  font-family: 'Inter', system-ui, sans-serif;
+  font-weight: 500;
+  letter-spacing: 0.2em;
+}
+
+.trust-item p {
+  font-family: 'Inter', system-ui, sans-serif;
+  letter-spacing: 0.03em;
+}
+
+/* Legacy trust-bar */
 .trust-bar {
   background: linear-gradient(135deg, #faf5f2 0%, #fdfcfb 100%);
 }
@@ -256,4 +310,30 @@ html {
     min-height: 44px;
     min-width: 44px;
   }
+}
+
+/* Custom Animations for Hero */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translate3d(0, 40px, 0);
+  }
+  to {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.8s cubic-bezier(0.25, 0.46, 0.45, 0.94) both;
+}
+
+.delay-100 {
+  animation-delay: 100ms;
+}
+.delay-200 {
+  animation-delay: 200ms;
+}
+.delay-300 {
+  animation-delay: 300ms;
 }

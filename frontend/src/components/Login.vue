@@ -2,9 +2,9 @@
   <!-- ===== MODAL OVERLAY LOGIN ===== -->
   <div class="fixed inset-0 z-[100]">
     
-    <!-- Backdrop: Página oscurecida con blur -->
+    <!-- Backdrop: Simple overlay sin blur -->
     <div 
-      class="absolute inset-0 bg-black/60 backdrop-blur-md"
+      class="absolute inset-0 bg-black/70"
       @click="closeModal"
     ></div>
 
@@ -33,13 +33,11 @@
           <!-- Logo -->
           <div class="flex justify-center mb-8">
             <router-link to="/" class="flex items-center gap-3">
-              <div class="w-12 h-12 bg-gradient-to-br from-brand-600 to-brand-700 rounded-2xl flex items-center justify-center shadow-soft">
-                <span class="text-white font-luxury font-bold text-xl">K</span>
-              </div>
-              <div>
-                <h1 class="text-xl font-luxury font-semibold text-text-dark tracking-wide">Kharis</h1>
-                <span class="text-[9px] text-brand-600 font-medium tracking-[0.25em] uppercase">Distribuidora</span>
-              </div>
+              <img 
+                src="/logo.jpeg" 
+                alt="Kharis Distribuidora" 
+                class="h-14 w-auto object-contain"
+              />
             </router-link>
           </div>
 
@@ -168,6 +166,7 @@
 <script>
 import { ref, reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import apiClient from '../services/api'
 
 export default {
   name: 'Login',
@@ -192,11 +191,35 @@ export default {
       error.value = null
       
       try {
-        await new Promise(resolve => setTimeout(resolve, 1000))
-        console.log('Login:', form)
+        // Llamar al endpoint de login del backend
+        const response = await apiClient.post('/auth/login', {
+          email: form.email,
+          password: form.password
+        })
+        
+        // Guardar tokens en localStorage
+        const { access, refresh, user } = response.data
+        localStorage.setItem('access_token', access)
+        localStorage.setItem('refresh_token', refresh)
+        localStorage.setItem('user', JSON.stringify(user))
+        
+        console.log('Login exitoso:', user)
+        
+        // Redirigir al home
         router.push('/')
+        
       } catch (err) {
-        error.value = 'Credenciales incorrectas'
+        console.error('Error de login:', err)
+        
+        if (err.response?.status === 401) {
+          error.value = 'Credenciales incorrectas. Verifica tu email y contraseña.'
+        } else if (err.response?.status === 429) {
+          error.value = 'Demasiados intentos. Por favor espera un momento.'
+        } else if (err.response?.data?.detail) {
+          error.value = err.response.data.detail
+        } else {
+          error.value = 'Error de conexión. Intenta de nuevo.'
+        }
       } finally {
         loading.value = false
       }

@@ -13,18 +13,34 @@
       <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
         <div class="flex items-center justify-between">
           <!-- Logo -->
-          <a href="#" class="flex items-center gap-3 group">
-            <div class="relative">
-              <div class="w-11 h-11 bg-gradient-to-br from-brand-600 to-brand-700 rounded-2xl flex items-center justify-center shadow-soft transition-transform duration-300 group-hover:scale-105">
-                <span class="text-white font-luxury font-bold text-xl">K</span>
-              </div>
-              <div class="absolute -bottom-1 -right-1 w-4 h-4 bg-gold-400 rounded-full opacity-60"></div>
-            </div>
-            <div class="hidden sm:block">
-              <h1 class="text-xl font-luxury font-semibold text-text-dark tracking-wide">Kharis</h1>
-              <span class="text-[9px] text-brand-600 font-medium tracking-[0.25em] uppercase">Distribuidora</span>
+          <a href="#" class="flex items-center gap-2 group flex-shrink-0">
+            <div class="w-11 h-11 sm:w-12 sm:h-12 rounded-full overflow-hidden border-2 border-white/80 shadow-lg transition-transform duration-300 group-hover:scale-105">
+              <img 
+                src="/logo.jpeg" 
+                alt="Kharis Distribuidora" 
+                class="w-full h-full object-cover"
+              />
             </div>
           </a>
+
+          <!-- Buscador Desktop -->
+          <div class="hidden lg:flex flex-1 max-w-md mx-8">
+            <div class="relative w-full">
+              <input 
+                type="text"
+                v-model="searchQuery"
+                @keyup.enter="handleSearch"
+                placeholder="Buscar extensiones, pelucas..."
+                class="w-full pl-11 pr-4 py-2.5 bg-white/80 border border-nude-200 rounded-full text-sm text-text-dark placeholder-text-light focus:outline-none focus:border-brand-400 focus:bg-white focus:ring-2 focus:ring-brand-400/20 transition-all duration-300"
+              />
+              <svg 
+                class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light"
+                fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </div>
+          </div>
 
           <!-- Navegación Desktop - Centrada -->
           <nav class="hidden lg:flex items-center gap-10">
@@ -36,7 +52,17 @@
           </nav>
 
           <!-- Acciones - Derecha -->
-          <div class="flex items-center gap-3">
+          <div class="flex items-center gap-2 sm:gap-3">
+            <!-- Buscador Mobile -->
+            <button 
+              @click="mobileSearchOpen = !mobileSearchOpen"
+              class="lg:hidden w-11 h-11 rounded-full flex items-center justify-center hover:bg-nude-200/60 transition-colors duration-300 touch-target"
+            >
+              <svg class="w-5 h-5 text-text-medium" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </button>
+            
             <!-- Usuario -->
             <router-link to="/login" class="w-11 h-11 rounded-full flex items-center justify-center hover:bg-nude-200/60 transition-colors duration-300 touch-target">
               <svg class="w-5 h-5 text-text-medium" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -73,6 +99,34 @@
           </div>
         </div>
 
+        <!-- Mobile Search Bar -->
+        <transition
+          enter-active-class="transition duration-200 ease-out"
+          enter-from-class="opacity-0 -translate-y-2"
+          enter-to-class="opacity-100 translate-y-0"
+          leave-active-class="transition duration-150 ease-in"
+          leave-from-class="opacity-100 translate-y-0"
+          leave-to-class="opacity-0 -translate-y-2"
+        >
+          <div v-if="mobileSearchOpen" class="lg:hidden mt-4 pb-2">
+            <div class="relative">
+              <input 
+                type="text"
+                v-model="searchQuery"
+                @keyup.enter="handleSearch"
+                placeholder="Buscar productos..."
+                class="w-full pl-11 pr-4 py-3 bg-white border border-nude-200 rounded-xl text-sm text-text-dark placeholder-text-light focus:outline-none focus:border-brand-400 focus:ring-2 focus:ring-brand-400/20 transition-all"
+              />
+              <svg 
+                class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light"
+                fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </div>
+          </div>
+        </transition>
+
         <!-- Mobile Menu -->
         <transition
           enter-active-class="transition duration-300 ease-out"
@@ -96,183 +150,193 @@
     </header>
 
     <!-- ========================================
-         HERO SECTION - Slider de Fondo con Fade
+         HERO SECTION - Full Screen High Impact
          ======================================== -->
     <section class="relative min-h-screen flex items-center overflow-hidden">
       
-      <!-- ===== SLIDER DE FONDOS (Solo cambian las imágenes) ===== -->
-      <div class="absolute inset-0 lg:left-1/3">
-        <!-- Slide 1: Hombre profesional -->
-        <transition name="hero-fade">
+      <!-- ===== BACKGROUND CAROUSEL ===== -->
+      <div class="absolute inset-0 z-0">
+        <!-- Carousel Images -->
+        <transition-group name="hero-crossfade" tag="div" class="absolute inset-0">
           <img 
-            v-if="currentSlide === 0"
-            key="slide-0"
-            src="https://images.unsplash.com/photo-1605980776566-0486c3ac7617?w=1400&h=1200&fit=crop&q=90" 
-            alt="Profesional de la belleza" 
-            class="absolute inset-0 w-full h-full object-cover object-center"
-          >
-        </transition>
-        
-        <!-- Slide 2: Mujer con cabello ondulado espectacular -->
-        <transition name="hero-fade">
-          <img 
-            v-if="currentSlide === 1"
-            key="slide-1"
-            src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1400&h=1200&fit=crop&q=90" 
-            alt="Mujer con cabello ondulado hermoso" 
-            class="absolute inset-0 w-full h-full object-cover object-center"
-          >
-        </transition>
-        
-        <!-- Slide 3: Close-up texturas de cabello y cosméticos -->
-        <transition name="hero-fade">
-          <img 
-            v-if="currentSlide === 2"
-            key="slide-2"
-            src="https://images.unsplash.com/photo-1560869713-7d0a29430803?w=1400&h=1200&fit=crop&q=90" 
-            alt="Texturas de cabello premium y cosméticos" 
+            v-for="(slide, index) in heroSlides"
+            :key="index"
+            v-show="currentSlide === index"
+            :src="slide.image" 
+            :alt="slide.alt" 
             class="absolute inset-0 w-full h-full object-cover object-top"
-          >
-        </transition>
-
-        <!-- Gradient Overlay (siempre visible) -->
-        <div class="absolute inset-0 bg-gradient-to-r from-[#FAFAFA] via-[#FAFAFA]/90 lg:via-[#FAFAFA]/70 to-transparent z-10"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-[#FAFAFA]/50 to-transparent lg:hidden z-10"></div>
+          />
+        </transition-group>
+        <!-- Gradients for readability -->
+        <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10"></div>
+        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 z-10"></div>
+        
+        <!-- Carousel Indicators -->
+        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+          <button 
+            v-for="(slide, index) in heroSlides" 
+            :key="index"
+            @click="goToSlide(index)"
+            :class="[
+              'w-2 h-2 rounded-full transition-all duration-300',
+              currentSlide === index 
+                ? 'bg-white w-6' 
+                : 'bg-white/40 hover:bg-white/60'
+            ]"
+          ></button>
+        </div>
       </div>
 
-      <!-- Decorative Elements -->
-      <div class="absolute top-32 right-20 w-64 h-64 bg-blush-200 rounded-full filter blur-3xl opacity-40 animate-pulse-soft hidden lg:block z-10"></div>
-      <div class="absolute bottom-40 left-1/3 w-48 h-48 bg-nude-300 rounded-full filter blur-3xl opacity-50 animate-pulse-soft hidden lg:block z-10"></div>
-
-      <!-- ===== CONTENIDO ESTÁTICO (NO se mueve) ===== -->
-      <div class="relative z-20 max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-32 pb-20 lg:py-0">
-        <div class="lg:max-w-lg xl:max-w-xl text-left">
+      <!-- ===== CONTENT ===== -->
+      <div class="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-20">
+        <div class="max-w-3xl text-left">
+          
           <!-- Badge -->
-          <div class="inline-flex items-center gap-2.5 bg-white/80 backdrop-blur-sm border border-nude-300/50 rounded-full px-5 py-2.5 shadow-soft mb-6">
-            <span class="w-2 h-2 bg-brand-600 rounded-full animate-pulse"></span>
-            <span class="text-sm font-medium text-text-medium">Distribuidora Mayorista desde 2015</span>
+          <div class="inline-flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-5 py-2.5 mb-8 animate-fade-in-up">
+            <span class="w-2 h-2 bg-gold-400 rounded-full animate-pulse"></span>
+            <span class="text-sm font-medium text-white tracking-wide uppercase">Distribuidora Mayorista desde 2015</span>
           </div>
 
           <!-- Title -->
-          <h1 class="font-luxury text-4xl sm:text-5xl lg:text-5xl xl:text-6xl text-text-dark leading-[1.15] mb-5">
-            Tu Socio Experto en 
-            <span class="block mt-1">
-              <em class="text-brand-600 not-italic">Belleza</em> Profesional
+          <h1 class="font-luxury text-5xl sm:text-6xl lg:text-7xl xl:text-8xl text-white leading-[1.05] mb-8 drop-shadow-2xl animate-fade-in-up delay-100">
+            Tu Socio Experto en <br />
+            <span class="text-transparent bg-clip-text bg-gradient-to-r from-white via-gold-200 to-gold-400 font-bold italic">
+              Belleza Profesional
             </span>
           </h1>
 
           <!-- Subtitle -->
-          <p class="text-base lg:text-lg text-text-medium leading-relaxed mb-8 max-w-sm">
-            Extensiones 100% naturales, pelucas premium y cosméticos de las mejores marcas internacionales para tu negocio.
+          <p class="text-lg sm:text-xl text-gray-100 leading-relaxed mb-12 max-w-xl font-light animate-fade-in-up delay-200 antialiased">
+            Elevamos tu negocio con extensiones 100% naturales, pelucas premium y cosméticos de clase mundial.
           </p>
 
           <!-- CTAs -->
-          <div class="flex flex-col sm:flex-row gap-3 mb-12">
+          <div class="flex flex-col sm:flex-row gap-5 mb-16 animate-fade-in-up delay-300">
             <a 
               href="#productos" 
-              class="btn-primary inline-flex items-center justify-center gap-3 text-base touch-target"
+              class="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 font-bold text-lg rounded-full shadow-[0_0_20px_rgba(255,255,255,0.3)] hover:shadow-[0_0_30px_rgba(255,255,255,0.5)] hover:bg-gray-100 transition-all duration-300 transform hover:-translate-y-1 hover:scale-105 touch-target"
             >
               Ver Catálogo
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
               </svg>
             </a>
+            
             <a 
               href="#mayoreo" 
-              class="btn-outline inline-flex items-center justify-center gap-3 text-base touch-target"
+              class="inline-flex items-center justify-center px-8 py-4 bg-transparent border border-white/50 text-white font-semibold text-lg rounded-full hover:bg-white hover:text-gray-900 transition-all duration-300 backdrop-blur-sm transform hover:-translate-y-1 touch-target"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                 <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
               </svg>
               Portal Mayorista
             </a>
-          </div>
-
-          <!-- Floating Card -->
-          <div class="hidden lg:flex items-center gap-4 bg-white rounded-2xl shadow-soft-lg p-5 max-w-xs animate-float-soft">
-            <div class="w-14 h-14 bg-gradient-to-br from-gold-300 to-gold-400 rounded-xl flex items-center justify-center flex-shrink-0">
-              <svg class="w-7 h-7 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
-              </svg>
-            </div>
-            <div>
-              <p class="font-semibold text-text-dark">Calidad Certificada</p>
-              <p class="text-sm text-text-light">100% Cabello Remy Natural</p>
-            </div>
-          </div>
-
-          <!-- Slide Indicators -->
-          <div class="flex items-center gap-3 mt-8 lg:mt-12">
-            <button 
-              v-for="(slide, index) in heroSlides" 
-              :key="index"
-              @click="goToSlide(index)"
-              :class="[
-                'h-1.5 rounded-full transition-all duration-500',
-                currentSlide === index 
-                  ? 'w-8 bg-brand-600' 
-                  : 'w-4 bg-nude-400 hover:bg-nude-500'
-              ]"
-              :aria-label="'Ir a slide ' + (index + 1)"
-            ></button>
           </div>
         </div>
       </div>
     </section>
 
     <!-- ========================================
-         TRUST BAR - Banderas de Confianza
+         TRUST BAR - Premium Editorial Ribbon
          ======================================== -->
-    <section class="trust-bar py-8 lg:py-10">
-      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-        <div class="grid grid-cols-2 md:grid-cols-4 gap-6 lg:gap-12">
-          <div class="flex items-center gap-4 justify-center md:justify-start">
-            <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-soft flex-shrink-0">
-              <svg class="w-6 h-6 text-brand-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-              </svg>
+    <section class="trust-ribbon-premium relative overflow-hidden">
+      <!-- Fondo degradado suave -->
+      <div class="absolute inset-0 bg-gradient-to-r from-[#FAF7F5] via-[#FDF9F7] to-[#FAF7F5]"></div>
+      <!-- Línea decorativa superior -->
+      <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4B9A9] to-transparent opacity-40"></div>
+      <!-- Línea decorativa inferior -->
+      <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4B9A9] to-transparent opacity-40"></div>
+      
+      <div class="relative max-w-6xl mx-auto px-4">
+        <div class="flex flex-wrap lg:flex-nowrap items-stretch justify-center">
+          
+          <!-- Item 1: Envíos VIP -->
+          <div class="trust-item-premium group w-1/2 lg:w-1/4 py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative">
+            <!-- Hover background effect -->
+            <div class="absolute inset-0 bg-white/0 group-hover:bg-white/60 transition-all duration-500"></div>
+            
+            <div class="relative z-10 flex flex-col items-center">
+              <!-- Icon container with subtle ring -->
+              <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-full border border-[#E8DED8] flex items-center justify-center mb-4 group-hover:border-[#D81B60]/30 group-hover:bg-[#D81B60]/5 transition-all duration-300">
+                <svg class="w-5 h-5 lg:w-6 lg:h-6 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                </svg>
+              </div>
+              <!-- Title -->
+              <h4 class="text-[10px] sm:text-[11px] font-semibold tracking-[0.25em] uppercase text-[#1a1a1a] mb-1">
+                Envíos VIP
+              </h4>
+              <!-- Subtitle -->
+              <p class="text-[10px] sm:text-[11px] text-[#8B7355] font-light">
+                Gratis en compras +$2,999
+              </p>
             </div>
-            <div>
-              <p class="font-semibold text-text-dark text-sm">Envíos a todo el país</p>
-              <p class="text-xs text-text-light">24-72 horas hábiles</p>
+            
+            <!-- Vertical Divider -->
+            <div class="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-px h-16 bg-gradient-to-b from-transparent via-[#D4B9A9]/50 to-transparent"></div>
+          </div>
+
+          <!-- Item 2: Calidad Remy -->
+          <div class="trust-item-premium group w-1/2 lg:w-1/4 py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative">
+            <div class="absolute inset-0 bg-white/0 group-hover:bg-white/60 transition-all duration-500"></div>
+            
+            <div class="relative z-10 flex flex-col items-center">
+              <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-full border border-[#E8DED8] flex items-center justify-center mb-4 group-hover:border-[#D81B60]/30 group-hover:bg-[#D81B60]/5 transition-all duration-300">
+                <svg class="w-5 h-5 lg:w-6 lg:h-6 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
+                </svg>
+              </div>
+              <h4 class="text-[10px] sm:text-[11px] font-semibold tracking-[0.25em] uppercase text-[#1a1a1a] mb-1">
+                Calidad Remy
+              </h4>
+              <p class="text-[10px] sm:text-[11px] text-[#8B7355] font-light">
+                100% Cabello Humano
+              </p>
+            </div>
+            
+            <div class="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-px h-16 bg-gradient-to-b from-transparent via-[#D4B9A9]/50 to-transparent"></div>
+          </div>
+
+          <!-- Item 3: Compra Segura -->
+          <div class="trust-item-premium group w-1/2 lg:w-1/4 py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative border-t lg:border-t-0 border-[#E8DED8]/50">
+            <div class="absolute inset-0 bg-white/0 group-hover:bg-white/60 transition-all duration-500"></div>
+            
+            <div class="relative z-10 flex flex-col items-center">
+              <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-full border border-[#E8DED8] flex items-center justify-center mb-4 group-hover:border-[#D81B60]/30 group-hover:bg-[#D81B60]/5 transition-all duration-300">
+                <svg class="w-5 h-5 lg:w-6 lg:h-6 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+                </svg>
+              </div>
+              <h4 class="text-[10px] sm:text-[11px] font-semibold tracking-[0.25em] uppercase text-[#1a1a1a] mb-1">
+                Pago Seguro
+              </h4>
+              <p class="text-[10px] sm:text-[11px] text-[#8B7355] font-light">
+                Encriptación SSL 256-bit
+              </p>
+            </div>
+            
+            <div class="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-px h-16 bg-gradient-to-b from-transparent via-[#D4B9A9]/50 to-transparent"></div>
+          </div>
+
+          <!-- Item 4: Asesoría Experta -->
+          <div class="trust-item-premium group w-1/2 lg:w-1/4 py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative border-t lg:border-t-0 border-[#E8DED8]/50">
+            <div class="absolute inset-0 bg-white/0 group-hover:bg-white/60 transition-all duration-500"></div>
+            
+            <div class="relative z-10 flex flex-col items-center">
+              <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-full border border-[#E8DED8] flex items-center justify-center mb-4 group-hover:border-[#D81B60]/30 group-hover:bg-[#D81B60]/5 transition-all duration-300">
+                <svg class="w-5 h-5 lg:w-6 lg:h-6 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+                </svg>
+              </div>
+              <h4 class="text-[10px] sm:text-[11px] font-semibold tracking-[0.25em] uppercase text-[#1a1a1a] mb-1">
+                Asesoría VIP
+              </h4>
+              <p class="text-[10px] sm:text-[11px] text-[#8B7355] font-light">
+                Atención Personalizada
+              </p>
             </div>
           </div>
 
-          <div class="flex items-center gap-4 justify-center md:justify-start">
-            <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-soft flex-shrink-0">
-              <svg class="w-6 h-6 text-gold-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
-              </svg>
-            </div>
-            <div>
-              <p class="font-semibold text-text-dark text-sm">Calidad Remy Certificada</p>
-              <p class="text-xs text-text-light">100% cabello natural</p>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-4 justify-center md:justify-start">
-            <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-soft flex-shrink-0">
-              <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-              </svg>
-            </div>
-            <div>
-              <p class="font-semibold text-text-dark text-sm">Pagos Seguros</p>
-              <p class="text-xs text-text-light">Tarjeta, transferencia, PayPal</p>
-            </div>
-          </div>
-
-          <div class="flex items-center gap-4 justify-center md:justify-start">
-            <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-soft flex-shrink-0">
-              <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
-              </svg>
-            </div>
-            <div>
-              <p class="font-semibold text-text-dark text-sm">Atención Experta</p>
-              <p class="text-xs text-text-light">Asesoría personalizada</p>
-            </div>
-          </div>
         </div>
       </div>
     </section>
@@ -471,65 +535,139 @@
     </section>
 
     <!-- ========================================
-         SECCIÓN MAYORISTA - Fondo Oscuro
+         VIDEO KANEKALON - Sección Inmersiva
          ======================================== -->
-    <section id="mayoreo" class="section-dark py-20 lg:py-28 relative overflow-hidden">
-      <!-- Decorative Elements -->
-      <div class="absolute top-0 right-0 w-96 h-96 bg-brand-600/10 rounded-full filter blur-3xl"></div>
-      <div class="absolute bottom-0 left-0 w-80 h-80 bg-gold-400/10 rounded-full filter blur-3xl"></div>
+    <section class="relative bg-black overflow-hidden">
+      <!-- Video Background -->
+      <div class="relative w-full">
+        <video 
+          class="w-full h-auto max-h-[80vh] object-cover"
+          autoplay 
+          loop 
+          muted 
+          playsinline
+        >
+          <source src="/kanekalon-video.mp4" type="video/mp4">
+          Tu navegador no soporta videos HTML5.
+        </video>
+        
+        <!-- Overlay con gradiente -->
+        <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-black/30"></div>
+        
+        <!-- Contenido sobre el video -->
+        <div class="absolute inset-0 flex items-end justify-center pb-12 lg:pb-20">
+          <div class="text-center px-6">
+            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-5 py-2 mb-6">
+              <span class="text-white/90 text-sm font-medium uppercase tracking-wider">Tecnología Japonesa</span>
+            </div>
+            <h2 class="font-luxury text-3xl sm:text-4xl lg:text-5xl text-white mb-4 drop-shadow-2xl">
+              Fibras <span class="text-brand-400">KANEKALON</span>
+            </h2>
+            <p class="text-white/80 text-lg max-w-2xl mx-auto mb-8">
+              Más de 65 años de innovación. La marca que cambia tu futuro a través del cabello.
+            </p>
+            <a 
+              href="https://www.kanekalon.com" 
+              target="_blank"
+              class="inline-flex items-center gap-2 bg-white hover:bg-nude-100 text-text-dark font-semibold px-8 py-4 rounded-full transition-all shadow-xl hover:scale-105"
+            >
+              Conoce más sobre Kanekalon
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+              </svg>
+            </a>
+          </div>
+        </div>
+      </div>
+    </section>
 
+    <!-- ========================================
+         SECCIÓN MAYORISTA - Diseño Premium
+         ======================================== -->
+    <section id="mayoreo" class="py-20 lg:py-32 relative overflow-hidden bg-gradient-to-br from-[#F5EDE4] via-[#FBF7F3] to-[#F0E6DC]">
+      <!-- Decorative Pattern -->
+      <div class="absolute inset-0 opacity-[0.03]" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
+      
       <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 relative z-10">
-        <div class="grid lg:grid-cols-2 gap-12 lg:gap-20 items-center">
+        <div class="grid lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+          
+          <!-- Image First -->
+          <div class="relative order-2 lg:order-1">
+            <div class="relative rounded-3xl overflow-hidden shadow-2xl">
+              <img 
+                src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=700&h=800&fit=crop&q=85" 
+                alt="Salón de belleza profesional" 
+                class="w-full h-auto"
+              >
+              <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
+              
+              <!-- Stats Card -->
+              <div class="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6">
+                <div class="flex items-center justify-around gap-4">
+                  <div class="text-center">
+                    <p class="text-3xl sm:text-4xl font-bold text-brand-600 mb-1">2K+</p>
+                    <p class="text-xs text-text-medium uppercase tracking-wider font-medium">Mayoristas</p>
+                  </div>
+                  <div class="w-px h-12 bg-nude-300"></div>
+                  <div class="text-center">
+                    <p class="text-3xl sm:text-4xl font-bold text-brand-600 mb-1">500+</p>
+                    <p class="text-xs text-text-medium uppercase tracking-wider font-medium">Productos</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
           <!-- Content -->
-          <div>
-            <span class="inline-flex items-center gap-2 bg-gold-400/20 border border-gold-400/30 text-gold-400 text-sm font-medium px-4 py-2 rounded-full mb-6">
+          <div class="order-1 lg:order-2">
+            <span class="inline-flex items-center gap-2.5 bg-brand-50 border border-brand-200 text-brand-700 text-xs font-semibold px-4 py-2 rounded-full mb-6">
               <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
-              Programa Exclusivo Mayoristas
+              PROGRAMA EXCLUSIVO MAYORISTAS
             </span>
 
-            <h2 class="font-luxury text-3xl sm:text-4xl lg:text-5xl text-white leading-tight mb-6">
-              Impulsa tu <em class="not-italic text-gradient-gold">Negocio</em> de Belleza
+            <h2 class="font-luxury text-3xl sm:text-4xl lg:text-5xl text-text-dark leading-tight mb-6">
+              Impulsa tu <em class="not-italic text-brand-600">Negocio</em> de Belleza
             </h2>
 
-            <p class="text-white/70 text-lg mb-8 max-w-lg">
+            <p class="text-text-medium text-lg mb-8 max-w-xl leading-relaxed">
               Únete a más de 2,000 profesionales que confían en Kharis para surtir sus salones, tiendas y negocios de belleza.
             </p>
 
             <!-- Benefits -->
-            <ul class="space-y-4 mb-10">
+            <ul class="space-y-5 mb-10">
               <li class="flex items-start gap-4">
-                <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                   </svg>
                 </div>
                 <div>
-                  <p class="text-white font-medium">Descuentos desde 25% en adelante</p>
-                  <p class="text-white/50 text-sm">Precios escalonados según volumen de compra</p>
+                  <p class="text-text-dark font-semibold text-base mb-0.5">Descuentos desde 25% en adelante</p>
+                  <p class="text-text-light text-sm">Precios escalonados según volumen de compra</p>
                 </div>
               </li>
               <li class="flex items-start gap-4">
-                <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                   </svg>
                 </div>
                 <div>
-                  <p class="text-white font-medium">Asesor de cuenta dedicado</p>
-                  <p class="text-white/50 text-sm">Atención personalizada vía WhatsApp</p>
+                  <p class="text-text-dark font-semibold text-base mb-0.5">Asesor de cuenta dedicado</p>
+                  <p class="text-text-light text-sm">Atención personalizada vía WhatsApp</p>
                 </div>
               </li>
               <li class="flex items-start gap-4">
-                <div class="w-8 h-8 bg-green-500/20 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
-                  <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 20 20">
+                <div class="w-10 h-10 bg-green-50 rounded-xl flex items-center justify-center flex-shrink-0 mt-0.5">
+                  <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
                     <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                   </svg>
                 </div>
                 <div>
-                  <p class="text-white font-medium">Envío gratis en pedidos +$5,000 MXN</p>
-                  <p class="text-white/50 text-sm">Entregas prioritarias a todo México</p>
+                  <p class="text-text-dark font-semibold text-base mb-0.5">Envío gratis en pedidos +$5,000 MXN</p>
+                  <p class="text-text-light text-sm">Entregas prioritarias a todo México</p>
                 </div>
               </li>
             </ul>
@@ -539,45 +677,158 @@
               <a 
                 href="https://wa.me/525512345678?text=Hola,%20me%20interesa%20el%20programa%20de%20mayoristas"
                 target="_blank"
-                class="inline-flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white font-semibold px-8 py-4 rounded-full transition-all shadow-lg hover:shadow-green-500/25 touch-target"
+                class="inline-flex items-center justify-center gap-3 bg-green-500 hover:bg-green-600 text-white font-bold px-8 py-4 rounded-full transition-all shadow-lg hover:shadow-green-500/30 hover:scale-105 touch-target"
               >
                 <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
                 </svg>
                 Contactar por WhatsApp
               </a>
-              <button class="inline-flex items-center justify-center gap-3 bg-white/10 hover:bg-white/20 border border-white/20 text-white font-semibold px-8 py-4 rounded-full transition-all touch-target">
+              <button class="inline-flex items-center justify-center gap-3 bg-white hover:bg-nude-50 border-2 border-nude-300 text-text-dark font-semibold px-8 py-4 rounded-full transition-all hover:border-brand-400 touch-target">
                 Solicitar catálogo
               </button>
             </div>
           </div>
 
-          <!-- Image -->
-          <div class="relative hidden lg:block">
-            <div class="relative rounded-3xl overflow-hidden shadow-2xl">
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         MARCAS CON LAS QUE TRABAJAMOS
+         ======================================== -->
+    <section class="py-20 lg:py-28 bg-gradient-to-b from-white to-nude-50">
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+        <div class="text-center mb-16">
+          <h2 class="font-luxury text-3xl sm:text-4xl lg:text-5xl text-text-dark mb-4">
+            Marcas <em class="not-italic text-brand-600">top</em> de nuestra tienda
+          </h2>
+          <p class="text-text-dark text-base sm:text-lg max-w-2xl mx-auto font-medium">
+            Trabajamos con las mejores marcas de extensiones y productos de cabello natural
+          </p>
+        </div>
+
+        <!-- Logos Grid -->
+        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 lg:gap-8 items-center">
+          <!-- Placeholder para logos - El usuario agregará las imágenes a /public -->
+          <div class="flex items-center justify-center p-8 bg-white rounded-2xl hover:shadow-luxury transition-all duration-300 border border-nude-200 hover:border-brand-300 hover:-translate-y-1">
+            <div class="text-center">
+              <p class="text-sm sm:text-base text-text-dark uppercase tracking-wide font-bold">kanekalon</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-center p-8 bg-white rounded-2xl hover:shadow-luxury transition-all duration-300 border border-nude-200 hover:border-brand-300 hover:-translate-y-1">
+            <div class="text-center">
+              <p class="text-sm sm:text-base text-text-dark uppercase tracking-wide font-bold">Cabello Humano</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-center p-8 bg-white rounded-2xl hover:shadow-luxury transition-all duration-300 border border-nude-200 hover:border-brand-300 hover:-translate-y-1">
+            <div class="text-center">
+              <p class="text-sm sm:text-base text-text-dark uppercase tracking-wide font-bold">Virgin Hair</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-center p-8 bg-white rounded-2xl hover:shadow-luxury transition-all duration-300 border border-nude-200 hover:border-brand-300 hover:-translate-y-1">
+            <div class="text-center">
+              <p class="text-sm sm:text-base text-text-dark uppercase tracking-wide font-bold">Remy Hair</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-center p-8 bg-white rounded-2xl hover:shadow-luxury transition-all duration-300 border border-nude-200 hover:border-brand-300 hover:-translate-y-1">
+            <div class="text-center">
+              <p class="text-sm sm:text-base text-text-dark uppercase tracking-wide font-bold">Brazilian Hair</p>
+            </div>
+          </div>
+          <div class="flex items-center justify-center p-8 bg-white rounded-2xl hover:shadow-luxury transition-all duration-300 border border-nude-200 hover:border-brand-300 hover:-translate-y-1">
+            <div class="text-center">
+              <p class="text-sm sm:text-base text-text-dark uppercase tracking-wide font-bold">Premium Extensions</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ========================================
+         OFERTAS IRRESISTIBLES - Diseño Optimizado
+         ======================================== -->
+    <section class="relative bg-gradient-to-br from-pink-50 via-purple-50 to-white overflow-hidden">
+      <!-- Badge PROMO del Mes -->
+      <div class="absolute top-0 left-0 z-20">
+        <div class="relative">
+          <svg class="w-32 h-32 sm:w-40 sm:h-40" viewBox="0 0 100 100" fill="none">
+            <path d="M0 0 L100 0 L100 80 L50 100 L0 80 Z" fill="#D81B60"/>
+          </svg>
+          <div class="absolute inset-0 flex flex-col items-center justify-center text-white pt-2">
+            <p class="text-xs sm:text-sm font-bold uppercase tracking-wide">PROMO</p>
+            <p class="text-lg sm:text-xl font-black leading-none">del Mes</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-16 lg:py-20">
+        <div class="grid lg:grid-cols-2 gap-8 lg:gap-12 items-center">
+          
+          <!-- Imagen Principal -->
+          <div class="relative order-2 lg:order-1">
+            <div class="relative">
               <img 
-                src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=700&h=800&fit=crop&q=85" 
-                alt="Salón de belleza profesional" 
-                class="w-full h-auto"
-              >
-              <div class="absolute inset-0 bg-gradient-to-t from-carbon-900/60 to-transparent"></div>
+                src="/promocion.webp" 
+                alt="Promociones especiales" 
+                class="w-full h-auto rounded-3xl shadow-2xl"
+              />
+            </div>
+          </div>
+
+          <!-- Contenido -->
+          <div class="order-1 lg:order-2 text-center lg:text-left">
+            <!-- Subtítulo Rosado -->
+            <div class="inline-block bg-pink-100 border-2 border-pink-300 rounded-full px-6 py-2 mb-6">
+              <p class="text-pink-700 font-bold text-sm uppercase tracking-wide">
+                ¡Productos de belleza de calidad excepcional!
+              </p>
             </div>
 
-            <!-- Stats Card -->
-            <div class="absolute -bottom-6 -left-6 bg-white rounded-2xl shadow-soft-xl p-6">
-              <div class="flex items-center gap-6">
-                <div class="text-center">
-                  <p class="text-3xl font-bold text-brand-600">2k+</p>
-                  <p class="text-xs text-text-light uppercase tracking-wider">Mayoristas</p>
-                </div>
-                <div class="w-px h-12 bg-nude-200"></div>
-                <div class="text-center">
-                  <p class="text-3xl font-bold text-brand-600">500+</p>
-                  <p class="text-xs text-text-light uppercase tracking-wider">Productos</p>
-                </div>
+            <!-- Título Principal -->
+            <h2 class="font-luxury text-4xl sm:text-5xl lg:text-6xl text-text-dark leading-tight mb-6">
+              ¡<span class="text-brand-600">OFERTAS</span> irresistibles!
+            </h2>
+
+            <!-- Descripción -->
+            <p class="text-text-dark text-lg sm:text-xl mb-8 leading-relaxed font-medium">
+              Disfruta de los mejores precios en cosméticos y productos de belleza por tiempo limitado, ¡aprovecha!
+            </p>
+
+            <!-- CTA Button -->
+            <a 
+              href="#productos"
+              class="inline-flex items-center justify-center gap-3 bg-brand-600 hover:bg-brand-700 text-white font-bold text-lg px-10 py-5 rounded-full transition-all shadow-2xl hover:shadow-brand-600/40 hover:scale-105 touch-target mb-8"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
+              </svg>
+              Ver promociones
+            </a>
+
+            <!-- Beneficios compactos -->
+            <div class="flex flex-wrap gap-4 justify-center lg:justify-start text-sm">
+              <div class="flex items-center gap-2 bg-green-50 px-4 py-2 rounded-full">
+                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+                <span class="font-semibold text-green-700">Hasta 40% OFF</span>
+              </div>
+              <div class="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-full">
+                <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+                <span class="font-semibold text-blue-700">Envío gratis +$999</span>
+              </div>
+              <div class="flex items-center gap-2 bg-purple-50 px-4 py-2 rounded-full">
+                <svg class="w-4 h-4 text-purple-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z" clip-rule="evenodd" />
+                </svg>
+                <span class="font-semibold text-purple-700">Garantía 30 días</span>
               </div>
             </div>
           </div>
+
         </div>
       </div>
     </section>
@@ -785,8 +1036,24 @@
     </footer>
 
     <!-- ========================================
-         FLOATING WHATSAPP BUTTON
+         FLOATING SOCIAL BUTTONS (Right Side)
          ======================================== -->
+    <!-- Instagram Button -->
+    <a 
+      href="https://instagram.com/kharisdistribuidora"
+      target="_blank"
+      class="fixed bottom-28 right-6 w-16 h-16 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 text-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all duration-300 z-40 group touch-target"
+    >
+      <svg class="w-8 h-8" fill="currentColor" viewBox="0 0 24 24">
+        <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
+      </svg>
+      <!-- Tooltip -->
+      <span class="absolute right-full mr-3 bg-white text-text-dark text-sm font-medium px-4 py-2 rounded-xl shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+        Síguenos en Instagram
+      </span>
+    </a>
+
+    <!-- WhatsApp Button -->
     <a 
       href="https://wa.me/525512345678?text=Hola,%20me%20interesa%20información%20sobre%20sus%20productos"
       target="_blank"
@@ -800,6 +1067,23 @@
         ¿Necesitas ayuda?
       </span>
     </a>
+
+    <!-- ========================================
+         SCROLL TO TOP BUTTON (Left Side)
+         ======================================== -->
+    <button 
+      v-show="isScrolled"
+      @click="scrollToTop"
+      class="fixed bottom-6 left-6 w-14 h-14 bg-brand-600 hover:bg-brand-700 text-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all duration-300 z-40 group touch-target"
+    >
+      <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
+      </svg>
+      <!-- Tooltip -->
+      <span class="absolute left-full ml-3 bg-white text-text-dark text-sm font-medium px-4 py-2 rounded-xl shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
+        Subir
+      </span>
+    </button>
 
   </div>
 </template>
@@ -817,28 +1101,63 @@ export default {
     const cartCount = ref(0)
     const isScrolled = ref(false)
     const mobileMenuOpen = ref(false)
+    const mobileSearchOpen = ref(false)
+    const searchQuery = ref('')
 
-    // ===== HERO SLIDER =====
+    // ===== HERO CAROUSEL =====
     const currentSlide = ref(0)
-    const heroSlides = ref([
-      { id: 0, alt: 'Profesional de belleza' },
-      { id: 1, alt: 'Mujer con cabello ondulado' },
-      { id: 2, alt: 'Texturas de cabello premium' }
-    ])
     let slideInterval = null
-
-    const startSlideshow = () => {
-      slideInterval = setInterval(() => {
-        currentSlide.value = (currentSlide.value + 1) % heroSlides.value.length
-      }, 6000) // Cambio cada 6 segundos
-    }
+    
+    const heroSlides = ref([
+      {
+        image: '/imghanekalom.jpg',
+        alt: 'Kanekalon - Fibras de cabello premium'
+      },
+      {
+        image: '/img2.jpg',
+        alt: 'Extensiones de cabello profesionales'
+      },
+      {
+        image: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1920&q=80',
+        alt: 'Extensiones de cabello premium'
+      },
+      {
+        image: 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=1920&q=80',
+        alt: 'Cabello largo natural'
+      },
+      {
+        image: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=1920&q=80',
+        alt: 'Estilista profesional'
+      },
+      {
+        image: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=1920&q=80',
+        alt: 'Salón de belleza'
+      }
+    ])
 
     const goToSlide = (index) => {
       currentSlide.value = index
-      // Reiniciar el intervalo para evitar saltos rápidos
-      if (slideInterval) {
-        clearInterval(slideInterval)
-        startSlideshow()
+      resetSlideInterval()
+    }
+
+    const nextSlide = () => {
+      currentSlide.value = (currentSlide.value + 1) % heroSlides.value.length
+    }
+
+    const startSlideshow = () => {
+      slideInterval = setInterval(nextSlide, 4000) // Cambio cada 4 segundos
+    }
+
+    const resetSlideInterval = () => {
+      if (slideInterval) clearInterval(slideInterval)
+      startSlideshow()
+    }
+
+    const handleSearch = () => {
+      if (searchQuery.value.trim()) {
+        console.log('Buscando:', searchQuery.value)
+        // TODO: Implementar búsqueda real
+        // router.push({ path: '/buscar', query: { q: searchQuery.value } })
       }
     }
 
@@ -848,6 +1167,13 @@ export default {
 
     const handleScroll = () => {
       isScrolled.value = window.scrollY > 50
+    }
+
+    const scrollToTop = () => {
+      window.scrollTo({
+        top: 0,
+        behavior: 'smooth'
+      })
     }
 
     const cargarProductos = async () => {
@@ -902,9 +1228,7 @@ export default {
 
     onUnmounted(() => {
       window.removeEventListener('scroll', handleScroll)
-      if (slideInterval) {
-        clearInterval(slideInterval)
-      }
+      if (slideInterval) clearInterval(slideInterval)
     })
 
     return {
@@ -914,9 +1238,13 @@ export default {
       cartCount,
       isScrolled,
       mobileMenuOpen,
+      mobileSearchOpen,
+      searchQuery,
       currentSlide,
       heroSlides,
       goToSlide,
+      handleSearch,
+      scrollToTop,
       formatPrice,
       cargarProductos,
       agregarAlCarrito
@@ -934,19 +1262,22 @@ export default {
   overflow: hidden;
 }
 
-/* Hero Slider Fade Transition */
-.hero-fade-enter-active {
-  transition: opacity 1.5s ease-in-out;
+/* Hero Crossfade Transition - Suave y elegante */
+.hero-crossfade-enter-active {
+  transition: opacity 1.2s ease-in-out;
 }
-.hero-fade-leave-active {
-  transition: opacity 1.5s ease-in-out;
+.hero-crossfade-leave-active {
+  transition: opacity 1.2s ease-in-out;
+  position: absolute;
 }
-.hero-fade-enter-from,
-.hero-fade-leave-to {
+.hero-crossfade-enter-from {
   opacity: 0;
 }
-.hero-fade-enter-to,
-.hero-fade-leave-from {
+.hero-crossfade-leave-to {
+  opacity: 0;
+}
+.hero-crossfade-enter-to,
+.hero-crossfade-leave-from {
   opacity: 1;
 }
 </style>
