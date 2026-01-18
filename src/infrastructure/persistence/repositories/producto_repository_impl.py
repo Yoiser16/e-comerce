@@ -1,17 +1,21 @@
 """
 Implementación del Repositorio de Producto con Django ORM
 """
-from typing import Optional, List
+from typing import Optional, List, Tuple, Dict, Any
 from uuid import UUID
 from decimal import Decimal
+
+from django.db.models import Q, Count, Min, Max, F
 
 from domain.repositories.producto_repository import ProductoRepository
 from domain.entities.producto import Producto
 from domain.value_objects.codigo_producto import CodigoProducto
 from domain.value_objects.dinero import Dinero
+from domain.value_objects.criterios_busqueda import CriteriosBusqueda
 from infrastructure.persistence.django.models import ProductoModel
 from infrastructure.auditing.servicio_auditoria import ServicioAuditoria
 from infrastructure.logging.logger_service import LoggerService
+from shared.enums.atributos_producto import OrdenProducto
 
 
 class ProductoRepositoryImpl(ProductoRepository):
@@ -202,3 +206,258 @@ class ProductoRepositoryImpl(ProductoRepository):
         models = ProductoModel.objects.all()[offset:offset + limite]
         return [self._to_domain(model) for model in models]
 
+    # ===== MÉTODOS DE BÚSQUEDA AVANZADA =====
+    
+    def buscar_con_filtros(self, criterios: CriteriosBusqueda) -> Tuple[List[Producto], int]:
+        """
+        Búsqueda avanzada con filtros, ordenamiento y paginación.
+        """
+        self._logger.info("Ejecutando búsqueda con filtros")
+        
+        queryset = ProductoModel.objects.all()
+        filtros = criterios.filtros
+        
+        # Aplicar filtros de disponibilidad
+        if filtros.solo_disponibles:
+            queryset = queryset.filter(activo=True)
+        if filtros.solo_con_stock:
+            queryset = queryset.filter(stock_actual__gt=0)
+        
+        # Filtro de texto (búsqueda en nombre y descripción)
+        if filtros.texto_busqueda:
+            texto = filtros.texto_busqueda
+            queryset = queryset.filter(
+                Q(nombre__icontains=texto) |
+                Q(descripcion__icontains=texto) |
+                Q(codigo__icontains=texto)
+            )
+        
+        # Filtros por atributos de cabello
+        if filtros.colores:
+            queryset = queryset.filter(color__in=[c.value for c in filtros.colores])
+        
+        if filtros.tipos:
+            queryset = queryset.filter(tipo__in=[t.value for t in filtros.tipos])
+        
+        if filtros.largos:
+            queryset = queryset.filter(largo__in=[l.value for l in filtros.largos])
+        
+        if filtros.origenes:
+            queryset = queryset.filter(origen__in=[o.value for o in filtros.origenes])
+        
+        if filtros.metodos:
+            queryset = queryset.filter(metodo__in=[m.value for m in filtros.metodos])
+        
+        if filtros.calidades:
+            queryset = queryset.filter(calidad__in=[c.value for c in filtros.calidades])
+        
+        # Filtros de rango de precio
+        if filtros.rango_precio and filtros.rango_precio.esta_definido:
+            if filtros.rango_precio.minimo is not None:
+                queryset = queryset.filter(monto_precio__gte=filtros.rango_precio.minimo)
+            if filtros.rango_precio.maximo is not None:
+                queryset = queryset.filter(monto_precio__lte=filtros.rango_precio.maximo)
+        
+        # Filtro de rango de largo
+        if filtros.rango_largo and filtros.rango_largo.esta_definido:
+            # Convertir largo string a int para comparación
+            if filtros.rango_largo.minimo is not None:
+                largos_validos = [
+                    str(i) for i in range(filtros.rango_largo.minimo, 33)
+                ]
+                queryset = queryset.filter(largo__in=largos_validos)
+            if filtros.rango_largo.maximo is not None:
+                largos_validos = [
+                    str(i) for i in range(8, filtros.rango_largo.maximo + 1)
+                ]
+                queryset = queryset.filter(largo__in=largos_validos)
+        
+        # Contar total antes de paginar
+        total = queryset.count()
+        
+        # Aplicar ordenamiento
+        queryset = self._aplicar_ordenamiento(queryset, criterios.orden)
+        
+        # Aplicar paginación
+        queryset = queryset[criterios.offset:criterios.offset + criterios.limit]
+        
+        productos = [self._to_domain(m) for m in queryset]
+        
+        self._logger.info(
+            "Búsqueda completada",
+            total=total,
+            retornados=len(productos)
+        )
+        
+        return productos, total
+    
+    def _aplicar_ordenamiento(self, queryset, orden: OrdenProducto):
+        """Aplica el ordenamiento según el criterio especificado"""
+        ordenamientos = {
+            OrdenProducto.RELEVANCIA: ['-destacado', '-total_vendidos', '-fecha_creacion'],
+            OrdenProducto.PRECIO_ASC: ['monto_precio'],
+            OrdenProducto.PRECIO_DESC: ['-monto_precio'],
+            OrdenProducto.NOMBRE_ASC: ['nombre'],
+            OrdenProducto.NOMBRE_DESC: ['-nombre'],
+            OrdenProducto.MAS_VENDIDOS: ['-total_vendidos', '-valoracion_promedio'],
+            OrdenProducto.MEJOR_VALORADOS: ['-valoracion_promedio', '-total_valoraciones'],
+            OrdenProducto.MAS_RECIENTES: ['-fecha_creacion'],
+            OrdenProducto.STOCK_DISPONIBLE: ['-stock_actual'],
+        }
+        
+        campos = ordenamientos.get(orden, ['-fecha_creacion'])
+        return queryset.order_by(*campos)
+    
+    def obtener_contadores_facetas(
+        self,
+        texto: Optional[str] = None,
+        solo_disponibles: bool = True,
+        solo_con_stock: bool = True
+    ) -> Dict[str, Any]:
+        """
+        Obtiene contadores para cada faceta de filtrado.
+        """
+        self._logger.info("Calculando contadores de facetas")
+        
+        queryset = ProductoModel.objects.all()
+        
+        if solo_disponibles:
+            queryset = queryset.filter(activo=True)
+        if solo_con_stock:
+            queryset = queryset.filter(stock_actual__gt=0)
+        if texto:
+            queryset = queryset.filter(
+                Q(nombre__icontains=texto) |
+                Q(descripcion__icontains=texto)
+            )
+        
+        contadores = {}
+        
+        # Contadores por color
+        colores = queryset.exclude(color__isnull=True).values('color').annotate(
+            cantidad=Count('id')
+        )
+        contadores['colores'] = {c['color']: c['cantidad'] for c in colores}
+        
+        # Contadores por tipo
+        tipos = queryset.exclude(tipo__isnull=True).values('tipo').annotate(
+            cantidad=Count('id')
+        )
+        contadores['tipos'] = {t['tipo']: t['cantidad'] for t in tipos}
+        
+        # Contadores por largo
+        largos = queryset.exclude(largo__isnull=True).values('largo').annotate(
+            cantidad=Count('id')
+        )
+        contadores['largos'] = {l['largo']: l['cantidad'] for l in largos}
+        
+        # Contadores por origen
+        origenes = queryset.exclude(origen__isnull=True).values('origen').annotate(
+            cantidad=Count('id')
+        )
+        contadores['origenes'] = {o['origen']: o['cantidad'] for o in origenes}
+        
+        # Contadores por método
+        metodos = queryset.exclude(metodo__isnull=True).values('metodo').annotate(
+            cantidad=Count('id')
+        )
+        contadores['metodos'] = {m['metodo']: m['cantidad'] for m in metodos}
+        
+        # Contadores por calidad
+        calidades = queryset.exclude(calidad__isnull=True).values('calidad').annotate(
+            cantidad=Count('id')
+        )
+        contadores['calidades'] = {c['calidad']: c['cantidad'] for c in calidades}
+        
+        # Rango de precios
+        precios = queryset.aggregate(
+            min_precio=Min('monto_precio'),
+            max_precio=Max('monto_precio')
+        )
+        contadores['precio'] = {
+            'min': precios['min_precio'] or Decimal('0'),
+            'max': precios['max_precio'] or Decimal('0')
+        }
+        
+        return contadores
+    
+    def obtener_sugerencias_busqueda(self, texto: str, limite: int = 10) -> List[Dict[str, Any]]:
+        """
+        Obtiene sugerencias de autocompletado.
+        """
+        self._logger.info("Generando sugerencias de búsqueda", texto=texto)
+        
+        sugerencias = []
+        
+        # Buscar en nombres de productos
+        productos = ProductoModel.objects.filter(
+            nombre__icontains=texto,
+            activo=True
+        ).values('nombre').distinct()[:limite]
+        
+        for p in productos:
+            nombre = p['nombre']
+            # Destacar el texto encontrado
+            destacado = nombre.replace(texto, f"<strong>{texto}</strong>")
+            sugerencias.append({
+                'texto': nombre,
+                'tipo': 'producto',
+                'destacado': destacado,
+                'metadata': {}
+            })
+        
+        # Buscar en atributos (colores, tipos, etc.)
+        colores_match = [
+            c[1] for c in ProductoModel.COLOR_CHOICES 
+            if texto.lower() in c[1].lower()
+        ]
+        for color in colores_match[:3]:
+            sugerencias.append({
+                'texto': color,
+                'tipo': 'color',
+                'destacado': color,
+                'metadata': {'filtro': 'color'}
+            })
+        
+        return sugerencias[:limite]
+    
+    def buscar_productos_rapido(self, texto: str, limite: int = 4) -> List[Producto]:
+        """
+        Búsqueda rápida para autocompletado con preview de productos.
+        """
+        modelos = ProductoModel.objects.filter(
+            Q(nombre__icontains=texto) | Q(codigo__icontains=texto),
+            activo=True,
+            stock_actual__gt=0
+        ).order_by('-total_vendidos')[:limite]
+        
+        return [self._to_domain(m) for m in modelos]
+    
+    def obtener_destacados(self, limite: int = 8) -> List[Producto]:
+        """Obtiene productos destacados"""
+        modelos = ProductoModel.objects.filter(
+            activo=True,
+            destacado=True,
+            stock_actual__gt=0
+        ).order_by('-total_vendidos')[:limite]
+        
+        return [self._to_domain(m) for m in modelos]
+    
+    def obtener_mas_vendidos(self, limite: int = 8) -> List[Producto]:
+        """Obtiene los productos más vendidos"""
+        modelos = ProductoModel.objects.filter(
+            activo=True,
+            stock_actual__gt=0
+        ).order_by('-total_vendidos')[:limite]
+        
+        return [self._to_domain(m) for m in modelos]
+    
+    def obtener_nuevos(self, limite: int = 8) -> List[Producto]:
+        """Obtiene los productos más recientes"""
+        modelos = ProductoModel.objects.filter(
+            activo=True,
+            es_nuevo=True,
+            stock_actual__gt=0
+        ).order_by('-fecha_creacion')[:limite]
+        
+        return [self._to_domain(m) for m in modelos]

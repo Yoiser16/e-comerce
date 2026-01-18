@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 
 from .cliente_router import router as cliente_router
 from .producto_router import router as producto_router
+from .carrito_router import router as carrito_router
+from .busqueda_router import router as busqueda_router
 from .exception_handlers import exception_handler_dominio
 from domain.exceptions.dominio import ExcepcionDominio
 from infrastructure.config.app_config import AppConfig
@@ -23,8 +25,8 @@ def crear_app(config: AppConfig) -> FastAPI:
     """
     
     app = FastAPI(
-        title="Sistema Empresarial de Gestión",
-        description="API REST para sistema empresarial con Clean Architecture",
+        title="E-Commerce Extensiones de Cabello",
+        description="API REST para e-commerce de extensiones de cabello humano con Clean Architecture",
         version="1.0.0",
         debug=config.debug
     )
@@ -44,5 +46,7 @@ def crear_app(config: AppConfig) -> FastAPI:
     # Routers
     app.include_router(cliente_router)
     app.include_router(producto_router)
+    app.include_router(busqueda_router)
+    app.include_router(carrito_router)
     
     return app

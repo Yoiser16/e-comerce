@@ -57,3 +57,35 @@ class OperacionNoPermitida(ExcepcionDominio):
     Uso típico: validaciones de permisos de dominio
     """
     pass
+
+
+class ConcurrenciaConflicto(ExcepcionDominio):
+    """
+    Se lanza cuando hay un conflicto de concurrencia optimista.
+    Uso típico: optimistic locking con versiones, race conditions
+    """
+    pass
+
+
+class CarritoVacio(ExcepcionDominio):
+    """
+    Se lanza cuando se intenta operar sobre un carrito vacío.
+    Uso típico: bloquear/confirmar carrito sin productos
+    """
+    pass
+
+
+class ProductoNoEnCarrito(ExcepcionDominio):
+    """
+    Se lanza cuando el producto no existe en el carrito.
+    Uso típico: quitar o actualizar item inexistente
+    """
+    pass
+
+
+class ProductoDuplicado(ExcepcionDominio):
+    """
+    Se lanza cuando se intenta agregar un producto que ya existe.
+    Uso típico: agregar producto duplicado al carrito
+    """
+    pass

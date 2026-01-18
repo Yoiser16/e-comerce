@@ -1,9 +1,11 @@
 """
-Modelo Django para Cliente
+Modelos Django para la Capa de Persistencia
 NOTA: Esta es la capa de infraestructura, separada del dominio
 """
 from django.db import models
+from django.contrib.auth import get_user_model
 from uuid import uuid4
+from decimal import Decimal
 
 
 class ClienteModel(models.Model):
@@ -39,19 +41,153 @@ class ClienteModel(models.Model):
 
 class ProductoModel(models.Model):
     """
-    Modelo ORM para Producto.
+    Modelo ORM para Producto de Extensiones de Cabello.
+    
+    Incluye atributos específicos para:
+    - Color, tipo, largo, origen
+    - Método de aplicación
+    - Calidad del cabello
+    - Imágenes y valoraciones
     """
+    # Choices para atributos
+    COLOR_CHOICES = [
+        ('negro_natural', 'Negro Natural'),
+        ('negro_azabache', 'Negro Azabache'),
+        ('castano_oscuro', 'Castaño Oscuro'),
+        ('castano_medio', 'Castaño Medio'),
+        ('castano_claro', 'Castaño Claro'),
+        ('castano_chocolate', 'Castaño Chocolate'),
+        ('rubio_oscuro', 'Rubio Oscuro'),
+        ('rubio_medio', 'Rubio Medio'),
+        ('rubio_claro', 'Rubio Claro'),
+        ('rubio_platino', 'Rubio Platino'),
+        ('rubio_cenizo', 'Rubio Cenizo'),
+        ('rubio_miel', 'Rubio Miel'),
+        ('pelirrojo', 'Pelirrojo'),
+        ('cobrizo', 'Cobrizo'),
+        ('borgona', 'Borgoña'),
+        ('rosa', 'Rosa'),
+        ('azul', 'Azul'),
+        ('morado', 'Morado'),
+        ('verde', 'Verde'),
+        ('gris', 'Gris'),
+        ('ombre', 'Ombré'),
+        ('balayage', 'Balayage'),
+        ('highlights', 'Highlights'),
+    ]
+    
+    TIPO_CHOICES = [
+        ('liso', 'Liso'),
+        ('ondulado', 'Ondulado'),
+        ('rizado', 'Rizado'),
+        ('afro', 'Afro'),
+        ('kinky', 'Kinky'),
+        ('body_wave', 'Body Wave'),
+        ('deep_wave', 'Deep Wave'),
+        ('water_wave', 'Water Wave'),
+        ('loose_wave', 'Loose Wave'),
+    ]
+    
+    LARGO_CHOICES = [
+        ('8', '8 pulgadas'),
+        ('10', '10 pulgadas'),
+        ('12', '12 pulgadas'),
+        ('14', '14 pulgadas'),
+        ('16', '16 pulgadas'),
+        ('18', '18 pulgadas'),
+        ('20', '20 pulgadas'),
+        ('22', '22 pulgadas'),
+        ('24', '24 pulgadas'),
+        ('26', '26 pulgadas'),
+        ('28', '28 pulgadas'),
+        ('30', '30 pulgadas'),
+        ('32', '32 pulgadas'),
+    ]
+    
+    ORIGEN_CHOICES = [
+        ('brasileno', 'Brasileño'),
+        ('peruano', 'Peruano'),
+        ('indio', 'Indio'),
+        ('malayo', 'Malayo'),
+        ('camboyano', 'Camboyano'),
+        ('mongol', 'Mongol'),
+        ('europeo', 'Europeo'),
+        ('vietnamita', 'Vietnamita'),
+        ('chino', 'Chino'),
+        ('ruso', 'Ruso'),
+    ]
+    
+    METODO_CHOICES = [
+        ('clip_in', 'Clip-In'),
+        ('tape_in', 'Tape-In'),
+        ('keratin_bond', 'Keratin Bond'),
+        ('micro_link', 'Micro Link'),
+        ('sew_in', 'Sew-In'),
+        ('fusion', 'Fusión'),
+        ('halo', 'Halo'),
+        ('ponytail', 'Ponytail'),
+        ('bundle', 'Bundle'),
+        ('closure', 'Closure'),
+        ('frontal', 'Frontal'),
+        ('wig', 'Peluca'),
+    ]
+    
+    CALIDAD_CHOICES = [
+        ('remy', 'Remy'),
+        ('virgin', 'Virgin'),
+        ('double_drawn', 'Double Drawn'),
+        ('single_drawn', 'Single Drawn'),
+        ('raw', 'Raw'),
+    ]
+    
+    # Campos base
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     codigo = models.CharField(max_length=50, unique=True, db_index=True)
     nombre = models.CharField(max_length=200)
     descripcion = models.TextField()
-    moneda_precio = models.CharField(max_length=3)
+    descripcion_corta = models.CharField(max_length=150, blank=True)
+    
+    # Precio
+    moneda_precio = models.CharField(max_length=3, default='USD')
     monto_precio = models.DecimalField(max_digits=10, decimal_places=2)
+    monto_precio_original = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    
+    # Stock
     stock_actual = models.IntegerField(default=0)
     stock_minimo = models.IntegerField(default=0)
+    
+    # Atributos específicos de cabello
+    color = models.CharField(max_length=30, choices=COLOR_CHOICES, null=True, blank=True, db_index=True)
+    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, null=True, blank=True, db_index=True)
+    largo = models.CharField(max_length=5, choices=LARGO_CHOICES, null=True, blank=True, db_index=True)
+    origen = models.CharField(max_length=20, choices=ORIGEN_CHOICES, null=True, blank=True, db_index=True)
+    metodo = models.CharField(max_length=20, choices=METODO_CHOICES, null=True, blank=True, db_index=True)
+    calidad = models.CharField(max_length=20, choices=CALIDAD_CHOICES, null=True, blank=True, db_index=True)
+    
+    # Peso en gramos (importante para extensiones)
+    peso_gramos = models.IntegerField(null=True, blank=True)
+    
+    # Imágenes
+    imagen_principal = models.URLField(max_length=500, null=True, blank=True)
+    
+    # Valoraciones (denormalizadas para performance)
+    valoracion_promedio = models.DecimalField(max_digits=3, decimal_places=2, default=Decimal('0.00'))
+    total_valoraciones = models.IntegerField(default=0)
+    
+    # Contadores de venta (para ordenar por popularidad)
+    total_vendidos = models.IntegerField(default=0, db_index=True)
+    
+    # Flags
     activo = models.BooleanField(default=True)
+    es_nuevo = models.BooleanField(default=True)
+    destacado = models.BooleanField(default=False)
+    
+    # Timestamps
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_modificacion = models.DateTimeField(auto_now=True)
+    
+    # Búsqueda full-text (PostgreSQL)
+    # search_vector = SearchVectorField(null=True)  # Descomentar si usas PostgreSQL
 
     class Meta:
         db_table = 'productos'
@@ -62,10 +198,54 @@ class ProductoModel(models.Model):
             models.Index(fields=['codigo']),
             models.Index(fields=['nombre']),
             models.Index(fields=['activo', 'stock_actual']),
+            # Índices para filtros
+            models.Index(fields=['color', 'activo']),
+            models.Index(fields=['tipo', 'activo']),
+            models.Index(fields=['largo', 'activo']),
+            models.Index(fields=['origen', 'activo']),
+            models.Index(fields=['metodo', 'activo']),
+            models.Index(fields=['calidad', 'activo']),
+            models.Index(fields=['monto_precio', 'activo']),
+            # Índices compuestos para búsquedas comunes
+            models.Index(fields=['activo', 'stock_actual', '-total_vendidos']),
+            models.Index(fields=['activo', 'color', 'tipo']),
         ]
 
     def __str__(self) -> str:
         return f"{self.nombre} ({self.codigo})"
+    
+    @property
+    def tiene_descuento(self) -> bool:
+        """Indica si el producto tiene precio de descuento"""
+        return self.monto_precio_original is not None and self.monto_precio_original > self.monto_precio
+    
+    @property
+    def porcentaje_descuento(self) -> int:
+        """Calcula el porcentaje de descuento"""
+        if not self.tiene_descuento:
+            return 0
+        return int(((self.monto_precio_original - self.monto_precio) / self.monto_precio_original) * 100)
+    
+    @property
+    def disponible(self) -> bool:
+        """Indica si el producto está disponible para venta"""
+        return self.activo and self.stock_actual > 0
+
+
+class ImagenProductoModel(models.Model):
+    """
+    Modelo para imágenes adicionales de productos.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    producto = models.ForeignKey(ProductoModel, on_delete=models.CASCADE, related_name='imagenes')
+    url = models.URLField(max_length=500)
+    es_principal = models.BooleanField(default=False)
+    orden = models.IntegerField(default=0)
+    alt_text = models.CharField(max_length=200, blank=True)
+    
+    class Meta:
+        db_table = 'imagenes_producto'
+        ordering = ['orden']
 
 
 class OrdenModel(models.Model):
@@ -213,3 +393,129 @@ class AuditoriaAccesoAPI(models.Model):
     
     def __str__(self):
         return f"{self.metodo} {self.endpoint} - {self.timestamp}"
+
+
+class CarritoModel(models.Model):
+    """
+    Modelo ORM para Carrito de Compras.
+    
+    Características Enterprise:
+    - Optimistic locking con versión
+    - Máquina de estados con transiciones controladas
+    - Un solo carrito activo por usuario
+    - Snapshot de productos para integridad de precios
+    - Auditoría completa
+    """
+    ESTADO_CHOICES = [
+        ('CREADO', 'Creado'),
+        ('ACTIVO', 'Activo'),
+        ('BLOQUEADO', 'Bloqueado'),
+        ('CONFIRMADO', 'Confirmado'),
+        ('EXPIRADO', 'Expirado'),
+    ]
+    
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    usuario_id = models.UUIDField(db_index=True)
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='CREADO', db_index=True)
+    
+    # Optimistic locking
+    version = models.IntegerField(default=1)
+    
+    # Totales precalculados (server-side only)
+    total_bruto_monto = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    total_bruto_moneda = models.CharField(max_length=3, default='USD')
+    total_descuentos_monto = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    total_descuentos_moneda = models.CharField(max_length=3, default='USD')
+    total_final_monto = models.DecimalField(max_digits=12, decimal_places=2, default=Decimal('0.00'))
+    total_final_moneda = models.CharField(max_length=3, default='USD')
+    
+    # Timestamps
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)
+    fecha_expiracion = models.DateTimeField(null=True, blank=True)
+    fecha_bloqueo = models.DateTimeField(null=True, blank=True)
+    fecha_confirmacion = models.DateTimeField(null=True, blank=True)
+    
+    # Metadata
+    motivo_bloqueo = models.CharField(max_length=100, null=True, blank=True)
+    motivo_expiracion = models.CharField(max_length=100, null=True, blank=True)
+    
+    # Orden generada (si fue confirmado)
+    orden_generada_id = models.UUIDField(null=True, blank=True, unique=True)
+    
+    class Meta:
+        db_table = 'carritos'
+        verbose_name = 'Carrito'
+        verbose_name_plural = 'Carritos'
+        ordering = ['-fecha_modificacion']
+        indexes = [
+            models.Index(fields=['usuario_id', 'estado']),
+            models.Index(fields=['estado', '-fecha_modificacion']),
+            models.Index(fields=['fecha_expiracion', 'estado']),
+        ]
+        constraints = [
+            # Un solo carrito activo por usuario
+            models.UniqueConstraint(
+                fields=['usuario_id'],
+                condition=models.Q(estado__in=['CREADO', 'ACTIVO', 'BLOQUEADO']),
+                name='unique_carrito_activo_por_usuario'
+            ),
+        ]
+    
+    def __str__(self) -> str:
+        return f"Carrito {self.id} - Usuario {self.usuario_id} [{self.estado}]"
+
+
+class ItemCarritoModel(models.Model):
+    """
+    Modelo ORM para Items del Carrito.
+    
+    Almacena SNAPSHOTS de productos:
+    - Precio al momento de agregar
+    - Nombre al momento de agregar
+    - SKU como referencia
+    """
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    carrito = models.ForeignKey(CarritoModel, on_delete=models.CASCADE, related_name='items')
+    
+    # Referencia al producto
+    producto_id = models.UUIDField(db_index=True)
+    
+    # Snapshots (nunca se actualizan desde catálogo automáticamente)
+    sku_snapshot = models.CharField(max_length=50)
+    nombre_snapshot = models.CharField(max_length=200)
+    precio_unitario_monto = models.DecimalField(max_digits=10, decimal_places=2)
+    precio_unitario_moneda = models.CharField(max_length=3, default='USD')
+    
+    # Cantidad
+    cantidad = models.PositiveIntegerField(default=1)
+    
+    # Subtotal precalculado
+    subtotal_monto = models.DecimalField(max_digits=12, decimal_places=2)
+    subtotal_moneda = models.CharField(max_length=3, default='USD')
+    
+    # Timestamps
+    fecha_agregado = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'items_carrito'
+        verbose_name = 'Item de Carrito'
+        verbose_name_plural = 'Items de Carrito'
+        ordering = ['fecha_agregado']
+        constraints = [
+            # No duplicar productos en el mismo carrito
+            models.UniqueConstraint(
+                fields=['carrito', 'producto_id'],
+                name='unique_producto_por_carrito'
+            ),
+        ]
+    
+    def __str__(self) -> str:
+        return f"{self.cantidad}x {self.nombre_snapshot} en Carrito {self.carrito_id}"
+    
+    def save(self, *args, **kwargs):
+        """Calcula subtotal antes de guardar"""
+        self.subtotal_monto = self.precio_unitario_monto * self.cantidad
+        self.subtotal_moneda = self.precio_unitario_moneda
+        super().save(*args, **kwargs)
