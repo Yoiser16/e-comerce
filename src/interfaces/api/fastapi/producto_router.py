@@ -20,7 +20,7 @@ router = APIRouter(prefix="/api/v1/productos", tags=["productos"])
 
 
 @router.post("/", response_model=ProductoDTO, status_code=status.HTTP_201_CREATED)
-async def crear_producto(
+def crear_producto(
     datos: CrearProductoDTO,
     repo: ProductoRepository = Depends(get_producto_repository)
 ):
@@ -37,7 +37,7 @@ async def crear_producto(
 
 
 @router.get("/", response_model=List[ProductoDTO])
-async def listar_productos(
+def listar_productos(
     repo: ProductoRepository = Depends(get_producto_repository)
 ):
     """
@@ -51,7 +51,7 @@ async def listar_productos(
 
 
 @router.get("/{producto_id}", response_model=ProductoDTO)
-async def obtener_producto(
+def obtener_producto(
     producto_id: UUID,
     repo: ProductoRepository = Depends(get_producto_repository)
 ):

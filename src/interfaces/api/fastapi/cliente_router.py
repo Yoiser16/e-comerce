@@ -20,7 +20,7 @@ router = APIRouter(prefix="/api/v1/clientes", tags=["clientes"])
 
 
 @router.post("/", response_model=ClienteDTO, status_code=status.HTTP_201_CREATED)
-async def crear_cliente(
+def crear_cliente(
     datos: CrearClienteDTO,
     repo: ClienteRepository = Depends(get_cliente_repository)
 ):
@@ -40,7 +40,7 @@ async def crear_cliente(
 
 
 @router.get("/{cliente_id}", response_model=ClienteDTO)
-async def obtener_cliente(
+def obtener_cliente(
     cliente_id: UUID,
     repo: ClienteRepository = Depends(get_cliente_repository)
 ):
@@ -55,7 +55,7 @@ async def obtener_cliente(
 
 
 @router.put("/", response_model=ClienteDTO)
-async def actualizar_cliente(
+def actualizar_cliente(
     datos: ActualizarClienteDTO,
     repo: ClienteRepository = Depends(get_cliente_repository)
 ):

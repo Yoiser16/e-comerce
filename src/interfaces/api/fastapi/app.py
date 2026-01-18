@@ -43,10 +43,10 @@ def crear_app(config: AppConfig) -> FastAPI:
     # Exception handlers
     app.add_exception_handler(ExcepcionDominio, exception_handler_dominio)
     
-    # Routers
+    # Routers - ORDEN IMPORTANTE: rutas específicas antes que rutas con parámetros
     app.include_router(cliente_router)
-    app.include_router(producto_router)
-    app.include_router(busqueda_router)
+    app.include_router(busqueda_router)   # Primero: /productos/destacados, /productos/buscar
+    app.include_router(producto_router)   # Después: /productos/{producto_id}
     app.include_router(carrito_router)
     
     return app

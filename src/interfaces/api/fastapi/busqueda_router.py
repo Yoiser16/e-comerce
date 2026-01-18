@@ -47,7 +47,7 @@ router = APIRouter(prefix="/api/v1/productos", tags=["busqueda"])
 # ===== BÚSQUEDA PRINCIPAL =====
 
 @router.get("/buscar", response_model=ResultadoBusquedaDTO)
-async def buscar_productos(
+def buscar_productos(
     # Texto libre
     q: Optional[str] = Query(None, description="Texto de búsqueda", max_length=200),
     
@@ -126,7 +126,7 @@ async def buscar_productos(
 # ===== AUTOCOMPLETADO =====
 
 @router.get("/autocompletar", response_model=AutocompletadoResponseDTO)
-async def autocompletar_busqueda(
+def autocompletar_busqueda(
     q: str = Query(..., min_length=2, max_length=100, description="Texto a autocompletar"),
     repo: ProductoRepository = Depends(get_producto_repository)
 ):
@@ -149,7 +149,7 @@ async def autocompletar_busqueda(
 # ===== FACETAS =====
 
 @router.get("/facetas", response_model=List[GrupoFacetasDTO])
-async def obtener_facetas(
+def obtener_facetas(
     q: Optional[str] = Query(None, description="Texto de búsqueda para contextualizar"),
     solo_disponibles: bool = Query(True),
     solo_con_stock: bool = Query(True),
@@ -264,7 +264,7 @@ async def obtener_facetas(
 # ===== PRODUCTOS DESTACADOS =====
 
 @router.get("/destacados", response_model=List[ProductoBusquedaDTO])
-async def obtener_productos_destacados(
+def obtener_productos_destacados(
     limite: int = Query(8, ge=1, le=20, description="Cantidad de productos"),
     repo: ProductoRepository = Depends(get_producto_repository)
 ):
@@ -283,7 +283,7 @@ async def obtener_productos_destacados(
 # ===== MÁS VENDIDOS =====
 
 @router.get("/mas-vendidos", response_model=List[ProductoBusquedaDTO])
-async def obtener_productos_mas_vendidos(
+def obtener_productos_mas_vendidos(
     limite: int = Query(8, ge=1, le=20, description="Cantidad de productos"),
     repo: ProductoRepository = Depends(get_producto_repository)
 ):
@@ -302,7 +302,7 @@ async def obtener_productos_mas_vendidos(
 # ===== PRODUCTOS NUEVOS =====
 
 @router.get("/nuevos", response_model=List[ProductoBusquedaDTO])
-async def obtener_productos_nuevos(
+def obtener_productos_nuevos(
     limite: int = Query(8, ge=1, le=20, description="Cantidad de productos"),
     repo: ProductoRepository = Depends(get_producto_repository)
 ):
@@ -336,7 +336,7 @@ async def obtener_productos_nuevos(
 # ===== FILTROS RÁPIDOS =====
 
 @router.get("/filtro-rapido/{filtro}")
-async def aplicar_filtro_rapido(
+def aplicar_filtro_rapido(
     filtro: str,
     pagina: int = Query(1, ge=1),
     por_pagina: int = Query(20, ge=1, le=100),

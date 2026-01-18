@@ -1,0 +1,259 @@
+@import "tailwindcss";
+
+/* ========================================
+   KHARIS DISTRIBUIDORA - Soft Luxury Theme
+   ======================================== */
+
+/* Colores de marca personalizados - Paleta Soft Luxury */
+@theme {
+  /* Magenta/Rosa Principal (del logo) - Solo para CTAs */
+  --color-brand-50: #fdf2f6;
+  --color-brand-100: #fce7ef;
+  --color-brand-200: #fbd0e0;
+  --color-brand-300: #f8a9c7;
+  --color-brand-400: #f272a0;
+  --color-brand-500: #e84a7e;
+  --color-brand-600: #D81B60; /* Color principal del logo */
+  --color-brand-700: #b91650;
+  --color-brand-800: #9a1543;
+  --color-brand-900: #81163b;
+  
+  /* Nude/Blush - Acentos de lujo */
+  --color-nude-50: #fdfcfb;
+  --color-nude-100: #faf5f2;
+  --color-nude-200: #f5ebe5;
+  --color-nude-300: #edddd2;
+  --color-nude-400: #e2c9b8;
+  --color-nude-500: #d4b29e;
+  
+  /* Rose Gold */
+  --color-rosegold-50: #fdf8f6;
+  --color-rosegold-100: #fcf0eb;
+  --color-rosegold-200: #f9dfd4;
+  --color-rosegold-300: #f2c4b0;
+  --color-rosegold-400: #e9a68a;
+  --color-rosegold-500: #d4886b;
+  
+  /* Blush suave */
+  --color-blush-50: #fefbfc;
+  --color-blush-100: #fdf5f7;
+  --color-blush-200: #fbeaed;
+  --color-blush-300: #f7d5dc;
+  --color-blush-400: #f0b8c4;
+  --color-blush-500: #e69aab;
+  
+  /* Dorado sutil */
+  --color-gold-50: #fdfcf9;
+  --color-gold-100: #fbf7ed;
+  --color-gold-200: #f6edd6;
+  --color-gold-300: #eedeb4;
+  --color-gold-400: #e4c88c;
+  --color-gold-500: #d4a85a;
+  
+  /* Porcelana - Fondo dominante */
+  --color-porcelain: #FAFAFA;
+  --color-porcelain-warm: #FAF9F7;
+  
+  /* Texto oscuro */
+  --color-text-dark: #1A1A1A;
+  --color-text-medium: #4A4A4A;
+  --color-text-light: #7A7A7A;
+  
+  /* Carbón para sección mayorista */
+  --color-carbon-900: #1a1a2e;
+  --color-carbon-800: #16213e;
+  --color-carbon-700: #1f2937;
+}
+
+/* Tipografía base */
+body {
+  font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  background-color: #FAFAFA;
+  color: #1A1A1A;
+}
+
+/* Tipografía de lujo para títulos */
+.font-luxury {
+  font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
+}
+
+/* Glassmorphism para navbar */
+.glass-navbar {
+  background: rgba(255, 255, 255, 0.75);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3);
+}
+
+.glass-navbar-scrolled {
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.05);
+}
+
+/* Sombras suaves - Soft shadows */
+.shadow-soft {
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 
+              0 2px 8px -2px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-soft-lg {
+  box-shadow: 0 8px 40px -4px rgba(0, 0, 0, 0.08), 
+              0 4px 16px -4px rgba(0, 0, 0, 0.04);
+}
+
+.shadow-soft-xl {
+  box-shadow: 0 16px 60px -8px rgba(0, 0, 0, 0.1), 
+              0 8px 24px -8px rgba(0, 0, 0, 0.06);
+}
+
+/* Hover suave con elevación */
+.hover-lift {
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
+              box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.hover-lift:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.12), 
+              0 10px 20px -10px rgba(0, 0, 0, 0.06);
+}
+
+/* Botón CTA Principal */
+.btn-primary {
+  background: linear-gradient(135deg, #D81B60 0%, #c2185b 100%);
+  color: white;
+  font-weight: 600;
+  padding: 1rem 2rem;
+  border-radius: 9999px;
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  box-shadow: 0 4px 14px -3px rgba(216, 27, 96, 0.4);
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px -5px rgba(216, 27, 96, 0.5);
+}
+
+/* Botón Secundario Outline */
+.btn-outline {
+  background: transparent;
+  color: #1A1A1A;
+  font-weight: 600;
+  padding: 1rem 2rem;
+  border-radius: 9999px;
+  border: 2px solid rgba(26, 26, 26, 0.15);
+  transition: all 0.3s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.btn-outline:hover {
+  border-color: #D81B60;
+  color: #D81B60;
+  background: rgba(216, 27, 96, 0.04);
+}
+
+/* Trust bar con fondo nude */
+.trust-bar {
+  background: linear-gradient(135deg, #faf5f2 0%, #fdfcfb 100%);
+}
+
+/* Sección mayorista oscura */
+.section-dark {
+  background: linear-gradient(135deg, #1a1a2e 0%, #16213e 50%, #1a1a2e 100%);
+}
+
+/* Animación de zoom suave para imágenes */
+.img-zoom {
+  transition: transform 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.group:hover .img-zoom {
+  transform: scale(1.08);
+}
+
+/* Bento grid */
+.bento-item {
+  border-radius: 1.5rem;
+  overflow: hidden;
+  position: relative;
+}
+
+.bento-overlay {
+  background: linear-gradient(0deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
+}
+
+/* Carrusel de testimonios */
+.testimonial-card {
+  background: white;
+  border-radius: 1.5rem;
+  padding: 2rem;
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06);
+}
+
+/* Animación flotante suave */
+@keyframes float-soft {
+  0%, 100% {
+    transform: translateY(0) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-12px) rotate(1deg);
+  }
+}
+
+.animate-float-soft {
+  animation: float-soft 4s ease-in-out infinite;
+}
+
+/* Animación de pulso suave */
+@keyframes pulse-soft {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.7;
+  }
+}
+
+.animate-pulse-soft {
+  animation: pulse-soft 3s ease-in-out infinite;
+}
+
+/* Gradiente de texto dorado */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #d4a85a 0%, #e4c88c 50%, #d4a85a 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+/* Scroll suave */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Estilo de scrollbar elegante */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #FAFAFA;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #e0e0e0;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #D81B60;
+}
+
+/* Responsive touch targets para mobile */
+@media (max-width: 768px) {
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}

@@ -65,7 +65,7 @@ router = APIRouter(prefix="/api/v1/carrito", tags=["carrito"])
 # ===== ENDPOINTS =====
 
 @router.get("/", response_model=Optional[CarritoDTO])
-async def obtener_carrito_activo(
+def obtener_carrito_activo(
     usuario_id: UUID = Depends(get_current_user_id),
     repo: CarritoRepository = Depends(get_carrito_repository)
 ):
@@ -82,7 +82,7 @@ async def obtener_carrito_activo(
 
 
 @router.post("/", response_model=CarritoDTO, status_code=status.HTTP_201_CREATED)
-async def crear_u_obtener_carrito(
+def crear_u_obtener_carrito(
     usuario_id: UUID = Depends(get_current_user_id),
     repo: CarritoRepository = Depends(get_carrito_repository)
 ):
@@ -101,7 +101,7 @@ async def crear_u_obtener_carrito(
 
 
 @router.get("/resumen", response_model=Optional[CarritoResumenDTO])
-async def obtener_resumen_carrito(
+def obtener_resumen_carrito(
     usuario_id: UUID = Depends(get_current_user_id),
     repo: CarritoRepository = Depends(get_carrito_repository)
 ):
@@ -118,7 +118,7 @@ async def obtener_resumen_carrito(
 
 
 @router.post("/items", response_model=OperacionCarritoResultadoDTO)
-async def agregar_producto_al_carrito(
+def agregar_producto_al_carrito(
     datos: AgregarProductoAlCarritoActivoDTO,
     usuario_id: UUID = Depends(get_current_user_id),
     carrito_repo: CarritoRepository = Depends(get_carrito_repository),
@@ -149,7 +149,7 @@ async def agregar_producto_al_carrito(
 
 
 @router.delete("/items/{producto_id}", response_model=OperacionCarritoResultadoDTO)
-async def quitar_producto_del_carrito(
+def quitar_producto_del_carrito(
     producto_id: UUID,
     carrito_id: UUID,
     usuario_id: UUID = Depends(get_current_user_id),
@@ -171,7 +171,7 @@ async def quitar_producto_del_carrito(
 
 
 @router.patch("/items/{producto_id}", response_model=OperacionCarritoResultadoDTO)
-async def actualizar_cantidad_producto(
+def actualizar_cantidad_producto(
     producto_id: UUID,
     carrito_id: UUID,
     nueva_cantidad: int,
@@ -202,7 +202,7 @@ async def actualizar_cantidad_producto(
 
 
 @router.post("/recalcular/{carrito_id}", response_model=CarritoDTO)
-async def recalcular_carrito(
+def recalcular_carrito(
     carrito_id: UUID,
     usuario_id: UUID = Depends(get_current_user_id),
     carrito_repo: CarritoRepository = Depends(get_carrito_repository),
@@ -225,7 +225,7 @@ async def recalcular_carrito(
 
 
 @router.post("/bloquear", response_model=OperacionCarritoResultadoDTO)
-async def bloquear_carrito_para_checkout(
+def bloquear_carrito_para_checkout(
     datos: BloquearCarritoDTO,
     usuario_id: UUID = Depends(get_current_user_id),
     carrito_repo: CarritoRepository = Depends(get_carrito_repository),
@@ -253,7 +253,7 @@ async def bloquear_carrito_para_checkout(
 
 
 @router.post("/desbloquear/{carrito_id}", response_model=OperacionCarritoResultadoDTO)
-async def desbloquear_carrito(
+def desbloquear_carrito(
     carrito_id: UUID,
     usuario_id: UUID = Depends(get_current_user_id),
     repo: CarritoRepository = Depends(get_carrito_repository)
@@ -275,7 +275,7 @@ async def desbloquear_carrito(
 
 
 @router.post("/confirmar", response_model=OperacionCarritoResultadoDTO)
-async def confirmar_carrito(
+def confirmar_carrito(
     datos: ConfirmarCarritoDTO,
     usuario_id: UUID = Depends(get_current_user_id),
     repo: CarritoRepository = Depends(get_carrito_repository)
@@ -299,7 +299,7 @@ async def confirmar_carrito(
 
 
 @router.delete("/{carrito_id}", response_model=OperacionCarritoResultadoDTO)
-async def vaciar_carrito(
+def vaciar_carrito(
     carrito_id: UUID,
     usuario_id: UUID = Depends(get_current_user_id),
     repo: CarritoRepository = Depends(get_carrito_repository)
