@@ -43,8 +43,7 @@ postgresql://ecommerce_user:ecommerce_dev_2026!@72.61.73.245:5432/ecommerce_db
 
 ### Para psql (terminal):
 ```bash
-psql -h 72.61.73.245 -U ecommerce_user -d ecommerce_db
-# Cuando pida password: ecommerce_dev_2026!
+PGPASSWORD='ecommerce_dev_2026!' psql -h 72.61.73.245 -U ecommerce_user -d ecommerce_db
 ```
 
 ---
@@ -63,14 +62,7 @@ Estos usuarios ya están creados en la base de datos:
 
 ## 🚀 CÓMO EJECUTAR EL PROYECTO (PARA TI Y TU COMPAÑERO)
 
-### 1. Clonar el Repositorio (Tu compañero)
-
-```bash
-git clone <URL-DEL-REPOSITORIO>
-cd e-comerce
-```
-
-### 2. Crear Entorno Virtual
+### 1. Crear Entorno Virtual
 
 ```bash
 python3 -m venv venv
@@ -78,13 +70,13 @@ source venv/bin/activate  # Linux/Mac
 # O en Windows: venv\Scripts\activate
 ```
 
-### 3. Instalar Dependencias
+### 2. Instalar Dependencias
 
 ```bash
 pip install -r requirements.txt
 ```
 
-### 4. Configurar .env
+### 3. Configurar .env
 
 Crear archivo `.env` en la raíz del proyecto con:
 
@@ -115,45 +107,22 @@ DB_CONN_MAX_AGE=0
 source venv/bin/activate
 
 # Iniciar servidor (OPCIÓN 1 - FastAPI + Django)
+cd s4. Ejecutar el Servidor
+
+```bash
+# Activar entorno virtual
+source venv/bin/activate
+
+# Iniciar servidor FastAPI + Django
 cd src
 python main.py
-# Servidor en: http://localhost:8000
-
-# O OPCIÓN 2 - Solo Django
-python manage.py runserver
-# Servidor en: http://127.0.0.1:8000
-```
-
-### 6. Acceder a la API
-
-- **Documentación interactiva**: http://localhost:8000/docs
-- **API Base**: http://localhost:8000/api/v1
-- **Admin Django**: http://localhost:8000/admin
+# Se5vidor en: http://localhostlhost:8000/admin
 
 ---
 
-## 🧪 PRUEBAS RÁPIDAS
+## 🧪 PROBAR LA API
 
-### Probar Login (API)
-
-```bash
-curl -X POST http://localhost:8000/api/v1/auth/login \
-  -H "Content-Type: application/json" \
-  -d '{
-    "email": "admin@ecommerce.com",
-    "password": "Admin123!"
-  }'
-```
-
-### Ver Productos
-
-```bash
-# Primero obtén el token del login anterior
-TOKEN="<tu-access-token>"
-
-curl http://localhost:8000/api/v1/productos \
-  -H "Authorization: Bearer $TOKEN"
-```
+Una vez iniciado el servidor, visita http://localhost:8000/docs para probar todos los endpoints de forma interactiva con Swagger UI.
 
 ---
 
@@ -210,32 +179,15 @@ psql -h 72.61.73.245 -U ecommerce_user -d ecommerce_db -c "
 ### Crear Datos de Prueba
 
 ```bash
-# Activar entorno virtual primero
-source venv/bin/activate
+```bash
+# Ver tablas en la BD
+PGPASSWORD='ecommerce_dev_2026!' psql -h 72.61.73.245 -U ecommerce_user -d ecommerce_db -c "\dt"
 
-# Crear más usuarios si necesitan
+# Crear usuarios de demo
+source venv/bin/activate
 python manage.py crear_usuarios_demo
 
-# O usar shell de Django
-python manage.py shell
-```
-
----
-
-## 📦 ARCHIVOS IMPORTANTES CREADOS
-
-### Scripts
-
-1. **`scripts/setup_vps_database.sh`**
-   - Script completo de configuración del VPS
-   - Ya ejecutado, pero está disponible para referencia
-
-2. **`scripts/test_db_connection.sh`**
-   - Prueba rápida de conexión a la BD
-   ```bash
-   bash scripts/test_db_connection.sh
-   ```
-
+# S
 ### Configuración
 
 1. **`.env`** (EN TU MÁQUINA)
@@ -258,30 +210,16 @@ python manage.py shell
 
 ### Para tu compañero:
 1. Clonar el repositorio
-2. Copiar las credenciales que le compartas
-3. Crear su `.env` con las mismas credenciales
-4. Instalar dependencias
-5. ¡Empezar a trabajar!
+2. Copiar las credenciales
 
----
+**`.env`** (EN TU MÁQUINA)
+- Configuración con credenciales del VPS
+- ⚠️ NO COMMITEAR A GIT
+- Tu compañero debe crear su propio `.env` con las mismas credenciales
 
-## 📋 INFORMACIÓN PARA COMPARTIR CON TU COMPAÑERO
-
-### Envíale esto:
-
-```markdown
-## 🚀 Setup del Proyecto E-Commerce
-
-Hey! Aquí está toda la info para que puedas trabajar:
-
-### Base de Datos (VPS Compartido)
-Usamos una BD PostgreSQL en el VPS, así ambos vemos los mismos datos.
-
-**Credenciales:**
-- Host: 72.61.73.245
-- Puerto: 5432
-- DB: ecommerce_db
-- Usuario: ecommerce_user
+**`.env.example`**
+- Plantilla de ejemplo (sin credenciales)
+suario: ecommerce_user
 - Password: ecommerce_dev_2026!
 
 ### Setup Rápido:
@@ -371,13 +309,9 @@ DB_CONN_MAX_AGE=0
 - [x] Documentación completa
 
 ---
+ logs del servidor**:
+   ```bash
+   ssh root@72.61.73.245 "tail -f /var/log/postgresql/postgresql-16-main.log"
+   ```
 
-## 🎉 ¡TODO LISTO!
-
-Tu setup está **100% funcional**. Tanto tú como tu compañero pueden:
-- Conectarse a la misma base de datos
-- Ver los mismos datos en tiempo real
-- Desarrollar sin conflictos
-- Empezar con el frontend inmediatamente
-
-**¡A construir ese e-commerce! 🚀**
+2
