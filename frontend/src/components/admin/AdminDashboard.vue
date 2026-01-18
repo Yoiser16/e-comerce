@@ -1,127 +1,126 @@
 <template>
   <div class="space-y-8">
-    <!-- Welcome Banner -->
-    <div class="bg-gradient-to-r from-brand-600 to-brand-700 rounded-2xl p-6 lg:p-8 text-white">
-      <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
-        <div>
-          <h2 class="text-2xl lg:text-3xl font-bold mb-2">¡Bienvenido, {{ userName }}!</h2>
-          <p class="text-white/80">Aquí tienes un resumen de tu tienda hoy.</p>
-        </div>
-        <div class="flex gap-3">
-          <router-link 
-            to="/admin/productos/nuevo"
-            class="flex items-center gap-2 bg-white text-brand-600 font-semibold px-5 py-2.5 rounded-xl hover:bg-brand-50 transition-colors"
-          >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-            </svg>
-            Nuevo Producto
-          </router-link>
-        </div>
+    
+    <!-- Welcome Section - Clean & Elegant -->
+    <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
+      <div>
+        <h1 class="font-luxury text-3xl lg:text-4xl text-text-dark mb-2">
+          Hola, {{ userName }}
+        </h1>
+        <p class="text-text-medium text-lg">Aquí está el resumen de tu tienda hoy.</p>
       </div>
+      <router-link 
+        to="/admin/productos/nuevo"
+        class="inline-flex items-center gap-2.5 bg-text-dark hover:bg-black text-white font-medium px-6 py-3.5 rounded-xl transition-all hover:shadow-lg hover:shadow-black/10"
+      >
+        <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
+        </svg>
+        Nuevo Producto
+      </router-link>
     </div>
 
-    <!-- Stats Grid -->
+    <!-- Stats Grid - Clean Cards -->
     <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+      
       <!-- Total Ventas -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <div class="flex items-center justify-between mb-4">
-          <div class="w-12 h-12 bg-green-100 rounded-xl flex items-center justify-center">
-            <svg class="w-6 h-6 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-          </div>
+      <div class="bg-white rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-shadow">
+        <div class="flex items-start justify-between mb-6">
+          <svg class="w-7 h-7 text-text-light" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+          </svg>
           <span class="text-green-600 text-sm font-medium flex items-center gap-1">
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 10l7-7m0 0l7 7m-7-7v18" />
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18" />
             </svg>
             +12.5%
           </span>
         </div>
-        <h3 class="text-2xl font-bold text-gray-900">${{ formatNumber(stats.totalVentas) }}</h3>
-        <p class="text-gray-500 text-sm">Ventas este mes</p>
+        <h3 class="text-3xl font-light text-text-dark tracking-tight">${{ formatNumber(stats.totalVentas) }}</h3>
+        <p class="text-text-light text-sm mt-1">Ventas este mes</p>
       </div>
 
       <!-- Órdenes -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <div class="flex items-center justify-between mb-4">
-          <div class="w-12 h-12 bg-blue-100 rounded-xl flex items-center justify-center">
-            <svg class="w-6 h-6 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" />
-            </svg>
-          </div>
+      <div class="bg-white rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-shadow">
+        <div class="flex items-start justify-between mb-6">
+          <svg class="w-7 h-7 text-text-light" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
+          </svg>
           <span class="text-blue-600 text-sm font-medium">{{ stats.ordenesPendientes }} pendientes</span>
         </div>
-        <h3 class="text-2xl font-bold text-gray-900">{{ stats.totalOrdenes }}</h3>
-        <p class="text-gray-500 text-sm">Órdenes totales</p>
+        <h3 class="text-3xl font-light text-text-dark tracking-tight">{{ stats.totalOrdenes }}</h3>
+        <p class="text-text-light text-sm mt-1">Órdenes totales</p>
       </div>
 
       <!-- Productos -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <div class="flex items-center justify-between mb-4">
-          <div class="w-12 h-12 bg-purple-100 rounded-xl flex items-center justify-center">
-            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
-            </svg>
-          </div>
-          <span class="text-orange-600 text-sm font-medium">{{ stats.stockBajo }} stock bajo</span>
+      <div class="bg-white rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-shadow">
+        <div class="flex items-start justify-between mb-6">
+          <svg class="w-7 h-7 text-text-light" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
+          </svg>
+          <span class="text-amber-600 text-sm font-medium">{{ stats.stockBajo }} stock bajo</span>
         </div>
-        <h3 class="text-2xl font-bold text-gray-900">{{ stats.totalProductos }}</h3>
-        <p class="text-gray-500 text-sm">Productos activos</p>
+        <h3 class="text-3xl font-light text-text-dark tracking-tight">{{ stats.totalProductos }}</h3>
+        <p class="text-text-light text-sm mt-1">Productos activos</p>
       </div>
 
       <!-- Clientes -->
-      <div class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
-        <div class="flex items-center justify-between mb-4">
-          <div class="w-12 h-12 bg-pink-100 rounded-xl flex items-center justify-center">
-            <svg class="w-6 h-6 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-            </svg>
-          </div>
+      <div class="bg-white rounded-2xl p-6 shadow-[0_4px_20px_rgba(0,0,0,0.04)] hover:shadow-[0_8px_30px_rgba(0,0,0,0.08)] transition-shadow">
+        <div class="flex items-start justify-between mb-6">
+          <svg class="w-7 h-7 text-text-light" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
+          </svg>
           <span class="text-green-600 text-sm font-medium">+{{ stats.clientesNuevos }} nuevos</span>
         </div>
-        <h3 class="text-2xl font-bold text-gray-900">{{ stats.totalClientes }}</h3>
-        <p class="text-gray-500 text-sm">Clientes registrados</p>
+        <h3 class="text-3xl font-light text-text-dark tracking-tight">{{ stats.totalClientes }}</h3>
+        <p class="text-text-light text-sm mt-1">Clientes registrados</p>
       </div>
     </div>
 
     <!-- Two Column Layout -->
     <div class="grid lg:grid-cols-3 gap-8">
-      <!-- Recent Orders -->
-      <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100">
-        <div class="flex items-center justify-between p-6 border-b border-gray-100">
-          <h3 class="text-lg font-semibold text-gray-900">Últimas Órdenes</h3>
-          <router-link to="/admin/ordenes" class="text-brand-600 text-sm font-medium hover:underline">
+      
+      <!-- Recent Orders - Magazine Style -->
+      <div class="lg:col-span-2 bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between p-6 border-b border-gray-50">
+          <h3 class="text-lg font-medium text-text-dark">Últimas Órdenes</h3>
+          <router-link to="/admin/ordenes" class="text-brand-600 text-sm font-medium hover:text-brand-700 transition-colors">
             Ver todas
           </router-link>
         </div>
         <div class="overflow-x-auto">
           <table class="w-full">
-            <thead class="bg-gray-50">
-              <tr>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Orden</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Cliente</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Estado</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Total</th>
-                <th class="px-6 py-3 text-left text-xs font-semibold text-gray-500 uppercase">Fecha</th>
+            <thead>
+              <tr class="border-b border-gray-50">
+                <th class="px-6 py-4 text-left text-xs font-semibold text-text-light uppercase tracking-wider">Orden</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-text-light uppercase tracking-wider">Cliente</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-text-light uppercase tracking-wider">Estado</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-text-light uppercase tracking-wider">Total</th>
+                <th class="px-6 py-4 text-left text-xs font-semibold text-text-light uppercase tracking-wider">Fecha</th>
               </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
-              <tr v-for="orden in recentOrders" :key="orden.id" class="hover:bg-gray-50">
+            <tbody class="divide-y divide-gray-50">
+              <tr v-for="orden in recentOrders" :key="orden.id" class="hover:bg-gray-50/50 transition-colors">
                 <td class="px-6 py-4">
-                  <span class="font-medium text-gray-900">#{{ orden.id.slice(0, 8) }}</span>
+                  <span class="font-mono text-sm text-text-dark">#{{ orden.id.slice(0, 8) }}</span>
                 </td>
-                <td class="px-6 py-4 text-gray-600">{{ orden.cliente }}</td>
                 <td class="px-6 py-4">
-                  <span :class="getStatusClass(orden.estado)" class="px-3 py-1 text-xs font-medium rounded-full">
-                    {{ orden.estado }}
+                  <span class="text-text-dark">{{ orden.cliente }}</span>
+                </td>
+                <td class="px-6 py-4">
+                  <span :class="getStatusClass(orden.estado)" class="px-3 py-1.5 text-xs font-medium rounded-full">
+                    {{ getStatusLabel(orden.estado) }}
                   </span>
                 </td>
-                <td class="px-6 py-4 font-medium text-gray-900">${{ formatNumber(orden.total) }}</td>
-                <td class="px-6 py-4 text-gray-500 text-sm">{{ orden.fecha }}</td>
+                <td class="px-6 py-4">
+                  <span class="font-medium text-text-dark">${{ formatNumber(orden.total) }}</span>
+                </td>
+                <td class="px-6 py-4">
+                  <span class="text-text-light text-sm">{{ orden.fecha }}</span>
+                </td>
               </tr>
               <tr v-if="recentOrders.length === 0">
-                <td colspan="5" class="px-6 py-8 text-center text-gray-500">
+                <td colspan="5" class="px-6 py-12 text-center text-text-light">
                   No hay órdenes recientes
                 </td>
               </tr>
@@ -130,93 +129,100 @@
         </div>
       </div>
 
-      <!-- Low Stock Products -->
-      <div class="bg-white rounded-2xl shadow-sm border border-gray-100">
-        <div class="flex items-center justify-between p-6 border-b border-gray-100">
-          <h3 class="text-lg font-semibold text-gray-900">Stock Bajo</h3>
-          <router-link to="/admin/inventario" class="text-brand-600 text-sm font-medium hover:underline">
+      <!-- Low Stock Products - Magazine Style -->
+      <div class="bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)]">
+        <div class="flex items-center justify-between p-6 border-b border-gray-50">
+          <h3 class="text-lg font-medium text-text-dark">Stock Bajo</h3>
+          <router-link to="/admin/inventario" class="text-brand-600 text-sm font-medium hover:text-brand-700 transition-colors">
             Ver todo
           </router-link>
         </div>
-        <div class="p-4 space-y-4">
+        <div class="p-4 space-y-3">
           <div 
             v-for="product in lowStockProducts" 
             :key="product.id"
-            class="flex items-center gap-4 p-3 bg-red-50 rounded-xl"
+            class="flex items-center gap-4 p-3 rounded-xl hover:bg-gray-50 transition-colors group"
           >
-            <div class="w-12 h-12 bg-white rounded-lg overflow-hidden flex-shrink-0">
-              <img :src="product.imagen" :alt="product.nombre" class="w-full h-full object-cover">
+            <!-- Larger Product Image -->
+            <div class="w-16 h-16 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0 shadow-sm">
+              <img 
+                :src="product.imagen" 
+                :alt="product.nombre" 
+                class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+              >
             </div>
             <div class="flex-1 min-w-0">
-              <p class="font-medium text-gray-900 truncate">{{ product.nombre }}</p>
-              <p class="text-sm text-red-600">Solo {{ product.stock }} unidades</p>
+              <p class="font-medium text-text-dark truncate">{{ product.nombre }}</p>
+              <p class="text-sm text-brand-600 font-medium">Solo {{ product.stock }} unidades</p>
             </div>
-            <button class="text-brand-600 hover:text-brand-700">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+            <button class="p-2 text-text-light hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors opacity-0 group-hover:opacity-100">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
               </svg>
             </button>
           </div>
-          <div v-if="lowStockProducts.length === 0" class="text-center py-8 text-gray-500">
-            <svg class="w-12 h-12 mx-auto mb-3 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+          
+          <div v-if="lowStockProducts.length === 0" class="text-center py-10">
+            <svg class="w-12 h-12 mx-auto mb-3 text-green-200" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            Todo el inventario OK
+            <p class="text-text-light">Todo el inventario OK</p>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Quick Actions -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-      <h3 class="text-lg font-semibold text-gray-900 mb-4">Acciones Rápidas</h3>
+    <!-- Quick Actions - Minimal -->
+    <div class="bg-white rounded-2xl shadow-[0_4px_20px_rgba(0,0,0,0.04)] p-6">
+      <h3 class="text-lg font-medium text-text-dark mb-6">Acciones Rápidas</h3>
       <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+        
         <router-link 
           to="/admin/productos/nuevo"
-          class="flex flex-col items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-brand-50 hover:text-brand-600 transition-colors group"
+          class="flex flex-col items-center gap-3 p-5 border border-gray-100 rounded-2xl hover:border-brand-200 hover:bg-brand-50/30 transition-all group"
         >
-          <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-            <svg class="w-6 h-6 text-gray-600 group-hover:text-brand-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center group-hover:bg-brand-100 transition-colors">
+            <svg class="w-5 h-5 text-text-light group-hover:text-brand-600 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
             </svg>
           </div>
-          <span class="text-sm font-medium text-gray-700 group-hover:text-brand-600">Nuevo Producto</span>
+          <span class="text-sm font-medium text-text-medium group-hover:text-brand-600 transition-colors">Nuevo Producto</span>
         </router-link>
 
         <router-link 
           to="/admin/ordenes"
-          class="flex flex-col items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-blue-50 hover:text-blue-600 transition-colors group"
+          class="flex flex-col items-center gap-3 p-5 border border-gray-100 rounded-2xl hover:border-blue-200 hover:bg-blue-50/30 transition-all group"
         >
-          <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-            <svg class="w-6 h-6 text-gray-600 group-hover:text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
+          <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center group-hover:bg-blue-100 transition-colors">
+            <svg class="w-5 h-5 text-text-light group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
             </svg>
           </div>
-          <span class="text-sm font-medium text-gray-700 group-hover:text-blue-600">Ver Órdenes</span>
+          <span class="text-sm font-medium text-text-medium group-hover:text-blue-600 transition-colors">Ver Órdenes</span>
         </router-link>
 
         <router-link 
           to="/admin/inventario"
-          class="flex flex-col items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-orange-50 hover:text-orange-600 transition-colors group"
+          class="flex flex-col items-center gap-3 p-5 border border-gray-100 rounded-2xl hover:border-amber-200 hover:bg-amber-50/30 transition-all group"
         >
-          <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-            <svg class="w-6 h-6 text-gray-600 group-hover:text-orange-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+          <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center group-hover:bg-amber-100 transition-colors">
+            <svg class="w-5 h-5 text-text-light group-hover:text-amber-600 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
             </svg>
           </div>
-          <span class="text-sm font-medium text-gray-700 group-hover:text-orange-600">Inventario</span>
+          <span class="text-sm font-medium text-text-medium group-hover:text-amber-600 transition-colors">Inventario</span>
         </router-link>
 
         <router-link 
           to="/admin/clientes"
-          class="flex flex-col items-center gap-3 p-4 bg-gray-50 rounded-xl hover:bg-pink-50 hover:text-pink-600 transition-colors group"
+          class="flex flex-col items-center gap-3 p-5 border border-gray-100 rounded-2xl hover:border-brand-200 hover:bg-brand-50/30 transition-all group"
         >
-          <div class="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm group-hover:shadow-md transition-shadow">
-            <svg class="w-6 h-6 text-gray-600 group-hover:text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          <div class="w-12 h-12 bg-gray-50 rounded-xl flex items-center justify-center group-hover:bg-brand-100 transition-colors">
+            <svg class="w-5 h-5 text-text-light group-hover:text-brand-600 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
             </svg>
           </div>
-          <span class="text-sm font-medium text-gray-700 group-hover:text-pink-600">Clientes</span>
+          <span class="text-sm font-medium text-text-medium group-hover:text-brand-600 transition-colors">Clientes</span>
         </router-link>
       </div>
     </div>
@@ -224,7 +230,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed } from 'vue'
 
 export default {
   name: 'AdminDashboard',
@@ -250,9 +256,9 @@ export default {
 
     // Low stock products (mock data)
     const lowStockProducts = ref([
-      { id: 1, nombre: 'Extensiones Brasileñas 24"', stock: 2, imagen: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=100' },
-      { id: 2, nombre: 'Peluca Lace Front Natural', stock: 3, imagen: 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=100' },
-      { id: 3, nombre: 'Clip-in Extensions Rubio', stock: 1, imagen: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=100' },
+      { id: 1, nombre: 'Extensiones Brasileñas 24"', stock: 2, imagen: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=150' },
+      { id: 2, nombre: 'Peluca Lace Front Natural', stock: 3, imagen: 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=150' },
+      { id: 3, nombre: 'Clip-in Extensions Rubio', stock: 1, imagen: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=150' },
     ])
 
     // User name
@@ -269,16 +275,29 @@ export default {
       return new Intl.NumberFormat('es-MX').format(num)
     }
 
+    // Pastel status styles - Magazine aesthetic
     const getStatusClass = (status) => {
       const classes = {
-        'PENDIENTE': 'bg-yellow-100 text-yellow-700',
-        'CONFIRMADA': 'bg-blue-100 text-blue-700',
-        'EN_PROCESO': 'bg-purple-100 text-purple-700',
-        'ENVIADA': 'bg-indigo-100 text-indigo-700',
-        'COMPLETADA': 'bg-green-100 text-green-700',
-        'CANCELADA': 'bg-red-100 text-red-700'
+        'PENDIENTE': 'bg-rose-50 text-rose-600',
+        'CONFIRMADA': 'bg-sky-50 text-sky-600',
+        'EN_PROCESO': 'bg-violet-50 text-violet-600',
+        'ENVIADA': 'bg-indigo-50 text-indigo-600',
+        'COMPLETADA': 'bg-emerald-50 text-emerald-600',
+        'CANCELADA': 'bg-gray-100 text-gray-500'
       }
-      return classes[status] || 'bg-gray-100 text-gray-700'
+      return classes[status] || 'bg-gray-50 text-gray-600'
+    }
+
+    const getStatusLabel = (status) => {
+      const labels = {
+        'PENDIENTE': 'Pendiente',
+        'CONFIRMADA': 'Confirmada',
+        'EN_PROCESO': 'En proceso',
+        'ENVIADA': 'Enviada',
+        'COMPLETADA': 'Completada',
+        'CANCELADA': 'Cancelada'
+      }
+      return labels[status] || status
     }
 
     return {
@@ -287,7 +306,8 @@ export default {
       lowStockProducts,
       userName,
       formatNumber,
-      getStatusClass
+      getStatusClass,
+      getStatusLabel
     }
   }
 }

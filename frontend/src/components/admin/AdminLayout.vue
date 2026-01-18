@@ -1,33 +1,45 @@
 <template>
-  <div class="min-h-screen bg-gray-100">
-    <!-- Sidebar -->
+  <div class="min-h-screen bg-[#F9FAFB]">
+    <!-- Sidebar - Clean Canvas Style -->
     <aside 
       :class="[
-        'fixed inset-y-0 left-0 z-50 w-64 bg-gray-900 transform transition-transform duration-300 ease-in-out lg:translate-x-0',
+        'fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-100 transform transition-transform duration-300 ease-in-out lg:translate-x-0',
         sidebarOpen ? 'translate-x-0' : '-translate-x-full'
       ]"
     >
-      <!-- Logo -->
-      <div class="flex items-center justify-center h-16 bg-gray-800">
-        <img src="/logo.jpeg" alt="Logo" class="w-10 h-10 rounded-full">
-        <span class="ml-3 text-xl font-bold text-white">Admin Panel</span>
+      <!-- Logo - Minimal -->
+      <div class="flex items-center h-20 px-8 border-b border-gray-50">
+        <router-link to="/" class="flex items-center gap-3 group">
+          <span class="font-luxury text-2xl text-text-dark tracking-wide">Kharis</span>
+          <span class="text-[10px] uppercase tracking-widest text-text-light font-medium">Admin</span>
+        </router-link>
       </div>
 
-      <!-- Navigation -->
-      <nav class="mt-6 px-4">
+      <!-- Navigation - Minimal -->
+      <nav class="mt-8 px-6">
         <div class="space-y-1">
           <router-link 
             v-for="item in menuItems" 
             :key="item.path"
             :to="item.path"
-            class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors group"
-            active-class="bg-brand-600 text-white"
+            :class="[
+              'flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-200 group relative',
+              isActive(item.path) 
+                ? 'text-text-dark font-semibold' 
+                : 'text-text-medium hover:text-text-dark hover:bg-gray-50'
+            ]"
           >
-            <span v-html="item.icon" class="w-5 h-5 mr-3"></span>
-            {{ item.name }}
+            <!-- Active Indicator -->
+            <div 
+              v-if="isActive(item.path)"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-brand-600 rounded-r-full"
+            ></div>
+            
+            <span v-html="item.icon" class="w-5 h-5 opacity-70 group-hover:opacity-100"></span>
+            <span class="flex-1">{{ item.name }}</span>
             <span 
               v-if="item.badge" 
-              class="ml-auto bg-red-500 text-white text-xs font-bold px-2 py-0.5 rounded-full"
+              class="bg-brand-50 text-brand-600 text-xs font-semibold px-2.5 py-1 rounded-full"
             >
               {{ item.badge }}
             </span>
@@ -35,41 +47,49 @@
         </div>
 
         <!-- Separator -->
-        <div class="my-6 border-t border-gray-700"></div>
+        <div class="my-8 border-t border-gray-100"></div>
 
         <!-- Secondary Menu -->
         <div class="space-y-1">
           <router-link 
             to="/admin/config"
-            class="flex items-center px-4 py-3 text-gray-300 rounded-lg hover:bg-gray-800 hover:text-white transition-colors"
-            active-class="bg-brand-600 text-white"
+            :class="[
+              'flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-200 group relative',
+              isActive('/admin/config') 
+                ? 'text-text-dark font-semibold' 
+                : 'text-text-medium hover:text-text-dark hover:bg-gray-50'
+            ]"
           >
-            <svg class="w-5 h-5 mr-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+            <div 
+              v-if="isActive('/admin/config')"
+              class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-brand-600 rounded-r-full"
+            ></div>
+            <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            Configuración
+            <span>Configuración</span>
           </router-link>
         </div>
       </nav>
 
-      <!-- User Info (Bottom) -->
-      <div class="absolute bottom-0 left-0 right-0 p-4 bg-gray-800">
-        <div class="flex items-center">
-          <div class="w-10 h-10 bg-brand-600 rounded-full flex items-center justify-center text-white font-bold">
+      <!-- User Info (Bottom) - Minimal -->
+      <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-50">
+        <div class="flex items-center gap-4">
+          <div class="w-11 h-11 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center text-text-dark font-semibold text-sm">
             {{ userInitials }}
           </div>
-          <div class="ml-3 flex-1">
-            <p class="text-sm font-medium text-white truncate">{{ userName }}</p>
-            <p class="text-xs text-gray-400">{{ userRole }}</p>
+          <div class="flex-1 min-w-0">
+            <p class="text-sm font-medium text-text-dark truncate">{{ userName }}</p>
+            <p class="text-xs text-text-light uppercase tracking-wider">{{ userRole }}</p>
           </div>
           <button 
             @click="handleLogout"
-            class="p-2 text-gray-400 hover:text-red-400 transition-colors"
+            class="p-2.5 text-text-light hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
             title="Cerrar sesión"
           >
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
             </svg>
           </button>
         </div>
@@ -80,53 +100,56 @@
     <div 
       v-if="sidebarOpen"
       @click="sidebarOpen = false"
-      class="fixed inset-0 z-40 bg-black/50 lg:hidden"
+      class="fixed inset-0 z-40 bg-black/20 lg:hidden"
     ></div>
 
     <!-- Main Content -->
-    <div class="lg:ml-64">
-      <!-- Top Header -->
-      <header class="sticky top-0 z-30 bg-white shadow-sm">
-        <div class="flex items-center justify-between h-16 px-4 lg:px-8">
+    <div class="lg:ml-72">
+      <!-- Top Header - Minimal -->
+      <header class="sticky top-0 z-30 bg-[#F9FAFB]/80 border-b border-gray-100/50">
+        <div class="flex items-center justify-between h-20 px-6 lg:px-10">
           <!-- Mobile Menu Button -->
           <button 
             @click="sidebarOpen = !sidebarOpen"
-            class="p-2 text-gray-600 rounded-lg hover:bg-gray-100 lg:hidden"
+            class="p-2.5 text-text-medium rounded-xl hover:bg-white hover:shadow-sm lg:hidden transition-all"
           >
-            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
             </svg>
           </button>
 
           <!-- Page Title -->
-          <h1 class="text-xl font-semibold text-gray-800">{{ pageTitle }}</h1>
+          <h1 class="hidden lg:block text-lg font-medium text-text-dark">{{ pageTitle }}</h1>
 
           <!-- Right Actions -->
-          <div class="flex items-center gap-4">
+          <div class="flex items-center gap-3">
             <!-- Notifications -->
-            <button class="relative p-2 text-gray-600 hover:bg-gray-100 rounded-lg">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+            <button class="relative p-2.5 text-text-medium hover:text-text-dark hover:bg-white rounded-xl transition-all hover:shadow-sm">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
               </svg>
-              <span class="absolute top-1 right-1 w-2 h-2 bg-red-500 rounded-full"></span>
+              <span class="absolute top-2 right-2 w-2 h-2 bg-brand-500 rounded-full ring-2 ring-[#F9FAFB]"></span>
             </button>
+
+            <!-- Divider -->
+            <div class="w-px h-6 bg-gray-200"></div>
 
             <!-- Back to Store -->
             <router-link 
               to="/"
-              class="hidden sm:flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-brand-600 transition-colors"
+              class="flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-text-medium hover:text-text-dark hover:bg-white rounded-xl transition-all hover:shadow-sm"
             >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
               </svg>
-              Ver tienda
+              <span class="hidden sm:inline">Ver tienda</span>
             </router-link>
           </div>
         </div>
       </header>
 
       <!-- Page Content -->
-      <main class="p-4 lg:p-8">
+      <main class="p-6 lg:p-10">
         <router-view />
       </main>
     </div>
@@ -144,45 +167,53 @@ export default {
     const route = useRoute()
     const sidebarOpen = ref(false)
 
-    // Menu items with SVG icons
+    // Menu items with thin stroke icons
     const menuItems = ref([
       {
         name: 'Dashboard',
         path: '/admin',
-        icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/></svg>',
+        icon: '<svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/></svg>',
         badge: null
       },
       {
         name: 'Productos',
         path: '/admin/productos',
-        icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>',
+        icon: '<svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z"/></svg>',
         badge: null
       },
       {
         name: 'Órdenes',
         path: '/admin/ordenes',
-        icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"/></svg>',
+        icon: '<svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg>',
         badge: '5'
       },
       {
         name: 'Clientes',
         path: '/admin/clientes',
-        icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>',
+        icon: '<svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z"/></svg>',
         badge: null
       },
       {
         name: 'Inventario',
         path: '/admin/inventario',
-        icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 7v10c0 2.21 3.582 4 8 4s8-1.79 8-4V7M4 7c0 2.21 3.582 4 8 4s8-1.79 8-4M4 7c0-2.21 3.582-4 8-4s8 1.79 8 4m0 5c0 2.21-3.582 4-8 4s-8-1.79-8-4"/></svg>',
+        icon: '<svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3"/></svg>',
         badge: '3'
       },
       {
         name: 'Usuarios',
         path: '/admin/usuarios',
-        icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>',
+        icon: '<svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/></svg>',
         badge: null
       }
     ])
+
+    // Check if route is active
+    const isActive = (path) => {
+      if (path === '/admin') {
+        return route.path === '/admin'
+      }
+      return route.path.startsWith(path)
+    }
 
     // User info from localStorage
     const user = computed(() => {
@@ -204,14 +235,14 @@ export default {
     const pageTitle = computed(() => {
       const titles = {
         '/admin': 'Dashboard',
-        '/admin/productos': 'Gestión de Productos',
-        '/admin/ordenes': 'Gestión de Órdenes',
+        '/admin/productos': 'Productos',
+        '/admin/ordenes': 'Órdenes',
         '/admin/clientes': 'Clientes',
         '/admin/inventario': 'Inventario',
         '/admin/usuarios': 'Usuarios',
         '/admin/config': 'Configuración'
       }
-      return titles[route.path] || 'Admin Panel'
+      return titles[route.path] || 'Admin'
     })
 
     const handleLogout = () => {
@@ -224,6 +255,7 @@ export default {
     return {
       sidebarOpen,
       menuItems,
+      isActive,
       userName,
       userRole,
       userInitials,
@@ -233,24 +265,3 @@ export default {
   }
 }
 </script>
-
-<style scoped>
-/* Custom scrollbar for sidebar */
-aside {
-  scrollbar-width: thin;
-  scrollbar-color: #4b5563 #1f2937;
-}
-
-aside::-webkit-scrollbar {
-  width: 6px;
-}
-
-aside::-webkit-scrollbar-track {
-  background: #1f2937;
-}
-
-aside::-webkit-scrollbar-thumb {
-  background-color: #4b5563;
-  border-radius: 3px;
-}
-</style>

@@ -122,6 +122,33 @@ const router = createRouter({
 
 // Navigation guard for admin routes
 router.beforeEach((to, from, next) => {
+  // PRIMERO: Capturar tokens de la URL (para login de admin en nueva pestaña)
+  if (to.query.token && to.query.refresh) {
+    console.log('Procesando tokens de URL para admin...')
+    localStorage.setItem('access_token', to.query.token)
+    localStorage.setItem('refresh_token', to.query.refresh)
+    
+    // Decodificar el JWT para obtener info del usuario
+    try {
+      const payload = JSON.parse(atob(to.query.token.split('.')[1]))
+      const user = {
+        id: payload.user_id,
+        email: payload.email,
+        nombre: payload.nombre,
+        rol: payload.rol
+      }
+      localStorage.setItem('user', JSON.stringify(user))
+      console.log('Token procesado, usuario:', user)
+    } catch (e) {
+      console.warn('No se pudo decodificar el token:', e)
+    }
+    
+    // Limpiar los tokens de la URL y continuar a la ruta limpia
+    const cleanPath = to.path
+    next({ path: cleanPath, replace: true })
+    return
+  }
+  
   const accessToken = localStorage.getItem('access_token')
   const user = JSON.parse(localStorage.getItem('user') || '{}')
   

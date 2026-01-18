@@ -1805,75 +1805,68 @@ export default {
     }
 
     const agregarAlCarrito = async (producto) => {
-      // Verificar si está logueado
+      try {
+        console.log('Agregando producto al carrito:', producto.id)
+        
+        // Actualizar carrito local inmediatamente (para todos los usuarios)
+        const currentItems = [...cartItems.value]
+        const existingIndex = currentItems.findIndex(i => i.producto_id === producto.id)
+        if (existingIndex >= 0) {
+          currentItems[existingIndex].cantidad++
+          currentItems[existingIndex].subtotal = currentItems[existingIndex].cantidad * currentItems[existingIndex].precio_unitario
+        } else {
+          currentItems.push({
+            producto_id: producto.id,
+            nombre: producto.nombre,
+            imagen_url: producto.imagen_url || producto.imagenes?.[0] || null,
+            precio_unitario: producto.precio_final || producto.precio,
+            cantidad: 1,
+            subtotal: producto.precio_final || producto.precio
+          })
+        }
+        
+        // Incrementar contador
+        cartCount.value++
+        
+        // Calcular nuevo total y guardar en localStorage
+        const newTotal = currentItems.reduce((sum, item) => sum + (item.subtotal || item.precio_unitario * item.cantidad), 0)
+        saveCartToLocal(currentItems, newTotal, cartCount.value)
+        cartItems.value = currentItems
+        cartTotal.value = newTotal
+        
+        // Mostrar toast premium con info del producto
+        showCartToast(producto)
+        
+        // Si está logueado, también sincronizar con el backend
+        if (isLoggedIn.value) {
+          try {
+            await carritoService.agregarProducto(producto.id, 1)
+            // Sincronizar con backend en segundo plano
+            cargarResumenCarrito().catch(e => console.warn('Error sync resumen:', e))
+          } catch (backendErr) {
+            console.warn('No se pudo sincronizar con backend, carrito guardado localmente:', backendErr)
+          }
+        }
+      } catch (err) {
+        console.error('Error agregando al carrito:', err)
+        showToast('Error al agregar el producto', 'error')
+      }
+    }
+    
+    const toggleFavorito = async (producto) => {
+      // Solo para usuarios logueados - mostrar mensaje amigable
       if (!isLoggedIn.value) {
-        showToast('Debes iniciar sesión para agregar productos', 'info')
+        showToast('Inicia sesión para guardar favoritos ❤️', 'info')
         setTimeout(() => router.push('/login'), 1500)
         return
       }
       
       try {
-        console.log('Agregando producto al carrito:', producto.id)
-        const resultado = await carritoService.agregarProducto(producto.id, 1)
-        console.log('Resultado de agregar al carrito:', resultado)
-        
-        // Verificar que realmente se agregó
-        if (resultado) {
-          // Incrementar contador inmediatamente para feedback visual
-          cartCount.value++
-          
-          // Guardar en cache local inmediatamente
-          const currentItems = [...cartItems.value]
-          const existingIndex = currentItems.findIndex(i => i.producto_id === producto.id)
-          if (existingIndex >= 0) {
-            currentItems[existingIndex].cantidad++
-          } else {
-            currentItems.push({
-              producto_id: producto.id,
-              nombre: producto.nombre,
-              imagen_url: producto.imagen_url || producto.imagenes?.[0] || null,
-              precio_unitario: producto.precio_final || producto.precio,
-              cantidad: 1,
-              subtotal: producto.precio_final || producto.precio
-            })
-          }
-          const newTotal = currentItems.reduce((sum, item) => sum + (item.subtotal || item.precio_unitario * item.cantidad), 0)
-          saveCartToLocal(currentItems, newTotal, cartCount.value)
-          cartItems.value = currentItems
-          cartTotal.value = newTotal
-          
-          // Mostrar toast premium con info del producto
-          showCartToast(producto)
-          
-          // Sincronizar con backend en segundo plano (sin esperar)
-          cargarResumenCarrito().catch(e => console.warn('Error sync resumen:', e))
-        }
-      } catch (err) {
-        console.error('Error agregando al carrito:', err)
-        const errorMsg = err.response?.data?.detail || err.message || 'Error desconocido'
-        if (err.response?.status === 401) {
-          showToast('Tu sesión ha expirado', 'error')
-          setTimeout(() => router.push('/login'), 1500)
-        } else if (err.response?.status === 422) {
-          showToast('Error de validación. Intenta de nuevo.', 'error')
-        } else {
-          showToast('Error al agregar: ' + errorMsg, 'error')
-        }
-      }
-    }
-    
-    const toggleFavorito = async (producto) => {
-      // Verificar si está logueado - redirigir directo a login
-      if (!isLoggedIn.value) {
-        router.push('/login')
-        return
-      }
-      
-      try {
         await favoritosService.toggle(producto.id)
-        // Podrías actualizar un estado local de favoritos aquí
+        showToast('Favorito actualizado', 'success')
       } catch (err) {
         console.error('Error toggling favorito:', err)
+        showToast('Error al actualizar favorito', 'error')
       }
     }
     
