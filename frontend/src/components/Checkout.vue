@@ -131,12 +131,12 @@
                   <span class="text-brand-500 ml-1">*</span>
                 </label>
                 <div class="relative">
-                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-text-medium">+52</span>
+                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-text-medium">+47</span>
                   <input 
                     type="tel" 
                     v-model="form.telefono"
                     class="w-full pl-14 pr-4 py-3.5 bg-nude-50/50 border border-nude-200 rounded-xl focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-100/50 focus:bg-white transition-all placeholder:text-text-light"
-                    placeholder="55 1234 5678"
+                    placeholder="47 966 57 763"
                   />
                 </div>
                 <p class="text-xs text-text-medium mt-2 flex items-center gap-1">
@@ -576,7 +576,7 @@ export default {
     const envioGratis = computed(() => getSubtotal() >= 500)
     
     // Número de WhatsApp de la tienda
-    const whatsappNumber = '5215512345678' // Cambiar por el número real
+    const whatsappNumber = '4796657763' // Cambiar por el número real
     
     const whatsappLink = computed(() => {
       const productos = cartItems.value.map(i => `• ${i.nombre || 'Producto'} x${i.cantidad || 1}`).join('%0A')
