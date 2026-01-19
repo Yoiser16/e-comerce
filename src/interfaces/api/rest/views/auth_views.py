@@ -8,6 +8,8 @@ Incluye protección anti-abuso:
 - Bloqueo temporal por intentos fallidos
 - Auditoría de todos los intentos
 """
+import os
+
 from rest_framework import status
 from rest_framework.views import APIView
 from rest_framework.response import Response
@@ -21,8 +23,11 @@ from rest_framework_simplejwt.views import (
 from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 from rest_framework_simplejwt.exceptions import InvalidToken, TokenError
 from django.contrib.auth import get_user_model
+from google.auth.transport import requests as google_requests
+from google.oauth2 import id_token as google_id_token
 
 from infrastructure.auditing.servicio_auditoria import ServicioAuditoria
+from infrastructure.auth.models import RolUsuario, Usuario
 from interfaces.api.rest.throttling import (
     LoginRateThrottle,
     RefreshTokenRateThrottle,
@@ -209,6 +214,82 @@ class LogoutView(APIView):
                 {'error': f'Error al cerrar sesión: {str(e)}'},
                 status=status.HTTP_400_BAD_REQUEST
             )
+
+
+class GoogleLoginView(APIView):
+    """
+    POST /api/v1/auth/login/google
+
+    Autenticación mediante Google Sign-In usando id_token.
+    Verifica el token con Google, crea el usuario si no existe y retorna JWT propios.
+    """
+
+    permission_classes = [AllowAny]
+
+    def post(self, request):
+        id_token_str = request.data.get('id_token')
+        client_id = os.getenv('GOOGLE_CLIENT_ID')
+
+        if not id_token_str:
+            return Response({'error': 'id_token es requerido'}, status=status.HTTP_400_BAD_REQUEST)
+        if not client_id:
+            return Response({'error': 'GOOGLE_CLIENT_ID no está configurado'}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+        try:
+            idinfo = google_id_token.verify_oauth2_token(
+                id_token_str,
+                google_requests.Request(),
+                client_id
+            )
+        except ValueError:
+            return Response({'error': 'Token de Google inválido'}, status=status.HTTP_401_UNAUTHORIZED)
+
+        email = idinfo.get('email')
+        nombre = idinfo.get('name') or (email.split('@')[0] if email else '')
+
+        if not email:
+            return Response({'error': 'El token de Google no incluye email'}, status=status.HTTP_400_BAD_REQUEST)
+
+        user, created = Usuario.objects.get_or_create(
+            email=email,
+            defaults={
+                'nombre': nombre,
+                'rol': RolUsuario.LECTURA
+            }
+        )
+
+        if created:
+            user.set_unusable_password()
+            user.save()
+        elif nombre and user.nombre != nombre:
+            user.nombre = nombre
+            user.save(update_fields=['nombre'])
+
+        refresh = RefreshToken.for_user(user)
+        access = refresh.access_token
+
+        ServicioAuditoria.registrar_acceso_api(
+            usuario_id=str(user.id),
+            endpoint='/api/v1/auth/login/google',
+            metodo='POST',
+            ip='unknown',
+            user_agent=request.META.get('HTTP_USER_AGENT', 'unknown')[:200],
+            resultado_exitoso=True
+        )
+
+        return Response(
+            {
+                'access': str(access),
+                'refresh': str(refresh),
+                'user': {
+                    'id': str(user.id),
+                    'email': user.email,
+                    'nombre': user.nombre,
+                    'rol': user.rol,
+                }
+            },
+            status=status.HTTP_200_OK
+        )
 
 
 class RefreshTokenView(TokenRefreshView):

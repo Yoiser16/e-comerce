@@ -12,6 +12,7 @@ from interfaces.api.rest.views.auth_views import (
     VerifyTokenView,
     PerfilUsuarioView,
     RegisterView,
+    GoogleLoginView,
 )
 
 # Importar health checks
@@ -32,6 +33,7 @@ urlpatterns = [
     # Autenticación JWT
     path('api/v1/auth/register', RegisterView.as_view(), name='auth-register'),
     path('api/v1/auth/login', LoginView.as_view(), name='auth-login'),
+    path('api/v1/auth/login/google', GoogleLoginView.as_view(), name='auth-login-google'),
     path('api/v1/auth/logout', LogoutView.as_view(), name='auth-logout'),
     path('api/v1/auth/refresh', RefreshTokenView.as_view(), name='auth-refresh'),
     path('api/v1/auth/verify', VerifyTokenView.as_view(), name='auth-verify'),

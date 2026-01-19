@@ -17,7 +17,7 @@ class CrearProductoDTO:
     nombre: str
     descripcion: str
     precio_monto: Decimal
-    precio_moneda: str = "MXN"
+    precio_moneda: str = "COP"
     stock_actual: int = 0
     stock_minimo: int = 0
     categoria: Optional[str] = None
