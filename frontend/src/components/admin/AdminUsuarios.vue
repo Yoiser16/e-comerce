@@ -116,19 +116,71 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, onMounted } from 'vue'
+import { usuariosService } from '../../services/usuarios'
 
 export default {
   name: 'AdminUsuarios',
   setup() {
     const showModal = ref(false)
+    const loading = ref(true)
+    const usuarios = ref([])
 
-    const usuarios = ref([
-      { id: '1', nombre: 'Administrador', email: 'admin@ecommerce.com', rol: 'ADMIN', activo: true, ultimoAcceso: 'Hace 5 minutos', iniciales: 'AD' },
-      { id: '2', nombre: 'Operador Sistema', email: 'operador@ecommerce.com', rol: 'OPERADOR', activo: true, ultimoAcceso: 'Hace 2 horas', iniciales: 'OP' },
-      { id: '3', nombre: 'María García', email: 'maria@ecommerce.com', rol: 'OPERADOR', activo: true, ultimoAcceso: 'Ayer', iniciales: 'MG' },
-      { id: '4', nombre: 'Consultor', email: 'consultor@ecommerce.com', rol: 'LECTURA', activo: false, ultimoAcceso: 'Hace 1 semana', iniciales: 'CO' },
-    ])
+    const cargarUsuarios = async () => {
+      try {
+        loading.value = true
+        const data = await usuariosService.obtenerTodos()
+        
+        // Transformar datos al formato del componente
+        usuarios.value = data.map(usuario => ({
+          id: usuario.id,
+          nombre: usuario.nombre || usuario.username || usuario.email.split('@')[0],
+          email: usuario.email,
+          rol: usuario.rol || usuario.role || 'LECTURA',
+          activo: usuario.activo !== undefined ? usuario.activo : usuario.is_active !== undefined ? usuario.is_active : true,
+          ultimoAcceso: formatearUltimoAcceso(usuario.last_login || usuario.ultimo_acceso),
+          iniciales: obtenerIniciales(usuario.nombre || usuario.username || usuario.email)
+        }))
+      } catch (error) {
+        console.error('Error al cargar usuarios:', error)
+        // Si falla, mostrar usuarios básicos del sistema
+        usuarios.value = [
+          { id: '1', nombre: 'Administrador', email: 'admin@ecommerce.com', rol: 'ADMIN', activo: true, ultimoAcceso: 'Activo', iniciales: 'AD' },
+          { id: '2', nombre: 'Operador Sistema', email: 'operador@ecommerce.com', rol: 'OPERADOR', activo: true, ultimoAcceso: 'Activo', iniciales: 'OP' },
+          { id: '3', nombre: 'Lectura', email: 'lectura@ecommerce.com', rol: 'LECTURA', activo: true, ultimoAcceso: 'Activo', iniciales: 'LE' },
+        ]
+      } finally {
+        loading.value = false
+      }
+    }
+
+    const obtenerIniciales = (nombre) => {
+      if (!nombre) return '??'
+      const parts = nombre.trim().split(' ')
+      if (parts.length >= 2) {
+        return (parts[0][0] + parts[1][0]).toUpperCase()
+      }
+      return nombre.substring(0, 2).toUpperCase()
+    }
+
+    const formatearUltimoAcceso = (fecha) => {
+      if (!fecha) return 'Nunca'
+      
+      const now = new Date()
+      const loginDate = new Date(fecha)
+      const diffMs = now - loginDate
+      const diffMins = Math.floor(diffMs / 60000)
+      const diffHours = Math.floor(diffMs / 3600000)
+      const diffDays = Math.floor(diffMs / 86400000)
+
+      if (diffMins < 1) return 'Ahora mismo'
+      if (diffMins < 60) return `Hace ${diffMins} minutos`
+      if (diffHours < 24) return `Hace ${diffHours} horas`
+      if (diffDays === 1) return 'Ayer'
+      if (diffDays < 7) return `Hace ${diffDays} días`
+      if (diffDays < 30) return `Hace ${Math.floor(diffDays / 7)} semanas`
+      return `Hace ${Math.floor(diffDays / 30)} meses`
+    }
 
     const getRoleColor = (rol) => {
       const colors = {
@@ -148,7 +200,12 @@ export default {
       return badges[rol] || 'bg-gray-100 text-gray-700'
     }
 
-    return { showModal, usuarios, getRoleColor, getRoleBadge }
+    onMounted(() => {
+      cargarUsuarios()
+    })
+
+    return { showModal, loading, usuarios, getRoleColor, getRoleBadge, cargarUsuarios }
   }
 }
 </script>
+

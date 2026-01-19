@@ -109,24 +109,46 @@
 </template>
 
 <script>
-import { ref } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { productosService } from '../../services/productos'
 
 export default {
   name: 'AdminInventario',
   setup() {
-    const stats = ref({
-      agotados: 2,
-      stockBajo: 5,
-      saludables: 80
+    const loading = ref(true)
+    const productos = ref([])
+
+    const cargarInventario = async () => {
+      try {
+        loading.value = true
+        const data = await productosService.obtenerTodos()
+        
+        // Transformar productos a formato de inventario
+        productos.value = data.map(p => ({
+          id: p.id,
+          nombre: p.nombre,
+          sku: p.codigo || p.sku || 'N/A',
+          stock: p.stock_disponible || p.stock || 0,
+          stockMinimo: p.stock_minimo || 5,
+          imagen: p.imagen_principal || p.imagen || 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=100'
+        }))
+      } catch (error) {
+        console.error('Error al cargar inventario:', error)
+        productos.value = []
+      } finally {
+        loading.value = false
+      }
+    }
+
+    const stats = computed(() => {
+      const agotados = productos.value.filter(p => p.stock === 0).length
+      const stockBajo = productos.value.filter(p => p.stock > 0 && p.stock <= p.stockMinimo).length
+      const saludables = productos.value.filter(p => p.stock > p.stockMinimo).length
+
+      return { agotados, stockBajo, saludables }
     })
 
-    const inventario = ref([
-      { id: '1', nombre: 'Extensiones Brasileñas 24"', sku: 'EXT-BR-24', stock: 0, stockMinimo: 5, imagen: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=100' },
-      { id: '2', nombre: 'Peluca Lace Front Natural', sku: 'PEL-LF-001', stock: 3, stockMinimo: 5, imagen: 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=100' },
-      { id: '3', nombre: 'Clip-in Extensions 18"', sku: 'EXT-CL-18', stock: 25, stockMinimo: 10, imagen: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=100' },
-      { id: '4', nombre: 'Shampoo Sin Sulfatos 500ml', sku: 'COS-SH-001', stock: 50, stockMinimo: 15, imagen: 'https://images.unsplash.com/photo-1556227702-d1e4e7b5c232?w=100' },
-      { id: '5', nombre: 'Extensiones Peruanas 26"', sku: 'EXT-PE-26', stock: 2, stockMinimo: 5, imagen: 'https://images.unsplash.com/photo-1562322140-8baeececf3df?w=100' },
-    ])
+    const inventario = computed(() => productos.value)
 
     const getStockTextClass = (item) => {
       if (item.stock === 0) return 'text-red-600'
@@ -146,7 +168,12 @@ export default {
       return 'Disponible'
     }
 
-    return { stats, inventario, getStockTextClass, getStockBadgeClass, getStockLabel }
+    onMounted(() => {
+      cargarInventario()
+    })
+
+    return { stats, inventario, loading, getStockTextClass, getStockBadgeClass, getStockLabel, cargarInventario }
   }
 }
 </script>
+

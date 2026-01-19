@@ -62,7 +62,21 @@
 
     <!-- Orders Table -->
     <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-      <div class="overflow-x-auto">
+      <!-- Loading State -->
+      <div v-if="loading" class="flex items-center justify-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600"></div>
+      </div>
+      
+      <!-- Empty State -->
+      <div v-else-if="filteredOrders.length === 0" class="text-center py-20">
+        <svg class="mx-auto h-16 w-16 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+        </svg>
+        <p class="mt-4 text-gray-500">No se encontraron órdenes</p>
+      </div>
+
+      <!-- Table Content -->
+      <div v-else class="overflow-x-auto">
         <table class="w-full">
           <thead class="bg-gray-50 border-b border-gray-100">
             <tr>
@@ -140,7 +154,8 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { ordenesService } from '../../services/ordenes'
 
 export default {
   name: 'AdminOrdenes',
@@ -148,22 +163,61 @@ export default {
     const searchQuery = ref('')
     const filterStatus = ref('')
     const filterDate = ref('')
+    const loading = ref(true)
+    const ordenes = ref([])
 
-    const orderStats = ref([
-      { status: '', label: 'Todas', count: 156, color: 'text-gray-900' },
-      { status: 'PENDIENTE', label: 'Pendientes', count: 5, color: 'text-yellow-600' },
-      { status: 'CONFIRMADA', label: 'Confirmadas', count: 12, color: 'text-blue-600' },
-      { status: 'ENVIADA', label: 'Enviadas', count: 8, color: 'text-indigo-600' },
-      { status: 'COMPLETADA', label: 'Completadas', count: 131, color: 'text-green-600' }
-    ])
+    const orderStats = computed(() => {
+      const all = ordenes.value.length
+      const pendiente = ordenes.value.filter(o => o.estado === 'PENDIENTE').length
+      const confirmada = ordenes.value.filter(o => o.estado === 'CONFIRMADA').length
+      const enviada = ordenes.value.filter(o => o.estado === 'ENVIADA').length
+      const completada = ordenes.value.filter(o => o.estado === 'COMPLETADA').length
 
-    const ordenes = ref([
-      { id: 'abc12345-6789-0123', cliente: { nombre: 'María García', email: 'maria@email.com' }, items: 3, total: 2450, estado: 'PENDIENTE', fecha: '17 Ene 2026, 14:30' },
-      { id: 'def12345-6789-0123', cliente: { nombre: 'Ana López', email: 'ana@email.com' }, items: 2, total: 1890, estado: 'CONFIRMADA', fecha: '17 Ene 2026, 10:15' },
-      { id: 'ghi12345-6789-0123', cliente: { nombre: 'Carmen Ruiz', email: 'carmen@email.com' }, items: 5, total: 4200, estado: 'EN_PROCESO', fecha: '16 Ene 2026, 18:45' },
-      { id: 'jkl12345-6789-0123', cliente: { nombre: 'Laura Sánchez', email: 'laura@email.com' }, items: 1, total: 890, estado: 'ENVIADA', fecha: '16 Ene 2026, 09:20' },
-      { id: 'mno12345-6789-0123', cliente: { nombre: 'Patricia Martínez', email: 'patricia@email.com' }, items: 4, total: 3560, estado: 'COMPLETADA', fecha: '15 Ene 2026, 16:00' },
-    ])
+      return [
+        { status: '', label: 'Todas', count: all, color: 'text-gray-900' },
+        { status: 'PENDIENTE', label: 'Pendientes', count: pendiente, color: 'text-yellow-600' },
+        { status: 'CONFIRMADA', label: 'Confirmadas', count: confirmada, color: 'text-blue-600' },
+        { status: 'ENVIADA', label: 'Enviadas', count: enviada, color: 'text-indigo-600' },
+        { status: 'COMPLETADA', label: 'Completadas', count: completada, color: 'text-green-600' }
+      ]
+    })
+
+    const cargarOrdenes = async () => {
+      try {
+        loading.value = true
+        const data = await ordenesService.obtenerTodas()
+        
+        // Transformar datos del backend al formato del componente
+        ordenes.value = data.map(orden => ({
+          id: orden.id,
+          cliente: orden.cliente_data || { 
+            nombre: orden.cliente_nombre || 'Cliente', 
+            email: orden.cliente_email || ''
+          },
+          items: orden.items?.length || orden.total_items || 0,
+          total: orden.total || 0,
+          estado: orden.estado,
+          fecha: formatearFecha(orden.fecha_creacion || orden.created_at)
+        }))
+      } catch (error) {
+        console.error('Error al cargar órdenes:', error)
+        ordenes.value = []
+      } finally {
+        loading.value = false
+      }
+    }
+
+    const formatearFecha = (fecha) => {
+      if (!fecha) return ''
+      const date = new Date(fecha)
+      return new Intl.DateTimeFormat('es-ES', {
+        day: '2-digit',
+        month: 'short',
+        year: 'numeric',
+        hour: '2-digit',
+        minute: '2-digit'
+      }).format(date)
+    }
 
     const filteredOrders = computed(() => {
       let result = ordenes.value
@@ -204,8 +258,13 @@ export default {
       filterDate.value = ''
     }
 
-    const updateOrderStatus = (orden) => {
-      console.log('Update status:', orden.id, orden.estado)
+    const updateOrderStatus = async (orden) => {
+      try {
+        await ordenesService.actualizarEstado(orden.id, orden.estado)
+        console.log('Estado actualizado:', orden.id, orden.estado)
+      } catch (error) {
+        console.error('Error al actualizar estado:', error)
+      }
     }
 
     const viewOrder = (orden) => {
@@ -216,10 +275,15 @@ export default {
       console.log('Print order:', orden)
     }
 
+    onMounted(() => {
+      cargarOrdenes()
+    })
+
     return {
       searchQuery,
       filterStatus,
       filterDate,
+      loading,
       orderStats,
       ordenes,
       filteredOrders,
@@ -228,7 +292,8 @@ export default {
       clearFilters,
       updateOrderStatus,
       viewOrder,
-      printOrder
+      printOrder,
+      cargarOrdenes
     }
   }
 }

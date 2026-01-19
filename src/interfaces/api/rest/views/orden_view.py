@@ -29,6 +29,7 @@ class OrdenListCreateView(APIView):
     Endpoint de Órdenes
     
     Permisos:
+    - GET: OPERADOR o ADMIN (ver todas las órdenes)
     - POST: OPERADOR o ADMIN (operación crítica de negocio)
     
     Protección Anti-Abuso:
@@ -36,6 +37,17 @@ class OrdenListCreateView(APIView):
     """
     permission_classes = [EsOperadorOAdmin]
     throttle_classes = [OrdenCreacionRateThrottle]
+    
+    def get(self, request):
+        """Listar todas las órdenes del sistema"""
+        repo_orden = OrdenRepositoryImpl()
+        
+        # Obtener todas las órdenes
+        ordenes = repo_orden.obtener_todos()
+        
+        # Serializar y devolver
+        serializer = OrdenSerializer(ordenes, many=True)
+        return Response(serializer.data, status=status.HTTP_200_OK)
     
     def post(self, request):
         serializer = CrearOrdenSerializer(data=request.data)

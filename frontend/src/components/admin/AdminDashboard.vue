@@ -1,6 +1,22 @@
 <template>
   <div class="space-y-8">
     
+    <!-- Loading State -->
+    <div v-if="loading" class="flex items-center justify-center py-20">
+      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600"></div>
+    </div>
+
+    <!-- Error State -->
+    <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
+      <p class="text-red-600 mb-4">{{ error }}</p>
+      <button @click="cargarDatos" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
+        Reintentar
+      </button>
+    </div>
+
+    <!-- Content -->
+    <div v-else>
+    
     <!-- Welcome Section - Clean & Elegant -->
     <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6">
       <div>
@@ -226,49 +242,117 @@
         </router-link>
       </div>
     </div>
-  </div>
+
+    </div><!-- End v-else content -->
+  </div><!-- End main container -->
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import apiClient from '../../services/api'
 
 export default {
   name: 'AdminDashboard',
   setup() {
     // Stats
     const stats = ref({
-      totalVentas: 45890,
-      totalOrdenes: 156,
-      ordenesPendientes: 5,
-      totalProductos: 87,
-      stockBajo: 3,
-      totalClientes: 432,
-      clientesNuevos: 12
+      totalVentas: 0,
+      totalOrdenes: 0,
+      ordenesPendientes: 0,
+      totalProductos: 0,
+      productosActivos: 0,
+      stockBajo: 0,
+      totalClientes: 0,
+      clientesNuevos: 0
     })
 
-    // Recent orders (mock data)
-    const recentOrders = ref([
-      { id: 'abc12345-6789', cliente: 'María García', estado: 'PENDIENTE', total: 2450, fecha: 'Hace 2 horas' },
-      { id: 'def12345-6789', cliente: 'Ana López', estado: 'CONFIRMADA', total: 1890, fecha: 'Hace 5 horas' },
-      { id: 'ghi12345-6789', cliente: 'Carmen Ruiz', estado: 'ENVIADA', total: 3200, fecha: 'Ayer' },
-      { id: 'jkl12345-6789', cliente: 'Laura Sánchez', estado: 'COMPLETADA', total: 1560, fecha: 'Hace 2 días' },
-    ])
+    const loading = ref(true)
+    const error = ref(null)
 
-    // Low stock products (mock data)
-    const lowStockProducts = ref([
-      { id: 1, nombre: 'Extensiones Brasileñas 24"', stock: 2, imagen: 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=150' },
-      { id: 2, nombre: 'Peluca Lace Front Natural', stock: 3, imagen: 'https://images.unsplash.com/photo-1519699047748-de8e457a634e?w=150' },
-      { id: 3, nombre: 'Clip-in Extensions Rubio', stock: 1, imagen: 'https://images.unsplash.com/photo-1580618672591-eb180b1a973f?w=150' },
-    ])
+    // Recent orders
+    const recentOrders = ref([])
+
+    // Low stock products
+    const lowStockProducts = ref([])
 
     // User name
     const userName = computed(() => {
       try {
         const user = JSON.parse(localStorage.getItem('user') || '{}')
-        return user.nombre || user.email?.split('@')[0] || 'Admin'
+        return user.nombre || user.email?.split('@')[0] || 'Administrador Sistema'
       } catch {
-        return 'Admin'
+        return 'Administrador Sistema'
       }
+    })
+
+    // Cargar estadísticas del backend
+    const cargarEstadisticas = async () => {
+      try {
+        const response = await apiClient.get('/dashboard/estadisticas')
+        stats.value = {
+          totalVentas: response.data.total_ventas || 0,
+          totalOrdenes: response.data.total_ordenes || 0,
+          ordenesPendientes: response.data.ordenes_pendientes || 0,
+          totalProductos: response.data.total_productos || 0,
+          productosActivos: response.data.productos_activos || 0,
+          stockBajo: response.data.stock_bajo || 0,
+          totalClientes: response.data.total_clientes || 0,
+          clientesNuevos: response.data.clientes_nuevos || 0
+        }
+      } catch (err) {
+        console.error('Error al cargar estadísticas:', err)
+        error.value = 'No se pudieron cargar las estadísticas'
+      }
+    }
+
+    // Cargar órdenes recientes
+    const cargarOrdenesRecientes = async () => {
+      try {
+        const response = await apiClient.get('/dashboard/ordenes/recientes?limite=5')
+        recentOrders.value = response.data.map(orden => ({
+          id: orden.id,
+          cliente: orden.cliente_nombre,
+          estado: orden.estado,
+          total: orden.total,
+          fecha: orden.tiempo_transcurrido
+        }))
+      } catch (err) {
+        console.error('Error al cargar órdenes recientes:', err)
+      }
+    }
+
+    // Cargar productos con stock bajo
+    const cargarProductosStockBajo = async () => {
+      try {
+        const response = await apiClient.get('/dashboard/productos/stock-bajo?umbral=5&limite=10')
+        lowStockProducts.value = response.data.map(producto => ({
+          id: producto.id,
+          nombre: producto.nombre,
+          stock: producto.stock_actual,
+          imagen: producto.imagen_url || 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=150'
+        }))
+      } catch (err) {
+        console.error('Error al cargar productos con stock bajo:', err)
+      }
+    }
+
+    // Cargar todos los datos
+    const cargarDatos = async () => {
+      loading.value = true
+      error.value = null
+      
+      await Promise.all([
+        cargarEstadisticas(),
+        cargarOrdenesRecientes(),
+        cargarProductosStockBajo()
+      ])
+      
+      loading.value = false
+    }
+
+    // Cargar datos al montar
+    onMounted(() => {
+      cargarDatos()
     })
 
     const formatNumber = (num) => {
@@ -305,9 +389,12 @@ export default {
       recentOrders,
       lowStockProducts,
       userName,
+      loading,
+      error,
       formatNumber,
       getStatusClass,
-      getStatusLabel
+      getStatusLabel,
+      cargarDatos
     }
   }
 }

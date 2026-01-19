@@ -11,6 +11,7 @@ from .producto_router import router as producto_router
 from .carrito_router import router as carrito_router
 from .busqueda_router import router as busqueda_router
 from .favoritos_router import router as favoritos_router
+from .dashboard_router import router as dashboard_router
 from .exception_handlers import exception_handler_dominio
 from domain.exceptions.dominio import ExcepcionDominio
 from infrastructure.config.app_config import AppConfig
@@ -53,6 +54,7 @@ def crear_app(config: AppConfig) -> FastAPI:
     app.include_router(producto_router)   # /productos/{id} (dinámico)
     app.include_router(carrito_router)
     app.include_router(favoritos_router)
+    app.include_router(dashboard_router)  # Dashboard administrativo
     
     # Montar Django como fallback en "/"
     # FastAPI procesa primero, Django solo maneja lo que no matcheó

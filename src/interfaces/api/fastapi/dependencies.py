@@ -43,6 +43,15 @@ def get_carrito_repository() -> Generator[CarritoRepository, None, None]:
     except Exception as e:
         raise e
 
+def get_orden_repository():
+    """Provee una instancia de OrdenRepository"""
+    from infrastructure.persistence.repositories.orden_repository_impl import OrdenRepositoryImpl
+    try:
+        repo = OrdenRepositoryImpl()
+        yield repo
+    except Exception as e:
+        raise e
+
 
 # --- Autenticación ---
 
@@ -91,6 +100,27 @@ def get_optional_user_id(
         return UUID("00000000-0000-0000-0000-000000000001")
     except Exception:
         return None
+
+
+def get_current_user_admin(
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+):
+    """
+    Verifica que el usuario actual sea ADMIN o OPERADOR.
+    
+    TODO: Implementar validación completa del JWT y verificar rol.
+    Por ahora permite acceso en desarrollo.
+    """
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No autenticado. Se requiere token de acceso.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # TODO: Decodificar JWT, extraer usuario y verificar rol
+    # Por ahora en desarrollo, permitir acceso
+    return {"user_id": "admin", "rol": "ADMIN"}
 
 
 # --- Services / Otros ---

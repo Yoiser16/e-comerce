@@ -155,8 +155,9 @@ router.beforeEach((to, from, next) => {
   if (to.meta.requiresAuth && !accessToken) {
     // Redirect to login if not authenticated
     next({ name: 'Login', query: { redirect: to.fullPath } })
-  } else if (to.meta.requiresAdmin && user.rol !== 'ADMIN') {
-    // Redirect non-admins away from admin pages
+  } else if (to.meta.requiresAdmin && !['ADMIN', 'OPERADOR'].includes(user.rol)) {
+    // Redirect non-admins/operadores away from admin pages
+    console.warn('Acceso denegado: Se requiere rol ADMIN o OPERADOR')
     next({ name: 'Home' })
   } else {
     next()

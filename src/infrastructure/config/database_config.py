@@ -48,6 +48,24 @@ class DatabaseConfig:
         # Leer variables de entorno
         db_engine = os.environ.get('DB_ENGINE', '').strip()
         db_name = os.environ.get('DB_NAME', '').strip()
+        
+        # Soporte para SQLite en desarrollo
+        if db_engine.lower() == 'sqlite':
+            if not db_name:
+                db_name = 'db.sqlite3'
+            
+            from pathlib import Path
+            BASE_DIR = Path(__file__).resolve().parent.parent.parent.parent
+            
+            config = {
+                'default': {
+                    'ENGINE': 'django.db.backends.sqlite3',
+                    'NAME': BASE_DIR / db_name,
+                }
+            }
+            return config
+        
+        # Configuración PostgreSQL
         db_user = os.environ.get('DB_USER', '').strip()
         db_password = os.environ.get('DB_PASSWORD', '').strip()
         db_host = os.environ.get('DB_HOST', '').strip()
@@ -58,9 +76,9 @@ class DatabaseConfig:
         errores = []
         
         if not db_engine:
-            errores.append("DB_ENGINE es obligatorio")
+            errores.append("DB_ENGINE es obligatorio (postgresql o sqlite)")
         elif db_engine not in ['postgresql', 'postgres']:
-            errores.append(f"DB_ENGINE '{db_engine}' no soportado. Use 'postgresql'")
+            errores.append(f"DB_ENGINE '{db_engine}' no soportado. Use 'postgresql' o 'sqlite'")
         
         if not db_name:
             errores.append("DB_NAME es obligatorio")
