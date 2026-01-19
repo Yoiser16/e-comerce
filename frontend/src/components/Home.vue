@@ -551,7 +551,7 @@
             <div class="px-1">
               <p class="text-xs text-text-light uppercase tracking-wider mb-1">{{ producto.categoria || producto.metodo || 'Extensiones' }}</p>
               <h3 class="font-medium text-text-dark mb-2 line-clamp-2 group-hover:text-brand-600 transition-colors">{{ producto.nombre }}</h3>
-              <p class="text-lg font-semibold text-brand-600">${{ formatPrice(producto.precio_monto || producto.precio) }} <span class="text-xs text-text-light font-normal">{{ producto.precio_moneda || 'MXN' }}</span></p>
+              <p class="text-lg font-semibold text-brand-600">${{ formatPrice(producto.precio_monto || producto.precio) }} <span class="text-xs text-text-light font-normal">{{ producto.precio_moneda || 'COP' }}</span></p>
             </div>
           </div>
         </div>
@@ -716,7 +716,7 @@
                   </svg>
                 </div>
                 <div>
-                  <p class="text-text-dark font-semibold text-sm sm:text-base mb-0.5">Envío gratis en pedidos +$5,000 MXN</p>
+                  <p class="text-text-dark font-semibold text-sm sm:text-base mb-0.5">Envío gratis en pedidos +$50,000 COP</p>
                   <p class="text-text-light text-xs sm:text-sm">Entregas prioritarias a todo México</p>
                 </div>
               </li>
@@ -1744,7 +1744,7 @@ export default {
       if (isNaN(numPrice) || numPrice === null || numPrice === undefined) {
         return '0'
       }
-      return new Intl.NumberFormat('es-MX').format(numPrice)
+      return new Intl.NumberFormat('es-CO').format(numPrice)
     }
     
     // Helper para obtener precio del item del carrito

@@ -349,7 +349,7 @@ export default {
     })
 
     const formatNumber = (num) => {
-      return new Intl.NumberFormat('es-MX').format(num)
+      return new Intl.NumberFormat('es-CO').format(num)
     }
 
     const getStockClass = (stock, stockMinimo) => {

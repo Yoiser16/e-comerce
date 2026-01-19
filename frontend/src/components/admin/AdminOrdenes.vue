@@ -184,7 +184,7 @@ export default {
       return result
     })
 
-    const formatNumber = (num) => new Intl.NumberFormat('es-MX').format(num)
+    const formatNumber = (num) => new Intl.NumberFormat('es-CO').format(num)
 
     const getStatusClass = (status) => {
       const classes = {

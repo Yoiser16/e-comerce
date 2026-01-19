@@ -61,7 +61,7 @@
                 <option value="USD">USD - Dólar Estadounidense</option>
                 <option value="EUR">EUR - Euro</option>
                 <option value="COP">COP - Peso Colombiano</option>
-                <option value="MXN">MXN - Peso Mexicano</option>
+                <option value="COP">COP - Peso Colombiano</option>
               </select>
             </div>
             <div class="flex items-center justify-between py-3">

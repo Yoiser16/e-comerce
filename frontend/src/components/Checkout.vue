@@ -171,7 +171,7 @@
                   type="text" 
                   v-model="form.direccion"
                   class="w-full px-4 py-3.5 bg-nude-50/50 border border-nude-200 rounded-xl focus:outline-none focus:border-brand-400 focus:ring-4 focus:ring-brand-100/50 focus:bg-white transition-all placeholder:text-text-light"
-                  placeholder="Calle, número, colonia..."
+                  placeholder="Calle, número, barrio..."
                 />
               </div>
               
@@ -393,7 +393,7 @@
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                 </svg>
-                Pagar ${{ formatPrice(getTotal()) }} MXN
+                Pagar ${{ formatPrice(getTotal()) }} COP
               </span>
             </button>
           </div>
@@ -481,7 +481,7 @@
                 <span class="text-text-dark font-semibold text-lg">Total</span>
                 <div class="text-right">
                   <span class="font-luxury text-3xl font-bold text-text-dark">${{ formatPrice(getTotal()) }}</span>
-                  <span class="text-sm text-text-medium ml-1">MXN</span>
+                  <span class="text-sm text-text-medium ml-1">COP</span>
                 </div>
               </div>
             </div>
@@ -571,16 +571,16 @@ export default {
     
     // Carrito desde localStorage
     const cartItems = ref([])
-    const costoEnvio = ref(50)
+    const costoEnvio = ref(5000)
     
-    const envioGratis = computed(() => getSubtotal() >= 500)
+    const envioGratis = computed(() => getSubtotal() >= 50000)
     
     // Número de WhatsApp de la tienda
     const whatsappNumber = '4796657763' // Cambiar por el número real
     
     const whatsappLink = computed(() => {
       const productos = cartItems.value.map(i => `• ${i.nombre || 'Producto'} x${i.cantidad || 1}`).join('%0A')
-      const mensaje = `Hola, quiero finalizar mi pedido con código *${preOrderCode.value}*%0A%0A📦 *Productos:*%0A${productos}%0A%0A💰 *Total:* $${formatPrice(getTotal())} MXN%0A%0A📍 *Envío a:* ${form.value.direccion || 'Por definir'}, ${form.value.ciudad || ''}`
+      const mensaje = `Hola, quiero finalizar mi pedido con código *${preOrderCode.value}*%0A%0A📦 *Productos:*%0A${productos}%0A%0A💰 *Total:* $${formatPrice(getTotal())} COP%0A%0A📍 *Envío a:* ${form.value.direccion || 'Por definir'}, ${form.value.ciudad || ''}`
       return `https://wa.me/${whatsappNumber}?text=${mensaje}`
     })
     
@@ -609,7 +609,7 @@ export default {
     const formatPrice = (price) => {
       const numPrice = Number(price)
       if (isNaN(numPrice)) return '0'
-      return new Intl.NumberFormat('es-MX').format(numPrice)
+      return new Intl.NumberFormat('es-CO').format(numPrice)
     }
     
     const getItemPrice = (item) => {

@@ -136,7 +136,7 @@
               v-model="form.precio_moneda"
               class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand-500"
             >
-              <option value="MXN">MXN - Peso Mexicano</option>
+              <option value="COP">COP - Peso Colombiano</option>
               <option value="USD">USD - Dólar</option>
             </select>
           </div>
@@ -410,7 +410,7 @@ export default {
       nombre: '',
       descripcion: '',
       precio_monto: null,
-      precio_moneda: 'MXN',
+      precio_moneda: 'COP',
       stock_actual: 0,
       stock_minimo: 5,
       metodo: '',
@@ -443,7 +443,7 @@ export default {
           nombre: producto.nombre,
           descripcion: producto.descripcion,
           precio_monto: producto.precio_monto,
-          precio_moneda: producto.precio_moneda || 'MXN',
+          precio_moneda: producto.precio_moneda || 'COP',
           stock_actual: producto.stock_actual,
           stock_minimo: producto.stock_minimo,
           metodo: producto.metodo || '',

@@ -92,7 +92,7 @@ export default {
       )
     })
 
-    const formatNumber = (num) => new Intl.NumberFormat('es-MX').format(num)
+    const formatNumber = (num) => new Intl.NumberFormat('es-CO').format(num)
 
     return { searchQuery, clientes, filteredClients, formatNumber }
   }
