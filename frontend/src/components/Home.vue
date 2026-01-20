@@ -401,68 +401,89 @@
           </p>
         </div>
 
-        <!-- Bento Grid -->
+        <!-- Bento Grid - Adaptativo Inteligente -->
         <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
-          <!-- Extensiones - Card Grande -->
-          <div class="md:col-span-2 lg:col-span-2 lg:row-span-2 group cursor-pointer">
-            <div class="relative h-80 lg:h-full min-h-[400px] bento-item shadow-soft hover-lift overflow-hidden">
+          <div 
+            v-for="(categoria, index) in categorias" 
+            :key="categoria.id"
+            :class="[
+              'group cursor-pointer',
+              // Lógica adaptativa según cantidad y prioridad
+              categorias.length === 1 ? 'md:col-span-2 lg:col-span-3' : // 1 sola = ancho completo
+              categorias.length === 2 ? 'md:col-span-1 lg:col-span-1.5' : // 2 = grid uniforme 50/50
+              categorias.length === 3 && categoria.prioridad === 1 ? 'md:col-span-2 lg:col-span-2 lg:row-span-2' : // 3 con P1 = grande
+              categorias.length === 3 && categoria.prioridad !== 1 ? '' : // 3 sin P1 = pequeñas
+              categorias.length >= 4 && index === 0 && categoria.prioridad === 1 ? 'md:col-span-2' : // 4+ con P1 en primera = mediano
+              '' // Default
+            ]"
+          >
+            <div 
+              :class="[
+                'relative bento-item shadow-soft hover-lift overflow-hidden',
+                // Altura adaptativa
+                categorias.length === 1 ? 'h-96 lg:h-[500px]' :
+                categorias.length === 2 ? 'h-80 lg:h-96' :
+                categorias.length === 3 && categoria.prioridad === 1 ? 'h-80 lg:h-full min-h-[400px]' :
+                categorias.length === 3 && categoria.prioridad !== 1 ? 'h-64 lg:h-full min-h-[200px]' :
+                'h-72 lg:h-80'
+              ]"
+            >
               <img 
-                src="https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1000&h=800&fit=crop&q=85" 
-                alt="Extensiones de cabello premium" 
+                :src="categoria.imagen || 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=1000&h=800&fit=crop&q=85'" 
+                :alt="categoria.nombre" 
                 class="absolute inset-0 w-full h-full object-cover img-zoom"
               >
               <div class="absolute inset-0 bento-overlay"></div>
-              <div class="absolute bottom-0 left-0 right-0 p-6 lg:p-8">
-                <span class="inline-block bg-gold-400 text-white text-xs font-bold px-3 py-1 rounded-full mb-3">MÁS VENDIDO</span>
-                <h3 class="font-luxury text-2xl lg:text-3xl text-white mb-2">Extensiones</h3>
-                <p class="text-white/80 mb-4 max-w-md">Cabello 100% Remy natural. Clip-in, tape, microring y más. Todos los largos y colores.</p>
-                <span class="inline-flex items-center gap-2 text-white font-medium group-hover:gap-4 transition-all">
-                  Explorar colección
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-                  </svg>
+              <div 
+                :class="[
+                  'absolute bottom-0 left-0 right-0',
+                  // Padding adaptativo según tamaño
+                  (categorias.length <= 2 || (categorias.length === 3 && categoria.prioridad === 1)) ? 'p-6 lg:p-8' : 'p-5 lg:p-6'
+                ]"
+              >
+                <!-- Badge "MÁS VENDIDO" solo para la primera P1 -->
+                <span 
+                  v-if="categoria.prioridad === 1 && categoria.orden === 1" 
+                  class="inline-block bg-gold-400 text-white text-xs font-bold px-3 py-1 rounded-full mb-3"
+                >
+                  MÁS VENDIDO
                 </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Pelucas -->
-          <div class="group cursor-pointer">
-            <div class="relative h-64 lg:h-full min-h-[200px] bento-item shadow-soft hover-lift overflow-hidden">
-              <img 
-                src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?w=600&h=500&fit=crop&q=85" 
-                alt="Pelucas lacefront premium" 
-                class="absolute inset-0 w-full h-full object-cover img-zoom"
-              >
-              <div class="absolute inset-0 bento-overlay"></div>
-              <div class="absolute bottom-0 left-0 right-0 p-5 lg:p-6">
-                <h3 class="font-luxury text-xl lg:text-2xl text-white mb-1">Pelucas</h3>
-                <p class="text-white/80 text-sm mb-3">Lacefront & Full Lace</p>
-                <span class="inline-flex items-center gap-2 text-white text-sm font-medium group-hover:gap-3 transition-all">
-                  Ver más
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-                  </svg>
-                </span>
-              </div>
-            </div>
-          </div>
-
-          <!-- Cosméticos -->
-          <div class="group cursor-pointer">
-            <div class="relative h-64 lg:h-full min-h-[200px] bento-item shadow-soft hover-lift overflow-hidden">
-              <img 
-                src="https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&h=500&fit=crop&q=85" 
-                alt="Cosméticos capilares profesionales" 
-                class="absolute inset-0 w-full h-full object-cover img-zoom"
-              >
-              <div class="absolute inset-0 bento-overlay"></div>
-              <div class="absolute bottom-0 left-0 right-0 p-5 lg:p-6">
-                <h3 class="font-luxury text-xl lg:text-2xl text-white mb-1">Cosméticos</h3>
-                <p class="text-white/80 text-sm mb-3">Cuidado & Styling</p>
-                <span class="inline-flex items-center gap-2 text-white text-sm font-medium group-hover:gap-3 transition-all">
-                  Ver más
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                
+                <!-- Título adaptativo -->
+                <h3 
+                  :class="[
+                    'font-luxury text-white mb-2',
+                    (categorias.length <= 2 || (categorias.length === 3 && categoria.prioridad === 1)) ? 'text-2xl lg:text-3xl' : 'text-xl lg:text-2xl'
+                  ]"
+                >
+                  {{ categoria.nombre }}
+                </h3>
+                
+                <!-- Descripción (larga para cards grandes, corta para pequeñas) -->
+                <p 
+                  :class="[
+                    'text-white/80 mb-4',
+                    (categorias.length <= 2 || (categorias.length === 3 && categoria.prioridad === 1)) ? 'max-w-md' : 'text-sm'
+                  ]"
+                >
+                  {{ (categorias.length <= 2 || (categorias.length === 3 && categoria.prioridad === 1)) ? categoria.descripcion : categoria.descripcion_corta }}
+                </p>
+                
+                <!-- CTA -->
+                <span 
+                  :class="[
+                    'inline-flex items-center gap-2 text-white font-medium transition-all',
+                    (categorias.length <= 2 || (categorias.length === 3 && categoria.prioridad === 1)) ? 'group-hover:gap-4' : 'text-sm group-hover:gap-3'
+                  ]"
+                >
+                  {{ (categorias.length <= 2 || (categorias.length === 3 && categoria.prioridad === 1)) ? 'Explorar colección' : 'Ver más' }}
+                  <svg 
+                    :class="(categorias.length <= 2 || (categorias.length === 3 && categoria.prioridad === 1)) ? 'w-5 h-5' : 'w-4 h-4'" 
+                    fill="none" 
+                    stroke="currentColor" 
+                    stroke-width="2" 
+                    viewBox="0 0 24 24"
+                  >
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
                   </svg>
                 </span>
@@ -532,10 +553,17 @@
               <!-- Image -->
               <div class="aspect-[3/4] overflow-hidden bg-nude-100">
                 <img
-                  :src="producto.imagen_principal || producto.imagen || 'https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400&h=500&fit=crop'"
+                  v-if="producto.imagen_principal || producto.imagen_url || producto.imagen"
+                  :src="getImageUrl(producto.imagen_principal || producto.imagen_url || producto.imagen)"
                   :alt="producto.nombre"
                   class="w-full h-full object-cover img-zoom"
+                  @error="handleImageError"
                 >
+                <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-nude-100 to-nude-200">
+                  <svg class="w-24 h-24 text-nude-400" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
+                  </svg>
+                </div>
               </div>
 
               <!-- Quick Add -->
@@ -1181,16 +1209,16 @@
           </div>
           
           <!-- Barra de progreso envío gratis -->
-          <div class="px-4 pb-3">
+          <div v-if="getCartSubtotal() < 300000" class="px-4 pb-3">
             <div class="flex items-center gap-2">
               <div class="flex-1 h-1 bg-nude-100 rounded-full overflow-hidden">
                 <div 
                   class="h-full bg-gradient-to-r from-brand-400 to-brand-600 rounded-full transition-all duration-500"
-                  :style="{ width: Math.min(100, (getCartSubtotal() / 500) * 100) + '%' }"
+                  :style="{ width: Math.min(100, (getCartSubtotal() / 300000) * 100) + '%' }"
                 ></div>
               </div>
               <span class="text-[10px] text-text-medium whitespace-nowrap">
-                {{ getCartSubtotal() >= 500 ? '¡Envío gratis!' : `$${formatPrice(500 - getCartSubtotal())} para envío gratis` }}
+                ${{ formatPrice(300000 - getCartSubtotal()) }} para envío gratis
               </span>
             </div>
           </div>
@@ -1274,18 +1302,26 @@
         </div>
 
         <!-- Barra de Progreso Envío Gratis - Minimalista -->
-        <div class="px-6 py-4 bg-gradient-to-r from-nude-50 to-white">
+        <div v-if="getCartSubtotal() < 300000" class="px-6 py-4 bg-gradient-to-r from-nude-50 to-white">
           <div class="flex items-center justify-between mb-2">
             <span class="text-xs text-text-medium">
-              {{ getCartSubtotal() >= 500 ? '¡Envío gratis desbloqueado! 🎉' : `Te faltan $${formatPrice(500 - getCartSubtotal())} para envío gratis` }}
+              Te faltan ${{ formatPrice(300000 - getCartSubtotal()) }} para envío gratis
             </span>
-            <span class="text-xs text-brand-600 font-medium">{{ Math.min(100, Math.round((getCartSubtotal() / 500) * 100)) }}%</span>
+            <span class="text-xs text-brand-600 font-medium">{{ Math.min(100, Math.round((getCartSubtotal() / 300000) * 100)) }}%</span>
           </div>
           <div class="h-1 bg-nude-200 rounded-full overflow-hidden">
             <div 
               class="h-full bg-gradient-to-r from-brand-500 to-brand-600 rounded-full transition-all duration-500"
-              :style="{ width: Math.min(100, (getCartSubtotal() / 500) * 100) + '%' }"
+              :style="{ width: Math.min(100, (getCartSubtotal() / 300000) * 100) + '%' }"
             ></div>
+          </div>
+        </div>
+        <div v-else class="px-6 py-4 bg-gradient-to-r from-green-50 to-white">
+          <div class="flex items-center justify-center gap-2">
+            <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+            </svg>
+            <span class="text-sm text-green-700 font-medium">Envío gratis aplicado</span>
           </div>
         </div>
         
@@ -1431,12 +1467,15 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { productosService, carritoService, authService, favoritosService } from '../services/productos'
+import { categoriasService } from '../services/categorias'
+import { getImageUrl } from '../services/api'
 
 export default {
   name: 'Home',
   setup() {
     const router = useRouter()
     const productos = ref([])
+    const categorias = ref([])
     const loading = ref(true)
     const error = ref(null)
     const cartCount = ref(0)
@@ -1444,6 +1483,8 @@ export default {
     const mobileMenuOpen = ref(false)
     const mobileSearchOpen = ref(false)
     const searchQuery = ref('')
+    
+    // Ya no necesitamos computed separados, usamos categorias.value directamente
     
     // Estado de usuario - usando ref para reactividad inmediata
     const isLoggedIn = ref(authService.isAuthenticated())
@@ -1531,6 +1572,10 @@ export default {
     
     const openCartDrawer = async () => {
       showCartDrawer.value = true
+      // Cerrar toast si está abierto para evitar superposición
+      if (toast.value.show) {
+        toast.value.show = false
+      }
       // Bloquear scroll del body
       document.body.style.overflow = 'hidden'
       await loadCartItems()
@@ -1595,9 +1640,7 @@ export default {
       }
       
       try {
-        console.log('Cargando carrito desde backend...')
         const data = await carritoService.getCarrito()
-        console.log('Respuesta del carrito:', data)
         
         // El carrito puede ser null si no existe todavía
         if (data && data.items && data.items.length > 0) {
@@ -1606,12 +1649,9 @@ export default {
           cartCount.value = data.items.reduce((sum, item) => sum + item.cantidad, 0)
           // Guardar en cache local
           saveCartToLocal(data.items, data.total_final || 0, cartCount.value)
-          console.log('Carrito cargado:', cartItems.value.length, 'items, total:', cartCount.value)
         } else if (data === null) {
           // Backend dice que no hay carrito - pero mantener cache si existe
-          console.log('Backend devolvió null, usando cache si existe')
         } else {
-          console.log('Carrito vacío del backend')
           // Solo limpiar si realmente está vacío
           if (!cachedCart || cachedCart.items.length === 0) {
             cartItems.value = []
@@ -1622,7 +1662,7 @@ export default {
       } catch (err) {
         // 404 es normal si no hay carrito creado
         if (err.response?.status === 404) {
-          console.log('No existe carrito (404), usando cache')
+          // No existe carrito, usando cache
         } else if (err.response?.status !== 401) {
           console.error('Error cargando carrito:', err)
         }
@@ -1636,16 +1676,23 @@ export default {
         // Primero actualizar UI localmente para feedback inmediato
         const itemIndex = cartItems.value.findIndex(i => i.producto_id === itemId)
         if (itemIndex >= 0) {
+          const itemCantidad = cartItems.value[itemIndex].cantidad || 1
           cartItems.value.splice(itemIndex, 1)
-          cartCount.value = Math.max(0, cartCount.value - 1)
+          
+          // Actualizar contador restando la cantidad del producto eliminado
+          cartCount.value = Math.max(0, cartCount.value - itemCantidad)
           
           // Actualizar cache local
           if (cartItems.value.length === 0) {
             clearCartLocal()
             cartTotal.value = 0
+            cartCount.value = 0
           } else {
             const newTotal = getCartSubtotal()
-            saveCartToLocal(cartItems.value, newTotal, cartCount.value)
+            // Recalcular el count total sumando todas las cantidades
+            const newCount = cartItems.value.reduce((sum, item) => sum + (item.cantidad || 1), 0)
+            cartCount.value = newCount
+            saveCartToLocal(cartItems.value, newTotal, newCount)
             cartTotal.value = newTotal
           }
         }
@@ -1732,7 +1779,6 @@ export default {
 
     const handleSearch = () => {
       if (searchQuery.value.trim()) {
-        console.log('Buscando:', searchQuery.value)
         // TODO: Implementar búsqueda real
         // router.push({ path: '/buscar', query: { q: searchQuery.value } })
       }
@@ -1777,6 +1823,16 @@ export default {
       })
     }
 
+    const cargarCategorias = async () => {
+      try {
+        const data = await categoriasService.listarHome()
+        categorias.value = data.categorias || data || []
+      } catch (err) {
+        console.error('Error cargando categorías:', err)
+        categorias.value = []
+      }
+    }
+    
     const cargarProductos = async () => {
       loading.value = true
       error.value = null
@@ -1787,7 +1843,6 @@ export default {
         
         // Si no hay destacados, obtener todos los productos disponibles
         if (productosData.length === 0) {
-          console.log('No hay productos destacados, cargando todos los disponibles...')
           data = await productosService.getProductos()
           productosData = data.productos || data.results || data || []
         }
@@ -1806,7 +1861,8 @@ export default {
 
     const agregarAlCarrito = async (producto) => {
       try {
-        console.log('Agregando producto al carrito:', producto.id)
+        // Obtener el precio correcto del producto
+        const precioProducto = Number(producto.precio_monto || producto.precio_final || producto.precio || 0)
         
         // Actualizar carrito local inmediatamente (para todos los usuarios)
         const currentItems = [...cartItems.value]
@@ -1818,10 +1874,10 @@ export default {
           currentItems.push({
             producto_id: producto.id,
             nombre: producto.nombre,
-            imagen_url: producto.imagen_url || producto.imagenes?.[0] || null,
-            precio_unitario: producto.precio_final || producto.precio,
+            imagen_url: producto.imagen_url || producto.imagen_principal || producto.imagen || producto.imagenes?.[0] || null,
+            precio_unitario: precioProducto,
             cantidad: 1,
-            subtotal: producto.precio_final || producto.precio
+            subtotal: precioProducto
           })
         }
         
@@ -1900,25 +1956,35 @@ export default {
         showUserMenu.value = false
       }
     }
+    
+    const handleImageError = (e) => {
+      e.target.style.display = 'none'
+      const parent = e.target.parentElement
+      if (parent) {
+        parent.innerHTML = `
+          <div class="w-full h-full flex items-center justify-center bg-gradient-to-br from-nude-100 to-nude-200">
+            <svg class="w-24 h-24 text-nude-400" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
+            </svg>
+          </div>
+        `
+      }
+    }
 
     const cargarResumenCarrito = async () => {
       // Primero cargar desde cache local para respuesta inmediata
       const cachedCart = loadCartFromLocal()
       if (cachedCart && cachedCart.count > 0) {
         cartCount.value = cachedCart.count
-        console.log('Contador del cache:', cachedCart.count)
       }
       
       // Si no está logueado, no intentar cargar del servidor
       if (!isLoggedIn.value) {
-        console.log('Usuario no logueado, no cargando resumen')
         return
       }
       
       try {
-        console.log('Cargando resumen del carrito...')
         const resumen = await carritoService.getResumen()
-        console.log('Resumen recibido:', resumen)
         
         // El resumen puede ser null si no hay carrito
         if (resumen !== null) {
@@ -1926,10 +1992,8 @@ export default {
           cartCount.value = count
           // Actualizar el count en localStorage
           localStorage.setItem(CART_COUNT_KEY, String(count))
-          console.log('Contador actualizado:', count)
         } else {
           // Resumen es null - mantener cache si existe
-          console.log('Resumen es null, manteniendo cache')
         }
       } catch (err) {
         // Solo mostrar error si no es 401 (no autenticado) o 404 (no hay carrito)
@@ -1937,13 +2001,11 @@ export default {
           console.error('Error cargando resumen del carrito:', err)
         }
         // Mantener el valor del cache
-        console.log('Error en resumen, manteniendo cache:', cartCount.value)
       }
     }
 
     // Listener para actualizar usuario cuando inicia sesión
     const handleUserLoggedIn = (event) => {
-      console.log('Login event received:', event.detail)
       currentUser.value = event.detail
       isLoggedIn.value = true // Actualizar estado de login inmediatamente
       cargarResumenCarrito()
@@ -1951,6 +2013,7 @@ export default {
     }
 
     onMounted(() => {
+      cargarCategorias()
       cargarProductos()
       cargarResumenCarrito()
       window.addEventListener('scroll', handleScroll)
@@ -1969,6 +2032,7 @@ export default {
 
     return {
       productos,
+      categorias,
       loading,
       error,
       cartCount,
@@ -2007,7 +2071,9 @@ export default {
       closeCartDrawer,
       removeFromCart,
       updateQuantity,
-      irACheckout
+      irACheckout,
+      handleImageError,
+      getImageUrl
     }
   }
 }

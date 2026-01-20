@@ -61,6 +61,14 @@ db.sqlite3
 media/
 staticfiles/
 
+# Uploads de imágenes
+static/uploads/*.jpg
+static/uploads/*.jpeg
+static/uploads/*.png
+static/uploads/*.webp
+static/uploads/*.gif
+!static/uploads/*/.gitkeep
+
 # Testing
 .coverage
 htmlcov/

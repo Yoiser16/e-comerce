@@ -2,7 +2,36 @@
 Admin configuration for Cliente model
 """
 from django.contrib import admin
-from .models import ClienteModel
+from .models import ClienteModel, CategoriaModel
+
+
+@admin.register(CategoriaModel)
+class CategoriaAdmin(admin.ModelAdmin):
+    list_display = ('nombre', 'slug', 'prioridad', 'orden', 'activo', 'mostrar_en_home', 'fecha_creacion')
+    list_filter = ('activo', 'prioridad', 'mostrar_en_home')
+    search_fields = ('nombre', 'descripcion')
+    readonly_fields = ('id', 'fecha_creacion', 'fecha_modificacion')
+    ordering = ('prioridad', 'orden', 'nombre')
+    prepopulated_fields = {'slug': ('nombre',)}
+    
+    fieldsets = (
+        ('Información', {
+            'fields': ('nombre', 'slug', 'descripcion', 'descripcion_corta')
+        }),
+        ('Imagen', {
+            'fields': ('imagen',)
+        }),
+        ('Visualización', {
+            'fields': ('prioridad', 'orden', 'mostrar_en_home')
+        }),
+        ('Estado', {
+            'fields': ('activo',)
+        }),
+        ('Metadatos', {
+            'fields': ('id', 'fecha_creacion', 'fecha_modificacion'),
+            'classes': ('collapse',)
+        }),
+    )
 
 
 @admin.register(ClienteModel)

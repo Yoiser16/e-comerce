@@ -6,15 +6,15 @@
         <h2 class="text-2xl font-bold text-gray-900">Productos</h2>
         <p class="text-gray-500">Gestiona tu catálogo de productos</p>
       </div>
-      <router-link 
-        to="/admin/productos/nuevo"
+      <button 
+        @click="openCreateModal"
         class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-5 py-3 rounded-xl transition-colors"
       >
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
         </svg>
         Nuevo Producto
-      </router-link>
+      </button>
     </div>
 
     <!-- Filters -->
@@ -120,11 +120,17 @@
                 <div class="flex items-center gap-4">
                   <div class="w-14 h-14 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
                     <img 
-                      :src="producto.imagen_principal || 'https://via.placeholder.com/100?text=Sin+Imagen'" 
+                      v-if="producto.imagen_principal"
+                      :src="getImageUrl(producto.imagen_principal)" 
                       :alt="producto.nombre"
                       class="w-full h-full object-cover"
                       @error="handleImageError"
                     >
+                    <div v-else class="w-full h-full flex items-center justify-center bg-gray-100">
+                      <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                      </svg>
+                    </div>
                   </div>
                   <div>
                     <p class="font-medium text-gray-900">{{ producto.nombre }}</p>
@@ -177,15 +183,15 @@
               <!-- Actions -->
               <td class="px-6 py-4 text-right">
                 <div class="flex items-center justify-end gap-2">
-                  <router-link 
-                    :to="`/admin/productos/${producto.id}/editar`"
+                  <button 
+                    @click="openEditModal(producto)"
                     class="p-2 text-gray-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
                     title="Editar"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
-                  </router-link>
+                  </button>
                   <button 
                     @click="confirmDelete(producto)"
                     class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
@@ -258,6 +264,15 @@
       </div>
     </div>
 
+    <!-- Edit/Create Product Modal -->
+    <ProductoEditModal 
+      :visible="showEditModal"
+      :product-id="editingProductId"
+      @close="closeEditModal"
+      @updated="handleProductUpdated"
+      @created="handleProductUpdated"
+    />
+
     <!-- Delete Confirmation Modal -->
     <div v-if="showDeleteModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
       <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
@@ -300,9 +315,14 @@
 <script>
 import { ref, computed, onMounted } from 'vue'
 import { productosService } from '../../services/productos'
+import { getImageUrl } from '../../services/api'
+import ProductoEditModal from './ProductoEditModal.vue'
 
 export default {
   name: 'AdminProductos',
+  components: {
+    ProductoEditModal
+  },
   setup() {
     const loading = ref(true)
     const productos = ref([])
@@ -314,6 +334,8 @@ export default {
     const deleting = ref(null)
     const showDeleteModal = ref(false)
     const productToDelete = ref(null)
+    const showEditModal = ref(false)
+    const editingProductId = ref(null)
 
     const filteredProducts = computed(() => {
       let result = productos.value
@@ -376,7 +398,27 @@ export default {
     }
 
     const handleImageError = (e) => {
-      e.target.src = 'https://via.placeholder.com/100?text=Sin+Imagen'
+      e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect fill="%23f3f4f6" width="100" height="100"/%3E%3Ctext x="50" y="50" text-anchor="middle" dy=".3em" fill="%239ca3af" font-size="12"%3ESin Imagen%3C/text%3E%3C/svg%3E'
+    }
+
+    const openCreateModal = () => {
+      editingProductId.value = null
+      showEditModal.value = true
+    }
+
+    const openEditModal = (producto) => {
+      editingProductId.value = producto.id
+      showEditModal.value = true
+    }
+
+    const closeEditModal = () => {
+      showEditModal.value = false
+      editingProductId.value = null
+    }
+
+    const handleProductUpdated = async () => {
+      // Recargar lista de productos después de editar/crear
+      await loadProducts()
     }
 
     const confirmDelete = (producto) => {
@@ -440,14 +482,21 @@ export default {
       deleting,
       showDeleteModal,
       productToDelete,
+      showEditModal,
+      editingProductId,
       formatNumber,
       getStockClass,
       getCategoryLabel,
       handleImageError,
+      openCreateModal,
+      openEditModal,
+      closeEditModal,
+      handleProductUpdated,
       confirmDelete,
       deleteProduct,
       clearFilters,
-      loadProducts
+      loadProducts,
+      getImageUrl
     }
   }
 }

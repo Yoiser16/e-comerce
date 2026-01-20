@@ -5,6 +5,7 @@ import Login from '../components/Login.vue'
 // Cliente imports (lazy loaded)
 const MiCuenta = () => import('../components/MiCuenta.vue')
 const Checkout = () => import('../components/Checkout.vue')
+const PagoExitoso = () => import('../components/PagoExitoso.vue')
 
 // Admin imports (lazy loaded)
 const AdminLayout = () => import('../components/admin/AdminLayout.vue')
@@ -16,6 +17,7 @@ const AdminClientes = () => import('../components/admin/AdminClientes.vue')
 const AdminInventario = () => import('../components/admin/AdminInventario.vue')
 const AdminUsuarios = () => import('../components/admin/AdminUsuarios.vue')
 const AdminConfig = () => import('../components/admin/AdminConfig.vue')
+const AdminCategorias = () => import('../components/admin/AdminCategorias.vue')
 
 const routes = [
   {
@@ -38,6 +40,11 @@ const routes = [
     path: '/checkout',
     name: 'Checkout',
     component: Checkout
+  },
+  {
+    path: '/pago-exitoso',
+    name: 'PagoExitoso',
+    component: PagoExitoso
   },
   // Admin routes
   {
@@ -86,6 +93,12 @@ const routes = [
         name: 'AdminInventario',
         component: AdminInventario,
         meta: { title: 'Inventario' }
+      },
+      {
+        path: 'categorias',
+        name: 'AdminCategorias',
+        component: AdminCategorias,
+        meta: { title: 'Categorías' }
       },
       {
         path: 'usuarios',

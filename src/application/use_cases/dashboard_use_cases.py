@@ -37,8 +37,15 @@ class ObtenerEstadisticasGeneralesUseCase:
         
         # Calcular total de ventas del mes actual
         mes_actual = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        ordenes_mes = [o for o in ordenes if o.fecha_creacion >= mes_actual]
-        total_ventas = sum(float(o.total) for o in ordenes_mes)
+        ordenes_mes = [o for o in ordenes if o.fecha_creacion and o.fecha_creacion >= mes_actual]
+        
+        # Calcular total de ventas (manejando Dinero y float)
+        total_ventas = 0.0
+        for o in ordenes_mes:
+            if hasattr(o.total, 'monto'):
+                total_ventas += float(o.total.monto)
+            else:
+                total_ventas += float(o.total)
         
         # Contar órdenes pendientes
         ordenes_pendientes = sum(1 for o in ordenes if o.estado.value == 'PENDIENTE')
@@ -48,14 +55,14 @@ class ObtenerEstadisticasGeneralesUseCase:
         productos_activos = [p for p in productos if p.activo]
         
         # Contar productos con stock bajo (menos de 5 unidades)
-        stock_bajo = sum(1 for p in productos_activos if p.stock_disponible < 5)
+        stock_bajo = sum(1 for p in productos_activos if p.stock_actual < 5)
         
         # Obtener clientes
         clientes = self.cliente_repo.obtener_todos(limite=10000)
         
         # Clientes nuevos (últimos 30 días)
         hace_30_dias = datetime.now() - timedelta(days=30)
-        clientes_nuevos = sum(1 for c in clientes if c.fecha_registro >= hace_30_dias)
+        clientes_nuevos = sum(1 for c in clientes if c.fecha_creacion and c.fecha_creacion >= hace_30_dias)
         
         return EstadisticasGeneralesDTO(
             total_ventas=total_ventas,
@@ -81,9 +88,12 @@ class ObtenerOrdenesRecientesUseCase:
         
         ordenes = self.orden_repo.obtener_todos(limite=1000)
         
+        # Filtrar órdenes con fecha_creacion válida
+        ordenes_con_fecha = [o for o in ordenes if o.fecha_creacion is not None]
+        
         # Ordenar por fecha de creación descendente
         ordenes_recientes = sorted(
-            ordenes,
+            ordenes_con_fecha,
             key=lambda o: o.fecha_creacion,
             reverse=True
         )[:limite]
@@ -110,7 +120,18 @@ class ObtenerOrdenesRecientesUseCase:
     
     def _calcular_tiempo_transcurrido(self, fecha: datetime) -> str:
         """Calcula el tiempo transcurrido de forma legible"""
+        if fecha is None:
+            return "Fecha desconocida"
+        
         ahora = datetime.now()
+        
+        # Asegurar que ambas fechas sean naive o ambas aware
+        if fecha.tzinfo is not None and ahora.tzinfo is None:
+            from datetime import timezone
+            ahora = ahora.replace(tzinfo=timezone.utc)
+        elif fecha.tzinfo is None and ahora.tzinfo is not None:
+            ahora = ahora.replace(tzinfo=None)
+        
         diferencia = ahora - fecha
         
         if diferencia.days > 0:
@@ -150,11 +171,11 @@ class ObtenerProductosStockBajoUseCase:
         # Filtrar productos activos con stock bajo
         productos_bajo_stock = [
             p for p in productos
-            if p.activo and p.stock_disponible < umbral
+            if p.activo and p.stock_actual < umbral
         ]
         
         # Ordenar por stock ascendente (más críticos primero)
-        productos_bajo_stock.sort(key=lambda p: p.stock_disponible)
+        productos_bajo_stock.sort(key=lambda p: p.stock_actual)
         
         # Limitar resultados
         productos_bajo_stock = productos_bajo_stock[:limite]
@@ -163,10 +184,10 @@ class ObtenerProductosStockBajoUseCase:
             ProductoStockBajoDTO(
                 id=str(p.id),
                 nombre=p.nombre,
-                stock_actual=p.stock_disponible,
+                stock_actual=p.stock_actual,
                 stock_minimo=umbral,
-                precio=float(p.precio_actual),
-                imagen_url=p.imagenes[0] if p.imagenes else None
+                precio=float(p.precio.monto) if hasattr(p, 'precio') else 0.0,
+                imagen_url=getattr(p, 'imagen_url', None) or getattr(p, 'imagenes', [None])[0] if hasattr(p, 'imagenes') and p.imagenes else None
             )
             for p in productos_bajo_stock
         ]

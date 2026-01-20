@@ -35,7 +35,22 @@ class CrearProductoUseCase(CasoUsoBase[CrearProductoDTO, ProductoDTO]):
             stock_minimo=request.stock_minimo
         )
         
-        guardado = self._repo.guardar(producto)
+        # Pasar atributos adicionales al repositorio
+        atributos_adicionales = {
+            'imagen_principal': request.imagen_principal,
+            'color': request.color,
+            'tipo': request.tipo,
+            'largo': request.largo,
+            'origen': request.origen,
+            'metodo': request.metodo,
+            'calidad': request.calidad
+        }
+        
+        guardado = self._repo.guardar(
+            producto, 
+            categoria_id=request.categoria,
+            atributos_adicionales=atributos_adicionales
+        )
         return ProductoDTO.desde_entidad(guardado)
 
 
@@ -98,10 +113,34 @@ class ActualizarProductoUseCase(CasoUsoBase[ActualizarProductoDTO, ProductoDTO])
             producto.precio = Dinero(request.precio_monto, producto.precio.moneda)
         if request.stock_actual is not None:
             producto.stock_actual = request.stock_actual
+        
+        # Preparar atributos adicionales para actualizar
+        atributos_adicionales = {}
+        if request.imagen_principal is not None:
+            atributos_adicionales['imagen_principal'] = request.imagen_principal
+        if request.color is not None:
+            atributos_adicionales['color'] = request.color
+        if request.tipo is not None:
+            atributos_adicionales['tipo'] = request.tipo
+        if request.largo is not None:
+            atributos_adicionales['largo'] = request.largo
+        if request.origen is not None:
+            atributos_adicionales['origen'] = request.origen
+        if request.metodo is not None:
+            atributos_adicionales['metodo'] = request.metodo
+        if request.calidad is not None:
+            atributos_adicionales['calidad'] = request.calidad
         if request.stock_minimo is not None:
             producto.stock_minimo = request.stock_minimo
+        if request.activo is not None:
+            producto.activo = request.activo
         
-        guardado = self._repo.guardar(producto)
+        # Guardar y pasar la categoría y atributos adicionales al repositorio
+        guardado = self._repo.guardar(
+            producto, 
+            categoria_id=request.categoria,
+            atributos_adicionales=atributos_adicionales if atributos_adicionales else None
+        )
         return ProductoDTO.desde_entidad(guardado)
 
 

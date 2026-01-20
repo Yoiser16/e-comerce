@@ -147,6 +147,17 @@ class ProductoModel(models.Model):
     descripcion = models.TextField()
     descripcion_corta = models.CharField(max_length=150, blank=True)
     
+    # Categoría (relación con CategoriaModel)
+    categoria = models.ForeignKey(
+        'CategoriaModel', 
+        on_delete=models.SET_NULL, 
+        null=True, 
+        blank=True, 
+        related_name='productos',
+        db_index=True,
+        help_text='Categoría a la que pertenece este producto'
+    )
+    
     # Precio
     moneda_precio = models.CharField(max_length=3, default='USD')
     monto_precio = models.DecimalField(max_digits=10, decimal_places=2)
@@ -246,6 +257,66 @@ class ImagenProductoModel(models.Model):
     class Meta:
         db_table = 'imagenes_producto'
         ordering = ['orden']
+
+
+class CategoriaModel(models.Model):
+    """
+    Modelo para Categorías de productos.
+    
+    Incluye:
+    - Nombre y descripción
+    - Imagen opcional para el ecommerce
+    - Prioridad para el diseño (1=grande, 2-3=más pequeño)
+    - Estado activo/inactivo
+    """
+    PRIORIDAD_CHOICES = [
+        (1, 'Prioridad Alta (Grande)'),
+        (2, 'Prioridad Media'),
+        (3, 'Prioridad Baja'),
+    ]
+    
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    nombre = models.CharField(max_length=100, unique=True)
+    slug = models.SlugField(max_length=100, unique=True, db_index=True)
+    descripcion = models.TextField(blank=True)
+    descripcion_corta = models.CharField(max_length=150, blank=True, help_text='Texto corto para mostrar en tarjetas')
+    
+    # Imagen para el ecommerce (URLs largas compatibles con Unsplash, etc.)
+    imagen = models.URLField(max_length=2000, null=True, blank=True)
+    
+    # Prioridad para diseño (1=más grande en grid, 2-3=más pequeño)
+    prioridad = models.IntegerField(choices=PRIORIDAD_CHOICES, default=2)
+    
+    # Orden manual dentro del mismo nivel de prioridad
+    orden = models.IntegerField(default=0)
+    
+    # Flags
+    activo = models.BooleanField(default=True)
+    mostrar_en_home = models.BooleanField(default=True, help_text='Mostrar en página principal')
+    
+    # Timestamps
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'categorias'
+        verbose_name = 'Categoría'
+        verbose_name_plural = 'Categorías'
+        ordering = ['prioridad', 'orden', 'nombre']
+        indexes = [
+            models.Index(fields=['slug']),
+            models.Index(fields=['activo', 'prioridad']),
+            models.Index(fields=['activo', 'mostrar_en_home', 'prioridad']),
+        ]
+    
+    def __str__(self) -> str:
+        return self.nombre
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            from django.utils.text import slugify
+            self.slug = slugify(self.nombre)
+        super().save(*args, **kwargs)
 
 
 class OrdenModel(models.Model):

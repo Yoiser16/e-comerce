@@ -309,7 +309,7 @@
           Imagen del Producto
         </h3>
         
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="space-y-4">
           <!-- Image URL -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">URL de Imagen</label>
@@ -319,13 +319,45 @@
               placeholder="https://ejemplo.com/imagen.jpg"
               class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
             >
-            <p class="text-xs text-gray-500 mt-1">Ingresa la URL de una imagen o sube una</p>
+          </div>
+
+          <!-- Divider con OR -->
+          <div class="flex items-center gap-4">
+            <div class="flex-1 h-px bg-gray-200"></div>
+            <span class="text-sm text-gray-500 font-medium">O</span>
+            <div class="flex-1 h-px bg-gray-200"></div>
+          </div>
+
+          <!-- File Upload -->
+          <div>
+            <label class="block text-sm font-medium text-gray-700 mb-2">Subir desde tu computadora</label>
+            <div class="flex items-center gap-4">
+              <input 
+                type="file"
+                accept="image/*"
+                @change="handleFileUpload"
+                class="hidden"
+                ref="fileInput"
+              >
+              <button
+                type="button"
+                @click="$refs.fileInput.click()"
+                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors flex items-center gap-2"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+                </svg>
+                Seleccionar archivo
+              </button>
+              <span v-if="uploadingFile" class="text-sm text-gray-500">Subiendo...</span>
+            </div>
+            <p class="text-xs text-gray-500 mt-1">JPG, PNG o WebP (máx. 5MB)</p>
           </div>
 
           <!-- Image Preview -->
           <div>
             <label class="block text-sm font-medium text-gray-700 mb-2">Vista Previa</label>
-            <div class="w-32 h-32 bg-gray-100 rounded-xl overflow-hidden border-2 border-dashed border-gray-300">
+            <div class="w-full max-w-xs h-48 bg-gray-100 rounded-xl overflow-hidden border-2 border-dashed border-gray-300">
               <img 
                 v-if="form.imagen_principal"
                 :src="form.imagen_principal" 
@@ -333,10 +365,11 @@
                 class="w-full h-full object-cover"
                 @error="handleImageError"
               >
-              <div v-else class="w-full h-full flex items-center justify-center">
-                <svg class="w-10 h-10 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div v-else class="w-full h-full flex flex-col items-center justify-center gap-2">
+                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
+                <p class="text-sm text-gray-500">Sin imagen</p>
               </div>
             </div>
           </div>
@@ -402,8 +435,10 @@ export default {
     
     const loadingProduct = ref(false)
     const saving = ref(false)
+    const uploadingFile = ref(false)
     const error = ref(null)
     const success = ref(null)
+    const fileInput = ref(null)
     
     const form = ref({
       codigo: '',
@@ -427,7 +462,45 @@ export default {
     const productId = computed(() => route.params.id)
 
     const handleImageError = (e) => {
-      e.target.src = 'https://via.placeholder.com/100?text=Error'
+      e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"%3E%3Crect fill="%23f3f4f6" width="400" height="300"/%3E%3Ctext x="200" y="150" text-anchor="middle" dy=".3em" fill="%239ca3af" font-size="20"%3ESin Imagen%3C/text%3E%3C/svg%3E'
+    }
+
+    const handleFileUpload = async (event) => {
+      const file = event.target.files[0]
+      if (!file) return
+
+      // Validar tipo
+      if (!file.type.startsWith('image/')) {
+        error.value = 'Por favor selecciona un archivo de imagen válido'
+        return
+      }
+
+      // Validar tamaño (5MB)
+      if (file.size > 5 * 1024 * 1024) {
+        error.value = 'La imagen no debe superar los 5MB'
+        return
+      }
+
+      uploadingFile.value = true
+      error.value = null
+
+      try {
+        // Convertir a base64 para preview inmediato
+        const reader = new FileReader()
+        reader.onload = (e) => {
+          form.value.imagen_principal = e.target.result
+        }
+        reader.readAsDataURL(file)
+
+        // Aquí puedes implementar la subida real a un servidor
+        // Por ahora usamos base64
+        
+        uploadingFile.value = false
+      } catch (err) {
+        console.error('Error uploading file:', err)
+        error.value = 'Error al subir la imagen'
+        uploadingFile.value = false
+      }
     }
 
     const loadProduct = async () => {
@@ -438,22 +511,27 @@ export default {
       
       try {
         const producto = await productosService.getProducto(productId.value)
+        console.log('Producto cargado:', producto)
+        
+        // Mapear atributos correctamente
+        const atributos = producto.atributos || {}
+        
         form.value = {
           codigo: producto.codigo,
           nombre: producto.nombre,
           descripcion: producto.descripcion,
-          precio_monto: producto.precio_monto,
-          precio_moneda: producto.precio_moneda || 'COP',
-          stock_actual: producto.stock_actual,
-          stock_minimo: producto.stock_minimo,
-          metodo: producto.metodo || '',
-          color: producto.color || '',
-          largo: producto.largo || '',
-          tipo: producto.tipo || '',
-          origen: producto.origen || '',
-          calidad: producto.calidad || '',
+          precio_monto: producto.precio?.monto || producto.precio_monto || 0,
+          precio_moneda: producto.precio?.moneda || producto.precio_moneda || 'COP',
+          stock_actual: producto.stock?.actual || producto.stock_actual || 0,
+          stock_minimo: producto.stock?.minimo || producto.stock_minimo || 0,
+          metodo: atributos.metodo || '',
+          color: atributos.color || '',
+          largo: atributos.largo || '',
+          tipo: atributos.tipo || '',
+          origen: atributos.origen || '',
+          calidad: atributos.calidad || '',
           imagen_principal: producto.imagen_principal || '',
-          activo: producto.activo
+          activo: producto.activo !== false
         }
       } catch (err) {
         console.error('Error loading product:', err)
@@ -510,10 +588,13 @@ export default {
       form,
       loadingProduct,
       saving,
+      uploadingFile,
       error,
       success,
       isEditing,
+      fileInput,
       handleImageError,
+      handleFileUpload,
       submitForm
     }
   }

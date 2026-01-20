@@ -123,6 +123,68 @@
 
           <!-- Right Actions -->
           <div class="flex items-center gap-3">
+            <!-- Mini Radio Player - Cuando está reproduciendo -->
+            <div 
+              v-if="isPlaying && currentStation"
+              class="flex items-center gap-2 px-3 py-2 bg-white rounded-xl border border-emerald-200 shadow-sm"
+            >
+              <!-- Barras animadas -->
+              <div class="flex items-center gap-0.5 h-4">
+                <div class="w-0.5 bg-emerald-500 rounded-full animate-music-bar" style="height: 30%; animation-delay: 0ms;"></div>
+                <div class="w-0.5 bg-emerald-500 rounded-full animate-music-bar" style="height: 50%; animation-delay: 200ms;"></div>
+                <div class="w-0.5 bg-emerald-500 rounded-full animate-music-bar" style="height: 70%; animation-delay: 400ms;"></div>
+                <div class="w-0.5 bg-emerald-500 rounded-full animate-music-bar" style="height: 40%; animation-delay: 100ms;"></div>
+              </div>
+
+              <!-- Info de la emisora -->
+              <button
+                @click="showRadio = true"
+                class="flex flex-col min-w-0 hover:opacity-80 transition-opacity"
+                title="Abrir reproductor"
+              >
+                <span class="text-[10px] font-semibold text-emerald-600 uppercase tracking-wider leading-none">
+                  En vivo
+                </span>
+                <span class="text-xs font-medium text-text-dark truncate max-w-[100px] leading-tight mt-0.5">
+                  {{ currentStation }}
+                </span>
+              </button>
+
+              <!-- Controles -->
+              <div class="flex items-center gap-0.5 flex-shrink-0 pl-1 border-l border-gray-200">
+                <!-- Play/Pause -->
+                <button
+                  @click="togglePlayback"
+                  class="w-6 h-6 rounded-lg flex items-center justify-center hover:bg-emerald-50 transition-colors text-emerald-600"
+                  :title="isPlaying ? 'Pausar' : 'Reproducir'"
+                >
+                  <svg v-if="isPlaying" class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M6 4h4v16H6V4zm8 0h4v16h-4V4z"/>
+                  </svg>
+                  <svg v-else class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24">
+                    <path d="M8 5v14l11-7z"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <!-- Radio Button - Solo cuando NO está reproduciendo -->
+            <button 
+              v-else
+              @click="showRadio = !showRadio"
+              :class="[
+                'relative flex items-center gap-2 px-3 py-2 rounded-xl transition-all',
+                showRadio 
+                  ? 'bg-emerald-500 text-white shadow-lg shadow-emerald-500/30' 
+                  : 'text-text-medium hover:text-text-dark hover:bg-white hover:shadow-sm'
+              ]"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 7.5l16.5-4.125M12 6.75c-2.708 0-5.363.224-7.948.655C2.999 7.58 2.25 8.507 2.25 9.574v9.176A2.25 2.25 0 004.5 21h15a2.25 2.25 0 002.25-2.25V9.574c0-1.067-.75-1.994-1.802-2.169A48.329 48.329 0 0012 6.75zm-1.683 6.443l-.311.311a1.125 1.125 0 01-1.59-1.59l.31-.312a1.125 1.125 0 011.591 1.591zm.22 3.17a.75.75 0 001.06 0l3.126-3.125a.75.75 0 00-1.06-1.061l-3.126 3.125a.75.75 0 000 1.061zm4.713-3.17l.311.311a1.125 1.125 0 01-1.59 1.59l-.312-.31a1.125 1.125 0 011.591-1.591z" />
+              </svg>
+              <span class="hidden sm:inline text-sm font-medium">Radio</span>
+            </button>
+
             <!-- Notifications -->
             <button class="relative p-2.5 text-text-medium hover:text-text-dark hover:bg-white rounded-xl transition-all hover:shadow-sm">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -153,19 +215,43 @@
         <router-view />
       </main>
     </div>
+
+    <!-- Radio Player Component -->
+    <RadioPlayer 
+      :visible="showRadio" 
+      @playing="isPlaying = $event"
+      @station-change="currentStation = $event"
+      @close="showRadio = false"
+    />
   </div>
 </template>
 
 <script>
 import { ref, computed } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import RadioPlayer from './RadioPlayer.vue'
 
 export default {
   name: 'AdminLayout',
+  components: {
+    RadioPlayer
+  },
   setup() {
     const router = useRouter()
     const route = useRoute()
     const sidebarOpen = ref(false)
+    const showRadio = ref(false)
+    const isPlaying = ref(false)
+    const currentStation = ref('')
+    const radioPlayerRef = ref(null)
+
+    const togglePlayback = () => {
+      // Si hay una emisora actual, hacer toggle del play/pause
+      if (radioPlayerRef.value) {
+        // Abrir el modal para controlar
+        showRadio.value = true
+      }
+    }
 
     // Menu items with thin stroke icons
     const menuItems = ref([
@@ -198,6 +284,12 @@ export default {
         path: '/admin/inventario',
         icon: '<svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M6.429 9.75L2.25 12l4.179 2.25m0-4.5l5.571 3 5.571-3m-11.142 0L2.25 7.5 12 2.25l9.75 5.25-4.179 2.25m0 0L21.75 12l-4.179 2.25m0 0l4.179 2.25L12 21.75 2.25 16.5l4.179-2.25m11.142 0l-5.571 3-5.571-3"/></svg>',
         badge: '3'
+      },
+      {
+        name: 'Categorías',
+        path: '/admin/categorias',
+        icon: '<svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/><path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/></svg>',
+        badge: null
       },
       {
         name: 'Usuarios',
@@ -239,6 +331,7 @@ export default {
         '/admin/ordenes': 'Órdenes',
         '/admin/clientes': 'Clientes',
         '/admin/inventario': 'Inventario',
+        '/admin/categorias': 'Categorías',
         '/admin/usuarios': 'Usuarios',
         '/admin/config': 'Configuración'
       }
@@ -254,6 +347,11 @@ export default {
 
     return {
       sidebarOpen,
+      showRadio,
+      isPlaying,
+      currentStation,
+      radioPlayerRef,
+      togglePlayback,
       menuItems,
       isActive,
       userName,
@@ -265,3 +363,14 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+@keyframes music-bar {
+  0%, 100% { height: 30%; }
+  50% { height: 100%; }
+}
+
+.animate-music-bar {
+  animation: music-bar 0.6s ease-in-out infinite;
+}
+</style>

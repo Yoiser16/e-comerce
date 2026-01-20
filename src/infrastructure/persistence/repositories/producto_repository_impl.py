@@ -35,6 +35,11 @@ class ProductoRepositoryImpl(ProductoRepository):
         """
         Mapea modelo Django a entidad de dominio.
         """
+        # Obtener nombre de categoría si existe
+        categoria_nombre = None
+        if model.categoria_id:
+            categoria_nombre = model.categoria.nombre if model.categoria else None
+        
         return Producto(
             id=model.id,
             codigo=CodigoProducto(model.codigo),
@@ -45,7 +50,15 @@ class ProductoRepositoryImpl(ProductoRepository):
             stock_minimo=model.stock_minimo,
             fecha_creacion=model.fecha_creacion,
             fecha_modificacion=model.fecha_modificacion,
-            activo=model.activo
+            activo=model.activo,
+            categoria=categoria_nombre,
+            imagen_principal=model.imagen_principal,
+            color=model.color,
+            tipo=model.tipo,
+            largo=model.largo,
+            origen=model.origen,
+            metodo=model.metodo,
+            calidad=model.calidad
         )
     
     def _to_model(self, entity: Producto) -> ProductoModel:
@@ -131,9 +144,13 @@ class ProductoRepositoryImpl(ProductoRepository):
             self._logger.warning("Producto no encontrado para bloqueo", producto_id=str(id))
             return None
 
-    def guardar(self, entidad: Producto) -> Producto:
+    def guardar(self, entidad: Producto, categoria_id=None, atributos_adicionales=None) -> Producto:
         producto_id = str(entidad.id)
         self._logger.info(f"Guardando producto", producto_id=producto_id)
+        
+        # LOG: Mostrar atributos adicionales recibidos
+        if atributos_adicionales:
+            self._logger.info(f"📦 Atributos adicionales recibidos: {atributos_adicionales}")
         
         try:
             existe = ProductoModel.objects.filter(id=entidad.id).exists()
@@ -148,8 +165,58 @@ class ProductoRepositoryImpl(ProductoRepository):
                     "stock": model_anterior.stock_actual,
                     "precio": f"{model_anterior.monto_precio} {model_anterior.moneda_precio}"
                 }
+                # Actualizar modelo existente
+                model_anterior.nombre = entidad.nombre
+                model_anterior.descripcion = entidad.descripcion
+                model_anterior.moneda_precio = entidad.precio.moneda
+                model_anterior.monto_precio = entidad.precio.monto
+                model_anterior.stock_actual = entidad.stock_actual
+                model_anterior.stock_minimo = entidad.stock_minimo
+                model_anterior.activo = entidad.activo
+                # Asignar categoría si se proporciona
+                if categoria_id:
+                    model_anterior.categoria_id = categoria_id
+                # Actualizar atributos adicionales si se proporcionan
+                if atributos_adicionales:
+                    if 'imagen_principal' in atributos_adicionales:
+                        model_anterior.imagen_principal = atributos_adicionales['imagen_principal']
+                        self._logger.info(f"🖼️ Imagen asignada: {model_anterior.imagen_principal}")
+                    if 'color' in atributos_adicionales:
+                        model_anterior.color = atributos_adicionales['color']
+                    if 'tipo' in atributos_adicionales:
+                        model_anterior.tipo = atributos_adicionales['tipo']
+                    if 'largo' in atributos_adicionales:
+                        model_anterior.largo = atributos_adicionales['largo']
+                    if 'origen' in atributos_adicionales:
+                        model_anterior.origen = atributos_adicionales['origen']
+                    if 'metodo' in atributos_adicionales:
+                        model_anterior.metodo = atributos_adicionales['metodo']
+                    if 'calidad' in atributos_adicionales:
+                        model_anterior.calidad = atributos_adicionales['calidad']
+                model = model_anterior
+            else:
+                # Crear nuevo modelo
+                model = self._to_model(entidad)
+                # Asignar categoría si se proporciona
+                if categoria_id:
+                    model.categoria_id = categoria_id
+                # Asignar atributos adicionales si se proporcionan
+                if atributos_adicionales:
+                    if 'imagen_principal' in atributos_adicionales:
+                        model.imagen_principal = atributos_adicionales['imagen_principal']
+                    if 'color' in atributos_adicionales:
+                        model.color = atributos_adicionales['color']
+                    if 'tipo' in atributos_adicionales:
+                        model.tipo = atributos_adicionales['tipo']
+                    if 'largo' in atributos_adicionales:
+                        model.largo = atributos_adicionales['largo']
+                    if 'origen' in atributos_adicionales:
+                        model.origen = atributos_adicionales['origen']
+                    if 'metodo' in atributos_adicionales:
+                        model.metodo = atributos_adicionales['metodo']
+                    if 'calidad' in atributos_adicionales:
+                        model.calidad = atributos_adicionales['calidad']
             
-            model = self._to_model(entidad)
             model.save()
             
             datos_nuevos = {

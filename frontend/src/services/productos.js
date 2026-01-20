@@ -46,6 +46,11 @@ export const productosService = {
     return response.data
   },
 
+  // Alias para obtenerTodos (mismo que listarTodos)
+  async obtenerTodos(params = {}) {
+    return this.listarTodos(params)
+  },
+
   // Crear producto
   async crear(producto) {
     const response = await apiClient.post('/productos/', producto)

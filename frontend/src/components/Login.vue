@@ -54,7 +54,7 @@
           <!-- Opciones de Login -->
           <div class="space-y-3">
             
-            <!-- Google - Botón renderizado por Google SDK -->
+            <!-- Google Sign-In -->
             <div 
               id="google-signin-button" 
               class="flex justify-center w-full"
@@ -215,8 +215,8 @@ export default {
     })
 
     onMounted(() => {
-      loadGoogleScript().catch(() => {
-        error.value = 'No se pudo cargar Google Sign-In'
+      handleGoogleLogin().catch(() => {
+        console.log('Google Sign-In no disponible')
       })
     })
 
@@ -404,10 +404,12 @@ export default {
       }
     }
 
-    // Inicializar Google Sign-In cuando se monta el componente
+    // Comentado temporalmente - Google Sign-In deshabilitado
+    /*
     onMounted(() => {
       handleGoogleLogin()
     })
+    */
 
     return {
       form,
@@ -418,8 +420,7 @@ export default {
       closeModal,
       handleLogin,
       handleRegister,
-      toggleMode,
-      handleGoogleLogin
+      toggleMode
     }
   }
 }

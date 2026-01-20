@@ -45,6 +45,12 @@ class EntidadBase(ABC):
     def activo(self) -> bool:
         return self._activo
     
+    @activo.setter
+    def activo(self, valor: bool) -> None:
+        """Actualiza el estado activo/inactivo"""
+        self._activo = valor
+        self.marcar_modificado()
+    
     def marcar_modificado(self) -> None:
         """Actualiza la fecha de modificación"""
         self._fecha_modificacion = datetime.now()
