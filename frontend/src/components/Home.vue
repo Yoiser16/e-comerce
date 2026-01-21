@@ -256,15 +256,15 @@
 
           <!-- CTAs - Más compactos en móvil -->
           <div class="flex flex-col sm:flex-row gap-3 sm:gap-5 mb-12 sm:mb-16 animate-fade-in-up delay-300">
-            <a 
-              href="#productos" 
+            <router-link 
+              to="/catalogo" 
               class="inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 bg-white text-gray-900 font-semibold text-sm sm:text-base rounded-full shadow-lg hover:shadow-xl hover:bg-gray-100 transition-all duration-300 touch-target"
             >
               Ver Catálogo
               <svg class="w-4 h-4 sm:w-5 sm:h-5 ml-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
               </svg>
-            </a>
+            </router-link>
             
             <a 
               href="#mayoreo" 
@@ -402,30 +402,36 @@
         </div>
 
         <!-- Bento Grid - Adaptativo Inteligente -->
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 lg:gap-6">
+        <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 lg:gap-6">
           <div 
             v-for="(categoria, index) in categorias" 
             :key="categoria.id"
             :class="[
               'group cursor-pointer',
-              // Lógica adaptativa según cantidad y prioridad
-              categorias.length === 1 ? 'md:col-span-2 lg:col-span-3' : // 1 sola = ancho completo
-              categorias.length === 2 ? 'md:col-span-1 lg:col-span-1.5' : // 2 = grid uniforme 50/50
-              categorias.length === 3 && categoria.prioridad === 1 ? 'md:col-span-2 lg:col-span-2 lg:row-span-2' : // 3 con P1 = grande
-              categorias.length === 3 && categoria.prioridad !== 1 ? '' : // 3 sin P1 = pequeñas
-              categorias.length >= 4 && index === 0 && categoria.prioridad === 1 ? 'md:col-span-2' : // 4+ con P1 en primera = mediano
-              '' // Default
+              // En móvil, solo categoría destacada (P1) ocupa 2 columnas
+              categoria.prioridad === 1 && index === 0 ? 'col-span-2' : '',
+              // Lógica adaptativa para tablet y desktop
+              categorias.length === 1 ? 'md:col-span-2 lg:col-span-3' : 
+              categorias.length === 2 ? 'md:col-span-1 lg:col-span-1.5' : 
+              categorias.length === 3 && categoria.prioridad === 1 ? 'md:col-span-2 lg:col-span-2 lg:row-span-2' : 
+              categorias.length === 3 && categoria.prioridad !== 1 ? '' : 
+              categorias.length >= 4 && index === 0 && categoria.prioridad === 1 ? 'md:col-span-2' : 
+              ''
             ]"
+            @click="irACategoria(categoria)"
+            role="button"
+            tabindex="0"
           >
             <div 
               :class="[
-                'relative bento-item shadow-soft hover-lift overflow-hidden',
-                // Altura adaptativa
-                categorias.length === 1 ? 'h-96 lg:h-[500px]' :
-                categorias.length === 2 ? 'h-80 lg:h-96' :
-                categorias.length === 3 && categoria.prioridad === 1 ? 'h-80 lg:h-full min-h-[400px]' :
-                categorias.length === 3 && categoria.prioridad !== 1 ? 'h-64 lg:h-full min-h-[200px]' :
-                'h-72 lg:h-80'
+                'relative bento-item shadow-soft hover-lift overflow-hidden rounded-2xl sm:rounded-3xl',
+                // Altura adaptativa móvil primero
+                categoria.prioridad === 1 && index === 0 ? 'h-56 sm:h-80 lg:h-96' : 'h-40 sm:h-64 lg:h-80',
+                // Lógica para otros tamaños
+                categorias.length === 1 ? 'sm:h-96 lg:h-[500px]' :
+                categorias.length === 2 ? 'sm:h-80 lg:h-96' :
+                categorias.length === 3 && categoria.prioridad === 1 ? 'sm:h-80 lg:h-full lg:min-h-[400px]' :
+                categorias.length === 3 && categoria.prioridad !== 1 ? 'sm:h-64 lg:h-full lg:min-h-[200px]' : ''
               ]"
             >
               <img 
@@ -437,14 +443,14 @@
               <div 
                 :class="[
                   'absolute bottom-0 left-0 right-0',
-                  // Padding adaptativo según tamaño
-                  (categorias.length <= 2 || (categorias.length === 3 && categoria.prioridad === 1)) ? 'p-6 lg:p-8' : 'p-5 lg:p-6'
+                  // Padding adaptativo - más compacto en móvil
+                  categoria.prioridad === 1 && index === 0 ? 'p-4 sm:p-6 lg:p-8' : 'p-3 sm:p-5 lg:p-6'
                 ]"
               >
                 <!-- Badge "MÁS VENDIDO" solo para la primera P1 -->
                 <span 
                   v-if="categoria.prioridad === 1 && categoria.orden === 1" 
-                  class="inline-block bg-gold-400 text-white text-xs font-bold px-3 py-1 rounded-full mb-3"
+                  class="inline-block bg-gold-400 text-white text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full mb-2 sm:mb-3"
                 >
                   MÁS VENDIDO
                 </span>
@@ -452,33 +458,40 @@
                 <!-- Título adaptativo -->
                 <h3 
                   :class="[
-                    'font-luxury text-white mb-2',
-                    (categorias.length <= 2 || (categorias.length === 3 && categoria.prioridad === 1)) ? 'text-2xl lg:text-3xl' : 'text-xl lg:text-2xl'
+                    'font-luxury text-white mb-1 sm:mb-2',
+                    categoria.prioridad === 1 && index === 0 ? 'text-lg sm:text-2xl lg:text-3xl' : 'text-sm sm:text-xl lg:text-2xl'
                   ]"
                 >
                   {{ categoria.nombre }}
                 </h3>
                 
-                <!-- Descripción (larga para cards grandes, corta para pequeñas) -->
+                <!-- Descripción - oculta en tarjetas pequeñas en móvil -->
                 <p 
+                  v-if="categoria.prioridad === 1 && index === 0"
                   :class="[
-                    'text-white/80 mb-4',
-                    (categorias.length <= 2 || (categorias.length === 3 && categoria.prioridad === 1)) ? 'max-w-md' : 'text-sm'
+                    'text-white/80 mb-2 sm:mb-4',
+                    'text-xs sm:text-base max-w-md'
                   ]"
                 >
-                  {{ (categorias.length <= 2 || (categorias.length === 3 && categoria.prioridad === 1)) ? categoria.descripcion : categoria.descripcion_corta }}
+                  {{ categoria.descripcion }}
+                </p>
+                <p 
+                  v-else
+                  class="hidden sm:block text-white/80 mb-4 text-sm"
+                >
+                  {{ categoria.descripcion_corta || categoria.descripcion }}
                 </p>
                 
                 <!-- CTA -->
                 <span 
                   :class="[
-                    'inline-flex items-center gap-2 text-white font-medium transition-all',
-                    (categorias.length <= 2 || (categorias.length === 3 && categoria.prioridad === 1)) ? 'group-hover:gap-4' : 'text-sm group-hover:gap-3'
+                    'inline-flex items-center gap-1.5 sm:gap-2 text-white font-medium transition-all',
+                    categoria.prioridad === 1 && index === 0 ? 'text-xs sm:text-base group-hover:gap-4' : 'text-[11px] sm:text-sm group-hover:gap-3'
                   ]"
                 >
-                  {{ (categorias.length <= 2 || (categorias.length === 3 && categoria.prioridad === 1)) ? 'Explorar colección' : 'Ver más' }}
+                  {{ categoria.prioridad === 1 && index === 0 ? 'Explorar colección' : 'Ver más' }}
                   <svg 
-                    :class="(categorias.length <= 2 || (categorias.length === 3 && categoria.prioridad === 1)) ? 'w-5 h-5' : 'w-4 h-4'" 
+                    :class="categoria.prioridad === 1 && index === 0 ? 'w-4 h-4 sm:w-5 sm:h-5' : 'w-3 h-3 sm:w-4 sm:h-4'" 
                     fill="none" 
                     stroke="currentColor" 
                     stroke-width="2" 
@@ -526,16 +539,16 @@
         </div>
 
         <!-- Products Grid -->
-        <div v-else-if="productos.length > 0" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
+        <div v-else-if="productos.length > 0" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
           <div
             v-for="producto in productos"
             :key="producto.id"
             class="group cursor-pointer"
           >
-            <div class="relative bg-white rounded-3xl overflow-hidden shadow-soft hover-lift mb-5">
+            <div class="relative bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-soft hover-lift mb-3 sm:mb-5">
               <!-- Badge -->
-              <div class="absolute top-4 left-4 z-10">
-                <span class="bg-white/90 backdrop-blur-sm text-text-dark text-xs font-medium px-3 py-1.5 rounded-full shadow-sm">
+              <div class="absolute top-2 sm:top-4 left-2 sm:left-4 z-10">
+                <span class="bg-white/90 backdrop-blur-sm text-text-dark text-[10px] sm:text-xs font-medium px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-sm">
                   {{ producto.categoria || 'Premium' }}
                 </span>
               </div>
@@ -543,9 +556,9 @@
               <!-- Wishlist Button -->
               <button 
                 @click.stop="toggleFavorito(producto)"
-                class="absolute top-4 right-4 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:bg-brand-50 transition-colors touch-target"
+                class="absolute top-2 sm:top-4 right-2 sm:right-4 z-10 w-8 h-8 sm:w-10 sm:h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:bg-brand-50 transition-colors touch-target"
               >
-                <svg class="w-5 h-5 text-text-light hover:text-brand-600 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-text-light hover:text-brand-600 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                 </svg>
               </button>
@@ -576,10 +589,10 @@
             </div>
 
             <!-- Product Info -->
-            <div class="px-1">
-              <p class="text-xs text-text-light uppercase tracking-wider mb-1">{{ producto.categoria || producto.metodo || 'Extensiones' }}</p>
-              <h3 class="font-medium text-text-dark mb-2 line-clamp-2 group-hover:text-brand-600 transition-colors">{{ producto.nombre }}</h3>
-              <p class="text-lg font-semibold text-brand-600">${{ formatPrice(producto.precio_monto || producto.precio) }} <span class="text-xs text-text-light font-normal">{{ producto.precio_moneda || 'COP' }}</span></p>
+            <div class="px-2 sm:px-1">
+              <p class="text-[10px] sm:text-xs text-text-light uppercase tracking-wider mb-0.5 sm:mb-1">{{ producto.categoria || producto.metodo || 'Extensiones' }}</p>
+              <h3 class="font-medium text-xs sm:text-base text-text-dark mb-1 sm:mb-2 line-clamp-2 group-hover:text-brand-600 transition-colors">{{ producto.nombre }}</h3>
+              <p class="text-sm sm:text-lg font-semibold text-brand-600">${{ formatPrice(producto.precio_monto || producto.precio) }} <span class="text-[10px] sm:text-xs text-text-light font-normal">{{ producto.precio_moneda || 'COP' }}</span></p>
             </div>
           </div>
         </div>
@@ -1784,6 +1797,15 @@ export default {
       }
     }
 
+    const irACategoria = (categoria) => {
+      const nombre = categoria?.nombre
+      if (nombre) {
+        router.push({ path: '/catalogo', query: { categoria: nombre } })
+      } else {
+        router.push('/catalogo')
+      }
+    }
+
     const formatPrice = (price) => {
       // Manejar casos de NaN, null, undefined
       const numPrice = Number(price)
@@ -2043,6 +2065,7 @@ export default {
       getItemPrice,
       getCartSubtotal,
       cargarProductos,
+      irACategoria,
       agregarAlCarrito,
       toggleFavorito,
       toggleUserMenu,

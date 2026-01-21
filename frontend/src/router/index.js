@@ -4,6 +4,7 @@ import Login from '../components/Login.vue'
 
 // Cliente imports (lazy loaded)
 const Catalogo = () => import('../components/Catalogo.vue')
+const ProductoDetalle = () => import('../components/ProductoDetalle.vue')
 const MiCuenta = () => import('../components/MiCuenta.vue')
 const Checkout = () => import('../components/Checkout.vue')
 const PagoExitoso = () => import('../components/PagoExitoso.vue')
@@ -36,6 +37,11 @@ const routes = [
     path: '/catalogo',
     name: 'Catalogo',
     component: Catalogo
+  },
+  {
+    path: '/producto/:id',
+    name: 'ProductoDetalle',
+    component: ProductoDetalle
   },
   {
     path: '/mi-cuenta',

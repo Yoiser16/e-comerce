@@ -112,7 +112,7 @@
             <td class="col-producto">
               <div class="producto-cell">
                 <div class="producto-thumb">
-                  <img v-if="item.imagen" :src="item.imagen" :alt="item.nombre" />
+                  <img v-if="item.imagen" :src="getImageUrl(item.imagen)" :alt="item.nombre" />
                   <svg v-else fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
@@ -238,7 +238,7 @@
               <td class="col-producto">
                 <div class="producto-mini">
                   <div class="producto-mini-thumb">
-                    <img v-if="mov.producto_imagen" :src="mov.producto_imagen" :alt="mov.producto_nombre" />
+                    <img v-if="mov.producto_imagen" :src="getImageUrl(mov.producto_imagen)" :alt="mov.producto_nombre" />
                     <svg v-else fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
@@ -313,6 +313,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { productosService } from '../../services/productos'
 import { inventarioService } from '../../services/inventario'
+import { getImageUrl } from '../../services/api'
 
 export default {
   name: 'AdminInventario',
@@ -572,6 +573,7 @@ export default {
       getStockLabel, 
       formatNumber,
       cargarInventario,
+      getImageUrl,
       // Movimientos
       filtros,
       movimientos,

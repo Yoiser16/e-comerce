@@ -2,7 +2,29 @@
   <div class="min-h-screen bg-[#FAFAFA]">
     <!-- Hero Minimalista -->
     <div class="bg-white border-b border-text-dark/5">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-12 sm:py-16">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 py-8 sm:py-12">
+        <!-- Navegación -->
+        <div class="flex items-center justify-between mb-6 sm:mb-8">
+          <button 
+            @click="$router.back()" 
+            class="inline-flex items-center gap-2 text-text-medium hover:text-text-dark text-sm transition-colors"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+            Volver
+          </button>
+          <button 
+            @click="mostrarCarrito = true"
+            class="inline-flex items-center gap-2 px-3 py-2 border border-text-dark/10 rounded-full hover:border-text-dark/30 transition-colors text-sm text-text-medium hover:text-text-dark"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3 3h2l1 7h12l1.5-5H6m0 0H3m13 7h3m-3 0a1 1 0 1 0 0 2h3a1 1 0 1 0 0-2m-12-1a1 1 0 1 0 0 2 1 1 0 0 0 0-2z" />
+            </svg>
+            Ver carrito (<span>{{ cartCount }}</span>)
+          </button>
+        </div>
+        <!-- Título -->
         <h1 class="font-luxury text-3xl sm:text-4xl lg:text-5xl text-text-dark mb-3">Catálogo Completo</h1>
         <p class="text-text-medium text-sm sm:text-base max-w-2xl">Explora nuestra colección exclusiva de extensiones de cabello premium</p>
       </div>
@@ -285,20 +307,106 @@
         </div>
       </Transition>
     </Teleport>
+
+    <!-- Drawer del Carrito -->
+    <Teleport to="body">
+      <Transition name="drawer-fade">
+        <div 
+          v-if="mostrarCarrito"
+          class="fixed inset-0 bg-black/30 z-40"
+          @click.self="mostrarCarrito = false"
+        ></div>
+      </Transition>
+      <Transition name="drawer-slide">
+        <div 
+          v-if="mostrarCarrito"
+          class="fixed right-0 top-0 bottom-0 w-full max-w-sm bg-white shadow-xl z-50 flex flex-col"
+        >
+          <!-- Header -->
+          <div class="border-b border-text-dark/5 p-6 flex items-center justify-between">
+            <h2 class="text-lg font-semibold text-text-dark">Mi Carrito</h2>
+            <button 
+              @click="mostrarCarrito = false"
+              class="p-2 hover:bg-[#FAFAFA] rounded-full transition-colors"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Items del carrito -->
+          <div class="flex-1 overflow-y-auto p-6">
+            <div v-if="carritoItems.length === 0" class="text-center py-12">
+              <p class="text-text-medium text-sm">Tu carrito está vacío</p>
+            </div>
+            <div v-else class="space-y-4">
+              <div 
+                v-for="item in carritoItems" 
+                :key="item.id"
+                class="flex gap-4 pb-4 border-b border-text-dark/5"
+              >
+                <img 
+                  :src="getImageUrl(item.imagen_url)"
+                  :alt="item.nombre"
+                  @error="handleImageError"
+                  class="w-20 h-20 object-cover rounded bg-[#FAFAFA]"
+                >
+                <div class="flex-1">
+                  <h3 class="text-sm font-medium text-text-dark">{{ item.nombre }}</h3>
+                  <p class="text-xs text-text-medium mt-1">Cantidad: {{ item.cantidad }}</p>
+                  <p class="text-sm font-semibold text-text-dark mt-2">{{ formatearPrecio((item.precio_unitario || item.precio_monto || 0) * item.cantidad) }}</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer con totales y botones -->
+          <div v-if="carritoItems.length > 0" class="border-t border-text-dark/5 p-6 space-y-4">
+            <div class="space-y-2">
+              <div class="flex justify-between text-sm text-text-medium">
+                <span>Subtotal:</span>
+                <span>{{ formatearPrecio(precioSubtotal) }}</span>
+              </div>
+              <div class="flex justify-between text-lg font-semibold text-text-dark pt-2 border-t border-text-dark/5">
+                <span>Total:</span>
+                <span>{{ formatearPrecio(precioSubtotal) }}</span>
+              </div>
+            </div>
+            <button 
+              @click="irACheckout"
+              class="w-full bg-text-dark hover:bg-black text-white font-medium py-3 rounded-sm transition-colors"
+            >
+              Completar pedido
+            </button>
+            <button 
+              @click="mostrarCarrito = false"
+              class="w-full border border-text-dark/10 hover:border-text-dark/30 text-text-dark py-3 rounded-sm transition-colors text-sm"
+            >
+              Seguir comprando
+            </button>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
 
 const router = useRouter()
+const route = useRoute()
 
 // Estados
 const productos = ref([])
 const categorias = ref([])
 const loading = ref(true)
+const cartCount = ref(0)
+const mostrarCarrito = ref(false)
+const carritoItems = ref([])
 
 // Filtros
 const filtroCategoria = ref(null)
@@ -370,6 +478,14 @@ const productosFiltrados = computed(() => {
   return resultado
 })
 
+// Cálculo del precio subtotal del carrito
+const precioSubtotal = computed(() => {
+  return carritoItems.value.reduce((total, item) => {
+    const precio = item.precio_unitario || item.precio_monto || 0
+    return total + (precio * item.cantidad)
+  }, 0)
+})
+
 // Métodos
 const cargarProductos = async () => {
   try {
@@ -411,6 +527,26 @@ const formatearPrecio = (precio) => {
   }).format(precio)
 }
 
+const loadCartFromLocal = () => {
+  try {
+    const cart = localStorage.getItem('kharis_cart_cache')
+    if (cart) {
+      const parsed = JSON.parse(cart)
+      // Si es un objeto con propiedad 'items' (formato nuevo), usa items
+      carritoItems.value = parsed.items ? parsed.items : parsed
+    } else {
+      carritoItems.value = []
+    }
+  } catch (err) {
+    carritoItems.value = []
+  }
+}
+
+const irACheckout = () => {
+  mostrarCarrito.value = false
+  router.push('/checkout')
+}
+
 const getImageUrl = (url) => {
   if (!url) return ''
   if (url.startsWith('http')) return url
@@ -421,11 +557,35 @@ const handleImageError = (e) => {
   e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"%3E%3Crect fill="%23f3f4f6" width="100" height="100"/%3E%3Ctext x="50" y="50" text-anchor="middle" dy=".3em" fill="%239ca3af" font-size="12"%3ESin Imagen%3C/text%3E%3C/svg%3E'
 }
 
+const loadCartCount = () => {
+  try {
+    const count = localStorage.getItem('kharis_cart_count')
+    cartCount.value = count ? parseInt(count) : 0
+  } catch (err) {
+    cartCount.value = 0
+  }
+}
+
 // Lifecycle
 onMounted(() => {
+  // Preseleccionar categoría si viene por query (?categoria=Nombre)
+  if (route.query?.categoria) {
+    filtroCategoria.value = route.query.categoria
+  }
+
   cargarProductos()
   cargarCategorias()
+  loadCartCount()
+  loadCartFromLocal()
 })
+
+// Mantener filtro en sync si cambia la query
+watch(
+  () => route.query.categoria,
+  (nuevaCategoria) => {
+    filtroCategoria.value = nuevaCategoria || null
+  }
+)
 </script>
 
 <style scoped>
@@ -449,6 +609,26 @@ onMounted(() => {
 }
 
 .modal-fade-leave-to > div {
+  transform: translateX(100%);
+}
+
+.drawer-fade-enter-active,
+.drawer-fade-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.drawer-fade-enter-from,
+.drawer-fade-leave-to {
+  opacity: 0;
+}
+
+.drawer-slide-enter-active,
+.drawer-slide-leave-active {
+  transition: transform 0.3s ease;
+}
+
+.drawer-slide-enter-from,
+.drawer-slide-leave-to {
   transform: translateX(100%);
 }
 </style>

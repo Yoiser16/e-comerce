@@ -323,6 +323,27 @@
         </div>
       </Transition>
     </Teleport>
+
+    <!-- Modal de Confirmación (evita alert/confirm del navegador) -->
+    <Teleport to="body">
+      <Transition name="modal-fade">
+        <div v-if="confirmState.open" class="modal-overlay" @click.self="cancelConfirm">
+          <div class="modal-container warning">
+            <div class="modal-icon">
+              <svg fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+            </div>
+            <h3 class="modal-title">{{ confirmState.title }}</h3>
+            <p class="modal-message whitespace-pre-line">{{ confirmState.message }}</p>
+            <div class="confirm-actions">
+              <button class="modal-btn ghost" @click="cancelConfirm">{{ confirmState.cancelText || 'Cancelar' }}</button>
+              <button class="modal-btn warning" @click="acceptConfirm">{{ confirmState.confirmText || 'Aceptar' }}</button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -352,6 +373,16 @@ const modalMessage = ref('')
 const modalButtonText = ref('Aceptar')
 const modalAction = ref(null) // Acción al cerrar (ej: redirigir a login)
 
+// Modal de confirmación
+const confirmState = ref({
+  open: false,
+  title: '',
+  message: '',
+  confirmText: 'Aceptar',
+  cancelText: 'Cancelar'
+})
+let confirmResolver = null
+
 const openModal = (type, title, message, buttonText = 'Aceptar', action = null) => {
   modalType.value = type
   modalTitle.value = title
@@ -370,6 +401,32 @@ const handleModalAction = () => {
   if (modalAction.value) {
     modalAction.value()
   }
+}
+
+// Abrir modal de confirmación y esperar respuesta
+const askConfirm = ({ title, message, confirmText = 'Aceptar', cancelText = 'Cancelar' }) => {
+  return new Promise((resolve) => {
+    confirmResolver = resolve
+    confirmState.value = {
+      open: true,
+      title,
+      message,
+      confirmText,
+      cancelText
+    }
+  })
+}
+
+const acceptConfirm = () => {
+  confirmState.value.open = false
+  if (confirmResolver) confirmResolver(true)
+  confirmResolver = null
+}
+
+const cancelConfirm = () => {
+  confirmState.value.open = false
+  if (confirmResolver) confirmResolver(false)
+  confirmResolver = null
 }
 
 // Función para reproducir sonido de caja registradora usando Web Audio API
@@ -597,16 +654,25 @@ const updateEstadoPago = async () => {
   
   // Mensajes de confirmación según el cambio
   let mensaje = ''
+  let titulo = 'Confirmar'
   if (nuevoEstado === 'PAGADO') {
+    titulo = 'Confirmar pago'
     mensaje = '⚠️ ¿Confirmar que el pago fue recibido?\n\nEsto descontará el stock del inventario de forma permanente.'
   } else if (nuevoEstado === 'CANCELADO') {
+    titulo = 'Cancelar orden'
     mensaje = '¿Está seguro de CANCELAR esta orden?\n\nEsta acción no se puede deshacer.'
   } else {
     mensaje = `¿Cambiar el estado de pago a "${nuevoEstado}"?`
   }
   
-  // Mostrar modal de confirmación
-  if (!confirm(mensaje)) {
+  const confirmado = await askConfirm({
+    title: titulo,
+    message: mensaje,
+    confirmText: nuevoEstado === 'PAGADO' ? 'Confirmar pago' : 'Aceptar',
+    cancelText: 'Cancelar'
+  })
+  
+  if (!confirmado) {
     // Restaurar estado anterior si cancela
     selectedOrder.value.estado_pago = estadoAnterior
     return
@@ -695,7 +761,14 @@ const updateEstadoEnvio = async () => {
     'ENTREGADO': '✅ ¿Confirmar que el pedido fue ENTREGADO?'
   }
   
-  if (!confirm(mensajes[nuevoEstado] || '¿Cambiar estado de envío?')) {
+  const confirmadoEnvio = await askConfirm({
+    title: 'Actualizar envío',
+    message: mensajes[nuevoEstado] || '¿Cambiar estado de envío?',
+    confirmText: 'Confirmar',
+    cancelText: 'Cancelar'
+  })
+  
+  if (!confirmadoEnvio) {
     selectedOrder.value.estado_envio = estadoAnterior
     return
   }
@@ -758,6 +831,9 @@ const formatStatus = (status) => {
   }
   return labels[status] || status
 }
+
+// --- Comentarios de estilo para el modal de confirmación ---
+// .confirm-actions usa layout horizontal con gap para botones
 
 const getShippingClass = (status) => {
   const classes = {
@@ -1874,6 +1950,21 @@ defineExpose({ getUnseenCount })
   color: #64748b;
   margin: 0 0 24px;
   line-height: 1.6;
+}
+
+.confirm-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.modal-btn.ghost {
+  background: #f3f4f6;
+  color: #1f2937;
+}
+
+.modal-btn.ghost:hover {
+  background: #e5e7eb;
 }
 
 .modal-btn {
