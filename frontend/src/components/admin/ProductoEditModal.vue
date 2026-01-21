@@ -532,7 +532,13 @@ const handleFileSelect = (event) => {
   selectedFileName.value = file.name
   error.value = null
   
-  // Create preview
+  // Cambiar a modo file (no URL)
+  imageUploadMode.value = 'file'
+  
+  // Limpiar la URL anterior para no confundir
+  form.value.imagen_principal = null
+  
+  // Create preview (solo para mostrar, NO guardar en el formulario)
   const reader = new FileReader()
   reader.onload = (e) => {
     imagePreview.value = e.target.result
@@ -601,9 +607,9 @@ const submitForm = async () => {
       form.value.codigo = `SKU-${Date.now()}-${Math.floor(Math.random() * 1000)}`
     }
     
-    let imagenUrl = form.value.imagen_principal
+    let imagenUrl = null
     
-    // Si hay un archivo seleccionado, subirlo primero
+    // Si hay un archivo seleccionado, DEBE subirlo primero
     if (selectedFile.value && imageUploadMode.value === 'file') {
       const formData = new FormData()
       formData.append('file', selectedFile.value)
@@ -622,14 +628,18 @@ const submitForm = async () => {
           const result = await uploadResponse.json()
           imagenUrl = result.url || result.imagen_url
         } else {
-          throw new Error('Error al subir la imagen')
+          const errorData = await uploadResponse.json()
+          throw new Error(errorData.detail || 'Error al subir la imagen')
         }
       } catch (uploadErr) {
         console.error('Error uploading image:', uploadErr)
-        error.value = 'Error al subir la imagen. Por ahora usa URL externa.'
+        error.value = uploadErr.message || 'Error al subir la imagen'
         saving.value = false
         return
       }
+    } else if (imageUploadMode.value === 'url') {
+      // Si se eligió URL externa, usar esa
+      imagenUrl = form.value.imagen_principal
     }
     
     const data = {

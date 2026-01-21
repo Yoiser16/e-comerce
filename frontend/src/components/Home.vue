@@ -238,7 +238,7 @@
           <!-- Badge -->
           <div class="inline-flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-5 py-2.5 mb-8 animate-fade-in-up">
             <span class="w-2 h-2 bg-gold-400 rounded-full animate-pulse"></span>
-            <span class="text-sm font-medium text-white tracking-wide uppercase">Distribuidora Mayorista desde 2015</span>
+            <span class="text-sm font-medium text-white tracking-wide uppercase">Distribuidora Mayorista desde 2023</span>
           </div>
 
           <!-- Title -->
@@ -745,7 +745,7 @@
                 </div>
                 <div>
                   <p class="text-text-dark font-semibold text-sm sm:text-base mb-0.5">Envío gratis en pedidos +$50,000 COP</p>
-                  <p class="text-text-light text-xs sm:text-sm">Entregas prioritarias a todo México</p>
+                  <p class="text-text-light text-xs sm:text-sm">Entregas prioritarias a todo Colombia</p>
                 </div>
               </li>
             </ul>

@@ -168,12 +168,12 @@ class ProductoModel(models.Model):
     stock_minimo = models.IntegerField(default=0)
     
     # Atributos específicos de cabello
-    color = models.CharField(max_length=30, choices=COLOR_CHOICES, null=True, blank=True, db_index=True)
-    tipo = models.CharField(max_length=20, choices=TIPO_CHOICES, null=True, blank=True, db_index=True)
-    largo = models.CharField(max_length=5, choices=LARGO_CHOICES, null=True, blank=True, db_index=True)
-    origen = models.CharField(max_length=20, choices=ORIGEN_CHOICES, null=True, blank=True, db_index=True)
-    metodo = models.CharField(max_length=20, choices=METODO_CHOICES, null=True, blank=True, db_index=True)
-    calidad = models.CharField(max_length=20, choices=CALIDAD_CHOICES, null=True, blank=True, db_index=True)
+    color = models.CharField(max_length=50, choices=COLOR_CHOICES, null=True, blank=True, db_index=True)
+    tipo = models.CharField(max_length=50, choices=TIPO_CHOICES, null=True, blank=True, db_index=True)
+    largo = models.CharField(max_length=50, choices=LARGO_CHOICES, null=True, blank=True, db_index=True)
+    origen = models.CharField(max_length=50, choices=ORIGEN_CHOICES, null=True, blank=True, db_index=True)
+    metodo = models.CharField(max_length=50, choices=METODO_CHOICES, null=True, blank=True, db_index=True)
+    calidad = models.CharField(max_length=50, choices=CALIDAD_CHOICES, null=True, blank=True, db_index=True)
     
     # Peso en gramos (importante para extensiones)
     peso_gramos = models.IntegerField(null=True, blank=True)
