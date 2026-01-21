@@ -18,13 +18,47 @@ APELLIDOS=("García" "Rodríguez" "Martínez" "López" "González" "Hernández" 
 DEPARTAMENTOS=("Antioquia" "Cundinamarca" "Valle del Cauca" "Atlántico" "Santander" "Bolívar" "Tolima")
 CIUDADES=("Medellín" "Bogotá" "Cali" "Barranquilla" "Bucaramanga" "Cartagena" "Ibagué")
 BARRIOS=("El Poblado" "Chapinero" "San Fernando" "El Prado" "Cabecera" "Bocagrande" "Centenario")
-PRODUCTOS=(
-    '{"producto_id": "00000000-0000-0000-0000-000000000001", "nombre": "Lápiz Labial Mate", "cantidad": 2, "precio_unitario": 45000}'
-    '{"producto_id": "00000000-0000-0000-0000-000000000002", "nombre": "Base de Maquillaje", "cantidad": 1, "precio_unitario": 89000}'
-    '{"producto_id": "00000000-0000-0000-0000-000000000003", "nombre": "Máscara de Pestañas", "cantidad": 3, "precio_unitario": 52000}'
-    '{"producto_id": "00000000-0000-0000-0000-000000000004", "nombre": "Rubor en Polvo", "cantidad": 1, "precio_unitario": 38000}'
-    '{"producto_id": "00000000-0000-0000-0000-000000000005", "nombre": "Set de Brochas", "cantidad": 1, "precio_unitario": 125000}'
+
+# Obtener productos REALES de la API y crear JSON directamente con Python
+echo -e "${BLUE}Obteniendo productos de la base de datos...${NC}"
+
+# Usar Python para obtener y parsear productos de forma segura
+PRODUCTOS_ARRAY=$(python3 << 'PYEOF'
+import json
+import urllib.request
+import random
+
+try:
+    with urllib.request.urlopen("http://localhost:8000/api/v1/productos/") as response:
+        data = json.loads(response.read().decode())
+        productos = []
+        for p in data[:10]:
+            precio = p.get("precio", "0")
+            if isinstance(precio, str):
+                precio = float(precio.replace(" COP", "").replace(",", ""))
+            productos.append({
+                "producto_id": p.get("id", ""),
+                "nombre": p.get("nombre", "Producto"),
+                "cantidad": 1,
+                "precio_unitario": int(precio)
+            })
+        # Seleccionar 1-3 productos aleatorios
+        num_items = random.randint(1, min(3, len(productos)))
+        selected = random.sample(productos, num_items)
+        print(json.dumps(selected))
+except Exception as e:
+    print("[]")
+PYEOF
 )
+
+# Verificar si obtuvimos productos
+if [ "$PRODUCTOS_ARRAY" == "[]" ]; then
+    echo -e "${YELLOW}⚠️ No se encontraron productos en la API. Usando productos de prueba...${NC}"
+    PRODUCTOS_ARRAY='[{"producto_id": "00000000-0000-0000-0000-000000000001", "nombre": "Producto de Prueba", "cantidad": 1, "precio_unitario": 50000}]'
+else
+    NUM_PRODS=$(echo "$PRODUCTOS_ARRAY" | python3 -c "import sys, json; print(len(json.load(sys.stdin)))")
+    echo -e "${GREEN}✅ Se seleccionaron $NUM_PRODS productos reales${NC}"
+fi
 
 # Seleccionar valores aleatorios
 NOMBRE="${NOMBRES[$RANDOM % ${#NOMBRES[@]}]}"
@@ -36,24 +70,12 @@ EMAIL="${NOMBRE,,}.${APELLIDO,,}${RANDOM_NUM}@test.com"
 TELEFONO="310${RANDOM:0:7}"
 DIRECCION="Calle ${RANDOM:0:2} # ${RANDOM:0:2}-${RANDOM:0:2}"
 
-# Generar items aleatorios (1-3 productos)
-NUM_ITEMS=$((1 + RANDOM % 3))
-ITEMS="["
-SUBTOTAL=0
+# Los items ya están en PRODUCTOS_ARRAY (JSON válido)
+ITEMS="$PRODUCTOS_ARRAY"
 
-for ((i=0; i<NUM_ITEMS; i++)); do
-    PRODUCTO="${PRODUCTOS[$RANDOM % ${#PRODUCTOS[@]}]}"
-    if [ $i -gt 0 ]; then
-        ITEMS+=","
-    fi
-    ITEMS+="$PRODUCTO"
-    
-    # Extraer precio para calcular subtotal
-    PRECIO=$(echo $PRODUCTO | grep -oP '(?<="precio_unitario": )\d+')
-    CANTIDAD=$(echo $PRODUCTO | grep -oP '(?<="cantidad": )\d+')
-    SUBTOTAL=$((SUBTOTAL + PRECIO * CANTIDAD))
-done
-ITEMS+="]"
+# Calcular subtotal con Python
+SUBTOTAL=$(echo "$ITEMS" | python3 -c "import sys, json; items=json.load(sys.stdin); print(sum(i['precio_unitario']*i['cantidad'] for i in items))")
+NUM_ITEMS=$(echo "$ITEMS" | python3 -c "import sys, json; print(len(json.load(sys.stdin)))")
 
 # Calcular totales
 ENVIO=8000

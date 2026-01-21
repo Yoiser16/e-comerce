@@ -195,9 +195,10 @@ class OrdenRepositoryImpl(OrdenRepository):
                 raise EntidadNoEncontrada(f"Orden {orden_id} no encontrada")
             
             # 2. Validar estado de la orden
-            if orden.estado != EstadoOrden.BORRADOR:
+            # Permitir confirmar desde BORRADOR o PENDIENTE
+            if orden.estado not in [EstadoOrden.BORRADOR, EstadoOrden.PENDIENTE]:
                 raise ReglaNegocioViolada(
-                    f"Solo se pueden confirmar órdenes en estado BORRADOR. Estado actual: {orden.estado.value}"
+                    f"Solo se pueden confirmar órdenes en estado BORRADOR o PENDIENTE. Estado actual: {orden.estado.value}"
                 )
             
             if not orden.lineas:

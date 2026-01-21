@@ -41,51 +41,81 @@ class ObtenerEstadisticasGeneralesUseCase:
     def ejecutar(self) -> EstadisticasGeneralesDTO:
         """Calcula todas las estadísticas"""
         
-        # Obtener todas las órdenes
-        ordenes = self.orden_repo.obtener_todos(limite=10000)
-        
-        # Calcular total de ventas del mes actual
-        mes_actual = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        ordenes_mes = [o for o in ordenes if hacer_fecha_comparable(o.fecha_creacion) and hacer_fecha_comparable(o.fecha_creacion) >= mes_actual]
-        
-        # Calcular total de ventas (manejando Dinero y float)
+        # Valores por defecto en caso de error
         total_ventas = 0.0
-        for o in ordenes_mes:
-            if hasattr(o.total, 'monto'):
-                total_ventas += float(o.total.monto)
-            else:
-                total_ventas += float(o.total) if o.total else 0.0
+        total_ordenes = 0
+        ordenes_pendientes = 0
+        total_productos = 0
+        productos_activos = 0
+        stock_bajo = 0
+        total_clientes = 0
+        clientes_nuevos = 0
         
-        # Contar órdenes pendientes (manejar enum y string)
-        def get_estado_str(o):
-            if hasattr(o.estado, 'value'):
-                return o.estado.value.upper()
-            return str(o.estado).upper() if o.estado else ''
+        # Estadísticas de órdenes
+        try:
+            ordenes = self.orden_repo.obtener_todos(limite=10000)
+            total_ordenes = len(ordenes)
+            
+            # Función para obtener estado como string
+            def get_estado_str(o):
+                if hasattr(o.estado, 'value'):
+                    return o.estado.value.upper()
+                return str(o.estado).upper() if o.estado else ''
+            
+            # Calcular total de ventas del mes actual - SOLO ÓRDENES CONFIRMADAS/PAGADAS
+            mes_actual = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+            estados_pagados = ['CONFIRMADA', 'PAGADA', 'PAGADO', 'ENVIADA', 'ENTREGADA', 'COMPLETADA']
+            
+            ordenes_pagadas_mes = [
+                o for o in ordenes 
+                if hacer_fecha_comparable(o.fecha_creacion) 
+                and hacer_fecha_comparable(o.fecha_creacion) >= mes_actual
+                and get_estado_str(o) in estados_pagados
+            ]
+            
+            # Calcular total de ventas (solo órdenes pagadas)
+            for o in ordenes_pagadas_mes:
+                if hasattr(o.total, 'monto'):
+                    total_ventas += float(o.total.monto)
+                else:
+                    total_ventas += float(o.total) if o.total else 0.0
+            
+            # Contar órdenes pendientes
+            ordenes_pendientes = sum(1 for o in ordenes if get_estado_str(o) == 'PENDIENTE')
+        except Exception as e:
+            print(f"⚠️ Error al procesar órdenes: {e}")
         
-        ordenes_pendientes = sum(1 for o in ordenes if get_estado_str(o) == 'PENDIENTE')
+        # Estadísticas de productos
+        try:
+            productos = self.producto_repo.obtener_todos(limite=10000)
+            total_productos = len(productos)
+            productos_activos_list = [p for p in productos if p.activo]
+            productos_activos = len(productos_activos_list)
+            
+            # Contar productos con stock bajo (menos de 5 unidades)
+            stock_bajo = sum(1 for p in productos_activos_list if p.stock_actual < 5)
+        except Exception as e:
+            print(f"⚠️ Error al procesar productos: {e}")
         
-        # Obtener productos
-        productos = self.producto_repo.obtener_todos(limite=10000)
-        productos_activos = [p for p in productos if p.activo]
-        
-        # Contar productos con stock bajo (menos de 5 unidades)
-        stock_bajo = sum(1 for p in productos_activos if p.stock_actual < 5)
-        
-        # Obtener clientes
-        clientes = self.cliente_repo.obtener_todos(limite=10000)
-        
-        # Clientes nuevos (últimos 30 días)
-        hace_30_dias = datetime.now() - timedelta(days=30)
-        clientes_nuevos = sum(1 for c in clientes if hacer_fecha_comparable(c.fecha_creacion) and hacer_fecha_comparable(c.fecha_creacion) >= hace_30_dias)
+        # Estadísticas de clientes
+        try:
+            clientes = self.cliente_repo.obtener_todos(limite=10000)
+            total_clientes = len(clientes)
+            
+            # Clientes nuevos (últimos 30 días)
+            hace_30_dias = datetime.now() - timedelta(days=30)
+            clientes_nuevos = sum(1 for c in clientes if hacer_fecha_comparable(c.fecha_creacion) and hacer_fecha_comparable(c.fecha_creacion) >= hace_30_dias)
+        except Exception as e:
+            print(f"⚠️ Error al procesar clientes: {e}")
         
         return EstadisticasGeneralesDTO(
             total_ventas=total_ventas,
-            total_ordenes=len(ordenes),
+            total_ordenes=total_ordenes,
             ordenes_pendientes=ordenes_pendientes,
-            total_productos=len(productos),
-            productos_activos=len(productos_activos),
+            total_productos=total_productos,
+            productos_activos=productos_activos,
             stock_bajo=stock_bajo,
-            total_clientes=len(clientes),
+            total_clientes=total_clientes,
             clientes_nuevos=clientes_nuevos
         )
 

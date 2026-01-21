@@ -79,9 +79,10 @@ class Orden(EntidadBase):
     
     def confirmar(self) -> None:
         """Confirma la orden (transición de estado)"""
-        if self._estado != EstadoOrden.BORRADOR:
+        # Permitir confirmar desde BORRADOR o PENDIENTE
+        if self._estado not in [EstadoOrden.BORRADOR, EstadoOrden.PENDIENTE]:
             raise ReglaNegocioViolada(
-                "Solo se pueden confirmar órdenes en estado borrador"
+                f"Solo se pueden confirmar órdenes en estado borrador o pendiente. Estado actual: {self._estado.value}"
             )
         
         if not self._lineas:

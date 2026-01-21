@@ -1,9 +1,86 @@
 <template>
   <div class="space-y-6 lg:space-y-8">
     
-    <!-- Loading State -->
-    <div v-if="loading" class="flex items-center justify-center py-20">
-      <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600"></div>
+    <!-- Loading Skeleton State -->
+    <div v-if="loading" class="space-y-6 lg:space-y-8">
+      
+      <!-- Header Skeleton -->
+      <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
+        <div class="space-y-2">
+          <div class="h-4 w-48 bg-gray-100 rounded-lg animate-pulse"></div>
+          <div class="h-8 w-64 bg-gray-100 rounded-lg animate-pulse"></div>
+        </div>
+        <div class="flex gap-3">
+          <div class="h-10 w-24 bg-gray-100 rounded-xl animate-pulse"></div>
+          <div class="h-10 w-32 bg-gray-100 rounded-xl animate-pulse"></div>
+        </div>
+      </div>
+
+      <!-- Stats Cards Skeleton -->
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
+        <div v-for="i in 4" :key="i" class="bg-white rounded-2xl p-5 lg:p-6 border border-gray-100">
+          <div class="flex items-start justify-between mb-4">
+            <div class="w-10 h-10 bg-gray-100 rounded-xl animate-pulse"></div>
+            <div class="h-6 w-16 bg-gray-100 rounded-full animate-pulse"></div>
+          </div>
+          <div class="h-8 w-24 bg-gray-100 rounded-lg animate-pulse mb-2"></div>
+          <div class="h-4 w-32 bg-gray-100 rounded-lg animate-pulse"></div>
+        </div>
+      </div>
+
+      <!-- Charts Skeleton -->
+      <div class="grid lg:grid-cols-5 gap-6">
+        <!-- Big chart -->
+        <div class="lg:col-span-3 bg-white rounded-2xl border border-gray-100 p-6">
+          <div class="h-6 w-40 bg-gray-100 rounded-lg animate-pulse mb-6"></div>
+          <div class="h-64 bg-gray-50 rounded-xl animate-pulse"></div>
+        </div>
+        <!-- Donut chart -->
+        <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
+          <div class="h-6 w-32 bg-gray-100 rounded-lg animate-pulse mb-6"></div>
+          <div class="flex flex-col items-center gap-4">
+            <div class="w-36 h-36 bg-gray-50 rounded-full animate-pulse"></div>
+            <div class="w-full space-y-2">
+              <div v-for="i in 3" :key="i" class="h-8 bg-gray-50 rounded-lg animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Tables Skeleton -->
+      <div class="grid lg:grid-cols-3 gap-6">
+        <!-- Left Table Skeleton -->
+        <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <div class="p-5 border-b border-gray-100">
+            <div class="h-6 w-40 bg-gray-100 rounded-lg animate-pulse"></div>
+          </div>
+          <div class="p-5 space-y-3">
+            <div v-for="i in 5" :key="i" class="flex justify-between items-center py-3 border-b border-gray-50">
+              <div class="space-y-2 flex-1">
+                <div class="h-4 w-3/4 bg-gray-100 rounded-lg animate-pulse"></div>
+                <div class="h-3 w-1/2 bg-gray-100 rounded-lg animate-pulse"></div>
+              </div>
+              <div class="h-6 w-20 bg-gray-100 rounded-full animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Table Skeleton -->
+        <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
+          <div class="p-5 border-b border-gray-100">
+            <div class="h-6 w-32 bg-gray-100 rounded-lg animate-pulse"></div>
+          </div>
+          <div class="p-5 space-y-3">
+            <div v-for="i in 5" :key="i" class="flex justify-between items-center py-3 border-b border-gray-50">
+              <div class="space-y-2 flex-1">
+                <div class="h-4 w-full bg-gray-100 rounded-lg animate-pulse"></div>
+                <div class="h-3 w-2/3 bg-gray-100 rounded-lg animate-pulse"></div>
+              </div>
+              <div class="h-6 w-12 bg-gray-100 rounded animate-pulse"></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- Error State -->
@@ -135,7 +212,7 @@
               <button 
                 v-for="period in ['24H', '7D', '30D']" 
                 :key="period"
-                @click="selectedPeriod = period"
+                @click="cambiarPeriodo(period)"
                 :class="selectedPeriod === period ? 'bg-white shadow-sm text-text-dark' : 'text-text-light hover:text-text-medium'"
                 class="px-3 py-1.5 text-xs font-medium rounded-md transition-all"
               >
@@ -145,8 +222,17 @@
           </div>
           
           <!-- Chart Container -->
-          <div class="h-64 lg:h-72">
-            <Line :data="salesChartData" :options="salesChartOptions" />
+          <div class="h-64 lg:h-72 relative">
+            <!-- Empty State -->
+            <div v-if="stats.totalVentas === 0" class="absolute inset-0 flex flex-col items-center justify-center">
+              <svg class="w-16 h-16 text-gray-200 mb-4" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
+              </svg>
+              <p class="text-text-light text-sm mb-2">Sin datos de ventas</p>
+              <p class="text-text-light/60 text-xs">Comienza registrando tu primera orden</p>
+            </div>
+            <!-- Chart -->
+            <Line v-else :data="salesChartData" :options="salesChartOptions" />
           </div>
         </div>
 
@@ -356,7 +442,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { Line, Doughnut } from 'vue-chartjs'
 import {
   Chart as ChartJS,
@@ -410,6 +496,7 @@ export default {
     const loading = ref(true)
     const error = ref(null)
     const selectedPeriod = ref('7D')
+    const pollingInterval = ref(null)
 
     // Recent orders
     const recentOrders = ref([])
@@ -419,6 +506,9 @@ export default {
     
     // Top products - datos reales del backend
     const topProducts = ref([])
+    
+    // Datos reales del gráfico de ventas
+    const ventasPorPeriodo = ref({ labels: [], data: [] })
 
     // Fecha actual formateada
     const fechaActual = computed(() => {
@@ -426,25 +516,26 @@ export default {
       return new Date().toLocaleDateString('es-CO', options)
     })
 
-    // Sales chart data
+    // Sales chart data - usando datos reales
     const salesChartData = computed(() => {
-      const labels = selectedPeriod.value === '24H' 
-        ? ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '23:00']
-        : selectedPeriod.value === '7D'
-        ? ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-        : ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4']
+      const labels = ventasPorPeriodo.value.labels.length > 0 
+        ? ventasPorPeriodo.value.labels 
+        : (selectedPeriod.value === '24H' 
+          ? ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00']
+          : selectedPeriod.value === '7D'
+          ? ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+          : ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'])
       
-      // Generate demo data based on period
-      const generateData = () => {
-        const baseValue = Math.max(stats.value.totalVentas / labels.length, 1000)
-        return labels.map(() => Math.floor(baseValue * (0.5 + Math.random())))
-      }
+      // Usar datos reales del backend
+      const data = ventasPorPeriodo.value.data.length > 0 
+        ? ventasPorPeriodo.value.data 
+        : labels.map(() => 0)
 
       return {
         labels,
         datasets: [{
           label: 'Ventas',
-          data: generateData(),
+          data,
           borderColor: '#10B981',
           backgroundColor: (context) => {
             const ctx = context.chart.ctx
@@ -589,23 +680,94 @@ export default {
       }
     }
 
-    // Cargar todos los datos
-    const cargarDatos = async () => {
-      loading.value = true
-      error.value = null
-      
-      await Promise.all([
-        cargarEstadisticas(),
-        cargarOrdenesRecientes(),
-        cargarProductosStockBajo()
-      ])
-      
-      loading.value = false
+    // Cargar ventas por período (datos reales para el gráfico)
+    const cargarVentasPorPeriodo = async () => {
+      try {
+        const response = await apiClient.get(`/dashboard/ventas/por-periodo?periodo=${selectedPeriod.value}`)
+        ventasPorPeriodo.value = {
+          labels: response.data.labels || [],
+          data: response.data.data || []
+        }
+      } catch (err) {
+        console.error('Error al cargar ventas por período:', err)
+        ventasPorPeriodo.value = { labels: [], data: [] }
+      }
     }
 
-    // Cargar datos al montar
+    // Cargar top productos
+    const cargarTopProductos = async () => {
+      try {
+        const response = await apiClient.get('/dashboard/top-productos?limite=5')
+        topProducts.value = response.data.map(p => ({
+          id: p.id,
+          nombre: p.nombre,
+          cantidad: p.cantidad,
+          ventas: p.ventas,
+          imagen: p.imagen
+        }))
+      } catch (err) {
+        console.error('Error al cargar top productos:', err)
+      }
+    }
+
+    // Recargar gráfico cuando cambia el período
+    const cambiarPeriodo = (periodo) => {
+      selectedPeriod.value = periodo
+      cargarVentasPorPeriodo()
+    }
+
+    // Cargar todos los datos
+    const cargarDatos = async (silent = false) => {
+      if (!silent) {
+        loading.value = true
+        error.value = null
+      }
+      
+      try {
+        await Promise.all([
+          cargarEstadisticas(),
+          cargarOrdenesRecientes(),
+          cargarProductosStockBajo(),
+          cargarVentasPorPeriodo(),
+          cargarTopProductos()
+        ])
+      } catch (err) {
+        if (!silent) {
+          error.value = 'Error al cargar datos del dashboard'
+        }
+        console.error('Error en cargarDatos:', err)
+      } finally {
+        if (!silent) {
+          loading.value = false
+        }
+      }
+    }
+
+    // Iniciar polling automático
+    const startPolling = () => {
+      // Actualizar cada 10 segundos en silent mode
+      pollingInterval.value = setInterval(() => {
+        cargarDatos(true)
+      }, 10000)
+    }
+
+    // Detener polling
+    const stopPolling = () => {
+      if (pollingInterval.value) {
+        clearInterval(pollingInterval.value)
+        pollingInterval.value = null
+      }
+    }
+
+    // Cargar datos al montar e iniciar polling
     onMounted(() => {
       cargarDatos()
+      startPolling()
+    })
+
+    // Limpiar polling al desmontar
+    onUnmounted(() => {
+      stopPolling()
     })
 
     const formatNumber = (num) => {

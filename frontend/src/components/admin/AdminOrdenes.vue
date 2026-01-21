@@ -198,12 +198,17 @@
                   <select 
                     v-model="selectedOrder.estado_pago" 
                     @change="updateEstadoPago"
+                    :disabled="selectedOrder.estado_pago === 'PAGADO'"
                     :class="['compact-select', getStatusClass(selectedOrder.estado_pago)]"
+                    :title="selectedOrder.estado_pago === 'PAGADO' ? 'No se puede cambiar el estado de una orden ya pagada' : ''"
                   >
                     <option value="PENDIENTE">Pendiente</option>
                     <option value="PAGADO">Pagado</option>
                     <option value="CANCELADO">Cancelado</option>
                   </select>
+                  <p v-if="selectedOrder.estado_pago === 'PAGADO'" class="text-xs text-emerald-600 mt-1">
+                    ✓ Orden confirmada - Stock descontado
+                  </p>
                 </div>
                 <div class="payment-details">
                   <div class="payment-row">
@@ -287,12 +292,46 @@
         </div>
       </div>
     </main>
+
+    <!-- Modal de Mensajes -->
+    <Teleport to="body">
+      <Transition name="modal-fade">
+        <div v-if="showModal" class="modal-overlay" @click.self="closeModal">
+          <div class="modal-container" :class="modalType">
+            <!-- Icono -->
+            <div class="modal-icon">
+              <svg v-if="modalType === 'success'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              </svg>
+              <svg v-else-if="modalType === 'error'" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+              <svg v-else fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
+              </svg>
+            </div>
+            
+            <!-- Contenido -->
+            <h3 class="modal-title">{{ modalTitle }}</h3>
+            <p class="modal-message">{{ modalMessage }}</p>
+            
+            <!-- Botón -->
+            <button @click="handleModalAction" class="modal-btn" :class="modalType">
+              {{ modalButtonText }}
+            </button>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import { ordenesService } from '@/services/ordenes'
+
+const router = useRouter()
 
 // Estado
 const ordenes = ref([])
@@ -304,6 +343,34 @@ const searchQuery = ref('')
 const activeFilter = ref('todas')
 const pollingInterval = ref(null)
 const lastOrderCount = ref(0)
+
+// Modal de mensajes
+const showModal = ref(false)
+const modalType = ref('success') // success, error, warning
+const modalTitle = ref('')
+const modalMessage = ref('')
+const modalButtonText = ref('Aceptar')
+const modalAction = ref(null) // Acción al cerrar (ej: redirigir a login)
+
+const openModal = (type, title, message, buttonText = 'Aceptar', action = null) => {
+  modalType.value = type
+  modalTitle.value = title
+  modalMessage.value = message
+  modalButtonText.value = buttonText
+  modalAction.value = action
+  showModal.value = true
+}
+
+const closeModal = () => {
+  showModal.value = false
+}
+
+const handleModalAction = () => {
+  closeModal()
+  if (modalAction.value) {
+    modalAction.value()
+  }
+}
 
 // Función para reproducir sonido de caja registradora usando Web Audio API
 const playNotificationSound = () => {
@@ -498,7 +565,10 @@ const getUnseenCount = () => {
 
 // Seleccionar orden
 const selectOrder = async (orden) => {
-  selectedOrder.value = orden
+  selectedOrder.value = { ...orden }
+  // Guardar estados originales para detectar cambios
+  selectedOrder.value._estadoOriginal = orden.estado_pago
+  selectedOrder.value._estadoEnvioOriginal = orden.estado_envio
   orderDetail.value = null
   
   // Marcar como vista
@@ -519,37 +589,145 @@ const selectOrder = async (orden) => {
 const updateEstadoPago = async () => {
   if (!selectedOrder.value) return
   
+  const nuevoEstado = selectedOrder.value.estado_pago
+  const estadoAnterior = selectedOrder.value._estadoOriginal || selectedOrder.value.estado_pago
+  
+  // Si no hay cambio real, no hacer nada
+  if (nuevoEstado === estadoAnterior) return
+  
+  // Mensajes de confirmación según el cambio
+  let mensaje = ''
+  if (nuevoEstado === 'PAGADO') {
+    mensaje = '⚠️ ¿Confirmar que el pago fue recibido?\n\nEsto descontará el stock del inventario de forma permanente.'
+  } else if (nuevoEstado === 'CANCELADO') {
+    mensaje = '¿Está seguro de CANCELAR esta orden?\n\nEsta acción no se puede deshacer.'
+  } else {
+    mensaje = `¿Cambiar el estado de pago a "${nuevoEstado}"?`
+  }
+  
+  // Mostrar modal de confirmación
+  if (!confirm(mensaje)) {
+    // Restaurar estado anterior si cancela
+    selectedOrder.value.estado_pago = estadoAnterior
+    return
+  }
+  
   try {
-    const estadoMap = { 'PENDIENTE': 'pendiente', 'PAGADO': 'confirmada', 'CANCELADO': 'cancelada' }
-    await ordenesService.actualizarEstado(selectedOrder.value.id, estadoMap[selectedOrder.value.estado_pago])
+    // CRÍTICO: Si cambiamos a PAGADO, debemos confirmar la orden para descontar stock
+    if (nuevoEstado === 'PAGADO') {
+      // Validar que la orden tenga productos antes de confirmar
+      if (!orderDetail.value?.items || orderDetail.value.items.length === 0) {
+        openModal('error', 'Sin productos', 'No se puede confirmar una orden sin productos. Agrega productos a la orden primero.')
+        selectedOrder.value.estado_pago = estadoAnterior
+        return
+      }
+      
+      // Llamar al endpoint de confirmación que descuenta stock atómicamente
+      await ordenesService.confirmar(selectedOrder.value.id)
+      console.log('✅ Orden confirmada - Stock descontado')
+    } else {
+      // Para otros estados (PENDIENTE, CANCELADO), solo actualizar estado
+      const estadoMap = { 'PENDIENTE': 'pendiente', 'CANCELADO': 'cancelada' }
+      await ordenesService.actualizarEstado(selectedOrder.value.id, estadoMap[nuevoEstado])
+    }
     
-    if (selectedOrder.value.estado_pago !== 'PAGADO') {
+    // Si no está pagado, resetear estado de envío
+    if (nuevoEstado !== 'PAGADO') {
       selectedOrder.value.estado_envio = 'NO_ENVIADO'
     }
     
+    // Guardar el nuevo estado como original
+    selectedOrder.value._estadoOriginal = nuevoEstado
+    
+    // Actualizar en la lista local
     const idx = ordenes.value.findIndex(o => o.id === selectedOrder.value.id)
     if (idx !== -1) {
       ordenes.value[idx].estado_pago = selectedOrder.value.estado_pago
       ordenes.value[idx].estado_envio = selectedOrder.value.estado_envio
+      ordenes.value[idx]._estadoOriginal = nuevoEstado
     }
+    
+    openModal('success', '¡Listo!', 'Estado actualizado correctamente')
   } catch (error) {
-    console.error('Error:', error)
+    console.error('Error al actualizar estado de pago:', error)
+    
+    // Detectar si es error de sesión expirada
+    if (error.response?.status === 401 || error.message?.includes('401') || error.message?.includes('lista negra') || error.message?.includes('token')) {
+      openModal('error', 'Sesión expirada', 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.', 'Ir al Login', () => {
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        router.push('/login')
+      })
+      return
+    }
+    
+    // Mensajes de error más específicos
+    let errorMsg = error.response?.data?.detail || error.message
+    
+    if (errorMsg.includes('BORRADOR o PENDIENTE')) {
+      errorMsg = 'Esta orden ya fue confirmada previamente. No se puede cambiar el estado de una orden pagada.'
+    } else if (errorMsg.includes('sin líneas')) {
+      errorMsg = 'No se puede confirmar una orden sin productos. Agrega productos primero.'
+    } else if (errorMsg.includes('Stock insuficiente')) {
+      errorMsg = 'Stock insuficiente para uno o más productos. ' + errorMsg
+    }
+    
+    openModal('error', 'Error al confirmar', errorMsg)
+    
+    // Restaurar estado anterior
+    selectedOrder.value.estado_pago = estadoAnterior
   }
 }
 
 const updateEstadoEnvio = async () => {
   if (!selectedOrder.value || selectedOrder.value.estado_pago !== 'PAGADO') return
   
+  const nuevoEstado = selectedOrder.value.estado_envio
+  const estadoAnterior = selectedOrder.value._estadoEnvioOriginal || selectedOrder.value.estado_envio
+  
+  // Si no hay cambio real, no hacer nada
+  if (nuevoEstado === estadoAnterior) return
+  
+  // Mensaje de confirmación
+  const mensajes = {
+    'NO_ENVIADO': '¿Marcar como NO ENVIADO?',
+    'ENVIADO': '📦 ¿Confirmar que el pedido fue ENVIADO?',
+    'ENTREGADO': '✅ ¿Confirmar que el pedido fue ENTREGADO?'
+  }
+  
+  if (!confirm(mensajes[nuevoEstado] || '¿Cambiar estado de envío?')) {
+    selectedOrder.value.estado_envio = estadoAnterior
+    return
+  }
+  
   try {
     const estadoMap = { 'NO_ENVIADO': 'confirmada', 'ENVIADO': 'enviada', 'ENTREGADO': 'entregada' }
     await ordenesService.actualizarEstado(selectedOrder.value.id, estadoMap[selectedOrder.value.estado_envio])
     
+    selectedOrder.value._estadoEnvioOriginal = nuevoEstado
+    
     const idx = ordenes.value.findIndex(o => o.id === selectedOrder.value.id)
     if (idx !== -1) {
       ordenes.value[idx].estado_envio = selectedOrder.value.estado_envio
+      ordenes.value[idx]._estadoEnvioOriginal = nuevoEstado
     }
+    
+    openModal('success', '¡Listo!', 'Estado de envío actualizado')
   } catch (error) {
     console.error('Error:', error)
+    
+    // Detectar sesión expirada
+    if (error.response?.status === 401) {
+      openModal('error', 'Sesión expirada', 'Tu sesión ha expirado. Por favor inicia sesión nuevamente.', 'Ir al Login', () => {
+        localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        router.push('/login')
+      })
+      return
+    }
+    
+    openModal('error', 'Error', 'No se pudo actualizar el estado de envío')
+    selectedOrder.value.estado_envio = estadoAnterior
   }
 }
 
@@ -1621,5 +1799,139 @@ defineExpose({ getUnseenCount })
   .bento-grid {
     grid-template-columns: repeat(3, 1fr);
   }
+}
+
+/* ========== MODAL DE MENSAJES ========== */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 9999;
+  padding: 20px;
+}
+
+.modal-container {
+  background: white;
+  border-radius: 16px;
+  padding: 32px;
+  max-width: 400px;
+  width: 100%;
+  text-align: center;
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+}
+
+.modal-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 20px;
+}
+
+.modal-icon svg {
+  width: 32px;
+  height: 32px;
+}
+
+.modal-container.success .modal-icon {
+  background: #dcfce7;
+}
+
+.modal-container.success .modal-icon svg {
+  color: #16a34a;
+}
+
+.modal-container.error .modal-icon {
+  background: #fee2e2;
+}
+
+.modal-container.error .modal-icon svg {
+  color: #dc2626;
+}
+
+.modal-container.warning .modal-icon {
+  background: #fef3c7;
+}
+
+.modal-container.warning .modal-icon svg {
+  color: #d97706;
+}
+
+.modal-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #1a1a1a;
+  margin: 0 0 12px;
+}
+
+.modal-message {
+  font-size: 14px;
+  color: #64748b;
+  margin: 0 0 24px;
+  line-height: 1.6;
+}
+
+.modal-btn {
+  width: 100%;
+  padding: 12px 24px;
+  border-radius: 10px;
+  font-size: 14px;
+  font-weight: 600;
+  border: none;
+  cursor: pointer;
+  transition: all 0.2s;
+}
+
+.modal-btn.success {
+  background: #16a34a;
+  color: white;
+}
+
+.modal-btn.success:hover {
+  background: #15803d;
+}
+
+.modal-btn.error {
+  background: #dc2626;
+  color: white;
+}
+
+.modal-btn.error:hover {
+  background: #b91c1c;
+}
+
+.modal-btn.warning {
+  background: #d97706;
+  color: white;
+}
+
+.modal-btn.warning:hover {
+  background: #b45309;
+}
+
+/* Animaciones del modal */
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
+
+.modal-fade-enter-active .modal-container,
+.modal-fade-leave-active .modal-container {
+  transition: transform 0.2s ease;
+}
+
+.modal-fade-enter-from .modal-container,
+.modal-fade-leave-to .modal-container {
+  transform: scale(0.95);
 }
 </style>

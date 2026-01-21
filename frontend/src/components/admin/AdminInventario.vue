@@ -310,13 +310,15 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { productosService } from '../../services/productos'
+import { inventarioService } from '../../services/inventario'
 
 export default {
   name: 'AdminInventario',
   setup() {
     const loading = ref(true)
+    const loadingMovimientos = ref(false)
     const productos = ref([])
     const activeTab = ref('stock')
 
@@ -328,87 +330,62 @@ export default {
       usuario: ''
     })
 
-    // Mock data para movimientos (en producción vendría del backend)
-    const movimientos = ref([
-      {
-        id: 1,
-        fecha: '2026-01-15T10:30:00',
-        producto_nombre: 'Extensions Rubias 18"',
-        producto_imagen: null,
-        tipo: 'ENTRADA',
-        cantidad: 50,
-        usuario: 'Ana García',
-        motivo: 'Compra proveedor'
-      },
-      {
-        id: 2,
-        fecha: '2026-01-15T11:45:00',
-        producto_nombre: 'Extensions Castaño Oscuro 22"',
-        producto_imagen: null,
-        tipo: 'SALIDA',
-        cantidad: 3,
-        usuario: 'Sistema',
-        motivo: 'Venta #ORD-1234'
-      },
-      {
-        id: 3,
-        fecha: '2026-01-15T14:20:00',
-        producto_nombre: 'Pegamento Ultra Hold',
-        producto_imagen: null,
-        tipo: 'AJUSTE',
-        cantidad: -2,
-        usuario: 'Carlos Pérez',
-        motivo: 'Corrección inventario físico'
-      },
-      {
-        id: 4,
-        fecha: '2026-01-14T09:15:00',
-        producto_nombre: 'Extensions Rubias 18"',
-        producto_imagen: null,
-        tipo: 'SALIDA',
-        cantidad: 5,
-        usuario: 'Sistema',
-        motivo: 'Venta #ORD-1230'
-      },
-      {
-        id: 5,
-        fecha: '2026-01-14T16:30:00',
-        producto_nombre: 'Champú Reparador Keratin',
-        producto_imagen: null,
-        tipo: 'ENTRADA',
-        cantidad: 100,
-        usuario: 'Ana García',
-        motivo: 'Compra proveedor'
-      },
-      {
-        id: 6,
-        fecha: '2026-01-13T13:10:00',
-        producto_nombre: 'Extensions Negras 24"',
-        producto_imagen: null,
-        tipo: 'AJUSTE',
-        cantidad: 5,
-        usuario: 'Carlos Pérez',
-        motivo: 'Devolución cliente'
+    // Movimientos reales desde el backend
+    const movimientos = ref([])
+
+    const cargarMovimientos = async () => {
+      try {
+        loadingMovimientos.value = true
+        
+        const params = {
+          limite: 100
+        }
+        
+        if (filtros.value.fechaDesde) params.fechaDesde = filtros.value.fechaDesde
+        if (filtros.value.fechaHasta) params.fechaHasta = filtros.value.fechaHasta
+        if (filtros.value.tipo) params.tipo = filtros.value.tipo
+        
+        const data = await inventarioService.obtenerMovimientos(params)
+        
+        movimientos.value = data.map(m => ({
+          id: m.id,
+          fecha: m.fecha,
+          producto_nombre: m.producto_nombre,
+          producto_imagen: m.producto_imagen,
+          tipo: m.tipo,
+          cantidad: m.cantidad,
+          usuario: m.usuario,
+          motivo: m.motivo
+        }))
+        
+        console.log(`✅ Movimientos cargados: ${movimientos.value.length} registros`)
+      } catch (error) {
+        console.error('❌ Error al cargar movimientos:', error)
+        movimientos.value = []
+      } finally {
+        loadingMovimientos.value = false
       }
-    ])
+    }
 
     const cargarInventario = async () => {
       try {
         loading.value = true
-        const data = await productosService.obtenerTodos()
+        const data = await productosService.obtenerTodos({ limite: 1000 })
         
         // Transformar productos a formato de inventario
         productos.value = data.map(p => ({
           id: p.id,
           nombre: p.nombre,
-          sku: p.codigo || p.sku || 'N/A',
-          stock: p.stock_disponible || p.stock || 0,
+          sku: p.codigo || 'N/A',
+          stock: p.stock_actual || 0,
           stockMinimo: p.stock_minimo || 5,
-          precio: p.precio || 0,
-          imagen: p.imagen_principal || p.imagen || ''
+          precio: parseFloat(p.precio_monto) || 0,
+          imagen: p.imagen_principal || ''
         }))
+        
+        console.log(`✅ Inventario cargado: ${productos.value.length} productos`)
       } catch (error) {
-        console.error('Error al cargar inventario:', error)
+        console.error('❌ Error al cargar inventario:', error)
         productos.value = []
       } finally {
         loading.value = false
@@ -506,6 +483,7 @@ export default {
         tipo: '',
         usuario: ''
       }
+      cargarMovimientos()
     }
 
     const formatFecha = (fecha) => {
@@ -552,11 +530,38 @@ export default {
       cargarInventario()
     })
 
+    // Cargar movimientos cuando se cambia al tab de movimientos
+    watch(activeTab, (newTab) => {
+      if (newTab === 'movimientos' && movimientos.value.length === 0) {
+        cargarMovimientos()
+      }
+    })
+
+    // Recargar movimientos cuando cambian los filtros de fecha o tipo
+    watch(() => filtros.value.fechaDesde, () => {
+      if (activeTab.value === 'movimientos') {
+        cargarMovimientos()
+      }
+    })
+
+    watch(() => filtros.value.fechaHasta, () => {
+      if (activeTab.value === 'movimientos') {
+        cargarMovimientos()
+      }
+    })
+
+    watch(() => filtros.value.tipo, () => {
+      if (activeTab.value === 'movimientos') {
+        cargarMovimientos()
+      }
+    })
+
     return { 
       stats, 
       inventario, 
       productos,
-      loading, 
+      loading,
+      loadingMovimientos,
       activeTab,
       valorInventario,
       porcentajeSaludable,
@@ -571,6 +576,7 @@ export default {
       filtros,
       movimientos,
       movimientosFiltrados,
+      cargarMovimientos,
       resetFiltros,
       formatFecha,
       formatHora,
