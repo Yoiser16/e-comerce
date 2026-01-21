@@ -3,79 +3,104 @@
     <!-- Sidebar - Clean Canvas Style -->
     <aside 
       :class="[
-        'fixed inset-y-0 left-0 z-50 w-72 bg-white border-r border-gray-100 transform transition-transform duration-300 ease-in-out lg:translate-x-0',
-        sidebarOpen ? 'translate-x-0' : '-translate-x-full'
+        'fixed inset-y-0 left-0 z-50 bg-white border-r border-gray-100 transform transition-all duration-300 ease-in-out lg:translate-x-0',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+        sidebarCollapsed ? 'w-20' : 'w-72'
       ]"
     >
       <!-- Logo - Minimal -->
-      <div class="flex items-center h-20 px-8 border-b border-gray-50">
-        <router-link to="/" class="flex items-center gap-3 group">
+      <div class="flex items-center justify-between h-20 px-6 border-b border-gray-50">
+        <router-link v-if="!sidebarCollapsed" to="/" class="flex items-center gap-3 group">
           <span class="font-luxury text-2xl text-text-dark tracking-wide">Kharis</span>
           <span class="text-[10px] uppercase tracking-widest text-text-light font-medium">Admin</span>
         </router-link>
+        <div v-else class="flex items-center justify-center w-full">
+          <span class="font-luxury text-xl text-text-dark">K</span>
+        </div>
+        <button 
+          @click="toggleSidebar" 
+          class="hidden lg:flex items-center justify-center w-8 h-8 text-text-medium hover:text-text-dark hover:bg-gray-50 rounded-lg transition-all"
+          :title="sidebarCollapsed ? 'Expandir' : 'Colapsar'"
+        >
+          <svg v-if="sidebarCollapsed" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 5l7 7-7 7M5 5l7 7-7 7"/>
+          </svg>
+          <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 19l-7-7 7-7m8 14l-7-7 7-7"/>
+          </svg>
+        </button>
       </div>
 
       <!-- Navigation - Minimal -->
-      <nav class="mt-8 px-6">
+      <nav class="mt-8" :class="sidebarCollapsed ? 'px-3' : 'px-6'">
         <div class="space-y-1">
           <router-link 
             v-for="item in menuItems" 
             :key="item.path"
             :to="item.path"
             :class="[
-              'flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-200 group relative',
+              'flex items-center gap-4 rounded-xl transition-all duration-200 group relative',
+              sidebarCollapsed ? 'justify-center px-2 py-3.5' : 'px-4 py-3.5',
               isActive(item.path) 
                 ? 'text-text-dark font-semibold' 
                 : 'text-text-medium hover:text-text-dark hover:bg-gray-50'
             ]"
+            :title="sidebarCollapsed ? item.name : ''"
           >
             <!-- Active Indicator -->
             <div 
-              v-if="isActive(item.path)"
+              v-if="isActive(item.path) && !sidebarCollapsed"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-brand-600 rounded-r-full"
             ></div>
             
-            <span v-html="item.icon" class="w-5 h-5 opacity-70 group-hover:opacity-100"></span>
-            <span class="flex-1">{{ item.name }}</span>
+            <span v-html="item.icon" class="w-5 h-5 opacity-70 group-hover:opacity-100 flex-shrink-0"></span>
+            <span v-if="!sidebarCollapsed" class="flex-1">{{ item.name }}</span>
             <span 
-              v-if="item.badge" 
+              v-if="getItemBadge(item) && !sidebarCollapsed" 
               class="bg-brand-50 text-brand-600 text-xs font-semibold px-2.5 py-1 rounded-full"
             >
-              {{ item.badge }}
+              {{ getItemBadge(item) }}
             </span>
+            <span 
+              v-if="getItemBadge(item) && sidebarCollapsed" 
+              class="absolute -top-1 -right-1 w-2 h-2 bg-brand-500 rounded-full ring-2 ring-white"
+            ></span>
           </router-link>
         </div>
 
         <!-- Separator -->
-        <div class="my-8 border-t border-gray-100"></div>
+        <div v-if="!sidebarCollapsed" class="my-8 border-t border-gray-100"></div>
+        <div v-else class="my-4"></div>
 
         <!-- Secondary Menu -->
         <div class="space-y-1">
           <router-link 
             to="/admin/config"
             :class="[
-              'flex items-center gap-4 px-4 py-3.5 rounded-xl transition-all duration-200 group relative',
+              'flex items-center gap-4 rounded-xl transition-all duration-200 group relative',
+              sidebarCollapsed ? 'justify-center px-2 py-3.5' : 'px-4 py-3.5',
               isActive('/admin/config') 
                 ? 'text-text-dark font-semibold' 
                 : 'text-text-medium hover:text-text-dark hover:bg-gray-50'
             ]"
+            :title="sidebarCollapsed ? 'Configuración' : ''"
           >
             <div 
-              v-if="isActive('/admin/config')"
+              v-if="isActive('/admin/config') && !sidebarCollapsed"
               class="absolute left-0 top-1/2 -translate-y-1/2 w-1 h-6 bg-brand-600 rounded-r-full"
             ></div>
-            <svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+            <svg class="w-5 h-5 opacity-70 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span>Configuración</span>
+            <span v-if="!sidebarCollapsed">Configuración</span>
           </router-link>
         </div>
       </nav>
 
       <!-- User Info (Bottom) - Minimal -->
       <div class="absolute bottom-0 left-0 right-0 p-6 border-t border-gray-50">
-        <div class="flex items-center gap-4">
+        <div v-if="!sidebarCollapsed" class="flex items-center gap-4">
           <div class="w-11 h-11 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center text-text-dark font-semibold text-sm">
             {{ userInitials }}
           </div>
@@ -86,6 +111,20 @@
           <button 
             @click="handleLogout"
             class="p-2.5 text-text-light hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+            title="Cerrar sesión"
+          >
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+            </svg>
+          </button>
+        </div>
+        <div v-else class="flex flex-col items-center gap-3">
+          <div class="w-11 h-11 bg-gradient-to-br from-gray-100 to-gray-200 rounded-xl flex items-center justify-center text-text-dark font-semibold text-sm">
+            {{ userInitials }}
+          </div>
+          <button 
+            @click="handleLogout"
+            class="p-2 text-text-light hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
             title="Cerrar sesión"
           >
             <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
@@ -104,7 +143,7 @@
     ></div>
 
     <!-- Main Content -->
-    <div class="lg:ml-72">
+    <div :class="sidebarCollapsed ? 'lg:ml-20' : 'lg:ml-72'" class="transition-all duration-300">
       <!-- Top Header - Minimal -->
       <header class="sticky top-0 z-30 bg-[#F9FAFB]/80 border-b border-gray-100/50">
         <div class="flex items-center justify-between h-20 px-6 lg:px-10">
@@ -227,9 +266,10 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import RadioPlayer from './RadioPlayer.vue'
+import { ordenesService } from '@/services/ordenes'
 
 export default {
   name: 'AdminLayout',
@@ -240,10 +280,15 @@ export default {
     const router = useRouter()
     const route = useRoute()
     const sidebarOpen = ref(false)
+    const sidebarCollapsed = ref(false)
     const showRadio = ref(false)
     const isPlaying = ref(false)
     const currentStation = ref('')
     const radioPlayerRef = ref(null)
+
+    const toggleSidebar = () => {
+      sidebarCollapsed.value = !sidebarCollapsed.value
+    }
 
     const togglePlayback = () => {
       // Si hay una emisora actual, hacer toggle del play/pause
@@ -251,6 +296,32 @@ export default {
         // Abrir el modal para controlar
         showRadio.value = true
       }
+    }
+
+    // Contador de órdenes sin ver
+    const unseenOrdersCount = ref(0)
+
+    const getSeenOrders = () => {
+      try {
+        return JSON.parse(localStorage.getItem('seenOrders') || '[]')
+      } catch {
+        return []
+      }
+    }
+
+    const updateUnseenCount = async () => {
+      try {
+        const ordenes = await ordenesService.obtenerTodas()
+        const seen = getSeenOrders()
+        unseenOrdersCount.value = ordenes.filter(o => !seen.includes(o.id)).length
+      } catch (error) {
+        console.error('Error al obtener órdenes:', error)
+      }
+    }
+
+    // Escuchar eventos de actualización
+    const handleOrdenesUpdated = () => {
+      updateUnseenCount()
     }
 
     // Menu items with thin stroke icons
@@ -271,7 +342,7 @@ export default {
         name: 'Órdenes',
         path: '/admin/ordenes',
         icon: '<svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z"/></svg>',
-        badge: '5'
+        badgeKey: 'ordenes'
       },
       {
         name: 'Clientes',
@@ -345,8 +416,27 @@ export default {
       router.push('/')
     }
 
+    // Función para obtener badge dinámico
+    const getItemBadge = (item) => {
+      if (item.badgeKey === 'ordenes') {
+        return unseenOrdersCount.value > 0 ? unseenOrdersCount.value : null
+      }
+      return item.badge || null
+    }
+
+    onMounted(() => {
+      updateUnseenCount()
+      window.addEventListener('ordenes-updated', handleOrdenesUpdated)
+    })
+
+    onUnmounted(() => {
+      window.removeEventListener('ordenes-updated', handleOrdenesUpdated)
+    })
+
     return {
       sidebarOpen,
+      sidebarCollapsed,
+      toggleSidebar,
       showRadio,
       isPlaying,
       currentStation,
@@ -358,7 +448,8 @@ export default {
       userRole,
       userInitials,
       pageTitle,
-      handleLogout
+      handleLogout,
+      getItemBadge
     }
   }
 }

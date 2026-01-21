@@ -62,15 +62,15 @@ class OrdenResponse(BaseModel):
     cliente_nombre: str
     cliente_email: str
     cliente_telefono: str
-    cliente_tipo_doc: str
-    cliente_num_doc: str
+    cliente_tipo_doc: Optional[str] = ''
+    cliente_num_doc: Optional[str] = ''
     direccion_envio: str
     departamento: str
     municipio: str
-    barrio: str
-    notas_envio: str
-    subtotal_monto: float
-    envio_monto: float
+    barrio: Optional[str] = ''
+    notas_envio: Optional[str] = ''
+    subtotal_monto: Optional[float] = 0.0
+    envio_monto: Optional[float] = 0.0
     total: float
     metodo_pago: str
     items: List[dict]
@@ -102,8 +102,13 @@ class CambiarEstadoInput(BaseModel):
 # ═══════════════════════════════════════════════════════════════════════════
 
 def _listar_ordenes_sync(estado: Optional[str], limite: int) -> List[dict]:
-    """Lista órdenes (sync)"""
-    queryset = OrdenModel.objects.select_related('cliente').order_by('-fecha_creacion')
+    """Lista órdenes (sync) - Optimizado con annotate"""
+    from django.db.models import Count
+    
+    queryset = (OrdenModel.objects
+                .select_related('cliente')
+                .annotate(num_items=Count('lineas'))
+                .order_by('-fecha_creacion'))
     
     if estado:
         queryset = queryset.filter(estado=estado.lower())
@@ -112,17 +117,15 @@ def _listar_ordenes_sync(estado: Optional[str], limite: int) -> List[dict]:
     
     resultado = []
     for orden in ordenes:
-        total_items = orden.lineas.count() if hasattr(orden, 'lineas') else 0
-        
         resultado.append({
             'id': str(orden.id),
             'codigo': orden.codigo or f"ORD-{str(orden.id)[:8]}",
-            'estado': orden.estado.upper(),
+            'estado': orden.estado,
             'cliente_nombre': f"{orden.cliente.nombre} {orden.cliente.apellido}" if orden.cliente else "Sin cliente",
             'cliente_email': orden.cliente.email if orden.cliente else "",
             'cliente_telefono': orden.cliente.telefono if orden.cliente else "",
             'total': float(orden.total_monto),
-            'total_items': total_items,
+            'total_items': orden.num_items,
             'metodo_pago': orden.metodo_pago or 'whatsapp',
             'fecha_creacion': orden.fecha_creacion
         })
@@ -231,11 +234,15 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
         'cliente_nombre': f"{cliente.nombre} {cliente.apellido}",
         'cliente_email': cliente.email,
         'cliente_telefono': cliente.telefono or '',
+        'cliente_tipo_doc': cliente.tipo_documento or 'CC',
+        'cliente_num_doc': cliente.numero_documento or '',
         'direccion_envio': orden.direccion_envio,
         'departamento': orden.departamento,
         'municipio': orden.municipio,
-        'subtotal': float(orden.subtotal_monto),
-        'envio': float(orden.envio_monto),
+        'barrio': orden.barrio or '',
+        'notas_envio': orden.notas_envio or '',
+        'subtotal_monto': float(orden.subtotal_monto),
+        'envio_monto': float(orden.envio_monto),
         'total': float(orden.total_monto),
         'metodo_pago': orden.metodo_pago,
         'items': items_response,
