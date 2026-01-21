@@ -42,42 +42,299 @@
               <div class="h-32 bg-gray-200 rounded"></div>
             </div>
 
-            <!-- Form -->
-            <form v-else @submit.prevent="submitForm" id="product-form" class="space-y-5">
-              <!-- Main Grid: 3 columns -->
-              <div class="grid grid-cols-1 lg:grid-cols-3 gap-5">
+            <!-- Form - Layout Asimétrico 2 Columnas (65% / 35%) -->
+            <form v-else @submit.prevent="submitForm" id="product-form">
+              <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 
-                <!-- Left Column: Basic Info -->
-                <div class="lg:col-span-2 space-y-4">
-                  <!-- Row 1: Código + Nombre + Categoría -->
-                  <div class="grid grid-cols-4 gap-4">
+                <!-- ════════════════════════════════════════════════════════ -->
+                <!-- COLUMNA IZQUIERDA (Principal - 65%) -->
+                <!-- ════════════════════════════════════════════════════════ -->
+                <div class="lg:col-span-8 space-y-6">
+                  
+                  <!-- ═══ BLOQUE: INFORMACIÓN GENERAL ═══ -->
+                  <div class="space-y-4">
+                    <h3 class="text-xs font-semibold text-text-medium uppercase tracking-wider">DETALLES</h3>
+                    
+                    <!-- Nombre (Ancho completo) -->
                     <div>
-                      <label class="block text-xs font-medium text-gray-600 mb-1">Código / SKU</label>
-                      <input 
-                        v-model="form.codigo"
-                        type="text"
-                        :disabled="isEditing"
-                        :class="isEditing ? 'bg-gray-100 text-gray-500' : 'bg-gray-50'"
-                        class="w-full px-3 py-2.5 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-500 text-sm"
-                        placeholder="Auto-generado si vacío"
-                      >
-                      <p class="text-xs text-gray-400 mt-1">Opcional - se genera automáticamente</p>
-                    </div>
-                    <div class="col-span-2">
-                      <label class="block text-xs font-medium text-gray-600 mb-1">Nombre <span class="text-red-500">*</span></label>
+                      <label class="block text-sm font-medium text-text-dark mb-2">Nombre del Producto <span class="text-red-500">*</span></label>
                       <input 
                         v-model="form.nombre"
                         type="text"
                         required
-                        class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-500 text-sm"
-                        placeholder="Extensiones Clip-in 20 pulgadas"
+                        class="w-full px-4 py-3 bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white transition-all text-sm"
+                        placeholder="Ej: Extensiones Clip-in Premium 20 pulgadas"
                       >
                     </div>
+
+                    <!-- Descripción (Mayor altura) -->
                     <div>
-                      <label class="block text-xs font-medium text-gray-600 mb-1">Categoría</label>
+                      <label class="block text-sm font-medium text-text-dark mb-2">Descripción</label>
+                      <textarea 
+                        v-model="form.descripcion"
+                        rows="4"
+                        class="w-full px-4 py-3 bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white transition-all resize-none text-sm"
+                        placeholder="Describe las características principales del producto..."
+                      ></textarea>
+                    </div>
+                  </div>
+
+                  <!-- ═══ BLOQUE: PRECIOS E INVENTARIO ═══ -->
+                  <div class="space-y-4">
+                    <h3 class="text-xs font-semibold text-text-medium uppercase tracking-wider">PRECIOS E INVENTARIO</h3>
+                    
+                    <!-- Fila 1: Precio, Costo, SKU -->
+                    <div class="grid grid-cols-3 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-text-dark mb-2">Precio <span class="text-red-500">*</span></label>
+                        <div class="relative">
+                          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-text-medium text-sm">$</span>
+                          <input 
+                            v-model.number="form.precio_monto"
+                            type="number"
+                            step="0.01"
+                            required
+                            class="w-full pl-8 pr-4 py-3 bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white transition-all text-sm"
+                            placeholder="45000"
+                          >
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label class="block text-sm font-medium text-text-light mb-2">Costo <span class="text-xs text-text-light">(opcional)</span></label>
+                        <div class="relative">
+                          <span class="absolute left-4 top-1/2 -translate-y-1/2 text-text-medium text-sm">$</span>
+                          <input 
+                            type="number"
+                            step="0.01"
+                            class="w-full pl-8 pr-4 py-3 bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white transition-all text-sm"
+                            placeholder="30000"
+                          >
+                        </div>
+                      </div>
+                      
+                      <div>
+                        <label class="block text-sm font-medium text-text-light mb-2">SKU</label>
+                        <input 
+                          v-model="form.codigo"
+                          type="text"
+                          :disabled="isEditing"
+                          :class="isEditing ? 'bg-gray-100 text-gray-500 cursor-not-allowed' : 'bg-[#FAFAFA]'"
+                          class="w-full px-4 py-3 border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 transition-all text-sm"
+                          placeholder="Auto"
+                        >
+                      </div>
+                    </div>
+
+                    <!-- Fila 2: Stock y Stock Mínimo -->
+                    <div class="grid grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-text-dark mb-2">Stock Actual <span class="text-red-500">*</span></label>
+                        <input 
+                          v-model.number="form.stock_actual"
+                          type="number"
+                          required
+                          class="w-full px-4 py-3 bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white transition-all text-sm"
+                          placeholder="50"
+                        >
+                      </div>
+                      
+                      <div>
+                        <label class="block text-sm font-medium text-text-dark mb-2">Stock Mínimo</label>
+                        <input 
+                          v-model.number="form.stock_minimo"
+                          type="number"
+                          class="w-full px-4 py-3 bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white transition-all text-sm"
+                          placeholder="5"
+                        >
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- ═══ BLOQUE: ATRIBUTOS (Opcional) ═══ -->
+                  <div class="space-y-4">
+                    <div class="flex items-center justify-between">
+                      <h3 class="text-xs font-semibold text-text-medium uppercase tracking-wider">ATRIBUTOS</h3>
+                      <span class="text-xs text-text-light">Opcional</span>
+                    </div>
+                    
+                    <div class="grid grid-cols-3 gap-4">
+                      <!-- Método -->
+                      <div class="space-y-2">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                          <input v-model="enabledAttrs.metodo" type="checkbox" class="w-4 h-4 text-[#D81B60] border-gray-300 rounded focus:ring-[#D81B60]">
+                          <span class="text-sm text-text-dark">Método</span>
+                        </label>
+                        <input 
+                          v-if="enabledAttrs.metodo"
+                          v-model="form.metodo"
+                          type="text"
+                          placeholder="Clip-in, Tape..."
+                          class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-sm focus:outline-none focus:border-text-dark/30"
+                        >
+                      </div>
+                      
+                      <!-- Color -->
+                      <div class="space-y-2">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                          <input v-model="enabledAttrs.color" type="checkbox" class="w-4 h-4 text-[#D81B60] border-gray-300 rounded focus:ring-[#D81B60]">
+                          <span class="text-sm text-text-dark">Color</span>
+                        </label>
+                        <input 
+                          v-if="enabledAttrs.color"
+                          v-model="form.color"
+                          type="text"
+                          placeholder="Negro, Castaño..."
+                          class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-sm focus:outline-none focus:border-text-dark/30"
+                        >
+                      </div>
+                      
+                      <!-- Largo -->
+                      <div class="space-y-2">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                          <input v-model="enabledAttrs.largo" type="checkbox" class="w-4 h-4 text-[#D81B60] border-gray-300 rounded focus:ring-[#D81B60]">
+                          <span class="text-sm text-text-dark">Largo</span>
+                        </label>
+                        <input 
+                          v-if="enabledAttrs.largo"
+                          v-model="form.largo"
+                          type="text"
+                          placeholder="20 pulgadas"
+                          class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-sm focus:outline-none focus:border-text-dark/30"
+                        >
+                      </div>
+                      
+                      <!-- Tipo -->
+                      <div class="space-y-2">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                          <input v-model="enabledAttrs.tipo" type="checkbox" class="w-4 h-4 text-[#D81B60] border-gray-300 rounded focus:ring-[#D81B60]">
+                          <span class="text-sm text-text-dark">Tipo</span>
+                        </label>
+                        <input 
+                          v-if="enabledAttrs.tipo"
+                          v-model="form.tipo"
+                          type="text"
+                          placeholder="Liso, Ondulado..."
+                          class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-sm focus:outline-none focus:border-text-dark/30"
+                        >
+                      </div>
+                      
+                      <!-- Origen -->
+                      <div class="space-y-2">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                          <input v-model="enabledAttrs.origen" type="checkbox" class="w-4 h-4 text-[#D81B60] border-gray-300 rounded focus:ring-[#D81B60]">
+                          <span class="text-sm text-text-dark">Origen</span>
+                        </label>
+                        <input 
+                          v-if="enabledAttrs.origen"
+                          v-model="form.origen"
+                          type="text"
+                          placeholder="Brasil, India..."
+                          class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-sm focus:outline-none focus:border-text-dark/30"
+                        >
+                      </div>
+                      
+                      <!-- Calidad -->
+                      <div class="space-y-2">
+                        <label class="flex items-center gap-2 cursor-pointer">
+                          <input v-model="enabledAttrs.calidad" type="checkbox" class="w-4 h-4 text-[#D81B60] border-gray-300 rounded focus:ring-[#D81B60]">
+                          <span class="text-sm text-text-dark">Calidad</span>
+                        </label>
+                        <input 
+                          v-if="enabledAttrs.calidad"
+                          v-model="form.calidad"
+                          type="text"
+                          placeholder="Premium, Remy..."
+                          class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-sm focus:outline-none focus:border-text-dark/30"
+                        >
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- ════════════════════════════════════════════════════════ -->
+                <!-- COLUMNA DERECHA (Media & Organización - 35%) -->
+                <!-- ════════════════════════════════════════════════════════ -->
+                <div class="lg:col-span-4 space-y-6">
+                  
+                  <!-- ═══ BLOQUE: MEDIA - ZONA DE IMAGEN (PROTAGONISTA) ═══ -->
+                  <div class="space-y-4">
+                    <h3 class="text-xs font-semibold text-text-medium uppercase tracking-wider">MEDIA</h3>
+                    
+                    <!-- Preview Cuadrado Grande -->
+                    <div class="aspect-square bg-[#F5F5F5] rounded-lg overflow-hidden border border-text-dark/10">
+                      <img 
+                        v-if="imagePreview || form.imagen_principal"
+                        :src="imagePreview || getImageUrl(form.imagen_principal)" 
+                        alt="Preview"
+                        class="w-full h-full object-cover"
+                        @error="handleImageError"
+                      >
+                      <div v-else class="w-full h-full flex flex-col items-center justify-center text-text-light">
+                        <!-- Icono elegante de cámara -->
+                        <svg class="w-16 h-16 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                        <span class="text-sm text-text-medium">Sin imagen</span>
+                      </div>
+                    </div>
+
+                    <!-- Botón de Subir Archivo -->
+                    <div>
+                      <input 
+                        ref="fileInput"
+                        type="file"
+                        accept="image/*"
+                        @change="handleFileSelect"
+                        class="hidden"
+                      >
+                      <button
+                        type="button"
+                        @click="$refs.fileInput.click()"
+                        class="w-full px-4 py-3 bg-text-dark hover:bg-black text-white rounded-lg font-medium transition-all text-sm flex items-center justify-center gap-2"
+                      >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                        </svg>
+                        {{ selectedFileName || 'Subir Imagen' }}
+                      </button>
+                      <p class="text-xs text-text-light mt-2 text-center">JPG, PNG, WEBP (máx. 5MB)</p>
+                    </div>
+
+                    <!-- URL Externa - Link pequeño -->
+                    <div class="text-center">
+                      <button
+                        type="button"
+                        @click="imageUploadMode = imageUploadMode === 'url' ? 'file' : 'url'"
+                        class="text-xs text-text-medium hover:text-text-dark underline transition-colors"
+                      >
+                        {{ imageUploadMode === 'url' ? '← Volver a subir' : 'O usar URL externa' }}
+                      </button>
+                    </div>
+
+                    <!-- Input URL (si está activado) -->
+                    <div v-if="imageUploadMode === 'url'">
+                      <input 
+                        v-model="form.imagen_principal"
+                        type="text"
+                        placeholder="https://ejemplo.com/imagen.jpg"
+                        class="w-full px-3 py-2.5 bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 text-xs"
+                        @input="imagePreview = null"
+                      >
+                    </div>
+                  </div>
+
+                  <!-- ═══ BLOQUE: ORGANIZACIÓN ═══ -->
+                  <div class="space-y-4">
+                    <h3 class="text-xs font-semibold text-text-medium uppercase tracking-wider">ORGANIZACIÓN</h3>
+                    
+                    <!-- Categoría -->
+                    <div>
+                      <label class="block text-sm font-medium text-text-dark mb-2">Categoría</label>
                       <select 
                         v-model="form.categoria"
-                        class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-500 text-sm"
+                        class="w-full px-4 py-3 bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 text-sm"
                       >
                         <option :value="null">Sin categoría</option>
                         <option v-for="cat in categorias" :key="cat.id" :value="cat.id">
@@ -85,255 +342,47 @@
                         </option>
                       </select>
                     </div>
-                  </div>
 
-                  <!-- Row 2: Descripción -->
-                  <div>
-                    <label class="block text-xs font-medium text-gray-600 mb-1">Descripción</label>
-                    <textarea 
-                      v-model="form.descripcion"
-                      rows="2"
-                      class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-500 resize-none text-sm"
-                      placeholder="Descripción breve del producto..."
-                    ></textarea>
-                  </div>
-
-                  <!-- Row 3: Precio, Stock, Stock Min, Estado -->
-                  <div class="grid grid-cols-4 gap-3">
+                    <!-- Marca (placeholder) -->
                     <div>
-                      <label class="block text-xs font-medium text-gray-600 mb-1">Precio</label>
-                      <div class="relative">
-                        <span class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 text-sm">$</span>
-                        <input 
-                          v-model.number="form.precio_monto"
-                          type="number"
-                          step="0.01"
-                          class="w-full pl-7 pr-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-500 text-sm"
-                        >
-                      </div>
-                    </div>
-                    <div>
-                      <label class="block text-xs font-medium text-gray-600 mb-1">Stock</label>
+                      <label class="block text-sm font-medium text-text-dark mb-2">Marca</label>
                       <input 
-                        v-model.number="form.stock_actual"
-                        type="number"
-                        class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-500 text-sm"
+                        type="text"
+                        placeholder="Kharis Distribuidora"
+                        class="w-full px-4 py-3 bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 text-sm"
                       >
                     </div>
+
+                    <!-- Estado -->
                     <div>
-                      <label class="block text-xs font-medium text-gray-600 mb-1">Stock Mín</label>
-                      <input 
-                        v-model.number="form.stock_minimo"
-                        type="number"
-                        class="w-full px-3 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-500 text-sm"
-                      >
-                    </div>
-                    <div>
-                      <label class="block text-xs font-medium text-gray-600 mb-1">Estado</label>
-                      <label class="flex items-center gap-2 h-[42px] cursor-pointer">
-                        <input v-model="form.activo" type="checkbox" class="sr-only peer">
-                        <div class="relative w-10 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-brand-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-brand-600"></div>
-                        <span class="text-xs text-gray-600">{{ form.activo ? 'Activo' : 'Inactivo' }}</span>
+                      <label class="block text-sm font-medium text-text-dark mb-2">Estado</label>
+                      <label class="flex items-center justify-between p-4 bg-[#FAFAFA] border border-text-dark/10 rounded-lg cursor-pointer hover:bg-white transition-all">
+                        <span class="text-sm text-text-dark">{{ form.activo ? 'Activo' : 'Borrador' }}</span>
+                        <div class="flex items-center gap-3">
+                          <input v-model="form.activo" type="checkbox" class="sr-only peer">
+                          <div class="relative w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-[#D81B60]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-green-500"></div>
+                        </div>
                       </label>
                     </div>
-                  </div>
 
-                  <!-- Row 3.5: Destacado -->
-                  <div class="border border-gold-200 bg-gold-50/30 rounded-lg p-3">
-                    <label class="flex items-center justify-between cursor-pointer">
-                      <div class="flex items-center gap-2">
-                        <svg class="w-4 h-4 text-gold-500" fill="currentColor" viewBox="0 0 20 20">
-                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-                        </svg>
-                        <div>
-                          <span class="text-xs font-medium text-gray-700">Producto Destacado</span>
-                          <p class="text-xs text-gray-500">Aparecerá en la página principal</p>
+                    <!-- Producto Destacado -->
+                    <div>
+                      <label class="flex items-center justify-between p-4 bg-[#FAF5F2] border border-[#C9A962]/20 rounded-lg cursor-pointer hover:bg-[#F5EBE5] transition-all">
+                        <div class="flex items-center gap-2">
+                          <svg class="w-5 h-5 text-[#C9A962]" fill="currentColor" viewBox="0 0 20 20">
+                            <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                          </svg>
+                          <div>
+                            <span class="text-sm font-medium text-text-dark">Destacado</span>
+                            <p class="text-xs text-text-light">Aparece en portada</p>
+                          </div>
                         </div>
-                      </div>
-                      <div class="flex items-center gap-2">
-                        <input v-model="form.destacado" type="checkbox" class="sr-only peer">
-                        <div class="relative w-10 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-gold-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gold-500"></div>
-                        <span class="text-xs font-medium" :class="form.destacado ? 'text-gold-600' : 'text-gray-500'">{{ form.destacado ? 'Sí' : 'No' }}</span>
-                      </div>
-                    </label>
-                  </div>
-
-                  <!-- Row 4: Atributos con Checkboxes -->
-                  <div class="border border-gray-200 rounded-lg p-3">
-                    <div class="flex items-center justify-between mb-3">
-                      <label class="text-xs font-medium text-gray-600">Atributos (opcional)</label>
-                      <span class="text-xs text-gray-400">Selecciona los que aplican</span>
+                        <div>
+                          <input v-model="form.destacado" type="checkbox" class="sr-only peer">
+                          <div class="relative w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-[#C9A962]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C9A962]"></div>
+                        </div>
+                      </label>
                     </div>
-                    <div class="grid grid-cols-3 gap-3">
-                      <!-- Método -->
-                      <div class="space-y-1">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                          <input v-model="enabledAttrs.metodo" type="checkbox" class="w-4 h-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500">
-                          <span class="text-xs text-gray-700">Método</span>
-                        </label>
-                        <input 
-                          v-if="enabledAttrs.metodo"
-                          v-model="form.metodo"
-                          type="text"
-                          placeholder="Clip-in, Tape..."
-                          class="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-xs focus:outline-none focus:border-brand-500"
-                        >
-                      </div>
-                      <!-- Color -->
-                      <div class="space-y-1">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                          <input v-model="enabledAttrs.color" type="checkbox" class="w-4 h-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500">
-                          <span class="text-xs text-gray-700">Color</span>
-                        </label>
-                        <input 
-                          v-if="enabledAttrs.color"
-                          v-model="form.color"
-                          type="text"
-                          placeholder="Negro, Castaño..."
-                          class="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-xs focus:outline-none focus:border-brand-500"
-                        >
-                      </div>
-                      <!-- Largo -->
-                      <div class="space-y-1">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                          <input v-model="enabledAttrs.largo" type="checkbox" class="w-4 h-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500">
-                          <span class="text-xs text-gray-700">Largo</span>
-                        </label>
-                        <input 
-                          v-if="enabledAttrs.largo"
-                          v-model="form.largo"
-                          type="text"
-                          placeholder="20 pulgadas..."
-                          class="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-xs focus:outline-none focus:border-brand-500"
-                        >
-                      </div>
-                      <!-- Tipo -->
-                      <div class="space-y-1">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                          <input v-model="enabledAttrs.tipo" type="checkbox" class="w-4 h-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500">
-                          <span class="text-xs text-gray-700">Tipo</span>
-                        </label>
-                        <input 
-                          v-if="enabledAttrs.tipo"
-                          v-model="form.tipo"
-                          type="text"
-                          placeholder="Liso, Ondulado..."
-                          class="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-xs focus:outline-none focus:border-brand-500"
-                        >
-                      </div>
-                      <!-- Origen -->
-                      <div class="space-y-1">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                          <input v-model="enabledAttrs.origen" type="checkbox" class="w-4 h-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500">
-                          <span class="text-xs text-gray-700">Origen</span>
-                        </label>
-                        <input 
-                          v-if="enabledAttrs.origen"
-                          v-model="form.origen"
-                          type="text"
-                          placeholder="Brasil, India..."
-                          class="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-xs focus:outline-none focus:border-brand-500"
-                        >
-                      </div>
-                      <!-- Calidad -->
-                      <div class="space-y-1">
-                        <label class="flex items-center gap-2 cursor-pointer">
-                          <input v-model="enabledAttrs.calidad" type="checkbox" class="w-4 h-4 text-brand-600 border-gray-300 rounded focus:ring-brand-500">
-                          <span class="text-xs text-gray-700">Calidad</span>
-                        </label>
-                        <input 
-                          v-if="enabledAttrs.calidad"
-                          v-model="form.calidad"
-                          type="text"
-                          placeholder="Premium, Remy..."
-                          class="w-full px-2 py-1.5 bg-gray-50 border border-gray-200 rounded text-xs focus:outline-none focus:border-brand-500"
-                        >
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                <!-- Right Column: Image -->
-                <div class="space-y-3">
-                  <label class="block text-xs font-medium text-gray-600">Imagen del Producto</label>
-                  
-                  <!-- Preview -->
-                  <div class="aspect-square bg-gray-100 rounded-xl overflow-hidden border-2 border-dashed border-gray-200">
-                    <img 
-                      v-if="imagePreview || form.imagen_principal"
-                      :src="imagePreview || getImageUrl(form.imagen_principal)" 
-                      alt="Preview"
-                      class="w-full h-full object-cover"
-                      @error="handleImageError"
-                    >
-                    <div v-else class="w-full h-full flex flex-col items-center justify-center text-gray-400">
-                      <svg class="w-12 h-12 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                      <span class="text-xs">Sin imagen</span>
-                    </div>
-                  </div>
-
-                  <!-- Tabs: URL o Subir Archivo -->
-                  <div class="flex gap-2 mb-2">
-                    <button
-                      type="button"
-                      @click="imageUploadMode = 'url'"
-                      :class="[
-                        'flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors',
-                        imageUploadMode === 'url' 
-                          ? 'bg-brand-600 text-white' 
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      ]"
-                    >
-                      URL Externa
-                    </button>
-                    <button
-                      type="button"
-                      @click="imageUploadMode = 'file'"
-                      :class="[
-                        'flex-1 px-3 py-2 text-xs font-medium rounded-lg transition-colors',
-                        imageUploadMode === 'file' 
-                          ? 'bg-brand-600 text-white' 
-                          : 'bg-gray-100 text-gray-600 hover:bg-gray-200'
-                      ]"
-                    >
-                      Subir Archivo
-                    </button>
-                  </div>
-
-                  <!-- URL Input -->
-                  <div v-if="imageUploadMode === 'url'">
-                    <input 
-                      v-model="form.imagen_principal"
-                      type="text"
-                      placeholder="https://ejemplo.com/imagen.jpg"
-                      class="w-full px-3 py-2 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-500 text-xs"
-                      @input="imagePreview = null"
-                    >
-                    <p class="text-xs text-gray-500 mt-1">Pega cualquier URL o link de imagen</p>
-                  </div>
-
-                  <!-- File Upload -->
-                  <div v-else>
-                    <input 
-                      ref="fileInput"
-                      type="file"
-                      accept="image/*"
-                      @change="handleFileSelect"
-                      class="hidden"
-                    >
-                    <button
-                      type="button"
-                      @click="$refs.fileInput.click()"
-                      class="w-full px-3 py-2.5 bg-gray-50 border-2 border-dashed border-gray-300 rounded-lg hover:border-brand-500 hover:bg-brand-50 transition-colors text-xs text-gray-600 font-medium"
-                    >
-                      <svg class="w-5 h-5 mx-auto mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
-                      </svg>
-                      {{ selectedFileName || 'Seleccionar imagen' }}
-                    </button>
-                    <p class="text-xs text-gray-500 mt-1">JPG, PNG, WEBP (máx. 5MB)</p>
                   </div>
                 </div>
               </div>

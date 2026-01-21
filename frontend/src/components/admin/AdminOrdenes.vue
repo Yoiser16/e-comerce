@@ -291,7 +291,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { ordenesService } from '@/services/ordenes'
 
 // Estado
@@ -302,6 +302,49 @@ const loading = ref(true)
 const loadingDetail = ref(false)
 const searchQuery = ref('')
 const activeFilter = ref('todas')
+const pollingInterval = ref(null)
+const lastOrderCount = ref(0)
+
+// Función para reproducir sonido de caja registradora usando Web Audio API
+const playNotificationSound = () => {
+  try {
+    const audioContext = new (window.AudioContext || window.webkitAudioContext)()
+    
+    // Función helper para crear tonos
+    const playTone = (frequency, startTime, duration, volume = 0.3) => {
+      const oscillator = audioContext.createOscillator()
+      const gainNode = audioContext.createGain()
+      
+      oscillator.connect(gainNode)
+      gainNode.connect(audioContext.destination)
+      
+      oscillator.frequency.value = frequency
+      oscillator.type = 'sine'
+      
+      gainNode.gain.setValueAtTime(volume, audioContext.currentTime + startTime)
+      gainNode.gain.exponentialRampToValueAtTime(0.01, audioContext.currentTime + startTime + duration)
+      
+      oscillator.start(audioContext.currentTime + startTime)
+      oscillator.stop(audioContext.currentTime + startTime + duration)
+    }
+    
+    // Secuencia de notas: "CHA-CHING!" 🔔💰
+    // Primera parte: "CHA" (campana alta)
+    playTone(1200, 0, 0.08, 0.4)
+    playTone(1600, 0.03, 0.08, 0.3)
+    
+    // Segunda parte: "CHING" (más agudo y resonante)
+    playTone(2000, 0.15, 0.15, 0.35)
+    playTone(2400, 0.18, 0.15, 0.25)
+    playTone(2800, 0.21, 0.2, 0.2)
+    
+    // Nota grave de fondo (simula mecanismo de caja)
+    playTone(200, 0, 0.1, 0.15)
+    
+  } catch (error) {
+    console.log('No se pudo reproducir el sonido:', error)
+  }
+}
 
 // Filtros
 const filters = computed(() => [
@@ -363,12 +406,12 @@ const mapEstadoEnvio = (estado) => {
 }
 
 // Cargar órdenes
-const cargarOrdenes = async () => {
+const cargarOrdenes = async (silent = false) => {
   try {
-    loading.value = true
+    if (!silent) loading.value = true
     const data = await ordenesService.obtenerTodas()
     
-    ordenes.value = data.map(orden => ({
+    const nuevasOrdenes = data.map(orden => ({
       id: orden.id,
       codigo: orden.codigo,
       cliente_nombre: orden.cliente_nombre || 'Sin cliente',
@@ -381,11 +424,47 @@ const cargarOrdenes = async () => {
       metodo_pago: orden.metodo_pago || 'whatsapp',
       fecha_creacion: orden.fecha_creacion
     })).sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion))
+    
+    // Detectar nuevas órdenes y reproducir sonido
+    if (silent && ordenes.value.length > 0 && nuevasOrdenes.length > ordenes.value.length) {
+      const cantidadNuevas = nuevasOrdenes.length - ordenes.value.length
+      console.log(`🔔 ${cantidadNuevas} nueva(s) orden(es) detectada(s)`)
+      
+      // Reproducir sonido de notificación
+      playNotificationSound()
+      
+      // Mostrar notificación del navegador si está permitido
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('Nueva Orden Recibida', {
+          body: `${cantidadNuevas} nueva(s) orden(es) pendiente(s)`,
+          icon: '/favicon.ico',
+          tag: 'nueva-orden'
+        })
+      }
+    }
+    
+    ordenes.value = nuevasOrdenes
   } catch (error) {
     console.error('Error al cargar órdenes:', error)
-    ordenes.value = []
+    if (!silent) ordenes.value = []
   } finally {
-    loading.value = false
+    if (!silent) loading.value = false
+  }
+}
+
+// Iniciar polling automático
+const startPolling = () => {
+  // Actualizar cada 5 segundos
+  pollingInterval.value = setInterval(() => {
+    cargarOrdenes(true) // true = silent mode (sin mostrar loading)
+  }, 5000)
+}
+
+// Detener polling
+const stopPolling = () => {
+  if (pollingInterval.value) {
+    clearInterval(pollingInterval.value)
+    pollingInterval.value = null
   }
 }
 
@@ -566,6 +645,17 @@ const openWhatsApp = () => {
 
 onMounted(() => {
   cargarOrdenes()
+  startPolling()
+  
+  // Solicitar permiso para notificaciones
+  if ('Notification' in window && Notification.permission === 'default') {
+    Notification.requestPermission()
+  }
+})
+
+// Limpiar al desmontar
+onUnmounted(() => {
+  stopPolling()
 })
 
 // Exponer función para el sidebar

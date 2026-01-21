@@ -1,42 +1,43 @@
 <template>
   <div class="space-y-6">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
-      <div>
-        <h2 class="text-2xl font-bold text-gray-900">Productos</h2>
-        <p class="text-gray-500">Gestiona tu catálogo de productos</p>
+    <!-- Header con Filtros Unificados -->
+    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+      <!-- Título y Botón CTA -->
+      <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
+        <div>
+          <h2 class="text-2xl font-bold text-text-dark">Gestión de Productos</h2>
+          <p class="text-text-light text-sm mt-1">{{ productos.length }} productos en inventario</p>
+        </div>
+        <button 
+          @click="openCreateModal"
+          class="inline-flex items-center gap-2 bg-[#D81B60] hover:bg-[#C2185B] text-white font-medium text-sm px-6 py-3 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md"
+        >
+          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+          Nuevo Producto
+        </button>
       </div>
-      <button 
-        @click="openCreateModal"
-        class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-5 py-3 rounded-xl transition-colors"
-      >
-        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-        </svg>
-        Nuevo Producto
-      </button>
-    </div>
 
-    <!-- Filters -->
-    <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-4">
-      <div class="flex flex-col lg:flex-row gap-4">
+      <!-- Barra de Filtros Cohesiva -->
+      <div class="flex flex-col lg:flex-row gap-3">
         <!-- Search -->
         <div class="flex-1 relative">
-          <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
           <input 
             v-model="searchQuery"
             type="text"
-            placeholder="Buscar productos..."
-            class="w-full pl-12 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+            placeholder="Buscar por nombre, SKU o descripción..."
+            class="w-full pl-10 pr-4 py-2.5 text-sm bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white transition-all"
           >
         </div>
 
         <!-- Category Filter -->
         <select 
           v-model="filterCategory"
-          class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand-500 min-w-[180px]"
+          class="px-3 py-2.5 text-sm bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white min-w-[160px] transition-all"
         >
           <option value="">Todas las categorías</option>
           <option value="extensiones">Extensiones</option>
@@ -48,7 +49,7 @@
         <!-- Stock Filter -->
         <select 
           v-model="filterStock"
-          class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand-500 min-w-[150px]"
+          class="px-3 py-2.5 text-sm bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white min-w-[140px] transition-all"
         >
           <option value="">Todo el stock</option>
           <option value="available">Disponible</option>
@@ -59,10 +60,11 @@
         <!-- Refresh button -->
         <button
           @click="loadProducts"
-          class="px-4 py-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+          class="px-3 py-2.5 bg-[#FAFAFA] hover:bg-gray-100 border border-text-dark/10 rounded-lg transition-all"
           :disabled="loading"
+          title="Actualizar"
         >
-          <svg class="w-5 h-5" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <svg class="w-4 h-4 text-text-medium" :class="{ 'animate-spin': loading }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
         </button>
@@ -99,26 +101,25 @@
         </div>
       </div>
 
-      <!-- Table -->
+      <!-- Table - Estilo Smart Inventory -->
       <div v-else class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-gray-50 border-b border-gray-100">
+          <thead class="bg-[#FAFAFA] border-b border-text-dark/5">
             <tr>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Producto</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">SKU</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Categoría</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Precio</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Stock</th>
-              <th class="px-6 py-4 text-left text-xs font-semibold text-gray-500 uppercase">Estado</th>
-              <th class="px-6 py-4 text-right text-xs font-semibold text-gray-500 uppercase">Acciones</th>
+              <th class="px-6 py-3.5 text-left text-xs font-semibold text-text-medium uppercase tracking-wide">Producto</th>
+              <th class="px-6 py-3.5 text-right text-xs font-semibold text-text-medium uppercase tracking-wide">Precio</th>
+              <th class="px-6 py-3.5 text-left text-xs font-semibold text-text-medium uppercase tracking-wide">Stock</th>
+              <th class="px-6 py-3.5 text-left text-xs font-semibold text-text-medium uppercase tracking-wide">Estado</th>
+              <th class="px-6 py-3.5 text-right text-xs font-semibold text-text-medium uppercase tracking-wide">Acciones</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-100">
-            <tr v-for="producto in filteredProducts" :key="producto.id" class="hover:bg-gray-50">
-              <!-- Product -->
+          <tbody class="divide-y divide-text-dark/5">
+            <tr v-for="producto in filteredProducts" :key="producto.id" class="hover:bg-[#FAFAFA] transition-colors">
+              <!-- Product - COLUMNA PRINCIPAL CON JERARQUÍA VISUAL -->
               <td class="px-6 py-4">
                 <div class="flex items-center gap-4">
-                  <div class="w-14 h-14 bg-gray-100 rounded-xl overflow-hidden flex-shrink-0">
+                  <!-- Thumbnail Cuadrado (56x56px) -->
+                  <div class="w-14 h-14 bg-[#F5F5F5] rounded-lg overflow-hidden flex-shrink-0 border border-text-dark/5">
                     <img 
                       v-if="producto.imagen_principal"
                       :src="getImageUrl(producto.imagen_principal)" 
@@ -126,55 +127,60 @@
                       class="w-full h-full object-cover"
                       @error="handleImageError"
                     >
-                    <div v-else class="w-full h-full flex items-center justify-center bg-gray-100">
-                      <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div v-else class="w-full h-full flex items-center justify-center">
+                      <svg class="w-6 h-6 text-text-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
                     </div>
                   </div>
-                  <div>
-                    <p class="font-medium text-gray-900">{{ producto.nombre }}</p>
-                    <p class="text-sm text-gray-500 truncate max-w-[200px]">{{ producto.descripcion }}</p>
+                  
+                  <!-- Jerarquía de Texto -->
+                  <div class="min-w-0 flex-1">
+                    <!-- Línea 1: Nombre (Negrita, Oscuro) -->
+                    <p class="font-semibold text-[#111827] text-sm truncate mb-0.5">{{ producto.nombre }}</p>
+                    
+                    <!-- Línea 2: SKU + Categoría (Pequeño, Gris) -->
+                    <div class="flex items-center gap-2 text-xs text-[#6B7280]">
+                      <span class="font-mono">SKU: {{ producto.codigo }}</span>
+                      <span class="text-text-light">•</span>
+                      <span>{{ getCategoryLabel(producto) }}</span>
+                    </div>
                   </div>
                 </div>
               </td>
               
-              <!-- SKU -->
-              <td class="px-6 py-4">
-                <span class="font-mono text-sm text-gray-600">{{ producto.codigo }}</span>
+              <!-- Precio - ALINEADO A LA DERECHA, FUENTE TABULAR -->
+              <td class="px-6 py-4 text-right">
+                <span class="font-semibold text-text-dark text-sm tabular-nums">${{ formatNumber(producto.precio_monto) }}</span>
               </td>
               
-              <!-- Category -->
-              <td class="px-6 py-4">
-                <span class="px-3 py-1 bg-gray-100 text-gray-700 text-xs font-medium rounded-full">
-                  {{ getCategoryLabel(producto) }}
-                </span>
-              </td>
-              
-              <!-- Price -->
-              <td class="px-6 py-4">
-                <span class="font-semibold text-gray-900">${{ formatNumber(producto.precio_monto) }}</span>
-              </td>
-              
-              <!-- Stock -->
+              <!-- Stock - INDICADORES VISUALES DE SALUD -->
               <td class="px-6 py-4">
                 <div class="flex items-center gap-2">
-                  <span :class="getStockClass(producto.stock_actual, producto.stock_minimo)" class="font-medium">
-                    {{ producto.stock_actual }}
-                  </span>
-                  <span v-if="producto.stock_actual <= producto.stock_minimo && producto.stock_actual > 0" class="text-orange-500">
-                    <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                      <path fill-rule="evenodd" d="M8.257 3.099c.765-1.36 2.722-1.36 3.486 0l5.58 9.92c.75 1.334-.213 2.98-1.742 2.98H4.42c-1.53 0-2.493-1.646-1.743-2.98l5.58-9.92zM11 13a1 1 0 11-2 0 1 1 0 012 0zm-1-8a1 1 0 00-1 1v3a1 1 0 002 0V6a1 1 0 00-1-1z" clip-rule="evenodd" />
-                    </svg>
-                  </span>
+                  <!-- Stock Alto (>20): Verde -->
+                  <template v-if="producto.stock_actual > 20">
+                    <div class="w-2 h-2 bg-green-500 rounded-full"></div>
+                    <span class="text-green-700 font-medium text-sm tabular-nums">{{ producto.stock_actual }}</span>
+                  </template>
+                  
+                  <!-- Stock Bajo (1-20): Naranja -->
+                  <template v-else-if="producto.stock_actual > 0 && producto.stock_actual <= 20">
+                    <div class="w-2 h-2 bg-orange-500 rounded-full"></div>
+                    <span class="text-orange-700 font-medium text-sm tabular-nums">{{ producto.stock_actual }}</span>
+                  </template>
+                  
+                  <!-- Sin Stock (0): Rojo -->
+                  <template v-else>
+                    <span class="px-2.5 py-1 bg-red-50 text-red-700 text-xs font-medium rounded-md">Sin Stock</span>
+                  </template>
                 </div>
               </td>
               
-              <!-- Status -->
+              <!-- Estado -->
               <td class="px-6 py-4">
                 <span 
-                  :class="producto.activo ? 'bg-green-100 text-green-700' : 'bg-red-100 text-red-700'"
-                  class="px-3 py-1 text-xs font-medium rounded-full"
+                  :class="producto.activo ? 'bg-green-50 text-green-700' : 'bg-gray-100 text-gray-600'"
+                  class="px-2.5 py-1 text-xs font-medium rounded-md"
                 >
                   {{ producto.activo ? 'Activo' : 'Inactivo' }}
                 </span>
@@ -194,14 +200,14 @@
                   </button>
                   <button 
                     @click="confirmDelete(producto)"
-                    class="p-2 text-gray-500 hover:text-red-600 hover:bg-red-50 rounded-lg transition-colors"
+                    class="p-2 text-text-medium hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
                     title="Eliminar"
                     :disabled="deleting === producto.id"
                   >
-                    <svg v-if="deleting !== producto.id" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg v-if="deleting !== producto.id" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                     </svg>
-                    <svg v-else class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <svg v-else class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                       <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                       <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                     </svg>
@@ -212,25 +218,28 @@
 
             <!-- Empty State -->
             <tr v-if="filteredProducts.length === 0 && !loading">
-              <td colspan="7" class="px-6 py-12 text-center">
+              <td colspan="5" class="px-6 py-16 text-center">
                 <div class="flex flex-col items-center">
-                  <svg class="w-16 h-16 text-gray-300 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                  <svg class="w-16 h-16 text-text-light mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
-                  <p class="text-gray-500 mb-4">
-                    {{ productos.length === 0 ? 'No hay productos en la base de datos' : 'No se encontraron productos con los filtros aplicados' }}
+                  <p class="text-text-medium font-medium mb-2">
+                    {{ productos.length === 0 ? 'No hay productos en el inventario' : 'No se encontraron productos' }}
                   </p>
-                  <router-link 
+                  <p class="text-text-light text-sm mb-4">
+                    {{ productos.length === 0 ? 'Comienza agregando tu primer producto' : 'Intenta ajustar los filtros de búsqueda' }}
+                  </p>
+                  <button 
                     v-if="productos.length === 0"
-                    to="/admin/productos/nuevo"
-                    class="text-brand-600 font-medium hover:underline"
+                    @click="openCreateModal"
+                    class="text-[#D81B60] font-medium hover:underline text-sm"
                   >
                     Agregar primer producto
-                  </router-link>
+                  </button>
                   <button 
                     v-else
                     @click="clearFilters"
-                    class="text-brand-600 font-medium hover:underline"
+                    class="text-[#D81B60] font-medium hover:underline text-sm"
                   >
                     Limpiar filtros
                   </button>
@@ -242,9 +251,9 @@
       </div>
 
       <!-- Pagination -->
-      <div v-if="productos.length > 0" class="flex items-center justify-between p-4 border-t border-gray-100">
-        <p class="text-sm text-gray-500">
-          Mostrando {{ filteredProducts.length }} de {{ productos.length }} productos
+      <div v-if="productos.length > 0" class="flex items-center justify-between p-4 border-t border-text-dark/5 bg-[#FAFAFA]">
+        <p class="text-sm text-text-medium">
+          Mostrando <span class="font-medium text-text-dark">{{ filteredProducts.length }}</span> de <span class="font-medium text-text-dark">{{ productos.length }}</span> productos
         </p>
         <div class="flex items-center gap-2">
           <button 
@@ -501,3 +510,11 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+/* Fuente tabular para n\u00fameros (precios y stock) */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum";
+}
+</style>
