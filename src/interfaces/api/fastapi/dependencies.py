@@ -108,9 +108,15 @@ def get_current_user_admin(
     """
     Verifica que el usuario actual sea ADMIN o OPERADOR.
     
-    TODO: Implementar validación completa del JWT y verificar rol.
-    Por ahora permite acceso en desarrollo.
+    En desarrollo, permite acceso sin token.
+    En producción, requiere validación JWT.
     """
+    import os
+    
+    # En desarrollo, permitir acceso sin autenticación
+    if os.getenv('AMBIENTE', 'development') == 'development':
+        return {"user_id": "dev-admin", "rol": "ADMIN"}
+    
     if not credentials:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

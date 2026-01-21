@@ -2,7 +2,7 @@
 Casos de uso para el dashboard administrativo
 """
 from typing import List
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 from domain.repositories.orden_repository import OrdenRepository
@@ -14,6 +14,15 @@ from application.dto.dashboard_dto import (
     OrdenResumeDTO,
     ProductoStockBajoDTO
 )
+
+
+def hacer_fecha_comparable(fecha):
+    """Convierte una fecha a naive (sin timezone) para comparaciones seguras"""
+    if fecha is None:
+        return None
+    if fecha.tzinfo is not None:
+        return fecha.replace(tzinfo=None)
+    return fecha
 
 
 class ObtenerEstadisticasGeneralesUseCase:
@@ -37,7 +46,7 @@ class ObtenerEstadisticasGeneralesUseCase:
         
         # Calcular total de ventas del mes actual
         mes_actual = datetime.now().replace(day=1, hour=0, minute=0, second=0, microsecond=0)
-        ordenes_mes = [o for o in ordenes if o.fecha_creacion and o.fecha_creacion >= mes_actual]
+        ordenes_mes = [o for o in ordenes if hacer_fecha_comparable(o.fecha_creacion) and hacer_fecha_comparable(o.fecha_creacion) >= mes_actual]
         
         # Calcular total de ventas (manejando Dinero y float)
         total_ventas = 0.0
@@ -45,10 +54,15 @@ class ObtenerEstadisticasGeneralesUseCase:
             if hasattr(o.total, 'monto'):
                 total_ventas += float(o.total.monto)
             else:
-                total_ventas += float(o.total)
+                total_ventas += float(o.total) if o.total else 0.0
         
-        # Contar órdenes pendientes
-        ordenes_pendientes = sum(1 for o in ordenes if o.estado.value == 'PENDIENTE')
+        # Contar órdenes pendientes (manejar enum y string)
+        def get_estado_str(o):
+            if hasattr(o.estado, 'value'):
+                return o.estado.value.upper()
+            return str(o.estado).upper() if o.estado else ''
+        
+        ordenes_pendientes = sum(1 for o in ordenes if get_estado_str(o) == 'PENDIENTE')
         
         # Obtener productos
         productos = self.producto_repo.obtener_todos(limite=10000)
@@ -62,7 +76,7 @@ class ObtenerEstadisticasGeneralesUseCase:
         
         # Clientes nuevos (últimos 30 días)
         hace_30_dias = datetime.now() - timedelta(days=30)
-        clientes_nuevos = sum(1 for c in clientes if c.fecha_creacion and c.fecha_creacion >= hace_30_dias)
+        clientes_nuevos = sum(1 for c in clientes if hacer_fecha_comparable(c.fecha_creacion) and hacer_fecha_comparable(c.fecha_creacion) >= hace_30_dias)
         
         return EstadisticasGeneralesDTO(
             total_ventas=total_ventas,
@@ -100,18 +114,37 @@ class ObtenerOrdenesRecientesUseCase:
         
         resultado = []
         for orden in ordenes_recientes:
-            # Obtener cliente
-            cliente = self.cliente_repo.obtener_por_id(orden.cliente_id)
+            # Obtener cliente (puede ser None si cliente_id es None)
+            cliente = None
+            if orden.cliente_id:
+                try:
+                    cliente = self.cliente_repo.obtener_por_id(orden.cliente_id)
+                except Exception:
+                    cliente = None
             
             # Calcular tiempo transcurrido
             tiempo = self._calcular_tiempo_transcurrido(orden.fecha_creacion)
             
+            # Manejar estado como enum o string
+            estado_str = orden.estado.value if hasattr(orden.estado, 'value') else str(orden.estado)
+            
+            # Manejar total como Dinero o float
+            total_float = float(orden.total.monto) if hasattr(orden.total, 'monto') else float(orden.total) if orden.total else 0.0
+            
+            # Manejar email del cliente
+            cliente_email = ''
+            if cliente:
+                if hasattr(cliente.email, 'valor'):
+                    cliente_email = cliente.email.valor
+                else:
+                    cliente_email = str(cliente.email) if cliente.email else ''
+            
             resultado.append(OrdenResumeDTO(
                 id=str(orden.id),
                 cliente_nombre=cliente.nombre if cliente else "Cliente desconocido",
-                cliente_email=cliente.email.valor if cliente else "",
-                estado=orden.estado.value,
-                total=float(orden.total),
+                cliente_email=cliente_email,
+                estado=estado_str.upper(),
+                total=total_float,
                 fecha_creacion=orden.fecha_creacion,
                 tiempo_transcurrido=tiempo
             ))

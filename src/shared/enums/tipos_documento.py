@@ -10,6 +10,9 @@ class TipoDocumento(Enum):
     Punto de extensión: agregar según región/país
     """
     
+    CC = "CC"  # Cédula de Ciudadanía (Colombia)
+    CE = "CE"  # Cédula de Extranjería (Colombia)
+    TI = "TI"  # Tarjeta de Identidad (Colombia)
     DNI = "DNI"
     PASAPORTE = "pasaporte"
     CEDULA = "cedula"

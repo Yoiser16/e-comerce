@@ -716,7 +716,7 @@ export default {
       publicKey: import.meta.env.VITE_EPAYCO_PUBLIC_KEY || '2943652c673afffaa5b7b67829f00a0c',
       test: import.meta.env.VITE_EPAYCO_TEST_MODE === 'true'
     }
-    const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '4796657763'
+    const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '573217355070'
     
     // Form con nuevos campos
     const form = ref({
@@ -1017,11 +1017,99 @@ export default {
     // Payment
     const processPayment = async () => {
       if (selectedPayment.value === 'asesor') {
-        const code = `K-${Math.floor(1000 + Math.random() * 9000)}`
-        const productos = cartItems.value.map(i => `• ${i.nombre || 'Producto'} x${i.cantidad || 1}`).join('%0A')
-        const msg = `Hola, quiero finalizar mi pedido ✨%0A%0A🆔 *Código:* ${code}%0A%0A📦 *Productos:*%0A${productos}%0A%0A💰 *Total:* $${formatPrice(getTotal())} COP%0A%0A👤 *${form.value.nombre} ${form.value.apellido}*%0A📍 ${getFullAddress()}`
-        window.open(`https://wa.me/${whatsappNumber}?text=${msg}`, '_blank')
-        clearFormStorage()
+        processing.value = true
+        
+        try {
+          // 1. Crear orden en el backend con estado PENDIENTE
+          // Obtener nombres de departamento y municipio (no IDs)
+          const depNombre = getDepName.value || form.value.departamento || ''
+          const munNombre = getMunName.value || form.value.municipio || ''
+          
+          const ordenData = {
+            email: form.value.email,
+            nombre: form.value.nombre,
+            apellido: form.value.apellido || '',
+            telefono: form.value.telefono,
+            direccion: form.value.direccion,
+            departamento: depNombre,
+            municipio: munNombre,
+            barrio: form.value.barrio || '',
+            notas: form.value.apartamento || '',
+            items: cartItems.value.map(item => ({
+              producto_id: item.id || item.producto_id || '00000000-0000-0000-0000-000000000000',
+              cantidad: item.cantidad || 1,
+              precio_unitario: item.precio_unitario || item.precio || 0,
+              nombre: item.nombre || 'Producto'
+            })),
+            subtotal: getSubtotal(),
+            envio: envioGratis.value ? 0 : costoEnvio.value,
+            total: getTotal(),
+            metodo_pago: 'whatsapp'
+          }
+          
+          // Usar URL completa para evitar problemas de proxy
+          const apiUrl = window.location.hostname === 'localhost' 
+            ? 'http://localhost:8000/api/v1/ordenes'
+            : '/api/v1/ordenes'
+          
+          const response = await fetch(apiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(ordenData)
+          })
+          
+          if (!response.ok) {
+            const errorData = await response.text()
+            console.error('Error API:', response.status, errorData)
+            throw new Error(`Error al crear la orden: ${response.status}`)
+          }
+          
+          const orden = await response.json()
+          const code = orden.codigo || `KH-${Math.floor(1000 + Math.random() * 9000)}`
+          
+          // 2. Construir mensaje de WhatsApp con el código real
+          const productos = cartItems.value.map(i => `• ${i.nombre || 'Producto'} x${i.cantidad || 1}`).join('%0A')
+          const msg = `Hola, quiero finalizar mi pedido ✨%0A%0A🆔 *Código:* ${code}%0A%0A📦 *Productos:*%0A${productos}%0A%0A💰 *Total:* $${formatPrice(getTotal())} COP%0A%0A👤 *${form.value.nombre} ${form.value.apellido}*%0A📞 ${form.value.telefono}%0A📍 ${getFullAddress()}`
+          
+          // 3. Guardar datos de la orden para la página de confirmación
+          sessionStorage.setItem('orden_whatsapp', JSON.stringify({
+            codigo: code,
+            total: getTotal(),
+            productos: cartItems.value,
+            cliente: {
+              nombre: form.value.nombre,
+              apellido: form.value.apellido,
+              telefono: form.value.telefono,
+              email: form.value.email
+            }
+          }))
+          
+          // 4. Abrir WhatsApp - Número fijo para desarrollo
+          const whatsappFinal = '573217355070'
+          window.open(`https://wa.me/${whatsappFinal}?text=${msg}`, '_blank')
+          
+          // 5. Esperar un momento para que se abra WhatsApp y luego redirigir
+          await new Promise(resolve => setTimeout(resolve, 500))
+          
+          // 6. Limpiar carrito y formulario
+          localStorage.removeItem('kharis_cart_cache')
+          clearFormStorage()
+          
+          // 7. Redirigir a página de confirmación
+          window.location.href = '/pedido-confirmado'
+          
+        } catch (e) {
+          console.error('Error al procesar la orden:', e)
+          // Aunque falle la API, abrir WhatsApp de todos modos para no perder la venta
+          const code = `K-${Math.floor(1000 + Math.random() * 9000)}`
+          const productos = cartItems.value.map(i => `• ${i.nombre || 'Producto'} x${i.cantidad || 1}`).join('%0A')
+          const msg = `Hola, quiero finalizar mi pedido ✨%0A%0A🆔 *Código:* ${code}%0A%0A📦 *Productos:*%0A${productos}%0A%0A💰 *Total:* $${formatPrice(getTotal())} COP%0A%0A👤 *${form.value.nombre} ${form.value.apellido}*%0A📞 ${form.value.telefono}%0A📍 ${getFullAddress()}`
+          const whatsappFinal = '573217355070'
+          window.open(`https://wa.me/${whatsappFinal}?text=${msg}`, '_blank')
+          clearFormStorage()
+        } finally {
+          processing.value = false
+        }
       } else {
         processing.value = true
         try {

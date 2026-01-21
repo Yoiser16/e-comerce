@@ -6,6 +6,7 @@ import Login from '../components/Login.vue'
 const MiCuenta = () => import('../components/MiCuenta.vue')
 const Checkout = () => import('../components/Checkout.vue')
 const PagoExitoso = () => import('../components/PagoExitoso.vue')
+const PedidoConfirmado = () => import('../components/PedidoConfirmado.vue')
 
 // Admin imports (lazy loaded)
 const AdminLayout = () => import('../components/admin/AdminLayout.vue')
@@ -45,6 +46,11 @@ const routes = [
     path: '/pago-exitoso',
     name: 'PagoExitoso',
     component: PagoExitoso
+  },
+  {
+    path: '/pedido-confirmado',
+    name: 'PedidoConfirmado',
+    component: PedidoConfirmado
   },
   // Admin routes
   {

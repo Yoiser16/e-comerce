@@ -15,6 +15,7 @@ from .favoritos_router import router as favoritos_router
 from .dashboard_router import router as dashboard_router
 from .categoria_router import router as categoria_router
 from .upload_router import router as upload_router
+from .orden_router import router as orden_router
 from .exception_handlers import exception_handler_dominio
 from domain.exceptions.dominio import ExcepcionDominio
 from infrastructure.config.app_config import AppConfig
@@ -60,6 +61,7 @@ def crear_app(config: AppConfig) -> FastAPI:
     app.include_router(favoritos_router)
     app.include_router(dashboard_router)  # Dashboard administrativo
     app.include_router(categoria_router)  # Categorías
+    app.include_router(orden_router)      # Órdenes
     
     # Servir archivos estáticos
     app.mount("/static", StaticFiles(directory="static"), name="static")

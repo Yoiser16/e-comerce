@@ -92,16 +92,17 @@
           <tbody class="divide-y divide-gray-100">
             <tr v-for="orden in filteredOrders" :key="orden.id" class="hover:bg-gray-50">
               <td class="px-6 py-4">
-                <span class="font-mono font-medium text-gray-900">#{{ orden.id.slice(0, 8) }}</span>
+                <span class="font-mono font-medium text-gray-900">{{ orden.codigo || '#' + orden.id.slice(0, 8) }}</span>
               </td>
               <td class="px-6 py-4">
                 <div>
-                  <p class="font-medium text-gray-900">{{ orden.cliente.nombre }}</p>
-                  <p class="text-sm text-gray-500">{{ orden.cliente.email }}</p>
+                  <p class="font-medium text-gray-900">{{ orden.cliente_nombre }}</p>
+                  <p class="text-sm text-gray-500">{{ orden.cliente_email }}</p>
+                  <p v-if="orden.cliente_telefono" class="text-xs text-gray-400">{{ orden.cliente_telefono }}</p>
                 </div>
               </td>
               <td class="px-6 py-4">
-                <span class="text-gray-600">{{ orden.items }} productos</span>
+                <span class="text-gray-600">{{ orden.total_items }} productos</span>
               </td>
               <td class="px-6 py-4">
                 <span class="font-semibold text-gray-900">${{ formatNumber(orden.total) }}</span>
@@ -150,6 +151,250 @@
         </table>
       </div>
     </div>
+
+    <!-- Modal de Detalles de Orden -->
+    <div 
+      v-if="showOrderDetail" 
+      class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4"
+      @click.self="closeOrderDetail"
+    >
+      <div class="bg-white rounded-3xl max-w-3xl w-full max-h-[90vh] overflow-y-auto shadow-2xl">
+        <!-- Header del Modal -->
+        <div class="sticky top-0 bg-white border-b border-gray-100 px-6 py-5 flex items-center justify-between rounded-t-3xl">
+          <div>
+            <h3 class="text-xl font-bold text-gray-900">Detalle de Orden</h3>
+            <p class="text-sm text-gray-500 font-mono mt-1">{{ selectedOrder?.codigo }}</p>
+          </div>
+          <button 
+            @click="closeOrderDetail"
+            class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+          >
+            <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <!-- Contenido del Modal -->
+        <div v-if="loadingDetail" class="flex items-center justify-center py-20">
+          <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-brand-600"></div>
+        </div>
+
+        <div v-else-if="orderDetail" class="p-6 space-y-6">
+          <!-- Información del Cliente -->
+          <div class="bg-gradient-to-br from-[#F8F3EF] to-[#FAF5F2] rounded-2xl p-5 border border-nude-200/50">
+            <h4 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-[#8B7355]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+              </svg>
+              Información del Cliente
+            </h4>
+            <div class="grid grid-cols-2 gap-4 text-sm">
+              <div>
+                <p class="text-gray-500 mb-1">Nombre</p>
+                <p class="font-medium text-gray-900">{{ orderDetail.cliente_nombre }}</p>
+              </div>
+              <div>
+                <p class="text-gray-500 mb-1">Documento</p>
+                <p class="font-medium text-gray-900">{{ orderDetail.cliente_tipo_doc }} {{ orderDetail.cliente_num_doc }}</p>
+              </div>
+              <div>
+                <p class="text-gray-500 mb-1">Email</p>
+                <p class="font-medium text-gray-900">{{ orderDetail.cliente_email }}</p>
+              </div>
+              <div>
+                <p class="text-gray-500 mb-1">Teléfono</p>
+                <p class="font-medium text-gray-900">{{ orderDetail.cliente_telefono }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Dirección de Envío -->
+          <div v-if="orderDetail.direccion_envio" class="bg-gradient-to-br from-blue-50 to-indigo-50 rounded-2xl p-5 border border-blue-100">
+            <h4 class="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
+              </svg>
+              Dirección de Envío
+            </h4>
+            <div class="space-y-2 text-sm">
+              <p class="text-gray-900">{{ orderDetail.direccion_envio }}</p>
+              <p class="text-gray-700">{{ orderDetail.barrio }}, {{ orderDetail.municipio }}, {{ orderDetail.departamento }}</p>
+              <p v-if="orderDetail.notas_envio" class="text-gray-600 italic mt-2">{{ orderDetail.notas_envio }}</p>
+            </div>
+          </div>
+
+          <!-- Productos -->
+          <div class="border border-gray-200 rounded-2xl overflow-hidden">
+            <div class="bg-gray-50 px-5 py-3 border-b border-gray-200">
+              <h4 class="font-semibold text-gray-900 flex items-center gap-2">
+                <svg class="w-5 h-5 text-[#8B7355]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
+                </svg>
+                Productos ({{ orderDetail.items?.length || 0 }})
+              </h4>
+            </div>
+            <div class="divide-y divide-gray-100">
+              <div 
+                v-for="item in orderDetail.items" 
+                :key="item.id"
+                class="flex items-center gap-4 p-4 hover:bg-gray-50"
+              >
+                <div class="w-12 h-12 rounded-lg bg-gradient-to-br from-brand-100 to-brand-50 flex items-center justify-center flex-shrink-0 border border-brand-200">
+                  <span class="font-bold text-brand-700">{{ item.cantidad }}x</span>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-medium text-gray-900">{{ item.nombre }}</p>
+                  <p class="text-sm text-gray-500">{{ item.sku }}</p>
+                </div>
+                <div class="text-right">
+                  <p class="font-semibold text-gray-900">${{ formatNumber(item.precio_unitario * item.cantidad) }}</p>
+                  <p class="text-sm text-gray-500">${{ formatNumber(item.precio_unitario) }} c/u</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Totales -->
+          <div class="bg-gradient-to-br from-green-50 to-emerald-50 rounded-2xl p-5 border border-green-100">
+            <div class="space-y-3">
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Subtotal</span>
+                <span class="font-medium text-gray-900">${{ formatNumber(orderDetail.subtotal_monto || 0) }}</span>
+              </div>
+              <div class="flex justify-between text-sm">
+                <span class="text-gray-600">Envío</span>
+                <span class="font-medium text-gray-900">${{ formatNumber(orderDetail.envio_monto || 0) }}</span>
+              </div>
+              <div class="flex justify-between text-lg font-bold pt-3 border-t border-green-200">
+                <span class="text-gray-900">Total</span>
+                <span class="text-green-700">${{ formatNumber(orderDetail.total) }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Estado y Método de Pago -->
+          <div class="grid grid-cols-2 gap-4">
+            <div class="bg-gray-50 rounded-xl p-4">
+              <p class="text-sm text-gray-500 mb-2">Estado</p>
+              <span :class="getStatusClass(orderDetail.estado)" class="inline-block px-3 py-1.5 text-xs font-medium rounded-full">
+                {{ getStatusLabel(orderDetail.estado) }}
+              </span>
+            </div>
+            <div class="bg-gray-50 rounded-xl p-4">
+              <p class="text-sm text-gray-500 mb-2">Método de Pago</p>
+              <p class="font-medium text-gray-900 capitalize">{{ orderDetail.metodo_pago || 'WhatsApp' }}</p>
+            </div>
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="flex gap-3 pt-4">
+            <button 
+              @click="printOrder(orderDetail)"
+              class="flex-1 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-medium px-6 py-3 rounded-xl transition-all flex items-center justify-center gap-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z" />
+              </svg>
+              Imprimir
+            </button>
+            <button 
+              @click="closeOrderDetail"
+              class="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Área de impresión oculta -->
+    <div id="printArea" class="hidden print:block">
+      <div v-if="orderDetail" class="p-8 max-w-4xl mx-auto">
+        <!-- Header de Impresión -->
+        <div class="text-center mb-8 border-b-2 border-gray-300 pb-6">
+          <h1 class="text-3xl font-bold text-gray-900 mb-2">Kharis Distribuidora</h1>
+          <p class="text-gray-600">Orden de Pedido</p>
+        </div>
+
+        <!-- Información de la Orden -->
+        <div class="grid grid-cols-2 gap-8 mb-8">
+          <div>
+            <h3 class="font-bold text-gray-900 mb-3">Información de Orden</h3>
+            <p class="text-sm mb-1"><strong>Código:</strong> {{ orderDetail.codigo }}</p>
+            <p class="text-sm mb-1"><strong>Fecha:</strong> {{ formatearFecha(orderDetail.fecha_creacion) }}</p>
+            <p class="text-sm mb-1"><strong>Estado:</strong> {{ getStatusLabel(orderDetail.estado) }}</p>
+            <p class="text-sm"><strong>Método de Pago:</strong> {{ orderDetail.metodo_pago || 'WhatsApp' }}</p>
+          </div>
+          <div>
+            <h3 class="font-bold text-gray-900 mb-3">Información del Cliente</h3>
+            <p class="text-sm mb-1"><strong>Nombre:</strong> {{ orderDetail.cliente_nombre }}</p>
+            <p class="text-sm mb-1"><strong>Documento:</strong> {{ orderDetail.cliente_tipo_doc }} {{ orderDetail.cliente_num_doc }}</p>
+            <p class="text-sm mb-1"><strong>Email:</strong> {{ orderDetail.cliente_email }}</p>
+            <p class="text-sm"><strong>Teléfono:</strong> {{ orderDetail.cliente_telefono }}</p>
+          </div>
+        </div>
+
+        <!-- Dirección de Envío -->
+        <div v-if="orderDetail.direccion_envio" class="mb-8">
+          <h3 class="font-bold text-gray-900 mb-3">Dirección de Envío</h3>
+          <p class="text-sm">{{ orderDetail.direccion_envio }}</p>
+          <p class="text-sm">{{ orderDetail.barrio }}, {{ orderDetail.municipio }}, {{ orderDetail.departamento }}</p>
+          <p v-if="orderDetail.notas_envio" class="text-sm mt-2"><strong>Notas:</strong> {{ orderDetail.notas_envio }}</p>
+        </div>
+
+        <!-- Tabla de Productos -->
+        <div class="mb-8">
+          <h3 class="font-bold text-gray-900 mb-3">Productos</h3>
+          <table class="w-full border-collapse border border-gray-300">
+            <thead>
+              <tr class="bg-gray-100">
+                <th class="border border-gray-300 px-4 py-2 text-left">SKU</th>
+                <th class="border border-gray-300 px-4 py-2 text-left">Producto</th>
+                <th class="border border-gray-300 px-4 py-2 text-center">Cantidad</th>
+                <th class="border border-gray-300 px-4 py-2 text-right">Precio Unit.</th>
+                <th class="border border-gray-300 px-4 py-2 text-right">Subtotal</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr v-for="item in orderDetail.items" :key="item.id">
+                <td class="border border-gray-300 px-4 py-2 text-sm">{{ item.sku }}</td>
+                <td class="border border-gray-300 px-4 py-2 text-sm">{{ item.nombre }}</td>
+                <td class="border border-gray-300 px-4 py-2 text-center text-sm">{{ item.cantidad }}</td>
+                <td class="border border-gray-300 px-4 py-2 text-right text-sm">${{ formatNumber(item.precio_unitario) }}</td>
+                <td class="border border-gray-300 px-4 py-2 text-right text-sm">${{ formatNumber(item.precio_unitario * item.cantidad) }}</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <!-- Totales -->
+        <div class="flex justify-end">
+          <div class="w-64">
+            <div class="flex justify-between mb-2">
+              <span class="text-sm">Subtotal:</span>
+              <span class="text-sm font-medium">${{ formatNumber(orderDetail.subtotal_monto || 0) }}</span>
+            </div>
+            <div class="flex justify-between mb-2">
+              <span class="text-sm">Envío:</span>
+              <span class="text-sm font-medium">${{ formatNumber(orderDetail.envio_monto || 0) }}</span>
+            </div>
+            <div class="flex justify-between pt-2 border-t-2 border-gray-300">
+              <span class="font-bold">TOTAL:</span>
+              <span class="font-bold text-lg">${{ formatNumber(orderDetail.total) }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer -->
+        <div class="mt-12 pt-6 border-t border-gray-300 text-center text-sm text-gray-600">
+          <p>Gracias por su compra | Kharis Distribuidora</p>
+          <p class="mt-1">WhatsApp: +57 321 735 5070</p>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -165,6 +410,10 @@ export default {
     const filterDate = ref('')
     const loading = ref(true)
     const ordenes = ref([])
+    const showOrderDetail = ref(false)
+    const loadingDetail = ref(false)
+    const selectedOrder = ref(null)
+    const orderDetail = ref(null)
 
     const orderStats = computed(() => {
       const all = ordenes.value.length
@@ -187,17 +436,18 @@ export default {
         loading.value = true
         const data = await ordenesService.obtenerTodas()
         
-        // Transformar datos del backend al formato del componente
+        // Los datos ya vienen en el formato correcto desde la API
         ordenes.value = data.map(orden => ({
           id: orden.id,
-          cliente: orden.cliente_data || { 
-            nombre: orden.cliente_nombre || 'Cliente', 
-            email: orden.cliente_email || ''
-          },
-          items: orden.items?.length || orden.total_items || 0,
+          codigo: orden.codigo,
+          cliente_nombre: orden.cliente_nombre || 'Sin cliente',
+          cliente_email: orden.cliente_email || '',
+          cliente_telefono: orden.cliente_telefono || '',
+          total_items: orden.total_items || 0,
           total: orden.total || 0,
           estado: orden.estado,
-          fecha: formatearFecha(orden.fecha_creacion || orden.created_at)
+          metodo_pago: orden.metodo_pago || 'whatsapp',
+          fecha: formatearFecha(orden.fecha_creacion)
         }))
       } catch (error) {
         console.error('Error al cargar órdenes:', error)
@@ -226,8 +476,10 @@ export default {
         const query = searchQuery.value.toLowerCase()
         result = result.filter(o => 
           o.id.toLowerCase().includes(query) ||
-          o.cliente.nombre.toLowerCase().includes(query) ||
-          o.cliente.email.toLowerCase().includes(query)
+          (o.codigo && o.codigo.toLowerCase().includes(query)) ||
+          o.cliente_nombre.toLowerCase().includes(query) ||
+          o.cliente_email.toLowerCase().includes(query) ||
+          (o.cliente_telefono && o.cliente_telefono.includes(query))
         )
       }
 
@@ -267,12 +519,53 @@ export default {
       }
     }
 
-    const viewOrder = (orden) => {
-      console.log('View order:', orden)
+    const viewOrder = async (orden) => {
+      selectedOrder.value = orden
+      showOrderDetail.value = true
+      loadingDetail.value = true
+      
+      try {
+        const detalle = await ordenesService.obtenerPorId(orden.id)
+        orderDetail.value = detalle
+      } catch (error) {
+        console.error('Error al cargar detalle de orden:', error)
+        alert('Error al cargar los detalles de la orden')
+        showOrderDetail.value = false
+      } finally {
+        loadingDetail.value = false
+      }
+    }
+
+    const closeOrderDetail = () => {
+      showOrderDetail.value = false
+      selectedOrder.value = null
+      orderDetail.value = null
     }
 
     const printOrder = (orden) => {
-      console.log('Print order:', orden)
+      // Si no tenemos el detalle cargado, lo cargamos primero
+      if (!orderDetail.value || orderDetail.value.id !== orden.id) {
+        viewOrder(orden).then(() => {
+          setTimeout(() => {
+            window.print()
+          }, 500)
+        })
+      } else {
+        window.print()
+      }
+    }
+
+    const getStatusLabel = (status) => {
+      const labels = {
+        'PENDIENTE': 'Pendiente',
+        'CONFIRMADA': 'Confirmada',
+        'EN_PROCESO': 'En Proceso',
+        'ENVIADA': 'Enviada',
+        'COMPLETADA': 'Completada',
+        'CANCELADA': 'Cancelada',
+        'BORRADOR': 'Borrador'
+      }
+      return labels[status] || status
     }
 
     onMounted(() => {
@@ -287,14 +580,70 @@ export default {
       orderStats,
       ordenes,
       filteredOrders,
+      showOrderDetail,
+      loadingDetail,
+      selectedOrder,
+      orderDetail,
       formatNumber,
       getStatusClass,
+      getStatusLabel,
       clearFilters,
       updateOrderStatus,
       viewOrder,
+      closeOrderDetail,
       printOrder,
-      cargarOrdenes
+      cargarOrdenes,
+      formatearFecha
     }
   }
 }
 </script>
+
+<style scoped>
+@media print {
+  /* Ocultar todo */
+  body * {
+    visibility: hidden;
+  }
+  
+  /* Mostrar solo el área de impresión */
+  #printArea,
+  #printArea * {
+    visibility: visible;
+  }
+  
+  #printArea {
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 100%;
+  }
+  
+  /* Asegurar que se muestre */
+  .print\:block {
+    display: block !important;
+  }
+  
+  /* Ocultar elementos innecesarios */
+  .no-print {
+    display: none !important;
+  }
+  
+  /* Ajustes de página */
+  @page {
+    size: A4;
+    margin: 1cm;
+  }
+}
+
+/* Animación del modal */
+.modal-enter-active,
+.modal-leave-active {
+  transition: opacity 0.3s ease;
+}
+
+.modal-enter-from,
+.modal-leave-to {
+  opacity: 0;
+}
+</style>

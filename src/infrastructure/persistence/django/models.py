@@ -322,12 +322,58 @@ class CategoriaModel(models.Model):
 class OrdenModel(models.Model):
     """
     Modelo ORM para Orden.
+    El cliente siempre es requerido - si no existe, se crea automáticamente.
     """
+    # Estados de la orden
+    ESTADO_CHOICES = [
+        ('pendiente', 'Pendiente'),
+        ('confirmada', 'Confirmada'),
+        ('en_proceso', 'En Proceso'),
+        ('enviada', 'Enviada'),
+        ('completada', 'Completada'),
+        ('cancelada', 'Cancelada'),
+    ]
+    
+    # Métodos de pago
+    METODO_PAGO_CHOICES = [
+        ('epayco', 'ePayco'),
+        ('whatsapp', 'WhatsApp/Asesor'),
+        ('transferencia', 'Transferencia'),
+        ('contraentrega', 'Contra Entrega'),
+    ]
+    
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    cliente = models.ForeignKey(ClienteModel, on_delete=models.PROTECT, related_name='ordenes')
-    estado = models.CharField(max_length=20)
+    
+    # Cliente siempre requerido (se crea automáticamente si no existe)
+    cliente = models.ForeignKey(
+        ClienteModel, 
+        on_delete=models.PROTECT, 
+        related_name='ordenes',
+        null=True,
+        blank=True
+    )
+    
+    # Código único de la orden (ej: KH-1234)
+    codigo = models.CharField(max_length=20, unique=True, db_index=True, default='')
+    
+    # Dirección de envío para esta orden específica
+    direccion_envio = models.CharField(max_length=300, default='')
+    departamento = models.CharField(max_length=100, default='')
+    municipio = models.CharField(max_length=100, default='')
+    barrio = models.CharField(max_length=100, blank=True, default='')
+    notas_envio = models.TextField(blank=True, default='')
+    
+    # Estado y método de pago
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
+    metodo_pago = models.CharField(max_length=20, choices=METODO_PAGO_CHOICES, default='whatsapp')
+    
+    # Totales
+    subtotal_monto = models.DecimalField(max_digits=12, decimal_places=2, default=0)
+    envio_monto = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     total_monto = models.DecimalField(max_digits=12, decimal_places=2, default=0)
-    total_moneda = models.CharField(max_length=3, default='USD')
+    total_moneda = models.CharField(max_length=3, default='COP')
+    
+    # Control
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_modificacion = models.DateTimeField(auto_now=True)
@@ -341,10 +387,11 @@ class OrdenModel(models.Model):
             models.Index(fields=['cliente']),
             models.Index(fields=['estado']),
             models.Index(fields=['fecha_creacion']),
+            models.Index(fields=['codigo']),
         ]
 
     def __str__(self) -> str:
-        return f"Orden {self.id} - {self.cliente}"
+        return f"Orden {self.codigo} - {self.cliente}"
 
 
 class LineaOrdenModel(models.Model):
