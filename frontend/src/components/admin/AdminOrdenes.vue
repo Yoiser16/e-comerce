@@ -47,16 +47,16 @@
             @click="selectOrder(orden)"
             :class="['order-card', { 'order-card--active': selectedOrder?.id === orden.id, 'order-card--unseen': !isOrderSeen(orden.id) }]"
           >
-            <!-- Indicador de no visto -->
-            <div v-if="!isOrderSeen(orden.id)" class="order-card__unseen-dot"></div>
+            <!-- Indicador de no visto: Barra vertical magenta/verde -->
+            <div v-if="!isOrderSeen(orden.id)" :class="['order-card__indicator', orden.estado_pago === 'PAGADO' ? 'order-card__indicator--paid' : 'order-card__indicator--new']"></div>
             <!-- Línea 1: ID + Hora -->
             <div class="order-card__row1">
-              <span class="order-card__id">{{ orden.codigo }}</span>
+              <span :class="['order-card__id', { 'order-card__id--bold': !isOrderSeen(orden.id) }]">{{ orden.codigo }}</span>
               <span class="order-card__time">{{ formatTimeAgo(orden.fecha_creacion) }}</span>
             </div>
             <!-- Línea 2: Cliente + Total -->
             <div class="order-card__row2">
-              <span class="order-card__client">{{ orden.cliente_nombre }}</span>
+              <span :class="['order-card__client', { 'order-card__client--bold': !isOrderSeen(orden.id) }]">{{ orden.cliente_nombre }}</span>
               <span class="order-card__total">${{ formatNumber(orden.total) }}</span>
             </div>
             <!-- Línea 3: Badge + Método pago -->
@@ -104,7 +104,7 @@
             <span class="detail-header__date">{{ formatDate(selectedOrder.fecha_creacion) }}</span>
           </div>
           <div class="detail-header__actions">
-            <button @click="printOrder" class="action-btn action-btn--outline" title="Imprimir">
+            <button @click="printOrder" class="action-btn" title="Imprimir">
               <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 17h2a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v4a2 2 0 002 2h2m2 4h6a2 2 0 002-2v-4a2 2 0 00-2-2H9a2 2 0 00-2 2v4a2 2 0 002 2zm8-12V5a2 2 0 00-2-2H9a2 2 0 00-2 2v4h10z"/>
               </svg>
@@ -114,7 +114,7 @@
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
               </svg>
             </button>
-            <button class="action-btn action-btn--outline" title="Editar">
+            <button class="action-btn" title="Editar">
               <svg class="action-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"/>
               </svg>
@@ -276,11 +276,11 @@
 
           <!-- Notas si existen -->
           <div v-if="orderDetail?.notas_envio" class="notes-box">
-            <svg class="notes-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z"/>
+            <svg class="notes-icon" fill="currentColor" viewBox="0 0 20 20">
+              <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
             </svg>
             <div class="notes-content">
-              <span class="notes-label">Notas del cliente</span>
+              <span class="notes-label">NOTAS DEL CLIENTE</span>
               <p class="notes-text">{{ orderDetail.notas_envio }}</p>
             </div>
           </div>
@@ -799,24 +799,42 @@ defineExpose({ getUnseenCount })
 
 /* Order Cards */
 .order-card {
+  position: relative;
   padding: 14px 16px;
-  margin-bottom: 6px;
+  padding-left: 20px;
+  margin-bottom: 2px;
   background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 10px;
+  border-bottom: 1px solid #f3f4f6;
   cursor: pointer;
   transition: all 0.15s ease;
 }
 
 .order-card:hover {
-  border-color: #d1d5db;
   background: #fafafa;
 }
 
 .order-card--active {
-  border-color: #3b82f6;
-  background: #eff6ff;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+  background: #F9FAFB;
+  border-left: 3px solid #111827;
+  padding-left: 17px;
+}
+
+/* Indicador de orden no leída: Barra vertical */
+.order-card__indicator {
+  position: absolute;
+  left: 0;
+  top: 0;
+  bottom: 0;
+  width: 3px;
+  border-radius: 0 2px 2px 0;
+}
+
+.order-card__indicator--new {
+  background: #D81B60;
+}
+
+.order-card__indicator--paid {
+  background: #10b981;
 }
 
 .order-card__row1 {
@@ -831,6 +849,10 @@ defineExpose({ getUnseenCount })
   font-weight: 600;
   color: #111827;
   letter-spacing: -0.01em;
+}
+
+.order-card__id--bold {
+  font-weight: 700;
 }
 
 .order-card__time {
@@ -855,6 +877,11 @@ defineExpose({ getUnseenCount })
   text-overflow: ellipsis;
 }
 
+.order-card__client--bold {
+  font-weight: 600;
+  color: #111827;
+}
+
 .order-card__total {
   font-size: 15px;
   font-weight: 600;
@@ -874,32 +901,6 @@ defineExpose({ getUnseenCount })
   border-radius: 6px;
   text-transform: uppercase;
   letter-spacing: 0.03em;
-}
-
-/* Indicador de orden no vista */
-.order-card {
-  position: relative;
-}
-
-.order-card__unseen-dot {
-  position: absolute;
-  top: 14px;
-  left: -4px;
-  width: 8px;
-  height: 8px;
-  background: #3b82f6;
-  border-radius: 50%;
-  box-shadow: 0 0 0 2px #ffffff;
-}
-
-.order-card--unseen {
-  background: #f0f9ff;
-  border-color: #bfdbfe;
-}
-
-.order-card--unseen:hover {
-  background: #e0f2fe;
-  border-color: #93c5fd;
 }
 
 .badge--pending {
@@ -1025,16 +1026,17 @@ defineExpose({ getUnseenCount })
 }
 
 .detail-header__title {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
   color: #111827;
   margin: 0;
-  letter-spacing: -0.02em;
+  letter-spacing: -0.03em;
 }
 
 .detail-header__date {
-  font-size: 13px;
-  color: #6b7280;
+  font-size: 14px;
+  color: #9ca3af;
+  font-weight: 500;
 }
 
 .detail-header__actions {
@@ -1051,23 +1053,18 @@ defineExpose({ getUnseenCount })
   border-radius: 8px;
   cursor: pointer;
   transition: all 0.15s ease;
-}
-
-.action-btn--outline {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
+  background: transparent;
+  border: none;
   color: #6b7280;
 }
 
-.action-btn--outline:hover {
-  background: #f9fafb;
-  border-color: #d1d5db;
+.action-btn:hover {
+  background: #f3f4f6;
   color: #111827;
 }
 
 .action-btn--whatsapp {
   background: #25d366;
-  border: none;
   color: #ffffff;
 }
 
@@ -1098,9 +1095,9 @@ defineExpose({ getUnseenCount })
 }
 
 .bento-box {
-  background: #ffffff;
-  border: 1px solid #e5e7eb;
-  border-radius: 12px;
+  background: #F8FAFC;
+  border: none;
+  border-radius: 16px;
   overflow: hidden;
 }
 
@@ -1108,9 +1105,9 @@ defineExpose({ getUnseenCount })
   display: flex;
   align-items: center;
   gap: 8px;
-  padding: 12px 16px;
-  background: #f9fafb;
-  border-bottom: 1px solid #f3f4f6;
+  padding: 14px 16px;
+  background: transparent;
+  border-bottom: none;
 }
 
 .bento-box__icon {
@@ -1120,11 +1117,11 @@ defineExpose({ getUnseenCount })
 }
 
 .bento-box__label {
-  font-size: 11px;
-  font-weight: 600;
+  font-size: 10px;
+  font-weight: 700;
   color: #6b7280;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.08em;
 }
 
 .bento-box__content {
@@ -1235,21 +1232,24 @@ defineExpose({ getUnseenCount })
 }
 
 .compact-select {
-  padding: 8px 12px;
-  border: 1px solid #e5e7eb;
+  padding: 8px 32px 8px 12px;
+  border: 1px solid transparent;
   border-radius: 8px;
-  font-size: 13px;
-  font-weight: 500;
+  font-size: 12px;
+  font-weight: 600;
   color: #111827;
   background: #ffffff;
   outline: none;
   cursor: pointer;
   transition: all 0.15s ease;
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 10px center;
 }
 
-.compact-select:focus {
-  border-color: #3b82f6;
-  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+.compact-select:hover {
+  border-color: #e5e7eb;
 }
 
 .compact-select:disabled {
@@ -1258,13 +1258,34 @@ defineExpose({ getUnseenCount })
   opacity: 0.6;
 }
 
-/* Select States */
-.compact-select.status-pending { border-color: #fbbf24; background: #fffbeb; }
-.compact-select.status-paid { border-color: #22c55e; background: #f0fdf4; }
-.compact-select.status-cancelled { border-color: #ef4444; background: #fef2f2; }
-.compact-select.shipping-pending { border-color: #d1d5db; }
-.compact-select.shipping-sent { border-color: #3b82f6; background: #eff6ff; }
-.compact-select.shipping-delivered { border-color: #22c55e; background: #f0fdf4; }
+/* Select States - Estilo Badge */
+.compact-select.status-pending { 
+  background: #fef3c7; 
+  color: #92400e; 
+  border-color: transparent;
+}
+.compact-select.status-paid { 
+  background: #dcfce7; 
+  color: #166534; 
+  border-color: transparent;
+}
+.compact-select.status-cancelled { 
+  background: #fee2e2; 
+  color: #991b1b; 
+  border-color: transparent;
+}
+.compact-select.shipping-pending { 
+  background: #f3f4f6; 
+  color: #4b5563;
+}
+.compact-select.shipping-sent { 
+  background: #dbeafe; 
+  color: #1e40af;
+}
+.compact-select.shipping-delivered { 
+  background: #dcfce7; 
+  color: #166534;
+}
 
 /* Payment Details */
 .payment-details {
@@ -1422,9 +1443,10 @@ defineExpose({ getUnseenCount })
 
 .empty-row {
   text-align: center;
-  color: #9ca3af;
-  font-style: italic;
-  padding: 40px 20px !important;
+  color: #d1d5db;
+  font-style: normal;
+  font-size: 13px;
+  padding: 32px 20px !important;
 }
 
 /* Invoice Totals */
@@ -1456,59 +1478,61 @@ defineExpose({ getUnseenCount })
 }
 
 .totals-row--final {
-  margin-top: 8px;
-  padding-top: 12px;
-  border-top: 1px solid #e5e7eb;
+  margin-top: 10px;
+  padding-top: 14px;
+  border-top: 2px solid #e5e7eb;
 }
 
 .totals-row--final .totals-label {
   font-size: 16px;
-  font-weight: 600;
+  font-weight: 700;
   color: #111827;
 }
 
 .totals-row--final .totals-value {
-  font-size: 20px;
+  font-size: 24px;
   font-weight: 700;
   color: #111827;
+  letter-spacing: -0.02em;
 }
 
 /* Notes Box */
 .notes-box {
   display: flex;
-  gap: 12px;
-  padding: 16px;
-  background: #fffbeb;
-  border: 1px solid #fde68a;
+  gap: 14px;
+  padding: 16px 18px;
+  background: #fefce8;
+  border: 1px solid #fde047;
   border-radius: 12px;
 }
 
 .notes-icon {
-  width: 20px;
-  height: 20px;
-  min-width: 20px;
-  color: #d97706;
+  width: 18px;
+  height: 18px;
+  min-width: 18px;
+  color: #ca8a04;
+  margin-top: 2px;
 }
 
 .notes-content {
   display: flex;
   flex-direction: column;
-  gap: 4px;
+  gap: 6px;
 }
 
 .notes-label {
-  font-size: 11px;
-  font-weight: 600;
-  color: #92400e;
+  font-size: 10px;
+  font-weight: 700;
+  color: #854d0e;
   text-transform: uppercase;
-  letter-spacing: 0.03em;
+  letter-spacing: 0.08em;
 }
 
 .notes-text {
   font-size: 13px;
-  color: #78350f;
+  color: #713f12;
   margin: 0;
-  line-height: 1.5;
+  line-height: 1.6;
 }
 
 /* ========== RESPONSIVE ========== */
