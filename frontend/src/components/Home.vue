@@ -507,12 +507,12 @@
               Productos <em class="not-italic text-brand-600">Destacados</em>
             </h2>
           </div>
-          <a href="#" class="inline-flex items-center gap-2 text-text-medium hover:text-brand-600 font-medium transition-colors group">
+          <router-link to="/catalogo" class="inline-flex items-center gap-2 text-text-medium hover:text-brand-600 font-medium transition-colors group">
             Ver todo el catálogo
             <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
             </svg>
-          </a>
+          </router-link>
         </div>
 
         <!-- Loading State - Skeleton dinámico -->
