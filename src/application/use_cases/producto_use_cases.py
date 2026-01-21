@@ -43,7 +43,8 @@ class CrearProductoUseCase(CasoUsoBase[CrearProductoDTO, ProductoDTO]):
             'largo': request.largo,
             'origen': request.origen,
             'metodo': request.metodo,
-            'calidad': request.calidad
+            'calidad': request.calidad,
+            'destacado': request.destacado
         }
         
         guardado = self._repo.guardar(
@@ -134,6 +135,8 @@ class ActualizarProductoUseCase(CasoUsoBase[ActualizarProductoDTO, ProductoDTO])
             producto.stock_minimo = request.stock_minimo
         if request.activo is not None:
             producto.activo = request.activo
+        if request.destacado is not None:
+            atributos_adicionales['destacado'] = request.destacado
         
         # Guardar y pasar la categoría y atributos adicionales al repositorio
         guardado = self._repo.guardar(

@@ -397,6 +397,30 @@
         </div>
       </div>
 
+      <!-- Producto Destacado -->
+      <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
+        <div class="flex items-center justify-between">
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Producto Destacado</h3>
+            <p class="text-gray-500 text-sm">Los productos destacados aparecerán en la página principal</p>
+          </div>
+          <label class="relative inline-flex items-center cursor-pointer">
+            <input 
+              type="checkbox" 
+              v-model="form.destacado" 
+              class="sr-only peer"
+            >
+            <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none peer-focus:ring-4 peer-focus:ring-gold-500/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-gold-500"></div>
+            <span class="ml-3 text-sm font-medium flex items-center gap-1.5" :class="form.destacado ? 'text-gold-500' : 'text-gray-500'">
+              <svg v-if="form.destacado" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+              </svg>
+              {{ form.destacado ? 'Destacado' : 'No Destacado' }}
+            </span>
+          </label>
+        </div>
+      </div>
+
       <!-- Actions -->
       <div class="flex justify-end gap-4">
         <button 
@@ -455,7 +479,8 @@ export default {
       origen: '',
       calidad: '',
       imagen_principal: '',
-      activo: true
+      activo: true,
+      destacado: false
     })
 
     const isEditing = computed(() => !!route.params.id)
@@ -531,7 +556,8 @@ export default {
           origen: atributos.origen || '',
           calidad: atributos.calidad || '',
           imagen_principal: producto.imagen_principal || '',
-          activo: producto.activo !== false
+          activo: producto.activo !== false,
+          destacado: producto.destacado || false
         }
       } catch (err) {
         console.error('Error loading product:', err)

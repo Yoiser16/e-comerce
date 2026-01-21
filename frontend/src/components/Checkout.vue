@@ -29,23 +29,23 @@
     <div class="bg-white border-b border-[#E5E7EB] py-8">
       <div class="max-w-2xl mx-auto px-6">
         <div class="flex items-center justify-between relative">
-          <div class="absolute top-5 left-[10%] right-[10%] h-[2px] bg-[#E5E7EB]"></div>
+          <div class="absolute top-5 left-[10%] right-[10%] h-[2px] bg-[#F5EBE5]"></div>
           <div 
-            class="absolute top-5 left-[10%] h-[2px] bg-[#1A1A1A] transition-all duration-500"
+            class="absolute top-5 left-[10%] h-[2px] bg-gradient-to-r from-[#D81B60] to-[#C9A962] transition-all duration-500"
             :style="{ width: stepperProgress }"
           ></div>
           
           <div class="relative z-10 flex flex-col items-center" @click="goToStep(1)">
             <div :class="[
               'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all cursor-pointer',
-              currentStep >= 1 ? 'bg-[#1A1A1A] text-white' : 'bg-white border-2 border-[#E5E7EB] text-[#9CA3AF]'
+              currentStep >= 1 ? 'bg-gradient-to-br from-[#D81B60] to-[#C2185B] text-white shadow-md' : 'bg-white border-2 border-[#F5EBE5] text-[#9CA3AF]'
             ]">
               <svg v-if="currentStep > 1" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
               </svg>
               <span v-else>1</span>
             </div>
-            <span :class="['mt-3 text-xs font-medium tracking-wide uppercase', currentStep >= 1 ? 'text-[#1A1A1A]' : 'text-[#9CA3AF]']">
+            <span :class="['mt-3 text-xs font-medium tracking-wide uppercase', currentStep >= 1 ? 'text-[#D81B60]' : 'text-[#9CA3AF]']">
               Datos
             </span>
           </div>
@@ -53,14 +53,14 @@
           <div class="relative z-10 flex flex-col items-center" @click="goToStep(2)">
             <div :class="[
               'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all cursor-pointer',
-              currentStep >= 2 ? 'bg-[#1A1A1A] text-white' : 'bg-white border-2 border-[#E5E7EB] text-[#9CA3AF]'
+              currentStep >= 2 ? 'bg-gradient-to-br from-[#D81B60] to-[#C2185B] text-white shadow-md' : 'bg-white border-2 border-[#F5EBE5] text-[#9CA3AF]'
             ]">
               <svg v-if="currentStep > 2" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
               </svg>
               <span v-else>2</span>
             </div>
-            <span :class="['mt-3 text-xs font-medium tracking-wide uppercase', currentStep >= 2 ? 'text-[#1A1A1A]' : 'text-[#9CA3AF]']">
+            <span :class="['mt-3 text-xs font-medium tracking-wide uppercase', currentStep >= 2 ? 'text-[#D81B60]' : 'text-[#9CA3AF]']">
               Envío
             </span>
           </div>
@@ -68,11 +68,11 @@
           <div class="relative z-10 flex flex-col items-center" @click="goToStep(3)">
             <div :class="[
               'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all cursor-pointer',
-              currentStep >= 3 ? 'bg-[#1A1A1A] text-white' : 'bg-white border-2 border-[#E5E7EB] text-[#9CA3AF]'
+              currentStep >= 3 ? 'bg-gradient-to-br from-[#D81B60] to-[#C2185B] text-white shadow-md' : 'bg-white border-2 border-[#F5EBE5] text-[#9CA3AF]'
             ]">
               <span>3</span>
             </div>
-            <span :class="['mt-3 text-xs font-medium tracking-wide uppercase', currentStep >= 3 ? 'text-[#1A1A1A]' : 'text-[#9CA3AF]']">
+            <span :class="['mt-3 text-xs font-medium tracking-wide uppercase', currentStep >= 3 ? 'text-[#D81B60]' : 'text-[#9CA3AF]']">
               Pago
             </span>
           </div>
@@ -128,7 +128,7 @@
                   <label class="flex items-center gap-3 cursor-pointer group mt-6">
                     <div class="relative">
                       <input type="checkbox" v-model="form.newsletter" class="sr-only peer" @change="saveFormToStorage" />
-                      <div class="w-5 h-5 border-2 border-[#D1D5DB] rounded peer-checked:bg-[#1A1A1A] peer-checked:border-[#1A1A1A] transition-all"></div>
+                      <div class="w-5 h-5 border-2 border-[#F5AEC8] rounded peer-checked:bg-gradient-to-br peer-checked:from-[#D81B60] peer-checked:to-[#C2185B] peer-checked:border-[#D81B60] transition-all"></div>
                       <svg class="absolute inset-0 w-5 h-5 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                       </svg>
@@ -141,7 +141,7 @@
                   <button 
                     @click="nextStep"
                     :disabled="!isStep1Valid"
-                    class="w-full bg-[#000000] hover:bg-[#D81B60] disabled:bg-[#F3F4F6] disabled:text-[#9CA3AF] text-white py-4 text-sm font-medium tracking-widest uppercase transition-all"
+                    class="w-full bg-gradient-to-r from-[#D81B60] to-[#C2185B] hover:from-[#C2185B] hover:to-[#AD1457] disabled:bg-[#F3F4F6] disabled:text-[#9CA3AF] text-white py-4 text-sm font-medium tracking-widest uppercase transition-all shadow-sm"
                   >
                     Continuar al Envío
                   </button>
@@ -380,14 +380,14 @@
                   <div class="flex gap-4">
                     <button 
                       @click="prevStep"
-                      class="px-8 py-4 border border-[#E5E7EB] text-[#4A4A4A] text-sm font-medium tracking-widest uppercase hover:border-[#1A1A1A] transition-all"
+                      class="px-8 py-4 border border-[#F5AEC8] text-[#4A4A4A] text-sm font-medium tracking-widest uppercase hover:border-[#D81B60] hover:bg-[#FEF7FA] transition-all"
                     >
                       Volver
                     </button>
                     <button 
                       @click="nextStep"
                       :disabled="!isStep2Valid"
-                      class="flex-1 bg-[#000000] hover:bg-[#D81B60] disabled:bg-[#F3F4F6] disabled:text-[#9CA3AF] text-white py-4 text-sm font-medium tracking-widest uppercase transition-all"
+                      class="flex-1 bg-gradient-to-r from-[#D81B60] to-[#C2185B] hover:from-[#C2185B] hover:to-[#AD1457] disabled:bg-[#F3F4F6] disabled:text-[#9CA3AF] text-white py-4 text-sm font-medium tracking-widest uppercase transition-all shadow-sm"
                     >
                       Continuar al Pago
                     </button>
@@ -508,14 +508,14 @@
                   <div class="flex gap-4">
                     <button 
                       @click="prevStep"
-                      class="px-8 py-4 border border-[#E5E7EB] text-[#4A4A4A] text-sm font-medium tracking-widest uppercase hover:border-[#1A1A1A] transition-all"
+                      class="px-8 py-4 border border-[#F5AEC8] text-[#4A4A4A] text-sm font-medium tracking-widest uppercase hover:border-[#D81B60] hover:bg-[#FEF7FA] transition-all"
                     >
                       Volver
                     </button>
                     <button 
                       @click="processPayment"
                       :disabled="!selectedPayment || processing"
-                      class="flex-1 bg-[#000000] hover:bg-[#D81B60] disabled:bg-[#F3F4F6] disabled:text-[#9CA3AF] text-white py-4 text-sm font-medium tracking-widest uppercase transition-all flex items-center justify-center gap-2"
+                      class="flex-1 bg-gradient-to-r from-[#D81B60] to-[#C2185B] hover:from-[#C2185B] hover:to-[#AD1457] disabled:bg-[#F3F4F6] disabled:text-[#9CA3AF] text-white py-4 text-sm font-medium tracking-widest uppercase transition-all shadow-sm flex items-center justify-center gap-2"
                     >
                       <svg v-if="processing" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                         <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -581,10 +581,10 @@
                   <input 
                     type="text" 
                     v-model="cupon"
-                    class="flex-1 px-4 py-3 bg-white border border-[#E5E7EB] text-sm focus:outline-none focus:border-[#1A1A1A] placeholder:text-[#9CA3AF]"
+                    class="flex-1 px-4 py-3 bg-white border border-[#E5E7EB] text-sm focus:outline-none focus:border-[#D81B60] focus:shadow-[0_0_0_3px_rgba(216,27,96,0.08)] placeholder:text-[#9CA3AF] transition-all"
                     placeholder="Código de descuento"
                   />
-                  <button class="px-5 py-3 bg-[#1A1A1A] text-white text-sm font-medium hover:bg-black transition-colors">
+                  <button class="px-5 py-3 bg-gradient-to-r from-[#D81B60] to-[#C2185B] text-white text-sm font-medium hover:from-[#C2185B] hover:to-[#AD1457] transition-all shadow-sm">
                     Aplicar
                   </button>
                 </div>
@@ -602,12 +602,12 @@
                   </span>
                 </div>
                 
-                <div class="border-t-2 border-[#1A1A1A] my-4"></div>
+                <div class="border-t-2 border-[#F5AEC8] my-4"></div>
                 
                 <div class="flex justify-between items-baseline">
                   <span class="font-luxury text-lg text-[#1A1A1A]">Total</span>
                   <div class="text-right">
-                    <span class="font-luxury text-2xl lg:text-3xl text-[#1A1A1A]">${{ formatPrice(getTotal()) }}</span>
+                    <span class="font-luxury text-2xl lg:text-3xl text-[#D81B60]">${{ formatPrice(getTotal()) }}</span>
                     <span class="text-xs text-[#7A7A7A] ml-1">COP</span>
                   </div>
                 </div>
@@ -615,19 +615,28 @@
                 <p class="text-xs text-[#6B7280] text-right">Incluye impuestos</p>
               </div>
               
-              <div v-if="!envioGratis" class="px-6 py-4 bg-[#F9FAFB] border-t border-[#E5E7EB]">
-                <div class="flex items-center gap-2 text-xs text-[#6B7280]">
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <div v-if="!envioGratis" class="px-6 py-4 bg-gradient-to-br from-[#FEF7FA] to-[#FAF5F2] border-t border-[#F5EBE5]">
+                <div class="flex items-center gap-2 text-xs text-[#6B7280] mb-3">
+                  <svg class="w-4 h-4 text-[#D81B60]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
                   </svg>
-                  <span>Agrega ${{ formatPrice(300000 - getSubtotal()) }} más para envío gratis</span>
+                  <span class="font-medium text-[#4A4A4A]">¡Estás cerca! Agrega ${{ formatPrice(300000 - getSubtotal()) }} más para envío gratis</span>
                 </div>
-                <div class="w-full h-1.5 bg-[#E5E7EB] rounded-full mt-2 overflow-hidden">
+                <div class="w-full h-1.5 bg-white rounded-full overflow-hidden shadow-inner mb-3">
                   <div 
-                    class="h-full bg-[#C9A962] transition-all"
+                    class="h-full bg-gradient-to-r from-[#D81B60] to-[#C9A962] transition-all shadow-sm"
                     :style="{ width: Math.min((getSubtotal() / 300000) * 100, 100) + '%' }"
                   ></div>
                 </div>
+                <router-link 
+                  to="/"
+                  class="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-[#D81B60] text-[#D81B60] text-xs font-medium tracking-wide uppercase hover:bg-[#D81B60] hover:text-white transition-all"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                  </svg>
+                  Seguir Comprando
+                </router-link>
               </div>
             </div>
           </div>
@@ -1156,8 +1165,8 @@ export default {
 .input-group select:focus,
 .input-group textarea:focus {
   outline: none;
-  border-color: #1A1A1A;
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+  border-color: #D81B60;
+  box-shadow: 0 0 0 3px rgba(216, 27, 96, 0.08);
 }
 
 .input-group input::placeholder,
@@ -1188,8 +1197,8 @@ export default {
 
 .select-wrapper select:focus {
   outline: none;
-  border-color: #1A1A1A;
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+  border-color: #D81B60;
+  box-shadow: 0 0 0 3px rgba(216, 27, 96, 0.08);
 }
 
 .select-wrapper select:disabled {
@@ -1232,13 +1241,14 @@ export default {
 }
 
 .dropdown-trigger:hover {
-  border-color: #9CA3AF;
+  border-color: #F5AEC8;
+  background-color: #FEFBFC;
 }
 
 .dropdown-trigger:focus {
   outline: none;
-  border-color: #1A1A1A;
-  box-shadow: 0 0 0 3px rgba(0, 0, 0, 0.05);
+  border-color: #D81B60;
+  box-shadow: 0 0 0 3px rgba(216, 27, 96, 0.08);
 }
 
 .dropdown-trigger:disabled {
@@ -1311,12 +1321,12 @@ export default {
 }
 
 .dropdown-list li:hover {
-  background: #F9FAFB;
+  background: #FEF7FA;
 }
 
 .dropdown-list li.selected {
-  background: #F3F4F6;
-  color: #1A1A1A;
+  background: linear-gradient(to right, #FEF7FA, #FAF5F2);
+  color: #D81B60;
   font-weight: 500;
 }
 

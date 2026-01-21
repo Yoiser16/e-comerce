@@ -138,6 +138,26 @@
                     </div>
                   </div>
 
+                  <!-- Row 3.5: Destacado -->
+                  <div class="border border-gold-200 bg-gold-50/30 rounded-lg p-3">
+                    <label class="flex items-center justify-between cursor-pointer">
+                      <div class="flex items-center gap-2">
+                        <svg class="w-4 h-4 text-gold-500" fill="currentColor" viewBox="0 0 20 20">
+                          <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                        </svg>
+                        <div>
+                          <span class="text-xs font-medium text-gray-700">Producto Destacado</span>
+                          <p class="text-xs text-gray-500">Aparecerá en la página principal</p>
+                        </div>
+                      </div>
+                      <div class="flex items-center gap-2">
+                        <input v-model="form.destacado" type="checkbox" class="sr-only peer">
+                        <div class="relative w-10 h-5 bg-gray-200 peer-focus:ring-2 peer-focus:ring-gold-300 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-4 after:w-4 after:transition-all peer-checked:bg-gold-500"></div>
+                        <span class="text-xs font-medium" :class="form.destacado ? 'text-gold-600' : 'text-gray-500'">{{ form.destacado ? 'Sí' : 'No' }}</span>
+                      </div>
+                    </label>
+                  </div>
+
                   <!-- Row 4: Atributos con Checkboxes -->
                   <div class="border border-gray-200 rounded-lg p-3">
                     <div class="flex items-center justify-between mb-3">
@@ -392,7 +412,8 @@ const form = ref({
   origen: '',
   calidad: '',
   imagen_principal: '',
-  activo: true
+  activo: true,
+  destacado: false
 })
 
 // Checkboxes para habilitar atributos
@@ -422,7 +443,8 @@ const resetForm = () => {
     origen: '',
     calidad: '',
     imagen_principal: '',
-    activo: true
+    activo: true,
+    destacado: false
   }
   enabledAttrs.value = {
     metodo: false,
@@ -443,41 +465,28 @@ const resetForm = () => {
 // Handle file selection
 const handleFileSelect = (event) => {
   const file = event.target.files[0]
-  if (!file) {
-    console.log('❌ No se seleccionó archivo')
-    return
-  }
-  
-  console.log('📁 Archivo seleccionado:', {
-    nombre: file.name,
-    tamaño: `${(file.size / 1024 / 1024).toFixed(2)} MB`,
-    tipo: file.type
-  })
+  if (!file) return
   
   // Validate file size (5MB max)
   if (file.size > 5 * 1024 * 1024) {
     error.value = 'La imagen no debe superar 5MB'
-    console.log('❌ Archivo muy grande:', file.size)
     return
   }
   
   // Validate file type
   if (!file.type.startsWith('image/')) {
     error.value = 'Solo se permiten archivos de imagen'
-    console.log('❌ Tipo de archivo no válido:', file.type)
     return
   }
   
   selectedFile.value = file
   selectedFileName.value = file.name
   error.value = null
-  console.log('✅ Archivo validado y listo para subir')
   
   // Create preview
   const reader = new FileReader()
   reader.onload = (e) => {
     imagePreview.value = e.target.result
-    console.log('🖼️ Preview generado')
   }
   reader.readAsDataURL(file)
 }
@@ -494,8 +503,6 @@ const loadProduct = async () => {
   
   try {
     const producto = await productosService.getProducto(props.productId)
-    console.log('Producto cargado en modal:', producto)
-    console.log('🖼️ Imagen del producto:', producto.imagen_principal)
     
     const atributos = producto.atributos || {}
     
@@ -514,10 +521,9 @@ const loadProduct = async () => {
       origen: atributos.origen || '',
       calidad: atributos.calidad || '',
       imagen_principal: producto.imagen_principal || '',
-      activo: producto.activo !== false
+      activo: producto.activo !== false,
+      destacado: producto.destacado || false
     }
-    
-    console.log('📋 Formulario rellenado con imagen:', form.value.imagen_principal)
     
     // Habilitar checkboxes si tienen valor
     enabledAttrs.value = {
@@ -548,20 +554,13 @@ const submitForm = async () => {
     
     let imagenUrl = form.value.imagen_principal
     
-    console.log('💾 Iniciando guardado de producto...')
-    console.log('🔧 Modo de imagen:', imageUploadMode.value)
-    console.log('📷 Archivo seleccionado:', selectedFile.value ? selectedFile.value.name : 'Ninguno')
-    console.log('🔗 URL actual:', imagenUrl)
-    
     // Si hay un archivo seleccionado, subirlo primero
     if (selectedFile.value && imageUploadMode.value === 'file') {
-      console.log('📤 Preparando subida de archivo...')
       const formData = new FormData()
       formData.append('file', selectedFile.value)
       
       try {
-        console.log('🌐 Enviando archivo a servidor...')
-        // Subir imagen al servidor (necesitas crear este endpoint)
+        // Subir imagen al servidor
         const uploadResponse = await fetch('http://localhost:8000/api/v1/upload/imagen', {
           method: 'POST',
           headers: {
@@ -570,20 +569,14 @@ const submitForm = async () => {
           body: formData
         })
         
-        console.log('📡 Respuesta del servidor:', uploadResponse.status)
-        
         if (uploadResponse.ok) {
           const result = await uploadResponse.json()
-          console.log('✅ Imagen subida exitosamente:', result)
           imagenUrl = result.url || result.imagen_url
-          console.log('🔗 Nueva URL de imagen:', imagenUrl)
         } else {
-          const errorText = await uploadResponse.text()
-          console.error('❌ Error del servidor:', errorText)
           throw new Error('Error al subir la imagen')
         }
       } catch (uploadErr) {
-        console.error('❌ Error uploading image:', uploadErr)
+        console.error('Error uploading image:', uploadErr)
         error.value = 'Error al subir la imagen. Por ahora usa URL externa.'
         saving.value = false
         return
@@ -599,23 +592,15 @@ const submitForm = async () => {
       tipo: enabledAttrs.value.tipo ? form.value.tipo : null,
       origen: enabledAttrs.value.origen ? form.value.origen : null,
       calidad: enabledAttrs.value.calidad ? form.value.calidad : null,
-      imagen_principal: imagenUrl || null
+      imagen_principal: imagenUrl || null,
+      destacado: form.value.destacado
     }
     
-    console.log('📦 Datos a enviar al backend:', {
-      ...data,
-      imagen_principal: data.imagen_principal ? data.imagen_principal.substring(0, 100) + '...' : 'null'
-    })
-    
     if (isEditing.value) {
-      console.log('✏️ Actualizando producto ID:', props.productId)
       await productosService.actualizar(props.productId, data)
-      console.log('✅ Producto actualizado')
       emit('updated')
     } else {
-      console.log('➕ Creando nuevo producto')
       await productosService.crear(data)
-      console.log('✅ Producto creado')
       emit('created')
     }
     closeModal()

@@ -28,6 +28,7 @@ class CrearProductoDTO:
     origen: Optional[str] = None
     metodo: Optional[str] = None
     calidad: Optional[str] = None
+    destacado: bool = False
 
 
 @dataclass
@@ -48,6 +49,7 @@ class ActualizarProductoDTO:
     origen: Optional[str] = None
     metodo: Optional[str] = None
     calidad: Optional[str] = None
+    destacado: Optional[bool] = None
 
 
 @dataclass
@@ -73,6 +75,7 @@ class ProductoDTO:
     origen: Optional[str] = None
     metodo: Optional[str] = None
     calidad: Optional[str] = None
+    destacado: bool = False
     
     @classmethod
     def desde_entidad(cls, producto: Producto) -> 'ProductoDTO':
@@ -99,4 +102,5 @@ class ProductoDTO:
             origen=getattr(producto, 'origen', None),
             metodo=getattr(producto, 'metodo', None),
             calidad=getattr(producto, 'calidad', None),
+            destacado=getattr(producto, 'destacado', False),
         )

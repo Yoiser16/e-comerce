@@ -42,7 +42,8 @@ class Producto(EntidadBase):
         largo: Optional[str] = None,
         origen: Optional[str] = None,
         metodo: Optional[str] = None,
-        calidad: Optional[str] = None
+        calidad: Optional[str] = None,
+        destacado: bool = False
     ):
         super().__init__(id, fecha_creacion, fecha_modificacion, activo)
         self._codigo = codigo
@@ -59,6 +60,7 @@ class Producto(EntidadBase):
         self._origen = origen
         self._metodo = metodo
         self._calidad = calidad
+        self._destacado = destacado
     
     @property
     def categoria(self) -> Optional[str]:
@@ -101,6 +103,15 @@ class Producto(EntidadBase):
     @property
     def calidad(self) -> Optional[str]:
         return self._calidad
+    
+    @property
+    def destacado(self) -> bool:
+        return self._destacado
+    
+    @destacado.setter
+    def destacado(self, valor: bool) -> None:
+        self._destacado = valor
+        self.marcar_modificado()
     
     @property
     def codigo(self) -> CodigoProducto:

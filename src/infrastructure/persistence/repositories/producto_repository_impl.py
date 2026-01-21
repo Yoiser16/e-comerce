@@ -58,7 +58,8 @@ class ProductoRepositoryImpl(ProductoRepository):
             largo=model.largo,
             origen=model.origen,
             metodo=model.metodo,
-            calidad=model.calidad
+            calidad=model.calidad,
+            destacado=model.destacado
         )
     
     def _to_model(self, entity: Producto) -> ProductoModel:
@@ -193,6 +194,8 @@ class ProductoRepositoryImpl(ProductoRepository):
                         model_anterior.metodo = atributos_adicionales['metodo']
                     if 'calidad' in atributos_adicionales:
                         model_anterior.calidad = atributos_adicionales['calidad']
+                    if 'destacado' in atributos_adicionales:
+                        model_anterior.destacado = atributos_adicionales['destacado']
                 model = model_anterior
             else:
                 # Crear nuevo modelo
@@ -216,6 +219,8 @@ class ProductoRepositoryImpl(ProductoRepository):
                         model.metodo = atributos_adicionales['metodo']
                     if 'calidad' in atributos_adicionales:
                         model.calidad = atributos_adicionales['calidad']
+                    if 'destacado' in atributos_adicionales:
+                        model.destacado = atributos_adicionales['destacado']
             
             model.save()
             

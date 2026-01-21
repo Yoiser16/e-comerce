@@ -53,6 +53,21 @@ def listar_productos(
         raise HTTPException(status_code=500, detail=str(e))
 
 
+@router.get("/destacados", response_model=List[ProductoDTO])
+def listar_productos_destacados(
+    limite: int = 8,
+    repo: ProductoRepository = Depends(get_producto_repository)
+):
+    """
+    Lista los productos destacados para mostrar en la página principal.
+    """
+    try:
+        productos = repo.obtener_destacados(limite=limite)
+        return [ProductoDTO.desde_entidad(p) for p in productos]
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/admin/todos", response_model=List[ProductoDTO])
 def listar_todos_productos(
     limite: int = 100,

@@ -1837,15 +1837,9 @@ export default {
       loading.value = true
       error.value = null
       try {
-        // Primero intentar obtener productos destacados
-        let data = await productosService.getDestacados()
-        let productosData = data.productos || data.results || data || []
-        
-        // Si no hay destacados, obtener todos los productos disponibles
-        if (productosData.length === 0) {
-          data = await productosService.getProductos()
-          productosData = data.productos || data.results || data || []
-        }
+        // Obtener SOLO productos destacados (no mostrar otros)
+        const data = await productosService.getDestacados()
+        const productosData = data.productos || data.results || data || []
         
         productos.value = productosData
       } catch (err) {
