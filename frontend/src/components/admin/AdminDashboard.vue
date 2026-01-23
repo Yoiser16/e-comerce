@@ -1,444 +1,303 @@
 <template>
-  <div class="space-y-6 lg:space-y-8">
+  <div class="space-y-8 animate-fade-in font-sans pb-12">
     
-    <!-- Loading Skeleton State -->
-    <div v-if="loading" class="space-y-6 lg:space-y-8">
-      
-      <!-- Header Skeleton -->
-      <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4">
-        <div class="space-y-2">
-          <div class="h-4 w-48 bg-gray-100 rounded-lg animate-pulse"></div>
-          <div class="h-8 w-64 bg-gray-100 rounded-lg animate-pulse"></div>
-        </div>
-        <div class="flex gap-3">
-          <div class="h-10 w-24 bg-gray-100 rounded-xl animate-pulse"></div>
-          <div class="h-10 w-32 bg-gray-100 rounded-xl animate-pulse"></div>
-        </div>
-      </div>
-
-      <!-- Stats Cards Skeleton -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6">
-        <div v-for="i in 4" :key="i" class="bg-white rounded-2xl p-5 lg:p-6 border border-gray-100">
-          <div class="flex items-start justify-between mb-4">
-            <div class="w-10 h-10 bg-gray-100 rounded-xl animate-pulse"></div>
-            <div class="h-6 w-16 bg-gray-100 rounded-full animate-pulse"></div>
-          </div>
-          <div class="h-8 w-24 bg-gray-100 rounded-lg animate-pulse mb-2"></div>
-          <div class="h-4 w-32 bg-gray-100 rounded-lg animate-pulse"></div>
-        </div>
-      </div>
-
-      <!-- Charts Skeleton -->
-      <div class="grid lg:grid-cols-5 gap-6">
-        <!-- Big chart -->
-        <div class="lg:col-span-3 bg-white rounded-2xl border border-gray-100 p-6">
-          <div class="h-6 w-40 bg-gray-100 rounded-lg animate-pulse mb-6"></div>
-          <div class="h-64 bg-gray-50 rounded-xl animate-pulse"></div>
-        </div>
-        <!-- Donut chart -->
-        <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 p-6">
-          <div class="h-6 w-32 bg-gray-100 rounded-lg animate-pulse mb-6"></div>
-          <div class="flex flex-col items-center gap-4">
-            <div class="w-36 h-36 bg-gray-50 rounded-full animate-pulse"></div>
-            <div class="w-full space-y-2">
-              <div v-for="i in 3" :key="i" class="h-8 bg-gray-50 rounded-lg animate-pulse"></div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Tables Skeleton -->
-      <div class="grid lg:grid-cols-3 gap-6">
-        <!-- Left Table Skeleton -->
-        <div class="lg:col-span-2 bg-white rounded-2xl border border-gray-100 overflow-hidden">
-          <div class="p-5 border-b border-gray-100">
-            <div class="h-6 w-40 bg-gray-100 rounded-lg animate-pulse"></div>
-          </div>
-          <div class="p-5 space-y-3">
-            <div v-for="i in 5" :key="i" class="flex justify-between items-center py-3 border-b border-gray-50">
-              <div class="space-y-2 flex-1">
-                <div class="h-4 w-3/4 bg-gray-100 rounded-lg animate-pulse"></div>
-                <div class="h-3 w-1/2 bg-gray-100 rounded-lg animate-pulse"></div>
-              </div>
-              <div class="h-6 w-20 bg-gray-100 rounded-full animate-pulse"></div>
-            </div>
-          </div>
-        </div>
-
-        <!-- Right Table Skeleton -->
-        <div class="bg-white rounded-2xl border border-gray-100 overflow-hidden">
-          <div class="p-5 border-b border-gray-100">
-            <div class="h-6 w-32 bg-gray-100 rounded-lg animate-pulse"></div>
-          </div>
-          <div class="p-5 space-y-3">
-            <div v-for="i in 5" :key="i" class="flex justify-between items-center py-3 border-b border-gray-50">
-              <div class="space-y-2 flex-1">
-                <div class="h-4 w-full bg-gray-100 rounded-lg animate-pulse"></div>
-                <div class="h-3 w-2/3 bg-gray-100 rounded-lg animate-pulse"></div>
-              </div>
-              <div class="h-6 w-12 bg-gray-100 rounded animate-pulse"></div>
-            </div>
-          </div>
+    <!-- Loading State -->
+    <div v-if="loading" class="flex items-center justify-center min-h-[600px]">
+      <div class="relative w-24 h-24">
+        <div class="absolute inset-0 border-4 border-gray-100 rounded-full"></div>
+        <div class="absolute inset-0 border-4 border-brand-500 rounded-full border-t-transparent animate-spin"></div>
+        <div class="absolute inset-0 flex items-center justify-center">
+          <span class="text-brand-500 font-bold text-xs">CARGANDO</span>
         </div>
       </div>
     </div>
 
     <!-- Error State -->
-    <div v-else-if="error" class="bg-red-50 border border-red-200 rounded-xl p-6 text-center">
-      <p class="text-red-600 mb-4">{{ error }}</p>
-      <button @click="cargarDatos" class="px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700">
-        Reintentar
-      </button>
+    <div v-else-if="error" class="min-h-[400px] flex items-center justify-center">
+      <div class="text-center max-w-md mx-auto p-8 rounded-3xl bg-white shadow-[0_20px_50px_rgba(0,0,0,0.05)] border border-gray-100">
+        <div class="w-20 h-20 mx-auto bg-red-50 rounded-2xl flex items-center justify-center mb-6 rotate-3 hover:rotate-6 transition-transform">
+          <svg class="w-10 h-10 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/></svg>
+        </div>
+        <h3 class="text-2xl font-bold text-gray-900 mb-2 font-luxury">Sin conexión</h3>
+        <p class="text-gray-500 mb-8 leading-relaxed">{{ error }}</p>
+        <button @click="cargarDatos" class="w-full py-4 bg-gray-900 text-white font-medium rounded-xl hover:bg-black transition-all hover:shadow-lg hover:-translate-y-1">
+          Reintentar ahora
+        </button>
+      </div>
     </div>
 
-    <!-- Content -->
-    <div v-else>
+    <!-- Main Content -->
+    <div v-else class="space-y-10">
 
-      <!-- Header Section -->
-      <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-4 lg:gap-6">
+      <!-- Header & Quick Actions -->
+      <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-8">
         <div>
-          <div class="flex items-center gap-2 text-sm text-text-light mb-1">
-            <span class="w-2 h-2 bg-green-500 rounded-full animate-pulse"></span>
-            Sistema Operativo • {{ fechaActual }}
-          </div>
-          <h1 class="font-luxury text-2xl lg:text-3xl text-text-dark">
-            Panel de Control
-          </h1>
+          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold tracking-wide border border-emerald-100 mb-4 shadow-sm">
+            <span class="relative flex h-2 w-2">
+              <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+              <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+            </span>
+            SISTEMA OPERATIVO
+          </span>
+          <h1 class="font-luxury text-5xl text-gray-900 mb-2 tracking-tight">Panel de Control</h1>
+          <p class="text-gray-500 text-lg">Resumen global de <span class="text-brand-600 font-medium">{{ fechaActual }}</span></p>
         </div>
-        <div class="flex items-center gap-3">
-          <button 
-            @click="cargarDatos"
-            class="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-text-medium hover:text-text-dark border border-gray-200 rounded-xl hover:bg-gray-50 transition-all"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-            </svg>
-            Refrescar
+
+        <div class="flex flex-wrap gap-4">
+          <router-link to="/admin/productos" class="pl-4 pr-6 py-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all flex items-center gap-3 group text-gray-600 hover:text-gray-900 hover:border-gray-200">
+            <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+            </div>
+            <span class="font-medium">Inventario</span>
+          </router-link>
+          
+          <router-link to="/admin/ordenes" class="pl-4 pr-6 py-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all flex items-center gap-3 group text-gray-600 hover:text-gray-900 hover:border-gray-200">
+            <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+            </div>
+            <span class="font-medium">Pedidos</span>
+          </router-link>
+
+          <button @click="cargarDatos" class="p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all text-gray-400 hover:text-brand-600 group">
+            <svg class="w-6 h-6 transform group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           </button>
-          <router-link 
-            to="/admin/productos/nuevo"
-            class="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-medium px-5 py-2.5 rounded-xl transition-all shadow-lg shadow-emerald-500/20"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
+
+          <router-link to="/admin/productos/nuevo" class="px-6 py-3 rounded-2xl bg-gray-900 text-white font-medium shadow-lg shadow-gray-900/20 hover:bg-black hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
             Nueva Venta
           </router-link>
         </div>
       </div>
 
-      <!-- Stats Cards Row -->
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-6 mt-6 lg:mt-8">
+      <!-- Stats Masonry Grid -->
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         
-        <!-- Ventas del Mes -->
-        <div class="bg-white rounded-2xl p-5 lg:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-          <div class="flex items-start justify-between mb-4">
-            <div class="w-10 h-10 bg-emerald-50 rounded-xl flex items-center justify-center">
-              <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 6v12m-3-2.818l.879.659c1.171.879 3.07.879 4.242 0 1.172-.879 1.172-2.303 0-3.182C13.536 12.219 12.768 12 12 12c-.725 0-1.45-.22-2.003-.659-1.106-.879-1.106-2.303 0-3.182s2.9-.879 4.006 0l.415.33M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
+        <!-- Revenue Card (Primary) -->
+        <div class="col-span-1 md:col-span-2 bg-gradient-to-br from-gray-900 to-gray-800 rounded-[2.5rem] p-8 text-white relative overflow-hidden group shadow-2xl shadow-gray-900/20">
+          <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
+          <div class="absolute bottom-0 left-0 w-48 h-48 bg-brand-500/20 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none"></div>
+          
+          <div class="relative z-10 flex flex-col h-full justify-between">
+            <div class="flex justify-between items-start">
+              <div>
+                <p class="text-white/60 font-medium mb-1">Ingresos Totales</p>
+                <div class="flex items-baseline gap-2">
+                  <span class="text-5xl font-luxury tracking-tight">${{ formatNumber(stats.totalVentas) }}</span>
+                </div>
+              </div>
+              <div class="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              </div>
             </div>
-            <span class="text-emerald-600 text-xs font-semibold flex items-center gap-0.5 bg-emerald-50 px-2 py-1 rounded-full">
-              <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 10.5L12 3m0 0l7.5 7.5M12 3v18" />
-              </svg>
-              +12.5%
-            </span>
+
+            <div class="mt-8 flex items-end justify-between">
+              <div>
+                <div class="flex items-center gap-2 mb-1">
+                  <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/20 flex items-center gap-1">
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="3" d="M5 10l7-7m0 0l7 7m-7-7v18"/></svg>
+                    +12.5%
+                  </span>
+                  <span class="text-white/40 text-xs">vs mes anterior</span>
+                </div>
+              </div>
+              <!-- Mini Sparkline visualization (aesthetic only) -->
+              <div class="flex items-end gap-1 h-12">
+                <div v-for="h in [40, 65, 50, 80, 55, 90, 70]" :key="h" class="w-2 bg-white/20 rounded-t-sm transition-all group-hover:bg-brand-400" :style="`height: ${h}%`"></div>
+              </div>
+            </div>
           </div>
-          <h3 class="text-2xl lg:text-3xl font-semibold text-text-dark tracking-tight">${{ formatNumber(stats.totalVentas) }}</h3>
-          <p class="text-text-light text-sm mt-1">Ventas este mes</p>
         </div>
 
-        <!-- Órdenes -->
-        <div class="bg-white rounded-2xl p-5 lg:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-          <div class="flex items-start justify-between mb-4">
-            <div class="w-10 h-10 bg-blue-50 rounded-xl flex items-center justify-center">
-              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-              </svg>
+        <!-- Orders Card -->
+        <div class="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between group">
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform duration-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
             </div>
-            <span class="text-blue-600 text-xs font-semibold bg-blue-50 px-2 py-1 rounded-full">
-              {{ stats.ordenesPendientes }} pendientes
-            </span>
+            <span class="px-3 py-1 rounded-full bg-gray-50 text-gray-600 text-xs font-bold border border-gray-100">{{ stats.ordenesPendientes }} pendientes</span>
           </div>
-          <h3 class="text-2xl lg:text-3xl font-semibold text-text-dark tracking-tight">{{ stats.totalOrdenes }}</h3>
-          <p class="text-text-light text-sm mt-1">Órdenes totales</p>
+          <div>
+            <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ stats.totalOrdenes }}</h3>
+            <p class="text-gray-400 font-medium text-sm">Órdenes Totales</p>
+          </div>
         </div>
 
-        <!-- Productos -->
-        <div class="bg-white rounded-2xl p-5 lg:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-          <div class="flex items-start justify-between mb-4">
-            <div class="w-10 h-10 bg-violet-50 rounded-xl flex items-center justify-center">
-              <svg class="w-5 h-5 text-violet-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-              </svg>
+        <!-- Products Card -->
+        <div class="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between group">
+          <div class="flex justify-between items-start mb-4">
+            <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform duration-300">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             </div>
-            <span :class="stats.stockBajo > 0 ? 'text-amber-600 bg-amber-50' : 'text-emerald-600 bg-emerald-50'" class="text-xs font-semibold px-2 py-1 rounded-full">
-              {{ stats.stockBajo }} stock bajo
+            <span :class="stats.stockBajo > 0 ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'" class="px-3 py-1 rounded-full text-xs font-bold border">
+              {{ stats.stockBajo }} Alertas
             </span>
           </div>
-          <h3 class="text-2xl lg:text-3xl font-semibold text-text-dark tracking-tight">{{ stats.totalProductos }}</h3>
-          <p class="text-text-light text-sm mt-1">Productos activos</p>
+          <div>
+            <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ stats.totalProductos }}</h3>
+            <p class="text-gray-400 font-medium text-sm">Productos Activos</p>
+          </div>
         </div>
 
-        <!-- Clientes -->
-        <div class="bg-white rounded-2xl p-5 lg:p-6 shadow-sm border border-gray-100 hover:shadow-md transition-shadow">
-          <div class="flex items-start justify-between mb-4">
-            <div class="w-10 h-10 bg-rose-50 rounded-xl flex items-center justify-center">
-              <svg class="w-5 h-5 text-rose-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-              </svg>
+        <!-- Clients Card -->
+        <div class="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4 bg-white rounded-[2rem] p-6 border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] flex items-center justify-between relative overflow-hidden">
+          <div class="absolute inset-0 bg-gradient-to-r from-pink-50/50 to-transparent pointer-events-none"></div>
+          <div class="relative z-10 flex items-center gap-6">
+            <div class="w-16 h-16 rounded-3xl bg-pink-50 flex items-center justify-center text-pink-600 shadow-sm border border-pink-100">
+               <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             </div>
-            <span class="text-rose-600 text-xs font-semibold bg-rose-50 px-2 py-1 rounded-full">
-              +{{ stats.clientesNuevos }} nuevos
-            </span>
+             <div>
+              <h3 class="text-2xl font-bold text-gray-900">{{ stats.totalClientes }} Clientes</h3>
+              <p class="text-gray-500 text-sm">Registrados en la plataforma</p>
+            </div>
           </div>
-          <h3 class="text-2xl lg:text-3xl font-semibold text-text-dark tracking-tight">{{ stats.totalClientes }}</h3>
-          <p class="text-text-light text-sm mt-1">Clientes registrados</p>
+          <div class="relative z-10 flex items-center gap-4 pr-4">
+             <div class="flex -space-x-3">
+               <div v-for="i in 4" :key="i" class="w-10 h-10 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-400">
+                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
+               </div>
+             </div>
+             <span class="text-sm font-semibold text-pink-600 bg-pink-50 px-3 py-1 rounded-full">+{{ stats.clientesNuevos }} nuevos este mes</span>
+          </div>
         </div>
+
       </div>
 
-      <!-- Charts Section -->
-      <div class="grid lg:grid-cols-5 gap-6 mt-6 lg:mt-8">
+      <!-- Content Grid -->
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        <!-- Sales Chart - Larger -->
-        <div class="lg:col-span-3 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <div class="flex items-center justify-between mb-6">
+        <!-- Main Chart Section -->
+        <div class="lg:col-span-2 bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-8 relative">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
             <div>
-              <h3 class="text-lg font-semibold text-text-dark">Análisis de Ventas</h3>
-              <p class="text-sm text-text-light">Tendencia de ventas en el tiempo</p>
+              <h3 class="text-2xl font-luxury font-bold text-gray-900">Análisis de Ingresos</h3>
+              <p class="text-gray-400 text-sm mt-1">Tendencia de ventas en el tiempo</p>
             </div>
-            <div class="flex items-center gap-1 bg-gray-100 rounded-lg p-1">
-              <button 
+            
+            <div class="bg-gray-50 p-1.5 rounded-2xl flex items-center shadow-inner">
+               <button 
                 v-for="period in ['24H', '7D', '30D']" 
                 :key="period"
                 @click="cambiarPeriodo(period)"
-                :class="selectedPeriod === period ? 'bg-white shadow-sm text-text-dark' : 'text-text-light hover:text-text-medium'"
-                class="px-3 py-1.5 text-xs font-medium rounded-md transition-all"
+                class="px-5 py-2 rounded-xl text-xs font-bold transition-all duration-300 relative z-10"
+                :class="selectedPeriod === period ? 'bg-white text-gray-900 shadow-md shadow-gray-200' : 'text-gray-400 hover:text-gray-600'"
               >
                 {{ period }}
               </button>
             </div>
           </div>
-          
-          <!-- Chart Container -->
-          <div class="h-64 lg:h-72 relative">
-            <!-- Empty State -->
-            <div v-if="stats.totalVentas === 0" class="absolute inset-0 flex flex-col items-center justify-center">
-              <svg class="w-16 h-16 text-gray-200 mb-4" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 14.25v2.25m3-4.5v4.5m3-6.75v6.75m3-9v9M6 20.25h12A2.25 2.25 0 0020.25 18V6A2.25 2.25 0 0018 3.75H6A2.25 2.25 0 003.75 6v12A2.25 2.25 0 006 20.25z" />
-              </svg>
-              <p class="text-text-light text-sm mb-2">Sin datos de ventas</p>
-              <p class="text-text-light/60 text-xs">Comienza registrando tu primera orden</p>
-            </div>
-            <!-- Chart -->
-            <Line v-else :data="salesChartData" :options="salesChartOptions" />
-          </div>
-        </div>
 
-        <!-- Top Products Donut Chart -->
-        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 p-6">
-          <div class="mb-6">
-            <h3 class="text-lg font-semibold text-text-dark">Top Productos</h3>
-            <p class="text-sm text-text-light">Distribución de ventas</p>
-          </div>
-          
-          <!-- Donut Chart -->
-          <div class="flex flex-col items-center gap-6">
-            <div class="relative w-36 h-36 lg:w-44 lg:h-44 flex-shrink-0">
-              <Doughnut :data="topProductsChartData" :options="donutChartOptions" />
-              <div class="absolute inset-0 flex flex-col items-center justify-center">
-                <span class="text-2xl font-bold text-text-dark">{{ topProducts.length }}</span>
-                <span class="text-xs text-text-light">ITEMS</span>
-              </div>
-            </div>
-            
-            <!-- Legend -->
-            <div class="w-full space-y-2">
-              <div 
-                v-for="(product, index) in topProducts.slice(0, 5)" 
-                :key="product.nombre"
-                class="flex items-center justify-between py-1"
-              >
-                <div class="flex items-center gap-2">
-                  <span 
-                    class="w-2.5 h-2.5 rounded-full flex-shrink-0" 
-                    :style="{ backgroundColor: chartColors[index] }"
-                  ></span>
-                  <span class="text-sm text-text-medium truncate max-w-[120px]">{{ product.nombre }}</span>
+          <div class="relative h-[400px] w-full">
+            <!-- Loading Overlay -->
+            <transition name="fade">
+              <div v-if="chartLoading" class="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center rounded-2xl">
+                <div class="flex items-center gap-3 bg-white px-6 py-3 rounded-full shadow-lg border border-gray-100">
+                   <div class="w-2 h-2 bg-brand-500 rounded-full animate-bounce"></div>
+                   <div class="w-2 h-2 bg-brand-500 rounded-full animate-bounce delay-75"></div>
+                   <div class="w-2 h-2 bg-brand-500 rounded-full animate-bounce delay-150"></div>
                 </div>
-                <span class="text-sm font-semibold text-text-dark">${{ formatNumber(product.ventas) }}</span>
               </div>
-              
-              <div v-if="topProducts.length === 0" class="text-center py-4 text-text-light text-sm">
-                Sin datos de ventas
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Bottom Section: Orders & Stock -->
-      <div class="grid lg:grid-cols-3 gap-6 mt-6 lg:mt-8">
-        
-        <!-- Recent Orders Table -->
-        <div class="lg:col-span-2 bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="flex items-center justify-between p-5 border-b border-gray-100">
-            <h3 class="text-lg font-semibold text-text-dark">Últimas Transacciones</h3>
-            <router-link to="/admin/ordenes" class="text-emerald-600 text-sm font-medium hover:text-emerald-700 transition-colors">
-              Ver todas →
-            </router-link>
-          </div>
-          <div class="overflow-x-auto">
-            <table class="w-full">
-              <thead>
-                <tr class="bg-gray-50/50">
-                  <th class="px-5 py-3 text-left text-xs font-semibold text-text-light uppercase tracking-wider">Orden</th>
-                  <th class="px-5 py-3 text-left text-xs font-semibold text-text-light uppercase tracking-wider">Cliente</th>
-                  <th class="px-5 py-3 text-left text-xs font-semibold text-text-light uppercase tracking-wider">Estado</th>
-                  <th class="px-5 py-3 text-right text-xs font-semibold text-text-light uppercase tracking-wider">Total</th>
-                </tr>
-              </thead>
-              <tbody class="divide-y divide-gray-50">
-                <tr v-for="orden in recentOrders" :key="orden.id" class="hover:bg-gray-50/50 transition-colors">
-                  <td class="px-5 py-4">
-                    <span class="font-mono text-sm font-medium text-text-dark">#{{ orden.id.slice(0, 6).toUpperCase() }}</span>
-                  </td>
-                  <td class="px-5 py-4">
-                    <div class="flex items-center gap-3">
-                      <div class="w-8 h-8 bg-gradient-to-br from-emerald-400 to-teal-500 rounded-full flex items-center justify-center text-white text-xs font-medium">
-                        {{ orden.cliente.charAt(0).toUpperCase() }}
-                      </div>
-                      <span class="text-text-dark text-sm">{{ orden.cliente }}</span>
-                    </div>
-                  </td>
-                  <td class="px-5 py-4">
-                    <span :class="getStatusClass(orden.estado)" class="px-2.5 py-1 text-xs font-medium rounded-full">
-                      {{ getStatusLabel(orden.estado) }}
-                    </span>
-                  </td>
-                  <td class="px-5 py-4 text-right">
-                    <span class="font-semibold text-text-dark">${{ formatNumber(orden.total) }}</span>
-                  </td>
-                </tr>
-                <tr v-if="recentOrders.length === 0">
-                  <td colspan="4" class="px-5 py-10 text-center text-text-light">
-                    <svg class="w-12 h-12 mx-auto mb-3 text-gray-200" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" d="M9 12h3.75M9 15h3.75M9 18h3.75m3 .75H18a2.25 2.25 0 002.25-2.25V6.108c0-1.135-.845-2.098-1.976-2.192a48.424 48.424 0 00-1.123-.08m-5.801 0c-.065.21-.1.433-.1.664 0 .414.336.75.75.75h4.5a.75.75 0 00.75-.75 2.25 2.25 0 00-.1-.664m-5.8 0A2.251 2.251 0 0113.5 2.25H15c1.012 0 1.867.668 2.15 1.586m-5.8 0c-.376.023-.75.05-1.124.08C9.095 4.01 8.25 4.973 8.25 6.108V8.25m0 0H4.875c-.621 0-1.125.504-1.125 1.125v11.25c0 .621.504 1.125 1.125 1.125h9.75c.621 0 1.125-.504 1.125-1.125V9.375c0-.621-.504-1.125-1.125-1.125H8.25zM6.75 12h.008v.008H6.75V12zm0 3h.008v.008H6.75V15zm0 3h.008v.008H6.75V18z" />
-                    </svg>
-                    No hay transacciones recientes
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-        <!-- Alerts & Stock Section -->
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-          <div class="flex items-center justify-between p-5 border-b border-gray-100">
-            <div class="flex items-center gap-2">
-              <svg class="w-5 h-5 text-amber-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" />
-              </svg>
-              <h3 class="text-lg font-semibold text-text-dark">Alertas Stock</h3>
-            </div>
-            <router-link to="/admin/inventario" class="text-amber-600 text-sm font-medium hover:text-amber-700">
-              Ver Todo
-            </router-link>
-          </div>
-          
-          <div class="p-4 space-y-3 max-h-80 overflow-y-auto">
-            <div 
-              v-for="product in lowStockProducts" 
-              :key="product.id"
-              class="flex items-center gap-3 p-3 bg-amber-50/50 rounded-xl border border-amber-100"
-            >
-              <div class="w-12 h-12 bg-white rounded-lg overflow-hidden shadow-sm flex-shrink-0">
-                <img 
-                  :src="product.imagen" 
-                  :alt="product.nombre" 
-                  class="w-full h-full object-cover"
-                  @error="$event.target.src = 'data:image/svg+xml,%3Csvg xmlns=%22http://www.w3.org/2000/svg%22 fill=%22%23f3f4f6%22 viewBox=%220 0 24 24%22%3E%3Cpath d=%22M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z%22/%3E%3C/svg%3E'"
-                >
-              </div>
-              <div class="flex-1 min-w-0">
-                <p class="font-medium text-sm text-text-dark truncate">{{ product.nombre }}</p>
-                <p class="text-xs text-amber-600 font-semibold">{{ product.stock }} unidades restantes</p>
-              </div>
-              <button class="p-2 text-amber-600 hover:bg-amber-100 rounded-lg transition-colors">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-                </svg>
-              </button>
-            </div>
+            </transition>
             
-            <div v-if="lowStockProducts.length === 0" class="text-center py-8">
-              <div class="w-16 h-16 mx-auto mb-4 bg-emerald-50 rounded-full flex items-center justify-center">
-                <svg class="w-8 h-8 text-emerald-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
+            <Line :data="salesChartData" :options="salesChartOptions" />
+          </div>
+        </div>
+
+        <!-- Right Column: Top Products -->
+        <div class="bg-gray-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-2xl flex flex-col">
+          <div class="absolute top-0 right-0 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl -mr-20 -mt-20"></div>
+          
+          <div class="relative z-10 mb-8">
+            <h3 class="text-2xl font-luxury font-bold text-white">Top Ventas</h3>
+            <p class="text-white/40 text-sm mt-1">Distribución mejores productos</p>
+          </div>
+
+          <div class="relative z-10 flex-1 flex flex-col justify-center items-center">
+            <div class="w-64 h-64 relative">
+              <Doughnut :data="topProductsChartData" :options="donutChartOptions" />
+              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+                 <span class="text-4xl font-luxury">{{ topProducts.length }}</span>
+                 <span class="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">Items</span>
               </div>
-              <p class="text-text-medium font-medium">Todo el inventario OK</p>
-              <p class="text-sm text-text-light">No hay productos críticos</p>
             </div>
           </div>
+
+          <div class="relative z-10 mt-8 space-y-4">
+             <div v-for="(product, index) in topProducts.slice(0,3)" :key="product.id" class="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
+               <div class="flex items-center gap-3 overflow-hidden">
+                 <span class="w-2 h-8 rounded-full flex-shrink-0" :style="{ backgroundColor: chartColors[index] }"></span>
+                 <span class="text-sm font-medium text-white/90 truncate">{{ product.nombre }}</span>
+               </div>
+               <span class="text-white font-bold text-sm">{{ product.ventas }}</span>
+             </div>
+          </div>
+
+        </div>
+
+      </div>
+
+      <!-- Recent Orders Table -->
+      <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden p-8">
+        <div class="flex items-center justify-between mb-8">
+          <div>
+            <h3 class="text-2xl font-luxury font-bold text-gray-900">Transacciones Recientes</h3>
+            <p class="text-gray-400 text-sm mt-1">Últimos movimientos registrados</p>
+          </div>
+          <router-link to="/admin/ordenes" class="px-5 py-2 rounded-xl bg-gray-50 text-gray-600 font-medium hover:bg-gray-100 transition-colors text-sm">
+            Ver historial completo
+          </router-link>
+        </div>
+
+        <div class="overflow-x-auto">
+          <table class="w-full">
+            <thead>
+              <tr class="border-b border-gray-100">
+                <th class="text-left py-4 px-4 text-xs font-bold text-gray-400 uppercase tracking-wider">ID Orden</th>
+                <th class="text-left py-4 px-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Cliente</th>
+                <th class="text-left py-4 px-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Fecha</th>
+                <th class="text-center py-4 px-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Estado</th>
+                <th class="text-right py-4 px-4 text-xs font-bold text-gray-400 uppercase tracking-wider">Monto</th>
+              </tr>
+            </thead>
+            <tbody class="divide-y divide-gray-50">
+              <tr v-for="orden in recentOrders" :key="orden.id" class="group hover:bg-gray-50/50 transition-colors">
+                 <td class="py-4 px-4">
+                   <span class="font-mono text-xs font-bold bg-gray-100 text-gray-600 px-2 py-1 rounded-md group-hover:bg-gray-200 transition-colors">
+                     #{{ orden.id.slice(0,6).toUpperCase() }}
+                   </span>
+                 </td>
+                 <td class="py-4 px-4">
+                   <div class="flex items-center gap-3">
+                     <div class="w-8 h-8 rounded-full bg-gradient-to-tr from-gray-200 to-gray-100 flex items-center justify-center text-xs font-bold text-gray-600">
+                        {{ orden.cliente.charAt(0).toUpperCase() }}
+                     </div>
+                     <span class="text-sm font-medium text-gray-900">{{ orden.cliente }}</span>
+                   </div>
+                 </td>
+                 <td class="py-4 px-4 text-sm text-gray-500">{{ orden.fecha }}</td>
+                 <td class="py-4 px-4 text-center">
+                   <span :class="getStatusClass(orden.estado)" class="inline-flex px-3 py-1 rounded-full text-xs font-bold border">
+                     {{ getStatusLabel(orden.estado) }}
+                   </span>
+                 </td>
+                 <td class="py-4 px-4 text-right">
+                   <span class="text-sm font-bold text-gray-900">${{ formatNumber(orden.total) }}</span>
+                 </td>
+              </tr>
+              <tr v-if="recentOrders.length === 0">
+                <td colspan="5" class="py-12 text-center text-gray-400 bg-gray-50/30 rounded-2xl border border-dashed border-gray-200">
+                  <div class="flex flex-col items-center gap-2">
+                    <svg class="w-8 h-8 opacity-20" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"/></svg> 
+                    <span>No hay datos recientes</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
         </div>
       </div>
 
-      <!-- Quick Actions Grid -->
-      <div class="grid grid-cols-2 sm:grid-cols-4 gap-4 mt-6 lg:mt-8">
-        <router-link 
-          to="/admin/productos/nuevo"
-          class="flex flex-col items-center gap-3 p-5 bg-white border border-gray-100 rounded-2xl hover:shadow-md hover:border-emerald-200 transition-all group"
-        >
-          <div class="w-12 h-12 bg-gray-50 group-hover:bg-emerald-100 rounded-xl flex items-center justify-center transition-colors">
-            <svg class="w-5 h-5 text-gray-400 group-hover:text-emerald-600 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 4.5v15m7.5-7.5h-15" />
-            </svg>
-          </div>
-          <span class="text-sm font-medium text-text-medium group-hover:text-emerald-600 transition-colors">Nuevo Producto</span>
-        </router-link>
-
-        <router-link 
-          to="/admin/ordenes"
-          class="flex flex-col items-center gap-3 p-5 bg-white border border-gray-100 rounded-2xl hover:shadow-md hover:border-blue-200 transition-all group"
-        >
-          <div class="w-12 h-12 bg-gray-50 group-hover:bg-blue-100 rounded-xl flex items-center justify-center transition-colors">
-            <svg class="w-5 h-5 text-gray-400 group-hover:text-blue-600 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
-            </svg>
-          </div>
-          <span class="text-sm font-medium text-text-medium group-hover:text-blue-600 transition-colors">Ver Órdenes</span>
-        </router-link>
-
-        <router-link 
-          to="/admin/inventario"
-          class="flex flex-col items-center gap-3 p-5 bg-white border border-gray-100 rounded-2xl hover:shadow-md hover:border-violet-200 transition-all group"
-        >
-          <div class="w-12 h-12 bg-gray-50 group-hover:bg-violet-100 rounded-xl flex items-center justify-center transition-colors">
-            <svg class="w-5 h-5 text-gray-400 group-hover:text-violet-600 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 7.5l-.625 10.632a2.25 2.25 0 01-2.247 2.118H6.622a2.25 2.25 0 01-2.247-2.118L3.75 7.5M10 11.25h4M3.375 7.5h17.25c.621 0 1.125-.504 1.125-1.125v-1.5c0-.621-.504-1.125-1.125-1.125H3.375c-.621 0-1.125.504-1.125 1.125v1.5c0 .621.504 1.125 1.125 1.125z" />
-            </svg>
-          </div>
-          <span class="text-sm font-medium text-text-medium group-hover:text-violet-600 transition-colors">Inventario</span>
-        </router-link>
-
-        <router-link 
-          to="/admin/clientes"
-          class="flex flex-col items-center gap-3 p-5 bg-white border border-gray-100 rounded-2xl hover:shadow-md hover:border-rose-200 transition-all group"
-        >
-          <div class="w-12 h-12 bg-gray-50 group-hover:bg-rose-100 rounded-xl flex items-center justify-center transition-colors">
-            <svg class="w-5 h-5 text-gray-400 group-hover:text-rose-600 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19.128a9.38 9.38 0 002.625.372 9.337 9.337 0 004.121-.952 4.125 4.125 0 00-7.533-2.493M15 19.128v-.003c0-1.113-.285-2.16-.786-3.07M15 19.128v.106A12.318 12.318 0 018.624 21c-2.331 0-4.512-.645-6.374-1.766l-.001-.109a6.375 6.375 0 0111.964-3.07M12 6.375a3.375 3.375 0 11-6.75 0 3.375 3.375 0 016.75 0zm8.25 2.25a2.625 2.625 0 11-5.25 0 2.625 2.625 0 015.25 0z" />
-            </svg>
-          </div>
-          <span class="text-sm font-medium text-text-medium group-hover:text-rose-600 transition-colors">Clientes</span>
-        </router-link>
-      </div>
-
-    </div><!-- End v-else content -->
-  </div><!-- End main container -->
+    </div>
+  </div>
 </template>
 
 <script>
@@ -458,100 +317,77 @@ import {
 } from 'chart.js'
 import apiClient from '../../services/api'
 
-// Register Chart.js components
-ChartJS.register(
-  CategoryScale,
-  LinearScale,
-  PointElement,
-  LineElement,
-  Title,
-  Tooltip,
-  Legend,
-  Filler,
-  ArcElement
-)
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler, ArcElement)
 
 export default {
   name: 'AdminDashboard',
-  components: {
-    Line,
-    Doughnut
-  },
+  components: { Line, Doughnut },
   setup() {
-    // Chart colors
-    const chartColors = ['#10B981', '#3B82F6', '#F59E0B', '#8B5CF6', '#EC4899']
+    // Definimos una paleta de colores personalizada y moderna
+    const brandColors = {
+      primary: '#111827', // Dark/Black
+      accent: '#D81B60', // Kharis Pink
+      gold: '#C9A962',  // Luxury Gold
+      success: '#10B981',
+      warning: '#F59E0B',
+      info: '#3B82F6'
+    }
+
+    const chartColors = [brandColors.accent, brandColors.gold, '#8B5CF6', brandColors.info, brandColors.success]
     
-    // Stats
-    const stats = ref({
-      totalVentas: 0,
-      totalOrdenes: 0,
-      ordenesPendientes: 0,
-      totalProductos: 0,
-      productosActivos: 0,
-      stockBajo: 0,
-      totalClientes: 0,
-      clientesNuevos: 0
-    })
+    const stats = ref({})
+    // Valores por defecto para evitar errores al cargar parcialmente
+    const defaultStats = { totalVentas: 0, totalOrdenes: 0, ordenesPendientes: 0, totalProductos: 0, productosActivos: 0, stockBajo: 0, totalClientes: 0, clientesNuevos: 0 }
+    stats.value = { ...defaultStats }
 
     const loading = ref(true)
+    const chartLoading = ref(false)
     const error = ref(null)
     const selectedPeriod = ref('7D')
     const pollingInterval = ref(null)
 
-    // Recent orders
     const recentOrders = ref([])
-
-    // Low stock products
     const lowStockProducts = ref([])
-    
-    // Top products - datos reales del backend
     const topProducts = ref([])
-    
-    // Datos reales del gráfico de ventas
     const ventasPorPeriodo = ref({ labels: [], data: [] })
 
-    // Fecha actual formateada
     const fechaActual = computed(() => {
-      const options = { day: 'numeric', month: 'long', year: 'numeric' }
-      return new Date().toLocaleDateString('es-CO', options)
+      const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
+      const date = new Date().toLocaleDateString('es-CO', options)
+      return date.charAt(0).toUpperCase() + date.slice(1)
     })
 
-    // Sales chart data - usando datos reales
+    // Sales Chart Configuration
     const salesChartData = computed(() => {
-      const labels = ventasPorPeriodo.value.labels.length > 0 
-        ? ventasPorPeriodo.value.labels 
-        : (selectedPeriod.value === '24H' 
-          ? ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00']
-          : selectedPeriod.value === '7D'
-          ? ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-          : ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4'])
-      
-      // Usar datos reales del backend
-      const data = ventasPorPeriodo.value.data.length > 0 
-        ? ventasPorPeriodo.value.data 
-        : labels.map(() => 0)
+      // Fallback labels
+      let defaultLabels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+      if (selectedPeriod.value === '24H') defaultLabels = ['00h', '04h', '08h', '12h', '16h', '20h']
+      if (selectedPeriod.value === '30D') defaultLabels = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4']
+
+      const labels = ventasPorPeriodo.value.labels?.length ? ventasPorPeriodo.value.labels : defaultLabels
+      const data = ventasPorPeriodo.value.data?.length ? ventasPorPeriodo.value.data : labels.map(() => 0)
 
       return {
         labels,
         datasets: [{
-          label: 'Ventas',
+          label: 'Ingresos',
           data,
-          borderColor: '#10B981',
+          fill: true,
+          borderColor: brandColors.accent,
+          borderWidth: 4,
+          tension: 0.45, // Super smooth
+          pointRadius: 0,
+          pointHoverRadius: 8,
+          pointHoverBackgroundColor: '#fff',
+          pointHoverBorderColor: brandColors.accent,
+          pointHoverBorderWidth: 3,
           backgroundColor: (context) => {
             const ctx = context.chart.ctx
-            const gradient = ctx.createLinearGradient(0, 0, 0, 250)
-            gradient.addColorStop(0, 'rgba(16, 185, 129, 0.3)')
-            gradient.addColorStop(1, 'rgba(16, 185, 129, 0)')
+            const gradient = ctx.createLinearGradient(0, 0, 0, 350)
+            gradient.addColorStop(0, 'rgba(216, 27, 96, 0.15)')
+            gradient.addColorStop(1, 'rgba(216, 27, 96, 0)')
             return gradient
           },
-          borderWidth: 2,
-          fill: true,
-          tension: 0.4,
-          pointRadius: 0,
-          pointHoverRadius: 6,
-          pointHoverBackgroundColor: '#10B981',
-          pointHoverBorderColor: '#fff',
-          pointHoverBorderWidth: 2
         }]
       }
     })
@@ -559,265 +395,194 @@ export default {
     const salesChartOptions = {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: {
-        intersect: false,
-        mode: 'index'
-      },
+      interaction: { intersect: false, mode: 'index' },
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: '#1a1a1a',
-          titleColor: '#fff',
-          bodyColor: '#fff',
-          padding: 12,
-          cornerRadius: 8,
+          enabled: true,
+          backgroundColor: '#111827',
+          padding: 16,
+          titleFont: { size: 14, family: "'Playfair Display', serif" },
+          bodyFont: { size: 13, weight: 'bold' },
+          cornerRadius: 10,
           displayColors: false,
           callbacks: {
-            label: (context) => `$${context.raw.toLocaleString('es-CO')}`
+            label: (context) => `$${new Intl.NumberFormat('es-CO').format(context.raw)}`
           }
         }
       },
       scales: {
         x: {
           grid: { display: false },
-          ticks: { 
-            color: '#9CA3AF',
-            font: { size: 11 }
-          }
+          ticks: { color: '#9CA3AF', font: { size: 12 }, padding: 10 }
         },
         y: {
-          grid: { 
-            color: '#F3F4F6',
-            drawBorder: false
-          },
+          border: { display: false },
+          grid: { color: '#F3F4F6', drawTicks: false },
           ticks: { 
-            color: '#9CA3AF',
-            font: { size: 11 },
-            callback: (value) => `$${(value / 1000).toFixed(0)}k`
+            color: '#9CA3AF', 
+            font: { size: 11, weight: '500' },
+            callback: val => `$${val >= 1000 ? val/1000 + 'k' : val}`,
+            padding: 12
           }
         }
       }
     }
 
-    // Donut chart data
+    // Donut Chart Configuration
     const topProductsChartData = computed(() => ({
       labels: topProducts.value.map(p => p.nombre),
       datasets: [{
         data: topProducts.value.map(p => p.ventas),
         backgroundColor: chartColors,
         borderWidth: 0,
-        hoverOffset: 4
+        hoverOffset: 15, // Dynamic pop on hover
+        borderRadius: 4
       }]
     }))
 
     const donutChartOptions = {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '75%',
+      cutout: '80%',
       plugins: {
         legend: { display: false },
         tooltip: {
-          backgroundColor: '#1a1a1a',
-          titleColor: '#fff',
-          bodyColor: '#fff',
-          padding: 12,
-          cornerRadius: 8,
+          backgroundColor: '#fff',
+          titleColor: '#111827',
+          bodyColor: '#111827',
+          borderColor: '#E5E7EB',
+          borderWidth: 1,
+          padding: 14,
           callbacks: {
-            label: (context) => `$${context.raw.toLocaleString('es-CO')}`
+            label: (context) => ` ${context.raw} unidades`
           }
         }
       }
     }
 
-    // Cargar estadísticas del backend
-    const cargarEstadisticas = async () => {
+    // Data Loading Functions
+    const fetchData = async (endpoint, targetRef, defaultVal = []) => {
       try {
-        const response = await apiClient.get('/dashboard/estadisticas')
-        stats.value = {
-          totalVentas: response.data.total_ventas || 0,
-          totalOrdenes: response.data.total_ordenes || 0,
-          ordenesPendientes: response.data.ordenes_pendientes || 0,
-          totalProductos: response.data.total_productos || 0,
-          productosActivos: response.data.productos_activos || 0,
-          stockBajo: response.data.stock_bajo || 0,
-          totalClientes: response.data.total_clientes || 0,
-          clientesNuevos: response.data.clientes_nuevos || 0
-        }
-      } catch (err) {
-        console.error('Error al cargar estadísticas:', err)
-        error.value = 'No se pudieron cargar las estadísticas'
+        const res = await apiClient.get(endpoint)
+        targetRef.value = res.data || defaultVal
+      } catch (e) {
+        console.error(`Error fetching ${endpoint}:`, e)
+        // Keep default/previous value
       }
     }
 
-    // Cargar órdenes recientes
-    const cargarOrdenesRecientes = async () => {
-      try {
-        const response = await apiClient.get('/dashboard/ordenes/recientes?limite=5')
-        recentOrders.value = response.data.map(orden => ({
-          id: orden.id,
-          cliente: orden.cliente_nombre || 'Cliente',
-          estado: orden.estado,
-          total: orden.total,
-          fecha: orden.tiempo_transcurrido
-        }))
-      } catch (err) {
-        console.error('Error al cargar órdenes recientes:', err)
-      }
-    }
-
-    // Cargar productos con stock bajo
-    const cargarProductosStockBajo = async () => {
-      try {
-        const response = await apiClient.get('/dashboard/productos/stock-bajo?umbral=5&limite=10')
-        lowStockProducts.value = response.data.map(producto => ({
-          id: producto.id,
-          nombre: producto.nombre,
-          stock: producto.stock_actual,
-          imagen: producto.imagen_url || ''
-        }))
-      } catch (err) {
-        console.error('Error al cargar productos con stock bajo:', err)
-      }
-    }
-
-    // Cargar ventas por período (datos reales para el gráfico)
-    const cargarVentasPorPeriodo = async () => {
-      try {
-        const response = await apiClient.get(`/dashboard/ventas/por-periodo?periodo=${selectedPeriod.value}`)
-        ventasPorPeriodo.value = {
-          labels: response.data.labels || [],
-          data: response.data.data || []
-        }
-      } catch (err) {
-        console.error('Error al cargar ventas por período:', err)
-        ventasPorPeriodo.value = { labels: [], data: [] }
-      }
-    }
-
-    // Cargar top productos
-    const cargarTopProductos = async () => {
-      try {
-        const response = await apiClient.get('/dashboard/top-productos?limite=5')
-        topProducts.value = response.data.map(p => ({
-          id: p.id,
-          nombre: p.nombre,
-          cantidad: p.cantidad,
-          ventas: p.ventas,
-          imagen: p.imagen
-        }))
-      } catch (err) {
-        console.error('Error al cargar top productos:', err)
-      }
-    }
-
-    // Recargar gráfico cuando cambia el período
-    const cambiarPeriodo = (periodo) => {
-      selectedPeriod.value = periodo
-      cargarVentasPorPeriodo()
-    }
-
-    // Cargar todos los datos
     const cargarDatos = async (silent = false) => {
-      if (!silent) {
-        loading.value = true
-        error.value = null
-      }
+      if(!silent) { loading.value = true; error.value = null }
       
       try {
-        await Promise.all([
-          cargarEstadisticas(),
-          cargarOrdenesRecientes(),
-          cargarProductosStockBajo(),
-          cargarVentasPorPeriodo(),
-          cargarTopProductos()
+        // Usamos una estrategia de "intento" individual para que si falla un endpoint
+        // no se caiga todo el dashboard.
+        await Promise.allSettled([
+          // Estadísticas
+          apiClient.get('/dashboard/estadisticas')
+            .then(r => stats.value = {...defaultStats, ...r.data})
+            .catch(e => console.warn('Fallo estadísticas:', e)),
+
+          // Órdenes Recientes
+          apiClient.get('/dashboard/ordenes/recientes?limite=5')
+            .then(r => {
+               recentOrders.value = (r.data || []).map(o => ({
+                id: o.id || '---',
+                cliente: o.cliente_nombre || 'Invitado',
+                estado: o.estado || 'PENDIENTE',
+                total: o.total || 0,
+                fecha: o.tiempo_transcurrido || 'Reciente'
+              }))
+            })
+            .catch(e => console.warn('Fallo ordenes:', e)),
+
+          // Gráfico Ventas
+          apiClient.get(`/dashboard/ventas/por-periodo?periodo=${selectedPeriod.value}`)
+            .then(r => {
+               ventasPorPeriodo.value = { labels: r.data.labels || [], data: r.data.data || [] }
+            })
+            .catch(e => console.warn('Fallo grafico ventas:', e)),
+
+          // Top Productos (ya usa fetchData interno, pero lo aseguramos)
+          fetchData('/dashboard/top-productos?limite=5', topProducts),
+          
+          // Stock Bajo
+          fetchData('/dashboard/productos/stock-bajo?umbral=5&limite=10', lowStockProducts)
         ])
-      } catch (err) {
-        if (!silent) {
-          error.value = 'Error al cargar datos del dashboard'
-        }
-        console.error('Error en cargarDatos:', err)
+
+      } catch (e) {
+        console.error('Error crítico dashboard:', e)
+        if(!silent) error.value = 'Hubo un problema cargando la información.'
       } finally {
-        if (!silent) {
-          loading.value = false
-        }
+        if(!silent) loading.value = false
       }
     }
 
-    // Iniciar polling automático
-    const startPolling = () => {
-      // Actualizar cada 10 segundos en silent mode
-      pollingInterval.value = setInterval(() => {
-        cargarDatos(true)
-      }, 10000)
+    const cambiarPeriodo = async (periodo) => {
+      if (selectedPeriod.value === periodo) return
+      selectedPeriod.value = periodo
+      chartLoading.value = true
+      
+      try {
+        // Fetch only sales data
+        const res = await apiClient.get(`/dashboard/ventas/por-periodo?periodo=${periodo}`)
+        ventasPorPeriodo.value = { labels: res.data.labels || [], data: res.data.data || [] }
+      } catch(e) { console.error(e) } 
+      finally { setTimeout(() => chartLoading.value = false, 300) }
     }
 
-    // Detener polling
-    const stopPolling = () => {
-      if (pollingInterval.value) {
-        clearInterval(pollingInterval.value)
-        pollingInterval.value = null
-      }
-    }
-
-    // Cargar datos al montar e iniciar polling
     onMounted(() => {
       cargarDatos()
-      startPolling()
+      pollingInterval.value = setInterval(() => cargarDatos(true), 15000) // Poll faster for live feel
     })
 
-    // Limpiar polling al desmontar
-    onUnmounted(() => {
-      stopPolling()
-    })
+    onUnmounted(() => clearInterval(pollingInterval.value))
 
-    const formatNumber = (num) => {
-      return new Intl.NumberFormat('es-CO').format(num || 0)
-    }
-
-    // Status styles
+    // Utils
+    const formatNumber = (n) => new Intl.NumberFormat('es-CO', { maximumFractionDigits: 0 }).format(n || 0)
+    
     const getStatusClass = (status) => {
-      const classes = {
-        'PENDIENTE': 'bg-amber-100 text-amber-700',
-        'CONFIRMADA': 'bg-blue-100 text-blue-700',
-        'EN_PROCESO': 'bg-violet-100 text-violet-700',
-        'ENVIADA': 'bg-indigo-100 text-indigo-700',
-        'COMPLETADA': 'bg-emerald-100 text-emerald-700',
-        'CANCELADA': 'bg-gray-100 text-gray-500'
+      const map = {
+        'PENDIENTE': 'bg-amber-50 text-amber-700 border-amber-100',
+        'CONFIRMADA': 'bg-blue-50 text-blue-700 border-blue-100',
+        'EN_PROCESO': 'bg-violet-50 text-violet-700 border-violet-100',
+        'ENVIADA': 'bg-indigo-50 text-indigo-700 border-indigo-100',
+        'COMPLETADA': 'bg-emerald-50 text-emerald-700 border-emerald-100',
+        'CANCELADA': 'bg-gray-50 text-gray-500 border-gray-100'
       }
-      return classes[status] || 'bg-gray-100 text-gray-600'
+      return map[status] || 'bg-gray-50 text-gray-500'
     }
 
     const getStatusLabel = (status) => {
-      const labels = {
-        'PENDIENTE': 'Pendiente',
-        'CONFIRMADA': 'Confirmada',
-        'EN_PROCESO': 'En proceso',
-        'ENVIADA': 'Enviada',
-        'COMPLETADA': 'Completada',
-        'CANCELADA': 'Cancelada'
+      const map = {
+        'PENDIENTE': 'Pendiente', 'CONFIRMADA': 'Confirmada', 'EN_PROCESO': 'En Proceso',
+        'ENVIADA': 'Enviada', 'COMPLETADA': 'Completada', 'CANCELADA': 'Cancelada'
       }
-      return labels[status] || status
+      return map[status] || status
     }
 
     return {
-      stats,
-      recentOrders,
-      lowStockProducts,
-      topProducts,
-      loading,
-      error,
-      selectedPeriod,
-      fechaActual,
-      chartColors,
-      salesChartData,
-      salesChartOptions,
-      topProductsChartData,
-      donutChartOptions,
-      formatNumber,
-      getStatusClass,
-      getStatusLabel,
-      cargarDatos
+      stats, loading, chartLoading, error, selectedPeriod, recentOrders, topProducts, lowStockProducts,
+      salesChartData, salesChartOptions, topProductsChartData, donutChartOptions, chartColors,
+      fechaActual, cargarDatos, cambiarPeriodo, formatNumber, getStatusClass, getStatusLabel
     }
   }
 }
 </script>
+
+<style scoped>
+.font-luxury { font-family: 'Playfair Display', serif; }
+
+.animate-fade-in {
+  animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); filter: blur(10px); }
+  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+}
+
+.delay-75 { animation-delay: 75ms; }
+.delay-150 { animation-delay: 150ms; }
+</style>

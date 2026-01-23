@@ -34,9 +34,9 @@
           <div class="flex justify-center mb-8">
             <router-link to="/" class="flex items-center gap-3">
               <img 
-                src="/logo.jpeg" 
+                src="/logo-kharis.png" 
                 alt="Kharis Distribuidora" 
-                class="h-14 w-auto object-contain"
+                class="h-20 w-auto object-contain"
               />
             </router-link>
           </div>

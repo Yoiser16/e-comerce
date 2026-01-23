@@ -42,7 +42,6 @@
           <option value="">Todas las categorías</option>
           <option value="extensiones">Extensiones</option>
           <option value="pelucas">Pelucas</option>
-          <option value="cosmeticos">Cosméticos</option>
           <option value="accesorios">Accesorios</option>
         </select>
 
