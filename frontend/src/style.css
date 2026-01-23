@@ -101,16 +101,16 @@ body {
 /* Links de navegación estilo lujo - Mayúsculas, kerning amplio, más legibles */
 .nav-link-luxury {
   font-size: 12px;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.12em;
-  color: rgba(26, 26, 26, 0.75);
+  color: #1A1A1A;
   transition: color 0.3s ease;
   padding: 0.375rem 0;
   position: relative;
 }
 
 .nav-link-luxury:hover {
-  color: rgba(26, 26, 26, 1);
+  color: #D81B60;
 }
 
 /* Línea sutil bajo el link activo/hover */
@@ -120,8 +120,8 @@ body {
   bottom: 0;
   left: 0;
   width: 0;
-  height: 1px;
-  background: rgba(26, 26, 26, 0.3);
+  height: 1.5px;
+  background: #D81B60;
   transition: width 0.3s ease;
 }
 

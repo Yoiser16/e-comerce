@@ -7,38 +7,97 @@
     <header 
       :class="[
         'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
-        isScrolled ? 'header-luxury-scrolled py-2.5' : 'header-luxury py-3.5'
+        isScrolled ? 'header-luxury-scrolled py-2' : 'header-luxury py-3'
       ]"
     >
       <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
         <div class="flex items-center justify-between">
-          <!-- Logo compacto -->
+          <!-- Logo -->
           <a href="#" class="flex items-center gap-3 group flex-shrink-0">
-            <div class="w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden border border-white/60 shadow-md transition-all duration-300 group-hover:scale-105 group-hover:shadow-lg">
+            <div class="relative">
+              <!-- Glow sutil detrás del logo para mayor presencia -->
+              <div class="absolute inset-0 bg-gradient-to-r from-brand-500/5 via-brand-600/8 to-brand-500/5 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full scale-150"></div>
+              
               <img 
-                src="/logo.jpeg" 
+                src="/logo-kharis.png" 
                 alt="Kharis Distribuidora" 
-                class="w-full h-full object-cover"
+                class="relative h-12 sm:h-16 lg:h-20 w-auto object-contain transition-all duration-300 group-hover:scale-105 drop-shadow-[0_2px_8px_rgba(216,27,96,0.15)]"
+                style="filter: contrast(1.1) saturate(1.15);"
               />
             </div>
           </a>
 
           <!-- Buscador Desktop -->
           <div class="hidden lg:flex flex-1 max-w-xs mx-8">
-            <div class="relative w-full">
+            <div class="relative w-full" ref="searchInputRef">
               <input 
                 type="text"
                 v-model="searchQuery"
-                @keyup.enter="handleSearch"
-                placeholder="Buscar extensiones, pelucas..."
-                class="w-full pl-10 pr-4 py-2 bg-white/70 backdrop-blur-sm border border-nude-200/60 rounded-full text-xs text-text-dark placeholder-text-light/70 focus:outline-none focus:border-text-dark/20 focus:bg-white/90 focus:ring-1 focus:ring-text-dark/10 transition-all duration-300"
+                @input="getSuggestions"
+                @keyup.enter="handleSearch()"
+                @focus="getSuggestions"
+                placeholder="Buscar extensiones, accesorios..."
+                class="w-full pl-10 pr-4 py-2 bg-white/80 border border-text-dark/15 rounded-full text-xs text-text-dark placeholder-text-dark/70 focus:outline-none focus:border-text-dark/30 focus:bg-white focus:ring-1 focus:ring-text-dark/15 transition-all duration-300"
               />
               <svg 
-                class="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-light/60"
+                class="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-medium pointer-events-none"
                 fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
               >
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
+              
+              <!-- Dropdown de Sugerencias -->
+              <transition
+                enter-active-class="transition duration-150 ease-out"
+                enter-from-class="opacity-0 -translate-y-2"
+                enter-to-class="opacity-100 translate-y-0"
+                leave-active-class="transition duration-100 ease-in"
+                leave-from-class="opacity-100 translate-y-0"
+                leave-to-class="opacity-0 -translate-y-2"
+              >
+                <div 
+                  v-if="showSuggestions && searchSuggestions.length > 0"
+                  ref="suggestionsRef"
+                  class="absolute top-full left-0 right-0 mt-2 bg-white border border-text-dark/10 shadow-soft-lg rounded-lg overflow-hidden z-50"
+                >
+                  <div class="max-h-80 overflow-y-auto">
+                    <button
+                      v-for="producto in searchSuggestions"
+                      :key="producto.id"
+                      @click="handleSearch(producto)"
+                      class="w-full px-4 py-2.5 hover:bg-nude-50 transition-colors flex items-center gap-3 text-left group"
+                    >
+                      <div class="w-10 h-10 rounded-md overflow-hidden flex-shrink-0 bg-nude-100">
+                        <img 
+                          v-if="producto.imagen_principal || producto.imagen_url || producto.imagen"
+                          :src="getImageUrl(producto.imagen_principal || producto.imagen_url || producto.imagen)"
+                          :alt="producto.nombre"
+                          class="w-full h-full object-cover"
+                        />
+                      </div>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-xs font-medium text-text-dark truncate group-hover:text-brand-600 transition-colors">
+                          {{ producto.nombre }}
+                        </p>
+                      </div>
+                      <p class="text-xs font-semibold text-text-dark flex-shrink-0">
+                        {{ formatPrice(getItemPrice(producto)) }}
+                      </p>
+                    </button>
+                  </div>
+                  <div class="border-t border-text-dark/10 bg-nude-50/50">
+                    <button
+                      @click="handleSearch()"
+                      class="w-full px-4 py-3 text-xs font-medium text-brand-600 hover:text-brand-700 transition-colors flex items-center justify-center gap-2"
+                    >
+                      Ver todos los {{ getTotalSearchResults() }} productos
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                      </svg>
+                    </button>
+                  </div>
+                </div>
+              </transition>
             </div>
           </div>
 
@@ -58,7 +117,7 @@
               @click="mobileSearchOpen = !mobileSearchOpen"
               class="lg:hidden w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors duration-300 touch-target"
             >
-              <svg class="w-4 h-4 text-text-dark/70" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
             </button>
@@ -75,7 +134,7 @@
                   {{ userInitial }}
                 </span>
                 <!-- Si no está logueado, mostrar icono -->
-                <svg v-else class="w-4 h-4 text-text-dark/70" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <svg v-else class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
               </button>
@@ -119,7 +178,7 @@
               class="relative w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors duration-300 touch-target"
               @click="openCartDrawer"
             >
-              <svg class="w-4 h-4 text-text-dark/70" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
               </svg>
               <span 
@@ -135,7 +194,7 @@
               @click="mobileMenuOpen = !mobileMenuOpen"
               class="lg:hidden w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors duration-300 touch-target"
             >
-              <svg class="w-4 h-4 text-text-dark/70" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path v-if="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
                 <path v-else stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -157,16 +216,61 @@
               <input 
                 type="text"
                 v-model="searchQuery"
-                @keyup.enter="handleSearch"
+                @input="getSuggestions"
+                @keyup.enter="handleSearch()"
+                @focus="getSuggestions"
                 placeholder="Buscar productos..."
                 class="w-full pl-11 pr-4 py-3 bg-white/80 backdrop-blur-sm border border-nude-200/50 rounded-full text-[11px] tracking-wider text-text-dark placeholder-text-light/60 focus:outline-none focus:border-text-dark/20 focus:ring-1 focus:ring-text-dark/5 transition-all"
               />
               <svg 
-                class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light/50"
+                class="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light/50 pointer-events-none"
                 fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24"
               >
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
+              
+              <!-- Sugerencias móvil -->
+              <div 
+                v-if="showSuggestions && searchSuggestions.length > 0"
+                class="absolute top-full left-0 right-0 mt-2 bg-white border border-text-dark/10 shadow-soft-lg rounded-lg overflow-hidden z-50"
+              >
+                <div class="max-h-64 overflow-y-auto">
+                  <button
+                    v-for="producto in searchSuggestions"
+                    :key="producto.id"
+                    @click="handleSearch(producto)"
+                    class="w-full px-3 py-2 hover:bg-nude-50 transition-colors flex items-center gap-2 text-left"
+                  >
+                    <div class="w-8 h-8 rounded overflow-hidden flex-shrink-0 bg-nude-100">
+                      <img 
+                        v-if="producto.imagen_principal || producto.imagen_url || producto.imagen"
+                        :src="getImageUrl(producto.imagen_principal || producto.imagen_url || producto.imagen)"
+                        :alt="producto.nombre"
+                        class="w-full h-full object-cover"
+                      />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <p class="text-[11px] font-medium text-text-dark truncate">
+                        {{ producto.nombre }}
+                      </p>
+                      <p class="text-[9px] text-text-medium truncate">
+                        {{ formatPrice(getItemPrice(producto)) }}
+                      </p>
+                    </div>
+                  </button>
+                </div>
+                <div class="border-t border-text-dark/10 bg-nude-50/50">
+                  <button
+                    @click="handleSearch()"
+                    class="w-full px-3 py-2.5 text-[11px] font-medium text-brand-600 hover:text-brand-700 transition-colors flex items-center justify-center gap-1.5"
+                  >
+                    Ver todos ({{ getTotalSearchResults() }})
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </transition>
@@ -511,7 +615,7 @@
          PRODUCTOS DESTACADOS
          ======================================== -->
     <section id="productos" class="py-20 lg:py-28 bg-gradient-to-b from-nude-100/50 to-[#FAFAFA]">
-      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+      <div class="max-w-screen-xl mx-auto px-5 sm:px-8 lg:px-10">
         <!-- Section Header -->
         <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
           <div>
@@ -543,6 +647,8 @@
           <div
             v-for="producto in productos"
             :key="producto.id"
+            :data-producto-id="producto.id"
+            :data-producto-nombre="producto.nombre"
             class="group cursor-pointer"
           >
             <div class="relative bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-soft hover-lift mb-3 sm:mb-5">
@@ -1064,7 +1170,7 @@
                 <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Extensiones Clip-in</a></li>
                 <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Extensiones Tape</a></li>
                 <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Pelucas Lacefront</a></li>
-                <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Cosméticos Capilares</a></li>
+                <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Accesorios</a></li>
                 <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Novedades</a></li>
               </ul>
             </div>
@@ -1496,6 +1602,10 @@ export default {
     const mobileMenuOpen = ref(false)
     const mobileSearchOpen = ref(false)
     const searchQuery = ref('')
+    const searchSuggestions = ref([])
+    const showSuggestions = ref(false)
+    const searchInputRef = ref(null)
+    const suggestionsRef = ref(null)
     
     // Ya no necesitamos computed separados, usamos categorias.value directamente
     
@@ -1790,10 +1900,81 @@ export default {
       startSlideshow()
     }
 
-    const handleSearch = () => {
-      if (searchQuery.value.trim()) {
-        // TODO: Implementar búsqueda real
-        // router.push({ path: '/buscar', query: { q: searchQuery.value } })
+    // Función para obtener sugerencias mientras escribe
+    const getSuggestions = () => {
+      const query = searchQuery.value.trim().toLowerCase()
+      
+      if (query.length < 2) {
+        searchSuggestions.value = []
+        showSuggestions.value = false
+        return
+      }
+      
+      // Filtrar productos que coincidan con la búsqueda
+      const matches = productos.value.filter(producto => 
+        producto.nombre.toLowerCase().includes(query) ||
+        producto.descripcion?.toLowerCase().includes(query) ||
+        producto.categoria?.nombre?.toLowerCase().includes(query)
+      ).slice(0, 6) // Máximo 6 sugerencias
+      
+      searchSuggestions.value = matches
+      showSuggestions.value = matches.length > 0
+    }
+    
+    // Función para obtener el total de resultados de búsqueda
+    const getTotalSearchResults = () => {
+      const query = searchQuery.value.trim().toLowerCase()
+      
+      if (!query) return 0
+      
+      return productos.value.filter(producto => 
+        producto.nombre.toLowerCase().includes(query) ||
+        producto.descripcion?.toLowerCase().includes(query) ||
+        producto.categoria?.nombre?.toLowerCase().includes(query)
+      ).length
+    }
+    
+    // Función para ejecutar la búsqueda
+    const handleSearch = (selectedProduct = null) => {
+      if (selectedProduct) {
+        // Si seleccionó un producto específico, ir directo a él
+        scrollToProducto(selectedProduct.id)
+        searchQuery.value = ''
+        showSuggestions.value = false
+        mobileSearchOpen.value = false
+      } else if (searchQuery.value.trim()) {
+        // Navegar al catálogo con el query de búsqueda
+        const query = searchQuery.value.trim()
+        router.push({ path: '/catalogo', query: { q: query } })
+        showSuggestions.value = false
+        mobileSearchOpen.value = false
+      }
+    }
+    
+    // Función para scrollear a un producto específico
+    const scrollToProducto = (productoId) => {
+      const element = document.getElementById('productos')
+      if (element) {
+        element.scrollIntoView({ behavior: 'smooth', block: 'start' })
+        
+        setTimeout(() => {
+          const productoCard = document.querySelector(`[data-producto-id="${productoId}"]`)
+          if (productoCard) {
+            productoCard.scrollIntoView({ behavior: 'smooth', block: 'center' })
+            productoCard.classList.add('ring-2', 'ring-brand-600', 'ring-offset-4')
+            setTimeout(() => {
+              productoCard.classList.remove('ring-2', 'ring-brand-600', 'ring-offset-4')
+            }, 2500)
+          }
+        }, 500)
+      }
+    }
+    
+    // Cerrar sugerencias al hacer clic fuera
+    const handleClickOutsideSearch = (event) => {
+      if (searchInputRef.value && !searchInputRef.value.contains(event.target) &&
+          suggestionsRef.value && !suggestionsRef.value.contains(event.target)) {
+        showSuggestions.value = false
       }
     }
 
@@ -2035,6 +2216,7 @@ export default {
       window.addEventListener('scroll', handleScroll)
       window.addEventListener('user-logged-in', handleUserLoggedIn)
       document.addEventListener('click', handleClickOutside)
+      document.addEventListener('click', handleClickOutsideSearch)
       handleScroll()
       startSlideshow()
     })
@@ -2043,6 +2225,7 @@ export default {
       window.removeEventListener('scroll', handleScroll)
       window.removeEventListener('user-logged-in', handleUserLoggedIn)
       document.removeEventListener('click', handleClickOutside)
+      document.removeEventListener('click', handleClickOutsideSearch)
       if (slideInterval) clearInterval(slideInterval)
     })
 
@@ -2056,9 +2239,17 @@ export default {
       mobileMenuOpen,
       mobileSearchOpen,
       searchQuery,
+      searchSuggestions,
+      showSuggestions,
+      searchInputRef,
+      suggestionsRef,
       currentSlide,
       heroSlides,
       goToSlide,
+      handleSearch,
+      getSuggestions,
+        getTotalSearchResults,
+      scrollToProducto,
       handleSearch,
       scrollToTop,
       formatPrice,
