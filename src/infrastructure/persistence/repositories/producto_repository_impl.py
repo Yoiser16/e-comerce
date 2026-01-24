@@ -83,7 +83,7 @@ class ProductoRepositoryImpl(ProductoRepository):
     def obtener_por_id(self, id: UUID) -> Optional[Producto]:
         self._logger.info(f"Obteniendo producto por ID", producto_id=str(id))
         try:
-            model = ProductoModel.objects.get(id=id)
+            model = ProductoModel.objects.select_related('categoria').get(id=id)
             return self._to_domain(model)
         except ProductoModel.DoesNotExist:
             return None
@@ -91,14 +91,14 @@ class ProductoRepositoryImpl(ProductoRepository):
     def obtener_por_codigo(self, codigo: CodigoProducto) -> Optional[Producto]:
         self._logger.info(f"Buscando producto por código", codigo=codigo.valor)
         try:
-            model = ProductoModel.objects.get(codigo=codigo.valor)
+            model = ProductoModel.objects.select_related('categoria').get(codigo=codigo.valor)
             return self._to_domain(model)
         except ProductoModel.DoesNotExist:
             return None
             
     def buscar_por_nombre(self, nombre: str) -> List[Producto]:
         self._logger.info(f"Buscando productos por nombre", nombre=nombre)
-        models = ProductoModel.objects.filter(
+        models = ProductoModel.objects.select_related('categoria').filter(
             nombre__icontains=nombre
         )
         return [self._to_domain(model) for model in models]
@@ -108,12 +108,12 @@ class ProductoRepositoryImpl(ProductoRepository):
         # En SQL: WHERE stock_actual <= stock_minimo
         # Django F expression para comparar columnas
         from django.db.models import F
-        models = ProductoModel.objects.filter(stock_actual__lte=F('stock_minimo'), activo=True)
+        models = ProductoModel.objects.select_related('categoria').filter(stock_actual__lte=F('stock_minimo'), activo=True)
         return [self._to_domain(model) for model in models]
         
     def obtener_disponibles(self) -> List[Producto]:
         self._logger.info("Obteniendo productos disponibles")
-        models = ProductoModel.objects.filter(activo=True, stock_actual__gt=0)
+        models = ProductoModel.objects.select_related('categoria').filter(activo=True, stock_actual__gt=0)
         return [self._to_domain(model) for model in models]
     
     def obtener_con_bloqueo(self, id: UUID) -> Optional[Producto]:
@@ -275,7 +275,7 @@ class ProductoRepositoryImpl(ProductoRepository):
 
     def obtener_todos(self, limite: int = 100, offset: int = 0) -> List[Producto]:
         self._logger.info(f"Obteniendo todos los productos", limite=limite, offset=offset)
-        models = ProductoModel.objects.all()[offset:offset + limite]
+        models = ProductoModel.objects.select_related('categoria').all()[offset:offset + limite]
         return [self._to_domain(model) for model in models]
 
     # ===== MÉTODOS DE BÚSQUEDA AVANZADA =====

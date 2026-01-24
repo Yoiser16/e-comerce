@@ -38,10 +38,18 @@
                 @keyup.enter="handleSearch()"
                 @focus="getSuggestions"
                 placeholder="Buscar extensiones, accesorios..."
-                class="w-full pl-10 pr-4 py-2 bg-white/80 border border-text-dark/15 rounded-full text-xs text-text-dark placeholder-text-dark/70 focus:outline-none focus:border-text-dark/30 focus:bg-white focus:ring-1 focus:ring-text-dark/15 transition-all duration-300"
+                :class="[
+                  'w-full pl-10 pr-4 py-2 border rounded-full text-xs focus:outline-none focus:ring-1 transition-all duration-300',
+                  isScrolled 
+                    ? 'bg-white/80 border-text-dark/15 text-text-dark placeholder-text-dark/70 focus:border-text-dark/30 focus:bg-white focus:ring-text-dark/15'
+                    : 'bg-white/20 border-white/30 text-white placeholder-white/70 focus:border-white/50 focus:bg-white/30 focus:ring-white/20'
+                ]"
               />
               <svg 
-                class="absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-text-medium pointer-events-none"
+                :class="[
+                  'absolute left-3.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 pointer-events-none',
+                  isScrolled ? 'text-text-medium' : 'text-white/80'
+                ]"
                 fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
               >
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
@@ -117,9 +125,12 @@
             <!-- Buscador Mobile -->
             <button 
               @click="mobileSearchOpen = !mobileSearchOpen"
-              class="lg:hidden w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors duration-300 touch-target"
+              :class="[
+                'lg:hidden w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target',
+                isScrolled ? 'hover:bg-black/5' : 'hover:bg-white/10'
+              ]"
             >
-              <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg :class="['w-4 h-4', isScrolled ? 'text-text-dark' : 'text-white']" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
             </button>
@@ -129,63 +140,138 @@
               <button 
                 @click="toggleUserMenu"
                 class="w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target"
-                :class="isLoggedIn ? 'border border-text-dark/20 hover:border-text-dark/40' : 'hover:bg-black/5'"
+                :class="[
+                  isLoggedIn 
+                    ? (isScrolled ? 'border border-text-dark/20 hover:border-text-dark/40' : 'border border-white/30 hover:border-white/60')
+                    : (isScrolled ? 'hover:bg-black/5' : 'hover:bg-white/10')
+                ]"
               >
                 <!-- Si está logueado, mostrar inicial con estilo sutil -->
-                <span v-if="isLoggedIn" class="text-text-dark text-xs font-medium">
+                <span v-if="isLoggedIn" class="text-xs font-medium" :class="isScrolled ? 'text-text-dark' : 'text-white'">
                   {{ userInitial }}
                 </span>
                 <!-- Si no está logueado, mostrar icono -->
-                <svg v-else class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <svg v-else class="w-4 h-4" :class="isScrolled ? 'text-text-dark' : 'text-white'" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
               </button>
               
-              <!-- Dropdown Menu -->
-              <transition
-                enter-active-class="transition duration-150 ease-out"
-                enter-from-class="opacity-0 scale-95"
-                enter-to-class="opacity-100 scale-100"
-                leave-active-class="transition duration-100 ease-in"
-                leave-from-class="opacity-100 scale-100"
-                leave-to-class="opacity-0 scale-95"
-              >
-                <div 
-                  v-if="showUserMenu && isLoggedIn"
-                  class="absolute right-0 mt-2 w-48 bg-white border border-black/5 shadow-lg py-1 z-50"
+              <!-- Dropdown Menu - Teleport al body para evitar overflow-hidden -->
+              <Teleport to="body">
+                <transition
+                  enter-active-class="transition duration-150 ease-out"
+                  enter-from-class="opacity-0 scale-95"
+                  enter-to-class="opacity-100 scale-100"
+                  leave-active-class="transition duration-100 ease-in"
+                  leave-from-class="opacity-100 scale-100"
+                  leave-to-class="opacity-0 scale-95"
                 >
-                  <div class="px-4 py-2 border-b border-black/5">
-                    <p class="text-xs text-text-dark/50">Hola,</p>
-                    <p class="text-sm text-text-dark font-medium truncate">{{ currentUser?.nombre || currentUser?.email }}</p>
+                  <div 
+                    v-if="showUserMenu"
+                    class="fixed w-52 bg-white rounded-lg shadow-[0_16px_48px_rgb(0,0,0,0.25)] py-2 border border-black/10"
+                    :style="{
+                      top: (userMenuRef?.getBoundingClientRect().bottom || 0) + 12 + 'px',
+                      left: ((userMenuRef?.getBoundingClientRect().right || 0) - 208) + 'px',
+                      zIndex: 99999
+                    }"
+                  >
+                    <!-- Si está logueado -->
+                    <template v-if="isLoggedIn">
+                      <div class="px-4 py-3 border-b border-black/10 bg-nude-50/30">
+                        <p class="text-xs text-text-medium mb-0.5">Hola,</p>
+                        <p class="text-sm text-text-dark font-semibold truncate">{{ currentUser?.nombre || currentUser?.email }}</p>
+                      </div>
+                      <router-link 
+                        to="/mi-cuenta"
+                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-text-dark font-medium hover:bg-nude-100 transition-colors"
+                        @click="showUserMenu = false"
+                      >
+                        <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                        </svg>
+                        Mi Cuenta
+                      </router-link>
+                      <button 
+                        @click="handleMenuAction('pedidos')"
+                        class="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-text-dark font-medium hover:bg-nude-100 transition-colors"
+                      >
+                        <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                        </svg>
+                        Mis Pedidos
+                      </button>
+                      <button 
+                        @click="handleMenuAction('favoritos')"
+                        class="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-text-dark font-medium hover:bg-nude-100 transition-colors border-b border-black/10"
+                      >
+                        <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                        </svg>
+                        Ver Favoritos
+                      </button>
+                      <button 
+                        @click="cerrarSesion"
+                        class="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors mt-1"
+                      >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                        </svg>
+                        Cerrar Sesión
+                      </button>
+                    </template>
+                    
+                    <!-- Si NO está logueado -->
+                    <template v-else>
+                      <button 
+                        @click="handleMenuAction('login')"
+                        class="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-text-dark font-medium hover:bg-nude-100 transition-colors"
+                      >
+                        <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                        </svg>
+                        Inicia sesión
+                      </button>
+                      <button 
+                        @click="handleMenuAction('pedidos')"
+                        class="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-text-dark font-medium hover:bg-nude-100 transition-colors"
+                      >
+                        <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                        </svg>
+                        Mi pedido
+                      </button>
+                      <button 
+                        @click="handleMenuAction('favoritos')"
+                        class="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-text-dark font-medium hover:bg-nude-100 transition-colors"
+                      >
+                        <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                        </svg>
+                        Ver Favoritos
+                      </button>
+                    </template>
                   </div>
-                  <router-link 
-                    to="/mi-cuenta"
-                    class="block px-4 py-2 text-sm text-text-dark hover:bg-black/5 transition-colors"
-                    @click="showUserMenu = false"
-                  >
-                    Mi Cuenta
-                  </router-link>
-                  <button 
-                    @click="cerrarSesion"
-                    class="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-red-50 transition-colors"
-                  >
-                    Cerrar Sesión
-                  </button>
-                </div>
-              </transition>
+                </transition>
+              </Teleport>
             </div>
             
             <!-- Carrito -->
             <button 
-              class="relative w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors duration-300 touch-target"
+              :class="[
+                'relative w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target',
+                isScrolled ? 'hover:bg-black/5' : 'hover:bg-white/10'
+              ]"
               @click="openCartDrawer"
             >
-              <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg :class="['w-4 h-4', isScrolled ? 'text-text-dark' : 'text-white']" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
               </svg>
               <span 
                 v-if="cartCount > 0"
-                class="absolute -top-0.5 -right-0.5 w-4 h-4 bg-text-dark text-white text-[9px] font-medium rounded-full flex items-center justify-center"
+                :class="[
+                  'absolute -top-0.5 -right-0.5 w-4 h-4 text-[9px] font-medium rounded-full flex items-center justify-center',
+                  isScrolled ? 'bg-text-dark text-white' : 'bg-brand-600 text-white'
+                ]"
               >
                 {{ cartCount }}
               </span>
@@ -194,9 +280,12 @@
             <!-- Menu Mobile -->
             <button 
               @click="mobileMenuOpen = !mobileMenuOpen"
-              class="lg:hidden w-9 h-9 rounded-full flex items-center justify-center hover:bg-black/5 transition-colors duration-300 touch-target"
+              :class="[
+                'lg:hidden w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target',
+                isScrolled ? 'hover:bg-black/5' : 'hover:bg-white/10'
+              ]"
             >
-              <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg :class="['w-4 h-4', isScrolled ? 'text-text-dark' : 'text-white']" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path v-if="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
                 <path v-else stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -758,24 +847,23 @@
         <div class="absolute inset-0 flex items-center lg:items-end justify-center pb-8 sm:pb-12 lg:pb-20">
           <div class="text-center px-5 sm:px-6">
             <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 sm:px-5 sm:py-2 mb-4 sm:mb-6">
-              <span class="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider">Tecnología Japonesa</span>
+              <span class="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider">Calidad Premium</span>
             </div>
             <h2 class="font-luxury text-2xl sm:text-3xl lg:text-5xl text-white mb-3 sm:mb-4 drop-shadow-2xl">
-              Fibras <span class="text-brand-400">KANEKALON</span>
+              Extensiones 100% <span class="text-brand-400">Naturales</span>
             </h2>
             <p class="text-white/80 text-sm sm:text-base lg:text-lg max-w-md sm:max-w-xl lg:max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed">
-              Más de 65 años de innovación. La marca que cambia tu futuro a través del cabello.
+              Tecnología de fibras de la más alta calidad. Transforma tu look con elegancia y sofisticación profesional.
             </p>
-            <a 
-              href="https://www.kanekalon.com" 
-              target="_blank"
+            <router-link 
+              to="/catalogo"
               class="inline-flex items-center gap-2 bg-white hover:bg-nude-100 text-text-dark font-medium text-sm sm:text-base px-5 py-2.5 sm:px-7 sm:py-3.5 rounded-full transition-all shadow-lg hover:shadow-xl"
             >
-              Conoce más sobre Kanekalon
+              Ver Catálogo Completo
               <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 6H5.25A2.25 2.25 0 003 8.25v10.5A2.25 2.25 0 005.25 21h10.5A2.25 2.25 0 0018 18.75V10.5m-10.5 6L21 3m0 0h-5.25M21 3v5.25" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
-            </a>
+            </router-link>
           </div>
         </div>
       </div>
@@ -2128,11 +2216,30 @@ export default {
     
     // User menu functions
     const toggleUserMenu = () => {
+      showUserMenu.value = !showUserMenu.value
+    }
+    
+    const handleMenuAction = (action) => {
+      showUserMenu.value = false
+      
       if (!isLoggedIn.value) {
+        // Si no está logueado, abrir modal de login
         router.push('/login')
         return
       }
-      showUserMenu.value = !showUserMenu.value
+      
+      // Si está logueado, redirigir según acción
+      switch(action) {
+        case 'pedidos':
+          router.push('/mi-cuenta')
+          break
+        case 'favoritos':
+          router.push('/catalogo?favoritos=true')
+          break
+        case 'login':
+          router.push('/login')
+          break
+      }
     }
     
     const cerrarSesion = () => {
@@ -2263,6 +2370,7 @@ export default {
       agregarAlCarrito,
       toggleFavorito,
       toggleUserMenu,
+      handleMenuAction,
       cerrarSesion,
       showUserMenu,
       userMenuRef,

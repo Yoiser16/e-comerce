@@ -41,17 +41,15 @@
             </router-link>
           </div>
 
-          <!-- Título elegante -->
-          <h2 class="text-center font-luxury text-2xl text-text-dark mb-2">
-            <span v-if="!isRegistering">Bienvenido de <em class="not-italic text-brand-600">nuevo</em></span>
-            <span v-else>Crea tu <em class="not-italic text-brand-600">cuenta</em></span>
+          <!-- Título elegante y minimalista -->
+          <h2 class="text-center font-luxury text-2xl sm:text-3xl text-text-dark mb-3">
+            ¿Cómo quieres <em class="not-italic text-brand-600">iniciar sesión</em>?
           </h2>
           <p class="text-center text-sm text-text-light mb-8">
-            <span v-if="!isRegistering">¿Cómo quieres iniciar sesión?</span>
-            <span v-else>Regístrate para comenzar</span>
+            Elige tu método preferido para continuar
           </p>
 
-          <!-- Opciones de Login -->
+          <!-- Opciones de Login - Estilo minimalista -->
           <div class="space-y-3">
             
             <!-- Google Sign-In -->
@@ -60,16 +58,16 @@
               class="flex justify-center w-full"
             ></div>
 
-            <!-- Email -->
+            <!-- Código de Acceso (Email) -->
             <button 
               type="button"
               @click="showEmailForm = !showEmailForm"
-              class="w-full flex items-center justify-center gap-3 py-4 px-6 bg-white border border-nude-300 rounded-xl hover:border-brand-500 hover:shadow-soft transition-all duration-300"
+              class="w-full flex items-center justify-center gap-3 py-4 px-6 bg-white border-2 border-text-dark/10 rounded-lg hover:border-brand-500 hover:bg-nude-50/30 transition-all duration-300 group"
             >
-              <svg class="w-5 h-5 text-text-medium" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 text-text-medium group-hover:text-brand-600 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
               </svg>
-              <span class="text-sm font-medium text-text-dark uppercase tracking-wide">Ingresar con correo</span>
+              <span class="text-sm font-medium text-text-dark uppercase tracking-[0.08em]">Ingresar con código de acceso</span>
             </button>
 
             <p v-if="error && !showEmailForm" class="text-center text-sm text-red-500">{{ error }}</p>
@@ -236,7 +234,12 @@ export default {
     })
 
     const closeModal = () => {
-      router.push('/')
+      // Usar replace para evitar agregar a historial y reducir delay
+      const currentPath = router.currentRoute.value.path
+      if (currentPath === '/login') {
+        router.replace('/')
+      }
+      // Si ya estamos en otra ruta, no hacer nada
     }
 
     const handleLogin = async () => {

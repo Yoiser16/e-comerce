@@ -2,6 +2,21 @@
   <div class="min-h-screen flex flex-col bg-white">
     
     <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- LOADING INICIAL - Mientras determina el paso correcto               -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <div v-if="initialLoading" class="min-h-screen flex items-center justify-center bg-white">
+      <div class="text-center">
+        <div class="w-12 h-12 border-2 border-[#D81B60] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+        <p class="text-[#7A7A7A] text-sm">Preparando tu pedido...</p>
+      </div>
+    </div>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <!-- CHECKOUT PRINCIPAL (solo se muestra cuando termina la carga)        -->
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
+    <template v-else>
+    
+    <!-- ═══════════════════════════════════════════════════════════════════ -->
     <!-- HEADER                                                               -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <header class="bg-white border-b border-[#E5E7EB]">
@@ -235,10 +250,10 @@
                               v-for="dep in departamentosFiltrados" 
                               :key="dep.id"
                               @click="selectDepartamento(dep)"
-                              :class="{ 'selected': dep.id === form.departamento }"
+                              :class="{ 'selected': dep.nombre === form.departamento || dep.id === form.departamentoId }"
                             >
                               {{ dep.nombre }}
-                              <svg v-if="dep.id === form.departamento" class="w-4 h-4 text-[#1A1A1A]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                              <svg v-if="dep.nombre === form.departamento || dep.id === form.departamentoId" class="w-4 h-4 text-[#1A1A1A]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                               </svg>
                             </li>
@@ -293,10 +308,10 @@
                               v-for="mun in municipiosFiltrados" 
                               :key="mun.id"
                               @click="selectMunicipio(mun)"
-                              :class="{ 'selected': mun.id === form.municipio }"
+                              :class="{ 'selected': mun.nombre === form.municipio }"
                             >
                               {{ mun.nombre }}
-                              <svg v-if="mun.id === form.municipio" class="w-4 h-4 text-[#1A1A1A]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                              <svg v-if="mun.nombre === form.municipio" class="w-4 h-4 text-[#1A1A1A]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                                 <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
                               </svg>
                             </li>
@@ -417,6 +432,23 @@
                 <div class="px-8 py-6 border-b border-[#E5E7EB]">
                   <h2 class="font-luxury text-xl text-[#1A1A1A]">Método de Pago</h2>
                   <p class="text-sm text-[#7A7A7A] mt-1">Selecciona cómo deseas pagar</p>
+                </div>
+                
+                <!-- Banner informativo para clientes con datos guardados -->
+                <div v-if="clienteConDatosCompletos" class="mx-8 mt-6 mb-2 bg-gradient-to-r from-[#FDF2F8] to-[#FCE7F3] border border-[#F9A8D4] rounded-lg p-4">
+                  <div class="flex items-start gap-3">
+                    <div class="flex-shrink-0 w-8 h-8 bg-[#D81B60] rounded-full flex items-center justify-center">
+                      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                      </svg>
+                    </div>
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-[#831843]">¡Hola de nuevo! 💕</p>
+                      <p class="text-xs text-[#9D174D] mt-1">
+                        Ya tenemos tu información guardada. Solo elige cómo pagar y listo.
+                      </p>
+                    </div>
+                  </div>
                 </div>
                 
                 <!-- Resumen de datos -->
@@ -674,6 +706,8 @@
         </div>
       </div>
     </div>
+    
+    </template><!-- fin v-else -->
   </div>
 </template>
 
@@ -699,6 +733,12 @@ export default {
     const processing = ref(false)
     const cupon = ref('')
     const epaycoLoaded = ref(false)
+    
+    // Estado de carga inicial - mostrar loading mientras determina el paso correcto
+    const initialLoading = ref(true)
+    
+    // Estado para clientes con datos completos (saltar al paso 3)
+    const clienteConDatosCompletos = ref(false)
     
     // Estado de carga para ubicación
     const loadingDepartamentos = ref(false)
@@ -727,6 +767,7 @@ export default {
       newsletter: false,
       pais: '',
       departamento: '',
+      departamentoId: null, // ID numérico para la API de Colombia
       municipio: '',
       tipoZona: '',
       direccion: '',
@@ -758,15 +799,37 @@ export default {
     }
     
     // Cargar municipios cuando cambia el departamento
-    const loadMunicipios = async (departamentoId) => {
-      if (!departamentoId) {
+    // Acepta tanto ID numérico como nombre del departamento
+    const loadMunicipios = async (departamentoIdOrName) => {
+      if (!departamentoIdOrName) {
         municipios.value = []
         return
       }
       
       loadingMunicipios.value = true
       try {
-        const response = await fetch(COLOMBIA_API.ciudades(departamentoId))
+        // Si es un string (nombre), buscar el ID
+        let depId = departamentoIdOrName
+        if (typeof departamentoIdOrName === 'string' && isNaN(parseInt(departamentoIdOrName))) {
+          // Es un nombre, buscar en la lista de departamentos
+          const dep = departamentos.value.find(d => 
+            d.nombre.toLowerCase() === departamentoIdOrName.toLowerCase()
+          )
+          if (dep) {
+            depId = dep.id
+            form.value.departamentoId = dep.id
+          } else {
+            console.log('⚠️ Departamento no encontrado en la lista:', departamentoIdOrName)
+            municipios.value = []
+            loadingMunicipios.value = false
+            return
+          }
+        }
+        
+        const response = await fetch(COLOMBIA_API.ciudades(depId))
+        if (!response.ok) {
+          throw new Error(`HTTP ${response.status}`)
+        }
         const data = await response.json()
         // Ordenar alfabéticamente y mapear al formato esperado
         municipios.value = data
@@ -814,7 +877,8 @@ export default {
     }
     
     const selectDepartamento = async (dep) => {
-      form.value.departamento = dep.id
+      form.value.departamento = dep.nombre  // Guardar nombre, no ID
+      form.value.departamentoId = dep.id    // Guardar ID para la API
       dropdowns.value.departamento = false
       searchDep.value = ''
       form.value.municipio = ''
@@ -824,7 +888,7 @@ export default {
     }
     
     const selectMunicipio = (mun) => {
-      form.value.municipio = mun.id
+      form.value.municipio = mun.nombre  // Guardar nombre, no ID
       dropdowns.value.municipio = false
       searchMun.value = ''
       saveFormToStorage()
@@ -832,13 +896,31 @@ export default {
     
     // Obtener nombre seleccionado
     const getDepName = computed(() => {
-      const dep = departamentos.value.find(d => d.id === form.value.departamento)
-      return dep ? dep.nombre : ''
+      // Convertir a string de forma segura
+      const depValue = form.value.departamento
+      const depStr = typeof depValue === 'string' ? depValue : String(depValue || '')
+      
+      // Buscar por ID o por nombre
+      const dep = departamentos.value.find(d => 
+        d.id === form.value.departamentoId ||
+        d.id === Number(depValue) ||
+        d.nombre === depStr ||
+        (depStr && d.nombre?.toLowerCase() === depStr.toLowerCase())
+      )
+      return dep ? dep.nombre : depStr
     })
     
     const getMunName = computed(() => {
-      const mun = municipios.value.find(m => m.id === form.value.municipio)
-      return mun ? mun.nombre : ''
+      // Convertir a string de forma segura
+      const munValue = form.value.municipio
+      const munStr = typeof munValue === 'string' ? munValue : String(munValue || '')
+      
+      const mun = municipios.value.find(m => 
+        m.id === Number(munValue) ||
+        m.nombre === munStr ||
+        (munStr && m.nombre?.toLowerCase() === munStr.toLowerCase())
+      )
+      return mun ? mun.nombre : munStr
     })
     
     // Cart
@@ -886,10 +968,199 @@ export default {
         const saved = localStorage.getItem(STORAGE_KEY)
         if (saved) {
           const data = JSON.parse(saved)
+          
+          // Limpiar datos corruptos (IDs numéricos en vez de nombres)
+          if (data.departamento && typeof data.departamento === 'number') {
+            // Dato corrupto, limpiar
+            localStorage.removeItem(STORAGE_KEY)
+            console.log('🧹 Limpiando datos de formulario corruptos')
+            return
+          }
+          
+          // Asegurar que departamento y municipio sean strings
+          if (data.departamento && typeof data.departamento !== 'string') {
+            data.departamento = String(data.departamento)
+          }
+          if (data.municipio && typeof data.municipio !== 'string') {
+            data.municipio = String(data.municipio)
+          }
           Object.assign(form.value, data)
         }
       } catch (e) {
         console.warn('Error loading form from storage', e)
+        localStorage.removeItem(STORAGE_KEY)
+      }
+    }
+    
+    // Cargar datos del cliente logueado y su última orden
+    const loadClienteData = async () => {
+      try {
+        const token = localStorage.getItem('access_token')
+        const userStr = localStorage.getItem('user')
+        
+        if (!token || !userStr) return // No hay usuario logueado
+        
+        const user = JSON.parse(userStr)
+        const userEmail = user.email
+        
+        if (!userEmail) return
+        
+        console.log('🔍 Buscando cliente con email:', userEmail)
+        
+        // Obtener todos los clientes y buscar el actual por email
+        const clientesResponse = await fetch('http://localhost:8000/api/v1/clientes/', {
+          headers: { 'Authorization': `Bearer ${token}` }
+        })
+        
+        if (!clientesResponse.ok) {
+          console.log('❌ Error al cargar clientes:', clientesResponse.status)
+          return
+        }
+        
+        const clientes = await clientesResponse.json()
+        const clienteActual = clientes.find(c => c.email === userEmail)
+        
+        if (!clienteActual) {
+          console.log('❌ Cliente no encontrado en la base de datos')
+          return
+        }
+        
+        console.log('✅ Cliente encontrado:', clienteActual)
+        
+        // Precargar datos del cliente
+        if (clienteActual.email && !form.value.email) {
+          form.value.email = clienteActual.email
+        }
+        if (clienteActual.nombre && !form.value.nombre) {
+          form.value.nombre = clienteActual.nombre
+        }
+        if (clienteActual.apellido && !form.value.apellido) {
+          form.value.apellido = clienteActual.apellido || ''
+        }
+        if (clienteActual.telefono && !form.value.telefono) {
+          form.value.telefono = clienteActual.telefono
+        }
+        
+        console.log('📋 Datos básicos precargados')
+        
+        // PRIMERO: Intentar cargar dirección guardada en el perfil del cliente
+        let direccionCargadaDesdeCliente = false
+        let telefonoCargado = !!form.value.telefono
+        
+        if (clienteActual.direccion || clienteActual.departamento) {
+          console.log('📍 Cliente tiene dirección guardada, precargando...')
+          
+          if (clienteActual.direccion && !form.value.direccion) {
+            form.value.direccion = clienteActual.direccion
+            console.log('📍 Dirección precargada desde cliente:', clienteActual.direccion)
+          }
+          if (clienteActual.departamento && !form.value.departamento) {
+            form.value.departamento = clienteActual.departamento
+            console.log('🏛️ Departamento precargado desde cliente:', clienteActual.departamento)
+            await loadMunicipios(clienteActual.departamento)
+          }
+          if (clienteActual.municipio && !form.value.municipio) {
+            form.value.municipio = clienteActual.municipio
+            console.log('🏘️ Municipio precargado desde cliente:', clienteActual.municipio)
+          }
+          if (clienteActual.barrio && !form.value.barrio) {
+            form.value.barrio = clienteActual.barrio
+            console.log('🏡 Barrio precargado desde cliente:', clienteActual.barrio)
+          }
+          direccionCargadaDesdeCliente = true
+          console.log('✅ Dirección precargada desde perfil del cliente')
+        }
+        
+        // SEGUNDO: Si no tiene dirección o teléfono, buscar en órdenes anteriores
+        if (!direccionCargadaDesdeCliente || !telefonoCargado) {
+          console.log('ℹ️ Buscando datos faltantes en órdenes anteriores...')
+          
+          // Intentar obtener todas las órdenes y filtrar por este cliente
+          try {
+            const ordenesResponse = await fetch('http://localhost:8000/api/v1/ordenes', {
+              headers: { 'Authorization': `Bearer ${token}` }
+            })
+          
+            if (ordenesResponse.ok) {
+              const ordenes = await ordenesResponse.json()
+              
+              console.log('📦 Órdenes totales:', ordenes.length)
+              
+              // Filtrar órdenes del cliente actual por EMAIL (no por ID)
+              const ordenesCliente = ordenes
+                .filter(o => o.cliente_email === clienteActual.email)
+                .sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion))
+              
+              console.log('📦 Órdenes del cliente:', ordenesCliente.length)
+              
+              if (ordenesCliente.length > 0) {
+                // Obtener el detalle de la última orden (tiene los datos de envío)
+                const ultimaOrdenId = ordenesCliente[0].id
+                console.log('🔍 Obteniendo detalle de orden:', ultimaOrdenId)
+                
+                const detalleResponse = await fetch(`http://localhost:8000/api/v1/ordenes/${ultimaOrdenId}`, {
+                  headers: { 'Authorization': `Bearer ${token}` }
+                })
+                
+                if (detalleResponse.ok) {
+                  const ultimaOrden = await detalleResponse.json()
+                  console.log('✅ Detalle última orden:', ultimaOrden)
+                  
+                  // Precargar teléfono si está en la orden pero no en el cliente
+                  if (ultimaOrden.cliente_telefono && !form.value.telefono) {
+                    form.value.telefono = ultimaOrden.cliente_telefono
+                    console.log('📞 Teléfono precargado:', ultimaOrden.cliente_telefono)
+                  }
+                  
+                  // Precargar dirección de la última orden
+                  if (ultimaOrden.direccion_envio && !form.value.direccion) {
+                    form.value.direccion = ultimaOrden.direccion_envio
+                    console.log('📍 Dirección precargada:', ultimaOrden.direccion_envio)
+                  }
+                  if (ultimaOrden.departamento && !form.value.departamento) {
+                    form.value.departamento = ultimaOrden.departamento
+                    console.log('🏛️ Departamento precargado:', ultimaOrden.departamento)
+                    await loadMunicipios(ultimaOrden.departamento)
+                  }
+                  if (ultimaOrden.municipio && !form.value.municipio) {
+                    form.value.municipio = ultimaOrden.municipio
+                    console.log('🏘️ Municipio precargado:', ultimaOrden.municipio)
+                  }
+                  if (ultimaOrden.barrio && !form.value.barrio) {
+                    form.value.barrio = ultimaOrden.barrio
+                    console.log('🏡 Barrio precargado:', ultimaOrden.barrio)
+                  }
+                  
+                  console.log('✅ Todos los datos del cliente precargados desde última orden')
+                  direccionCargadaDesdeCliente = true
+                }
+              } else {
+                console.log('ℹ️ Cliente no tiene órdenes anteriores')
+              }
+            }
+          } catch (e) {
+            console.log('⚠️ No se pudieron cargar órdenes anteriores:', e.message)
+          }
+        } // fin if (!direccionCargadaDesdeCliente)
+        
+        // TERCERO: Si tiene todos los datos completos, saltar al paso 3
+        const datosContactoCompletos = form.value.email && form.value.nombre && form.value.telefono
+        const datosEnvioCompletos = form.value.direccion && form.value.departamento && form.value.municipio
+        
+        if (datosContactoCompletos && datosEnvioCompletos) {
+          console.log('🚀 Cliente tiene datos completos, saltando al paso 3 (Pago)')
+          clienteConDatosCompletos.value = true
+          currentStep.value = 3
+          maxStep.value = 3
+        } else {
+          console.log('📝 Cliente necesita completar datos:', {
+            contacto: datosContactoCompletos,
+            envio: datosEnvioCompletos
+          })
+        }
+        
+      } catch (error) {
+        console.log('❌ Error al cargar datos del cliente:', error.message)
       }
     }
     
@@ -916,18 +1187,40 @@ export default {
     
     // Get full address for display
     const getFullAddress = () => {
-      const dep = departamentos.value.find(d => d.codigo === form.value.departamento || d.id === Number(form.value.departamento))
-      const mun = municipiosFiltrados.value.find(m => m.codigo === form.value.municipio || m.id === Number(form.value.municipio))
+      // Asegurar que tenemos strings
+      const depValue = typeof form.value.departamento === 'string' ? form.value.departamento : ''
+      const munValue = typeof form.value.municipio === 'string' ? form.value.municipio : ''
       
-      let addr = ''
-      if (form.value.tipoZona === 'urbano') {
-        addr = form.value.direccion
-        if (form.value.barrio) addr += `, ${form.value.barrio}`
-      } else {
-        addr = form.value.indicacionesRural?.substring(0, 50) + '...'
+      // Buscar departamento por código, id o nombre
+      const dep = departamentos.value.find(d => 
+        d.codigo === depValue || 
+        d.id === Number(depValue) ||
+        d.nombre === depValue ||
+        (depValue && d.nombre?.toLowerCase() === depValue.toLowerCase())
+      )
+      
+      // Buscar municipio por código, id o nombre
+      const mun = municipios.value.find(m => 
+        m.codigo === munValue || 
+        m.id === Number(munValue) ||
+        m.nombre === munValue ||
+        (munValue && m.nombre?.toLowerCase() === munValue.toLowerCase())
+      )
+      
+      // Construir dirección
+      let addr = form.value.direccion || ''
+      if (form.value.barrio) addr += `, Barrio ${form.value.barrio}`
+      
+      // Usar el nombre del departamento/municipio, o el valor guardado si no se encontró
+      const depName = dep?.nombre || depValue || ''
+      const munName = mun?.nombre || munValue || ''
+      
+      // Si no hay datos, mostrar mensaje amigable
+      if (!addr && !munName && !depName) {
+        return 'Sin dirección registrada'
       }
       
-      return `${addr}, ${mun?.nombre || ''}, ${dep?.nombre || ''}`
+      return `${addr}${munName ? ', ' + munName : ''}${depName ? ', ' + depName : ''}`
     }
     
     // Navigation
@@ -1067,6 +1360,54 @@ export default {
           const orden = await response.json()
           const code = orden.codigo || `KH-${Math.floor(1000 + Math.random() * 9000)}`
           
+          // 1.5 Actualizar dirección del cliente para futuras compras
+          try {
+            const token = localStorage.getItem('access_token') // Corregido: access_token
+            const userStr = localStorage.getItem('user')
+            if (token && userStr) {
+              const user = JSON.parse(userStr)
+              // Obtener el cliente por email
+              const clientesResponse = await fetch('http://localhost:8000/api/v1/clientes/', {
+                headers: { 'Authorization': `Bearer ${token}` }
+              })
+              if (clientesResponse.ok) {
+                const clientes = await clientesResponse.json()
+                const clienteActual = clientes.find(c => c.email === user.email)
+                if (clienteActual) {
+                  // Actualizar cliente con la dirección usada en esta orden
+                  const updateData = {
+                    id: clienteActual.id,
+                    telefono: form.value.telefono,
+                    direccion: form.value.direccion,
+                    departamento: depNombre, // Usar el nombre que ya calculamos
+                    municipio: munNombre, // Usar el nombre que ya calculamos
+                    barrio: form.value.barrio || ''
+                  }
+                  console.log('📤 Actualizando dirección del cliente:', updateData)
+                  
+                  // PUT sin ID en la ruta - el ID va en el body
+                  const updateResponse = await fetch('http://localhost:8000/api/v1/clientes/', {
+                    method: 'PUT',
+                    headers: { 
+                      'Content-Type': 'application/json',
+                      'Authorization': `Bearer ${token}` 
+                    },
+                    body: JSON.stringify(updateData)
+                  })
+                  if (updateResponse.ok) {
+                    console.log('✅ Dirección del cliente actualizada para futuras compras')
+                  } else {
+                    const errText = await updateResponse.text()
+                    console.log('⚠️ Error al actualizar dirección:', updateResponse.status, errText)
+                  }
+                }
+              }
+            }
+          } catch (updateError) {
+            console.log('⚠️ No se pudo actualizar la dirección del cliente:', updateError.message)
+            // No fallar la orden por esto
+          }
+          
           // 2. Construir mensaje de WhatsApp con el código real
           const productos = cartItems.value.map(i => `• ${i.nombre || 'Producto'} x${i.cantidad || 1}`).join('%0A')
           const msg = `Hola, quiero finalizar mi pedido ✨%0A%0A🆔 *Código:* ${code}%0A%0A📦 *Productos:*%0A${productos}%0A%0A💰 *Total:* $${formatPrice(getTotal())} COP%0A%0A👤 *${form.value.nombre} ${form.value.apellido}*%0A📞 ${form.value.telefono}%0A📍 ${getFullAddress()}`
@@ -1176,17 +1517,16 @@ export default {
     
     onMounted(async () => {
       unlockScroll()
-      loadFormFromStorage() // Cargar formulario guardado
+      loadFormFromStorage() // Cargar formulario guardado primero
       loadCart()
       loadEpaycoSDK().catch(() => {}) // Pre-cargar SDK
       
       // Cargar departamentos de Colombia
       await loadDepartamentos()
       
-      // Si hay un departamento guardado, cargar sus municipios
-      if (form.value.departamento) {
-        await loadMunicipios(form.value.departamento)
-      }
+      // Cargar datos del cliente logueado (precarga automática)
+      // Esto también carga municipios si el cliente tiene departamento guardado
+      await loadClienteData()
       
       // Cerrar dropdowns al hacer click fuera
       document.addEventListener('click', (e) => {
@@ -1194,6 +1534,9 @@ export default {
           closeDropdowns()
         }
       })
+      
+      // Carga completa - mostrar checkout
+      initialLoading.value = false
     })
     
     onUnmounted(() => { unlockScroll() })
@@ -1210,7 +1553,9 @@ export default {
       nextStep, prevStep, goToStep,
       onPaisChange, onDepartamentoChange,
       getFullAddress, saveFormToStorage,
-      formatPrice, getItemPrice, getSubtotal, getTotal, processPayment
+      formatPrice, getItemPrice, getSubtotal, getTotal, processPayment,
+      clienteConDatosCompletos,
+      initialLoading
     }
   }
 }

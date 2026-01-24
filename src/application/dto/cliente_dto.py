@@ -27,6 +27,10 @@ class ActualizarClienteDTO:
     id: UUID
     email: Optional[str] = None
     telefono: Optional[str] = None
+    direccion: Optional[str] = None
+    departamento: Optional[str] = None
+    municipio: Optional[str] = None
+    barrio: Optional[str] = None
 
 
 @dataclass
@@ -39,6 +43,10 @@ class ClienteDTO:
     tipo_documento: str
     numero_documento: str
     telefono: Optional[str]
+    direccion: Optional[str]
+    departamento: Optional[str]
+    municipio: Optional[str]
+    barrio: Optional[str]
     activo: bool
     fecha_creacion: datetime
     fecha_modificacion: datetime
@@ -54,6 +62,10 @@ class ClienteDTO:
             tipo_documento=cliente.documento.tipo.value,
             numero_documento=cliente.documento.numero,
             telefono=cliente.telefono.valor if cliente.telefono else None,
+            direccion=cliente.direccion,
+            departamento=cliente.departamento,
+            municipio=cliente.municipio,
+            barrio=cliente.barrio,
             activo=cliente.activo,
             fecha_creacion=cliente.fecha_creacion,
             fecha_modificacion=cliente.fecha_modificacion

@@ -193,6 +193,14 @@
                 <span class="bento-box__label">Pago</span>
               </div>
               <div class="bento-box__content">
+                <!-- Loading overlay para cambios de estado -->
+                <div v-if="loadingEstadoChange" class="absolute inset-0 bg-white/80 backdrop-blur-sm z-20 flex items-center justify-center rounded-xl">
+                  <div class="flex flex-col items-center gap-3">
+                    <div class="w-8 h-8 border-3 border-brand-600 border-t-transparent rounded-full animate-spin"></div>
+                    <p class="text-sm text-text-dark font-medium">Actualizando estado...</p>
+                  </div>
+                </div>
+                
                 <div class="payment-status">
                   <label class="compact-label">Estado</label>
                   <select 
@@ -360,6 +368,7 @@ const selectedOrder = ref(null)
 const orderDetail = ref(null)
 const loading = ref(true)
 const loadingDetail = ref(false)
+const loadingEstadoChange = ref(false) // Loading para cambios de estado
 const searchQuery = ref('')
 const activeFilter = ref('todas')
 const pollingInterval = ref(null)
@@ -678,6 +687,9 @@ const updateEstadoPago = async () => {
     return
   }
   
+  // Activar loading
+  loadingEstadoChange.value = true
+  
   try {
     // CRÍTICO: Si cambiamos a PAGADO, debemos confirmar la orden para descontar stock
     if (nuevoEstado === 'PAGADO') {
@@ -742,6 +754,9 @@ const updateEstadoPago = async () => {
     
     // Restaurar estado anterior
     selectedOrder.value.estado_pago = estadoAnterior
+  } finally {
+    // Desactivar loading
+    loadingEstadoChange.value = false
   }
 }
 
@@ -773,6 +788,9 @@ const updateEstadoEnvio = async () => {
     return
   }
   
+  // Activar loading
+  loadingEstadoChange.value = true
+  
   try {
     const estadoMap = { 'NO_ENVIADO': 'confirmada', 'ENVIADO': 'enviada', 'ENTREGADO': 'entregada' }
     await ordenesService.actualizarEstado(selectedOrder.value.id, estadoMap[selectedOrder.value.estado_envio])
@@ -801,6 +819,9 @@ const updateEstadoEnvio = async () => {
     
     openModal('error', 'Error', 'No se pudo actualizar el estado de envío')
     selectedOrder.value.estado_envio = estadoAnterior
+  } finally {
+    // Desactivar loading
+    loadingEstadoChange.value = false
   }
 }
 

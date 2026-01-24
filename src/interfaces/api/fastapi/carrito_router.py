@@ -117,19 +117,26 @@ def crear_u_obtener_carrito(
 
 @router.get("/resumen", response_model=Optional[CarritoResumenDTO])
 def obtener_resumen_carrito(
-    usuario_id: UUID = Depends(get_current_user_id),
+    usuario_id: Optional[UUID] = Depends(get_optional_user_id),
     repo: CarritoRepository = Depends(get_carrito_repository)
 ):
     """
     Obtiene un resumen ligero del carrito (para badge/header).
     
     Solo retorna: cantidad de items, total, estado.
+    Permite usuarios no autenticados (retorna None).
     """
     try:
+        # Si no hay usuario logueado, retornar None (carrito vacío)
+        if not usuario_id:
+            return None
+            
         use_case = ObtenerResumenCarritoUseCase(repo)
         return use_case.ejecutar(usuario_id)
     except Exception as e:
-        raise HTTPException(status_code=500, detail=str(e))
+        # En caso de error, retornar None en lugar de 500
+        print(f"Error obteniendo resumen del carrito: {e}")
+        return None
 
 
 @router.post("/items", response_model=OperacionCarritoResultadoDTO)

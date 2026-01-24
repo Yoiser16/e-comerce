@@ -20,6 +20,11 @@ class ClienteModel(models.Model):
     tipo_documento = models.CharField(max_length=20)
     numero_documento = models.CharField(max_length=50, unique=True, db_index=True)
     telefono = models.CharField(max_length=20, null=True, blank=True)
+    # Campos de dirección para auto-relleno en próximas compras
+    direccion = models.CharField(max_length=255, null=True, blank=True)
+    departamento = models.CharField(max_length=100, null=True, blank=True)
+    municipio = models.CharField(max_length=100, null=True, blank=True)
+    barrio = models.CharField(max_length=100, null=True, blank=True)
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)
     fecha_modificacion = models.DateTimeField(auto_now=True)

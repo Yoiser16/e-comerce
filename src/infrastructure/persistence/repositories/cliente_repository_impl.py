@@ -50,32 +50,24 @@ class ClienteRepositoryImpl(ClienteRepository):
         if model.telefono:
             try:
                 telefono = Telefono(model.telefono)
-            except Exception as e:
+            except Exception:
                 # Log warning pero no fallar - datos legacy pueden tener teléfonos inválidos
-                self._logger.warning(
-                    f"Teléfono inválido para cliente {model.id}: {model.telefono}. {e}",
-                    cliente_id=str(model.id)
-                )
                 telefono = None
         
-        # Manejar email con validación tolerante
+        # Manejar email con validación rápida
         email_obj = None
         try:
+            # Intentar crear email directamente (caso común y rápido)
             email_obj = Email(model.email)
-        except Exception as e:
-            # Para emails inválidos (ej: con tildes), intentar sanitizar
-            self._logger.warning(
-                f"Email con formato inusual para cliente {model.id}: {model.email}. {e}",
-                cliente_id=str(model.id)
-            )
-            # Crear un email "safe" temporal para no perder el cliente
-            import unicodedata
-            email_safe = unicodedata.normalize('NFKD', model.email).encode('ASCII', 'ignore').decode('ASCII')
+        except Exception:
+            # SOLO si falla, sanitizar (caso raro)
             try:
-                email_obj = Email(email_safe if '@' in email_safe else f"cliente_{model.id[:8]}@legacy.local")
+                import unicodedata
+                email_safe = unicodedata.normalize('NFKD', model.email).encode('ASCII', 'ignore').decode('ASCII')
+                email_obj = Email(email_safe if '@' in email_safe else f"cliente_{str(model.id)[:8]}@legacy.local")
             except:
                 # Último recurso: email genérico
-                email_obj = Email(f"cliente_{model.id[:8]}@legacy.local")
+                email_obj = Email(f"cliente_{str(model.id)[:8]}@legacy.local")
         
         return Cliente(
             id=model.id,
@@ -87,6 +79,10 @@ class ClienteRepositoryImpl(ClienteRepository):
                 numero=model.numero_documento
             ),
             telefono=telefono,
+            direccion=model.direccion,
+            departamento=model.departamento,
+            municipio=model.municipio,
+            barrio=model.barrio,
             fecha_creacion=model.fecha_creacion,
             fecha_modificacion=model.fecha_modificacion,
             activo=model.activo
@@ -114,6 +110,10 @@ class ClienteRepositoryImpl(ClienteRepository):
             tipo_documento=entity.documento.tipo.value,
             numero_documento=entity.documento.numero,
             telefono=telefono_valor,
+            direccion=entity.direccion,
+            departamento=entity.departamento,
+            municipio=entity.municipio,
+            barrio=entity.barrio,
             activo=entity.activo,
             fecha_creacion=entity.fecha_creacion,
             fecha_modificacion=entity.fecha_modificacion

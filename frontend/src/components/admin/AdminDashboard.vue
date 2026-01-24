@@ -73,16 +73,16 @@
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
         
         <!-- Revenue Card (Primary) -->
-        <div class="col-span-1 md:col-span-2 bg-gradient-to-br from-gray-900 to-gray-800 rounded-[2.5rem] p-8 text-white relative overflow-hidden group shadow-2xl shadow-gray-900/20">
+        <div class="col-span-1 md:col-span-2 bg-gradient-to-br from-gray-900 to-gray-800 rounded-[2.5rem] p-6 text-white relative overflow-hidden group shadow-2xl shadow-gray-900/20">
           <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
           <div class="absolute bottom-0 left-0 w-48 h-48 bg-brand-500/20 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none"></div>
           
           <div class="relative z-10 flex flex-col h-full justify-between">
             <div class="flex justify-between items-start">
               <div>
-                <p class="text-white/60 font-medium mb-1">Ingresos Totales</p>
+                <p class="text-white/60 font-medium mb-1 text-xs">Ingresos Totales</p>
                 <div class="flex items-baseline gap-2">
-                  <span class="text-5xl font-luxury tracking-tight">${{ formatNumber(stats.totalVentas) }}</span>
+                  <span class="text-4xl font-luxury tracking-tight">${{ formatNumber(stats.totalVentas) }}</span>
                 </div>
               </div>
               <div class="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10">
@@ -90,7 +90,7 @@
               </div>
             </div>
 
-            <div class="mt-8 flex items-end justify-between">
+            <div class="mt-4 flex items-end justify-between">
               <div>
                 <div class="flex items-center gap-2 mb-1">
                   <span class="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-xs font-bold border border-emerald-500/20 flex items-center gap-1">
@@ -101,7 +101,7 @@
                 </div>
               </div>
               <!-- Mini Sparkline visualization (aesthetic only) -->
-              <div class="flex items-end gap-1 h-12">
+              <div class="flex items-end gap-1 h-8">
                 <div v-for="h in [40, 65, 50, 80, 55, 90, 70]" :key="h" class="w-2 bg-white/20 rounded-t-sm transition-all group-hover:bg-brand-400" :style="`height: ${h}%`"></div>
               </div>
             </div>
@@ -109,45 +109,45 @@
         </div>
 
         <!-- Orders Card -->
-        <div class="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between group">
-          <div class="flex justify-between items-start mb-4">
-            <div class="w-12 h-12 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform duration-300">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+        <div class="bg-white rounded-[2rem] p-4 border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between group">
+          <div class="flex justify-between items-start mb-3">
+            <div class="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform duration-300">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
             </div>
-            <span class="px-3 py-1 rounded-full bg-gray-50 text-gray-600 text-xs font-bold border border-gray-100">{{ stats.ordenesPendientes }} pendientes</span>
+            <span class="px-2 py-0.5 rounded-full bg-gray-50 text-gray-600 text-xs font-bold border border-gray-100">{{ stats.ordenesPendientes }} pendientes</span>
           </div>
           <div>
-            <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ stats.totalOrdenes }}</h3>
-            <p class="text-gray-400 font-medium text-sm">Órdenes Totales</p>
+            <h3 class="text-2xl font-bold text-gray-900 mb-1">{{ stats.totalOrdenes }}</h3>
+            <p class="text-gray-400 font-medium text-xs">Órdenes Totales</p>
           </div>
         </div>
 
         <!-- Products Card -->
-        <div class="bg-white rounded-[2rem] p-6 border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between group">
-          <div class="flex justify-between items-start mb-4">
-            <div class="w-12 h-12 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform duration-300">
-              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        <div class="bg-white rounded-[2rem] p-4 border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between group">
+          <div class="flex justify-between items-start mb-3">
+            <div class="w-10 h-10 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform duration-300">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             </div>
-            <span :class="stats.stockBajo > 0 ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'" class="px-3 py-1 rounded-full text-xs font-bold border">
+            <span :class="stats.stockBajo > 0 ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'" class="px-2 py-0.5 rounded-full text-xs font-bold border">
               {{ stats.stockBajo }} Alertas
             </span>
           </div>
           <div>
-            <h3 class="text-3xl font-bold text-gray-900 mb-1">{{ stats.totalProductos }}</h3>
-            <p class="text-gray-400 font-medium text-sm">Productos Activos</p>
+            <h3 class="text-2xl font-bold text-gray-900 mb-1">{{ stats.totalProductos }}</h3>
+            <p class="text-gray-400 font-medium text-xs">Productos Activos</p>
           </div>
         </div>
 
         <!-- Clients Card -->
-        <div class="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4 bg-white rounded-[2rem] p-6 border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] flex items-center justify-between relative overflow-hidden">
+        <div class="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4 bg-white rounded-[2rem] p-4 border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] flex items-center justify-between relative overflow-hidden">
           <div class="absolute inset-0 bg-gradient-to-r from-pink-50/50 to-transparent pointer-events-none"></div>
-          <div class="relative z-10 flex items-center gap-6">
-            <div class="w-16 h-16 rounded-3xl bg-pink-50 flex items-center justify-center text-pink-600 shadow-sm border border-pink-100">
-               <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
+          <div class="relative z-10 flex items-center gap-4">
+            <div class="w-12 h-12 rounded-3xl bg-pink-50 flex items-center justify-center text-pink-600 shadow-sm border border-pink-100">
+               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
             </div>
              <div>
-              <h3 class="text-2xl font-bold text-gray-900">{{ stats.totalClientes }} Clientes</h3>
-              <p class="text-gray-500 text-sm">Registrados en la plataforma</p>
+              <h3 class="text-xl font-bold text-gray-900">{{ stats.totalClientes }} Clientes</h3>
+              <p class="text-gray-500 text-xs">Registrados en la plataforma</p>
             </div>
           </div>
           <div class="relative z-10 flex items-center gap-4 pr-4">

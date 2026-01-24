@@ -369,7 +369,7 @@ DB_CONN_MAX_AGE=0
 - [x] Usuarios de prueba creados
 - [x] Servidor backend funcionando
 - [x] Documentación completa
-
+ 
 ---
 
 ## 🎉 ¡TODO LISTO!

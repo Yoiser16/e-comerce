@@ -149,6 +149,10 @@ def listar_clientes(
                 telefono=c.telefono.numero if c.telefono and hasattr(c.telefono, 'numero') else None,
                 tipo_documento=c.documento.tipo.value if c.documento else None,
                 numero_documento=c.documento.numero if c.documento else None,
+                direccion=c.direccion,
+                departamento=c.departamento,
+                municipio=c.municipio,
+                barrio=c.barrio,
                 fecha_creacion=c.fecha_creacion,
                 fecha_modificacion=c.fecha_modificacion,
                 activo=c.activo

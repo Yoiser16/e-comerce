@@ -417,8 +417,8 @@ export default {
             nombre: `${cliente.nombre} ${cliente.apellido || ''}`.trim(),
             email: cliente.email,
             telefono: cliente.telefono || 'No especificado',
-            ordenes: ordenesPagadas.length, // Solo contar órdenes pagadas
-            totalCompras: totalCompras,
+            ordenes: ordenesCliente.length, // Contar TODAS las órdenes (pendientes y pagadas)
+            totalCompras: totalCompras, // Solo sumar el monto de las pagadas
             iniciales: obtenerIniciales(`${cliente.nombre} ${cliente.apellido || ''}`),
             ultimaCompra: ultimaOrden?.fecha_creacion || null
           }

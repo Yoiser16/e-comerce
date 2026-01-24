@@ -92,6 +92,15 @@ class ActualizarClienteUseCase(CasoUsoBase[ActualizarClienteDTO, ClienteDTO]):
         if request.telefono:
             cliente.actualizar_telefono(Telefono(request.telefono))
         
+        # Actualizar dirección si se proporciona
+        if any([request.direccion, request.departamento, request.municipio, request.barrio]):
+            cliente.actualizar_direccion(
+                direccion=request.direccion,
+                departamento=request.departamento,
+                municipio=request.municipio,
+                barrio=request.barrio
+            )
+        
         # Persistir
         cliente_actualizado = self._cliente_repository.guardar(cliente)
         

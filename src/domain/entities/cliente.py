@@ -30,6 +30,10 @@ class Cliente(EntidadBase):
         email: Email,
         documento: DocumentoIdentidad,
         telefono: Optional[Telefono] = None,
+        direccion: Optional[str] = None,
+        departamento: Optional[str] = None,
+        municipio: Optional[str] = None,
+        barrio: Optional[str] = None,
         id: Optional[UUID] = None,
         fecha_creacion: Optional[datetime] = None,
         fecha_modificacion: Optional[datetime] = None,
@@ -41,6 +45,10 @@ class Cliente(EntidadBase):
         self._email = email
         self._documento = documento
         self._telefono = telefono
+        self._direccion = direccion
+        self._departamento = departamento
+        self._municipio = municipio
+        self._barrio = barrio
     
     @property
     def nombre(self) -> str:
@@ -66,6 +74,22 @@ class Cliente(EntidadBase):
     def telefono(self) -> Optional[Telefono]:
         return self._telefono
     
+    @property
+    def direccion(self) -> Optional[str]:
+        return self._direccion
+    
+    @property
+    def departamento(self) -> Optional[str]:
+        return self._departamento
+    
+    @property
+    def municipio(self) -> Optional[str]:
+        return self._municipio
+    
+    @property
+    def barrio(self) -> Optional[str]:
+        return self._barrio
+    
     def actualizar_email(self, nuevo_email: Email) -> None:
         """Actualiza el email del cliente"""
         self._email = nuevo_email
@@ -74,4 +98,22 @@ class Cliente(EntidadBase):
     def actualizar_telefono(self, nuevo_telefono: Telefono) -> None:
         """Actualiza el teléfono del cliente"""
         self._telefono = nuevo_telefono
+        self.marcar_modificado()
+    
+    def actualizar_direccion(
+        self,
+        direccion: Optional[str] = None,
+        departamento: Optional[str] = None,
+        municipio: Optional[str] = None,
+        barrio: Optional[str] = None
+    ) -> None:
+        """Actualiza la dirección del cliente"""
+        if direccion is not None:
+            self._direccion = direccion
+        if departamento is not None:
+            self._departamento = departamento
+        if municipio is not None:
+            self._municipio = municipio
+        if barrio is not None:
+            self._barrio = barrio
         self.marcar_modificado()
