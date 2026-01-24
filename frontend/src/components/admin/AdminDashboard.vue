@@ -479,10 +479,26 @@ export default {
         // Usamos una estrategia de "intento" individual para que si falla un endpoint
         // no se caiga todo el dashboard.
         await Promise.allSettled([
-          // Estadísticas
+          // Estadísticas - Convertir snake_case a camelCase
           apiClient.get('/dashboard/estadisticas')
-            .then(r => stats.value = {...defaultStats, ...r.data})
-            .catch(e => console.warn('Fallo estadísticas:', e)),
+            .then(r => {
+              const data = r.data || {}
+              stats.value = {
+                totalVentas: data.total_ventas || 0,
+                totalOrdenes: data.total_ordenes || 0,
+                ordenesPendientes: data.ordenes_pendientes || 0,
+                totalProductos: data.total_productos || 0,
+                productosActivos: data.productos_activos || 0,
+                stockBajo: data.stock_bajo || 0,
+                totalClientes: data.total_clientes || 0,
+                clientesNuevos: data.clientes_nuevos || 0
+              }
+              console.log('📊 Stats cargadas:', stats.value)
+            })
+            .catch(e => {
+              console.warn('Fallo estadísticas:', e)
+              stats.value = defaultStats
+            }),
 
           // Órdenes Recientes
           apiClient.get('/dashboard/ordenes/recientes?limite=5')

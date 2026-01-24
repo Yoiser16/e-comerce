@@ -5,7 +5,7 @@ export const clientesService = {
    * Obtener todos los clientes (admin)
    */
   async obtenerTodos() {
-    const response = await apiClient.get('/clientes')
+    const response = await apiClient.get('/clientes/')
     return response.data
   },
 

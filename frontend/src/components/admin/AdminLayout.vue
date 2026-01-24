@@ -330,71 +330,79 @@
       @close="showRadio = false"
     />
 
-    <!-- Modal de Permisos (Primera vez) -->
+    <!-- Modal de Permisos (Primera vez) - Rediseño Luxury Femenino -->
     <div 
       v-if="showPermissionModal" 
-      class="fixed inset-0 z-[100] flex items-center justify-center bg-black/50 backdrop-blur-sm"
+      class="fixed inset-0 z-[100] flex items-center justify-center bg-black/40 backdrop-blur-md permission-modal-overlay"
     >
-      <div class="bg-white rounded-3xl shadow-2xl max-w-md mx-4 overflow-hidden animate-scale-in">
-        <!-- Header -->
-        <div class="bg-gradient-to-r from-emerald-500 to-teal-500 p-6 text-center">
-          <div class="w-16 h-16 bg-white rounded-full flex items-center justify-center mx-auto mb-3">
-            <svg class="w-8 h-8 text-emerald-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+      <div class="bg-white rounded-[28px] shadow-luxury max-w-md mx-4 overflow-hidden permission-modal-content">
+        <!-- Header - Fondo Blanco con Icono Rosado -->
+        <div class="bg-white pt-10 pb-6 px-8 text-center">
+          <div class="w-20 h-20 bg-gradient-to-br from-brand-50 to-brand-100 rounded-full flex items-center justify-center mx-auto mb-5 ring-4 ring-brand-100/50">
+            <svg class="w-9 h-9 text-brand-600" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0" />
             </svg>
           </div>
-          <h2 class="text-2xl font-bold text-white">¡Activa las Notificaciones!</h2>
+          <h2 class="font-luxury text-3xl font-semibold text-brand-600 mb-2">¡Activa las Notificaciones!</h2>
+          <p class="text-text-medium text-sm leading-relaxed px-2">
+            Para no perderte ninguna orden nueva, necesitamos<br class="hidden sm:inline" /> tu permiso para enviarte notificaciones y reproducir sonidos.
+          </p>
         </div>
 
-        <!-- Body -->
-        <div class="p-6">
-          <p class="text-text-medium text-center mb-6">
-            Para no perderte ninguna orden nueva, necesitamos tu permiso para enviarte notificaciones y reproducir sonidos.
-          </p>
-
-          <div class="space-y-3 mb-6">
-            <div class="flex items-start gap-3 bg-emerald-50 p-3 rounded-lg">
-              <svg class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-              </svg>
-              <div>
-                <p class="text-sm font-medium text-text-dark">Notificaciones Push</p>
-                <p class="text-xs text-text-light">Recibe alertas incluso fuera del navegador</p>
+        <!-- Body - Espaciado Generoso -->
+        <div class="px-8 pb-8">
+          <div class="space-y-4 mb-8">
+            <!-- Feature 1: Push -->
+            <div class="flex items-start gap-4 bg-gradient-to-br from-brand-50/30 to-transparent p-5 rounded-2xl border border-brand-100/30 hover:border-brand-200/50 transition-all duration-300">
+              <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm ring-1 ring-brand-100/40">
+                <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-semibold text-[#2A2A2A] mb-1">Notificaciones Push</p>
+                <p class="text-xs text-text-light leading-relaxed">Recibe alertas incluso fuera del navegador</p>
               </div>
             </div>
 
-            <div class="flex items-start gap-3 bg-emerald-50 p-3 rounded-lg">
-              <svg class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
-              </svg>
-              <div>
-                <p class="text-sm font-medium text-text-dark">Sonido de Campanita</p>
-                <p class="text-xs text-text-light">Escucha cuando llega una orden nueva</p>
+            <!-- Feature 2: Sonido -->
+            <div class="flex items-start gap-4 bg-gradient-to-br from-brand-50/30 to-transparent p-5 rounded-2xl border border-brand-100/30 hover:border-brand-200/50 transition-all duration-300">
+              <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm ring-1 ring-brand-100/40">
+                <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.114 5.636a9 9 0 010 12.728M16.463 8.288a5.25 5.25 0 010 7.424M6.75 8.25l4.72-4.72a.75.75 0 011.28.53v15.88a.75.75 0 01-1.28.53l-4.72-4.72H4.51c-.88 0-1.704-.507-1.938-1.354A9.01 9.01 0 012.25 12c0-.83.112-1.633.322-2.396C2.806 8.756 3.63 8.25 4.51 8.25H6.75z" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-semibold text-[#2A2A2A] mb-1">Sonido de Campanita</p>
+                <p class="text-xs text-text-light leading-relaxed">Escucha cuando llega una orden nueva</p>
               </div>
             </div>
 
-            <div class="flex items-start gap-3 bg-emerald-50 p-3 rounded-lg">
-              <svg class="w-5 h-5 text-emerald-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
-              </svg>
-              <div>
-                <p class="text-sm font-medium text-text-dark">Actualización Automática</p>
-                <p class="text-xs text-text-light">Sin necesidad de refrescar la página</p>
+            <!-- Feature 3: Auto-refresh -->
+            <div class="flex items-start gap-4 bg-gradient-to-br from-brand-50/30 to-transparent p-5 rounded-2xl border border-brand-100/30 hover:border-brand-200/50 transition-all duration-300">
+              <div class="w-10 h-10 bg-white rounded-xl flex items-center justify-center flex-shrink-0 shadow-sm ring-1 ring-brand-100/40">
+                <svg class="w-5 h-5 text-brand-500" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.023 9.348h4.992v-.001M2.985 19.644v-4.992m0 0h4.992m-4.993 0l3.181 3.183a8.25 8.25 0 0013.803-3.7M4.031 9.865a8.25 8.25 0 0113.803-3.7l3.181 3.182m0-4.991v4.99" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-sm font-semibold text-[#2A2A2A] mb-1">Actualización Automática</p>
+                <p class="text-xs text-text-light leading-relaxed">Sin necesidad de refrescar la página</p>
               </div>
             </div>
           </div>
 
           <!-- Actions -->
-          <div class="space-y-2">
+          <div class="space-y-3">
             <button 
               @click="enableNotifications"
-              class="w-full bg-emerald-500 hover:bg-emerald-600 text-white font-medium py-3 px-6 rounded-xl transition-all shadow-lg shadow-emerald-500/20"
+              class="w-full bg-gradient-to-r from-brand-500 to-brand-600 hover:from-brand-600 hover:to-brand-700 text-white font-semibold text-sm py-4 px-6 rounded-2xl transition-all duration-300 shadow-luxury-brand"
             >
               🔔 Activar Notificaciones
             </button>
             <button 
               @click="skipPermissions"
-              class="w-full text-text-light hover:text-text-medium text-sm py-2 transition-colors"
+              class="w-full text-text-light hover:text-text-medium text-xs py-3 transition-colors font-medium"
             >
               Omitir (podré activarlo después)
             </button>

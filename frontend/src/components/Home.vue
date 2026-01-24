@@ -59,29 +59,30 @@
                 <div 
                   v-if="showSuggestions && searchSuggestions.length > 0"
                   ref="suggestionsRef"
-                  class="absolute top-full left-0 right-0 mt-2 bg-white border border-text-dark/10 shadow-soft-lg rounded-lg overflow-hidden z-50"
+                  class="dropdown-search-luxury absolute top-full left-0 right-0 mt-2 bg-white border border-text-dark/8 rounded-2xl overflow-hidden z-50"
+                  style="box-shadow: 0 12px 40px -8px rgba(216, 27, 96, 0.12), 0 4px 16px -4px rgba(0, 0, 0, 0.08);"
                 >
-                  <div class="max-h-80 overflow-y-auto">
+                  <div class="max-h-80 overflow-y-auto search-results-scroll">
                     <button
                       v-for="producto in searchSuggestions"
                       :key="producto.id"
                       @click="handleSearch(producto)"
-                      class="w-full px-4 py-2.5 hover:bg-nude-50 transition-colors flex items-center gap-3 text-left group"
+                      class="w-full px-5 py-4 hover:bg-[#FFF0F5] transition-all duration-300 flex items-center gap-4 text-left group border-b border-nude-100/50 last:border-b-0"
                     >
-                      <div class="w-10 h-10 rounded-md overflow-hidden flex-shrink-0 bg-nude-100">
+                      <div class="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-nude-50 ring-1 ring-nude-200/40 group-hover:ring-brand-300/40 transition-all duration-300">
                         <img 
                           v-if="producto.imagen_principal || producto.imagen_url || producto.imagen"
                           :src="getImageUrl(producto.imagen_principal || producto.imagen_url || producto.imagen)"
                           :alt="producto.nombre"
-                          class="w-full h-full object-cover"
+                          class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                         />
                       </div>
                       <div class="flex-1 min-w-0">
-                        <p class="text-xs font-medium text-text-dark truncate group-hover:text-brand-600 transition-colors">
+                        <p class="text-sm font-medium text-[#2A2A2A] truncate group-hover:text-brand-600 transition-colors duration-300">
                           {{ producto.nombre }}
                         </p>
                       </div>
-                      <p class="text-xs font-semibold text-text-dark flex-shrink-0">
+                      <p class="text-sm font-semibold text-brand-600 flex-shrink-0">
                         {{ formatPrice(getItemPrice(producto)) }}
                       </p>
                     </button>
@@ -233,28 +234,29 @@
               <!-- Sugerencias móvil -->
               <div 
                 v-if="showSuggestions && searchSuggestions.length > 0"
-                class="absolute top-full left-0 right-0 mt-2 bg-white border border-text-dark/10 shadow-soft-lg rounded-lg overflow-hidden z-50"
+                class="dropdown-search-luxury absolute top-full left-0 right-0 mt-2 bg-white border border-text-dark/8 rounded-2xl overflow-hidden z-50"
+                style="box-shadow: 0 12px 40px -8px rgba(216, 27, 96, 0.12), 0 4px 16px -4px rgba(0, 0, 0, 0.08);"
               >
-                <div class="max-h-64 overflow-y-auto">
+                <div class="max-h-64 overflow-y-auto search-results-scroll">
                   <button
                     v-for="producto in searchSuggestions"
                     :key="producto.id"
                     @click="handleSearch(producto)"
-                    class="w-full px-3 py-2 hover:bg-nude-50 transition-colors flex items-center gap-2 text-left"
+                    class="w-full px-4 py-3 hover:bg-[#FFF0F5] transition-all duration-300 flex items-center gap-3 text-left group border-b border-nude-100/50 last:border-b-0"
                   >
-                    <div class="w-8 h-8 rounded overflow-hidden flex-shrink-0 bg-nude-100">
+                    <div class="w-11 h-11 rounded-lg overflow-hidden flex-shrink-0 bg-nude-50 ring-1 ring-nude-200/40 group-hover:ring-brand-300/40 transition-all duration-300">
                       <img 
                         v-if="producto.imagen_principal || producto.imagen_url || producto.imagen"
                         :src="getImageUrl(producto.imagen_principal || producto.imagen_url || producto.imagen)"
                         :alt="producto.nombre"
-                        class="w-full h-full object-cover"
+                        class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
                     </div>
                     <div class="flex-1 min-w-0">
-                      <p class="text-[11px] font-medium text-text-dark truncate">
+                      <p class="text-xs font-medium text-[#2A2A2A] truncate group-hover:text-brand-600 transition-colors duration-300">
                         {{ producto.nombre }}
                       </p>
-                      <p class="text-[9px] text-text-medium truncate">
+                      <p class="text-[10px] font-semibold text-brand-600 truncate mt-0.5">
                         {{ formatPrice(getItemPrice(producto)) }}
                       </p>
                     </div>

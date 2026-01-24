@@ -37,6 +37,7 @@ class ClienteRepositoryImpl(ClienteRepository):
     def _to_domain(self, model: ClienteModel) -> Cliente:
         """
         Mapea modelo Django a entidad de dominio.
+        Maneja datos legacy con validaciones tolerantes.
         
         Args:
             model: Modelo Django ClienteModel
@@ -44,15 +45,43 @@ class ClienteRepositoryImpl(ClienteRepository):
         Returns:
             Entidad Cliente del dominio
         """
+        # Manejar teléfono con validación tolerante
         telefono = None
         if model.telefono:
-            telefono = Telefono(model.telefono)
+            try:
+                telefono = Telefono(model.telefono)
+            except Exception as e:
+                # Log warning pero no fallar - datos legacy pueden tener teléfonos inválidos
+                self._logger.warning(
+                    f"Teléfono inválido para cliente {model.id}: {model.telefono}. {e}",
+                    cliente_id=str(model.id)
+                )
+                telefono = None
+        
+        # Manejar email con validación tolerante
+        email_obj = None
+        try:
+            email_obj = Email(model.email)
+        except Exception as e:
+            # Para emails inválidos (ej: con tildes), intentar sanitizar
+            self._logger.warning(
+                f"Email con formato inusual para cliente {model.id}: {model.email}. {e}",
+                cliente_id=str(model.id)
+            )
+            # Crear un email "safe" temporal para no perder el cliente
+            import unicodedata
+            email_safe = unicodedata.normalize('NFKD', model.email).encode('ASCII', 'ignore').decode('ASCII')
+            try:
+                email_obj = Email(email_safe if '@' in email_safe else f"cliente_{model.id[:8]}@legacy.local")
+            except:
+                # Último recurso: email genérico
+                email_obj = Email(f"cliente_{model.id[:8]}@legacy.local")
         
         return Cliente(
             id=model.id,
             nombre=model.nombre,
             apellido=model.apellido,
-            email=Email(model.email),
+            email=email_obj,
             documento=DocumentoIdentidad(
                 tipo=TipoDocumento(model.tipo_documento),
                 numero=model.numero_documento

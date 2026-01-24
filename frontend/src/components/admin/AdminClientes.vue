@@ -356,6 +356,7 @@
 <script>
 import { ref, computed, onMounted } from 'vue'
 import { ordenesService } from '../../services/ordenes'
+import { clientesService } from '../../services/clientes'
 
 export default {
   name: 'AdminClientes',
@@ -373,45 +374,59 @@ export default {
     const cargarClientes = async () => {
       try {
         loading.value = true
-        // Obtener todas las órdenes para extraer información de clientes
+        
+        // Función helper para normalizar emails (sin acentos, lowercase)
+        const normalizarEmail = (email) => {
+          if (!email) return ''
+          return email.toLowerCase()
+            .normalize('NFD')
+            .replace(/[\u0300-\u036f]/g, '') // Eliminar acentos
+        }
+        
+        // Obtener TODOS los clientes desde el endpoint
+        const clientesData = await clientesService.obtenerTodos()
+        
+        // Obtener todas las órdenes para enriquecer datos
         const ordenes = await ordenesService.obtenerTodas()
         ordenesTodas.value = ordenes
         
-        // Agrupar órdenes por cliente
-        const clientesMap = {}
-        ordenes.forEach(orden => {
-          const clienteId = orden.cliente_id || orden.cliente_email
-          if (!clienteId) return
+        // Estados de órdenes confirmadas/pagadas
+        const estadosPagados = ['CONFIRMADA', 'PAGADA', 'PAGADO', 'ENVIADA', 'ENTREGADA', 'COMPLETADA']
+        
+        // Enriquecer cada cliente con información de sus órdenes
+        clientes.value = clientesData.map(cliente => {
+          const emailNormalizado = normalizarEmail(cliente.email)
           
-          // Construir nombre del cliente de forma defensiva
-          let nombreCliente = orden.cliente_nombre
-          if (!nombreCliente || nombreCliente === 'undefined' || nombreCliente === 'null') {
-            nombreCliente = orden.cliente_nombre_pila || orden.nombre_cliente || 'Cliente anónimo'
+          // Matchear por email normalizado o por cliente_id
+          const ordenesCliente = ordenes.filter(o => 
+            o.cliente_id === cliente.id || 
+            normalizarEmail(o.cliente_email) === emailNormalizado
+          )
+          
+          // Solo contar órdenes pagadas para el total de compras
+          const ordenesPagadas = ordenesCliente.filter(o => {
+            const estado = (o.estado || '').toUpperCase()
+            return estadosPagados.includes(estado)
+          })
+          
+          const totalCompras = ordenesPagadas.reduce((sum, o) => sum + (o.total_monto || o.total || 0), 0)
+          const ultimaOrden = ordenesCliente.sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion))[0]
+          
+          return {
+            id: cliente.id,
+            nombre: `${cliente.nombre} ${cliente.apellido || ''}`.trim(),
+            email: cliente.email,
+            telefono: cliente.telefono || 'No especificado',
+            ordenes: ordenesPagadas.length, // Solo contar órdenes pagadas
+            totalCompras: totalCompras,
+            iniciales: obtenerIniciales(`${cliente.nombre} ${cliente.apellido || ''}`),
+            ultimaCompra: ultimaOrden?.fecha_creacion || null
           }
-          
-          if (!clientesMap[clienteId]) {
-            const ordenesCliente = ordenes.filter(o => o.cliente_id === clienteId || o.cliente_email === clienteId)
-            const totalCompras = ordenesCliente.reduce((sum, o) => sum + (o.total_monto || o.total || 0), 0)
-            const ultimaOrden = ordenesCliente.sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion))[0]
-            
-            clientesMap[clienteId] = {
-              id: orden.cliente_id || orden.cliente_email,
-              nombre: nombreCliente,
-              email: orden.cliente_email || 'no@disponible.com',
-              telefono: orden.cliente_telefono || 'No especificado',
-              ordenes: 0,
-              totalCompras: totalCompras,
-              iniciales: obtenerIniciales(nombreCliente),
-              ultimaCompra: ultimaOrden?.fecha_creacion || null
-            }
-          }
-          
-          clientesMap[clienteId].ordenes += 1
         })
         
-        clientes.value = Object.values(clientesMap)
+        console.log('✅ Clientes cargados desde API:', clientes.value.length)
       } catch (error) {
-        console.error('Error al cargar clientes desde órdenes:', error)
+        console.error('❌ Error al cargar clientes:', error)
         clientes.value = []
       } finally {
         loading.value = false

@@ -21,6 +21,13 @@ from domain.exceptions.dominio import ExcepcionDominio
 router = APIRouter(prefix="/api/v1/clientes", tags=["clientes"])
 
 
+# Endpoint de prueba simple
+@router.get("/test")
+def test_endpoint():
+    """Endpoint de prueba para verificar que el router funciona"""
+    return {"status": "ok", "message": "Router de clientes funcionando"}
+
+
 # DTO para auto-registro desde checkout
 class AutoRegisterDTO(BaseModel):
     email: EmailStr
@@ -120,6 +127,38 @@ def crear_cliente(
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.get("/", response_model=List[ClienteDTO])
+def listar_clientes(
+    limite: int = 1000,
+    repo: ClienteRepository = Depends(get_cliente_repository)
+):
+    """
+    Lista todos los clientes (para panel admin).
+    """
+    try:
+        clientes = repo.obtener_todos(limite=limite)
+        # Convertir entidades de dominio a DTOs
+        return [
+            ClienteDTO(
+                id=str(c.id.valor) if hasattr(c.id, 'valor') else str(c.id),
+                nombre=c.nombre,
+                apellido=c.apellido,
+                email=c.email.valor if hasattr(c.email, 'valor') else str(c.email),
+                telefono=c.telefono.numero if c.telefono and hasattr(c.telefono, 'numero') else None,
+                tipo_documento=c.documento.tipo.value if c.documento else None,
+                numero_documento=c.documento.numero if c.documento else None,
+                fecha_creacion=c.fecha_creacion,
+                fecha_modificacion=c.fecha_modificacion,
+                activo=c.activo
+            )
+            for c in clientes
+        ]
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error al listar clientes: {str(e)}")
 
 
 @router.get("/{cliente_id}", response_model=ClienteDTO)
