@@ -55,6 +55,39 @@ def get_orden_repository():
 
 # --- Autenticación ---
 
+def get_current_user_email(
+    request: Request = Depends(),
+    credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
+) -> str:
+    """
+    Extrae el email del usuario desde el header X-User-Email.
+    
+    El frontend debe enviar el email en el header X-User-Email.
+    Esto es un workaround temporal hasta que se implemente JWT decodification correctamente.
+    
+    Ejemplo:
+    GET /api/v1/ordenes/mis-ordenes
+    Authorization: Bearer <token>
+    X-User-Email: usuario@example.com
+    """
+    if not credentials:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="No autenticado",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
+    # Obtener email del header X-User-Email
+    email = request.headers.get('X-User-Email', '').strip()
+    
+    if not email:
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="Se requiere header X-User-Email",
+        )
+    
+    return email
+
 def get_current_user_id(
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
 ) -> UUID:

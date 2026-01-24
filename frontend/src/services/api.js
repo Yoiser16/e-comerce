@@ -25,13 +25,27 @@ export const getImageUrl = (url) => {
   return `${API_BASE_URL}${url}`
 }
 
-// Interceptor para agregar el token JWT
+// Interceptor para agregar el token JWT y email
 apiClient.interceptors.request.use(
   (config) => {
     const token = localStorage.getItem('access_token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
+    
+    // Agregar email del usuario en header X-User-Email si está disponible
+    const user = localStorage.getItem('user')
+    if (user) {
+      try {
+        const userData = JSON.parse(user)
+        if (userData.email) {
+          config.headers['X-User-Email'] = userData.email
+        }
+      } catch (e) {
+        console.warn('Error parsing user data:', e)
+      }
+    }
+    
     return config
   },
   (error) => {

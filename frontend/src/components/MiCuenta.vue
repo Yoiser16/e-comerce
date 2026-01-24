@@ -1,12 +1,17 @@
 <template>
-  <div class="min-h-screen bg-[#FAFAFA]">
+  <div class="min-h-screen bg-gradient-to-b from-[#FAF5F2] via-[#FAFAFA] to-white text-text-dark">
     <!-- Header Simple -->
-    <header class="bg-white/95 backdrop-blur-md border-b border-black/5 sticky top-0 z-50">
+    <header class="bg-white/90 border-b border-black/5 shadow-[0_6px_30px_rgba(0,0,0,0.04)] sticky top-0 z-50">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
         <div class="flex items-center justify-between h-16">
-          <!-- Logo -->
-          <router-link to="/" class="font-luxury text-xl tracking-wider text-text-dark">
-            KHARIS
+          <!-- Logo + Texto -->
+          <router-link to="/" class="flex items-center gap-3 group">
+            <img 
+              src="/logo-kharis.png" 
+              alt="Kharis Distribuidora" 
+              class="h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
+            />
+            <span class="font-luxury text-xl tracking-wider text-text-dark hidden sm:inline-block">KHARIS</span>
           </router-link>
           
           <!-- Navegación -->
@@ -42,7 +47,7 @@
         <nav class="flex gap-8">
           <button 
             @click="activeTab = 'favoritos'"
-            class="pb-4 text-sm tracking-wider transition-colors relative"
+              class="pb-4 text-sm tracking-[0.18em] uppercase transition-colors relative"
             :class="activeTab === 'favoritos' 
               ? 'text-text-dark font-medium' 
               : 'text-text-dark/50 hover:text-text-dark/70'"
@@ -55,7 +60,7 @@
           </button>
           <button 
             @click="activeTab = 'compras'"
-            class="pb-4 text-sm tracking-wider transition-colors relative"
+              class="pb-4 text-sm tracking-[0.18em] uppercase transition-colors relative"
             :class="activeTab === 'compras' 
               ? 'text-text-dark font-medium' 
               : 'text-text-dark/50 hover:text-text-dark/70'"
@@ -68,7 +73,7 @@
           </button>
           <button 
             @click="activeTab = 'datos'"
-            class="pb-4 text-sm tracking-wider transition-colors relative"
+              class="pb-4 text-sm tracking-[0.18em] uppercase transition-colors relative"
             :class="activeTab === 'datos' 
               ? 'text-text-dark font-medium' 
               : 'text-text-dark/50 hover:text-text-dark/70'"
@@ -108,16 +113,17 @@
           <div 
             v-for="producto in favoritos" 
             :key="producto.producto_id"
-            class="group"
+            @click="irADetalle(producto.producto_id)"
+            class="group cursor-pointer bg-white/85 border border-black/5 shadow-[0_18px_50px_rgba(0,0,0,0.06)] rounded-sm p-3 transition-transform duration-300 hover:-translate-y-1"
           >
             <div class="relative aspect-[3/4] bg-nude-50 mb-3 overflow-hidden">
               <img 
-                :src="producto.imagen_principal || '/placeholder.jpg'" 
+                :src="getImageUrl(producto.imagen_principal) || '/placeholder.jpg'" 
                 :alt="producto.nombre"
                 class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <button 
-                @click="quitarFavorito(producto.producto_id)"
+                @click.stop="quitarFavorito(producto.producto_id)"
                 class="absolute top-3 right-3 w-8 h-8 bg-white/90 rounded-full flex items-center justify-center hover:bg-white transition-colors"
               >
                 <svg class="w-4 h-4 text-red-500" fill="currentColor" viewBox="0 0 24 24">
@@ -141,7 +147,7 @@
           <div class="w-8 h-8 border-2 border-text-dark/20 border-t-text-dark rounded-full animate-spin"></div>
         </div>
         
-        <div v-else-if="compras.length === 0" class="text-center py-16">
+        <div v-else-if="compras.length === 0" class="text-center py-16 bg-white/85 border border-black/5 rounded-sm shadow-[0_18px_50px_rgba(0,0,0,0.06)]">
           <svg class="w-16 h-16 mx-auto text-text-dark/20 mb-4" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
           </svg>
@@ -161,7 +167,7 @@
           <div 
             v-for="orden in compras" 
             :key="orden.id"
-            class="bg-white p-6 border border-black/5"
+            class="bg-white/90 p-6 border border-black/5 shadow-[0_18px_50px_rgba(0,0,0,0.06)] rounded-sm"
           >
             <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-4 pb-4 border-b border-black/5">
               <div>
@@ -274,6 +280,8 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { favoritosService } from '../services/productos'
+import { ordenesService } from '../services/ordenes'
+import { getImageUrl } from '../services/api'
 
 export default {
   name: 'MiCuenta',
@@ -312,7 +320,8 @@ export default {
       loadingFavoritos.value = true
       try {
         const data = await favoritosService.listar()
-        favoritos.value = data
+        // Backend devuelve una lista (List[FavoritoDTO]). Si viniera envuelto, manejar ambos casos.
+        favoritos.value = Array.isArray(data) ? data : (data?.favoritos || data?.items || [])
       } catch (error) {
         console.error('Error cargando favoritos:', error)
         favoritos.value = []
@@ -324,12 +333,25 @@ export default {
     const cargarCompras = async () => {
       loadingCompras.value = true
       try {
-        // TODO: Implementar endpoint de órdenes del usuario
-        // const response = await apiClient.get('/ordenes/mis-ordenes')
-        // compras.value = response.data
-        compras.value = [] // Por ahora vacío
+        if (!user.value?.email) {
+          compras.value = []
+          return
+        }
+
+        const data = await ordenesService.obtenerPorEmail(user.value.email)
+        const lista = Array.isArray(data) ? data : (data?.ordenes || data?.items || [])
+
+        compras.value = lista.map((orden) => ({
+          ...orden,
+          estado: (orden.estado || '').toUpperCase(),
+          items: (orden.items || []).map((item) => ({
+            ...item,
+            imagen: getImageUrl(item.imagen) || '/placeholder.jpg'
+          }))
+        }))
       } catch (error) {
         console.error('Error cargando compras:', error)
+        compras.value = []
       } finally {
         loadingCompras.value = false
       }
@@ -342,6 +364,10 @@ export default {
       } catch (error) {
         console.error('Error quitando favorito:', error)
       }
+    }
+    
+    const irADetalle = (productoId) => {
+      router.push(`/producto/${productoId}`)
     }
     
     const guardarDatos = async () => {
@@ -415,11 +441,13 @@ export default {
       datosUsuario,
       guardando,
       quitarFavorito,
+      irADetalle,
       guardarDatos,
       cerrarSesion,
       formatPrice,
       formatDate,
-      getEstadoClass
+      getEstadoClass,
+      getImageUrl
     }
   }
 }

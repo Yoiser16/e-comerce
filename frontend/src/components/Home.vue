@@ -741,6 +741,7 @@
             :key="producto.id"
             :data-producto-id="producto.id"
             :data-producto-nombre="producto.nombre"
+            @click="irADetalle(producto.id)"
             class="group cursor-pointer"
           >
             <div class="relative bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-soft hover-lift mb-3 sm:mb-5">
@@ -2078,6 +2079,10 @@ export default {
       }
     }
 
+    const irADetalle = (productoId) => {
+      router.push(`/producto/${productoId}`)
+    }
+
     const formatPrice = (price) => {
       // Manejar casos de NaN, null, undefined
       const numPrice = Number(price)
@@ -2367,6 +2372,7 @@ export default {
       getCartSubtotal,
       cargarProductos,
       irACategoria,
+      irADetalle,
       agregarAlCarrito,
       toggleFavorito,
       toggleUserMenu,

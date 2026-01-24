@@ -155,13 +155,15 @@ export const carritoService = {
 export const favoritosService = {
   // Listar favoritos del usuario
   async listar() {
-    const response = await apiClient.get('/favoritos')
+    // FastAPI define el endpoint en "/favoritos/" (barra final requerida)
+    const response = await apiClient.get('/favoritos/')
     return response.data
   },
 
   // Agregar a favoritos
   async agregar(productoId) {
-    const response = await apiClient.post('/favoritos', {
+    // Usar barra final para coincidir con el backend
+    const response = await apiClient.post('/favoritos/', {
       producto_id: productoId
     })
     return response.data

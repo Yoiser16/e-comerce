@@ -42,6 +42,14 @@ export const ordenesService = {
   },
 
   /**
+   * Obtener órdenes del usuario autenticado por email
+   */
+  async obtenerPorEmail(email) {
+    const response = await apiClient.get(`/ordenes/mis-ordenes?email=${encodeURIComponent(email)}`)
+    return response.data
+  },
+
+  /**
    * Obtener órdenes recientes (dashboard)
    */
   async obtenerRecientes(limite = 5) {

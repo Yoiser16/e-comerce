@@ -21,6 +21,7 @@ import django
 django.setup()
 
 from infrastructure.persistence.django.models import OrdenModel, LineaOrdenModel, ClienteModel, ProductoModel
+from interfaces.api.fastapi.dependencies import get_current_user_email
 
 
 router = APIRouter(prefix="/api/v1/ordenes", tags=["ordenes"])
@@ -128,6 +129,52 @@ def _listar_ordenes_sync(estado: Optional[str], limite: int) -> List[dict]:
             'total_items': orden.num_items,
             'metodo_pago': orden.metodo_pago or 'whatsapp',
             'fecha_creacion': orden.fecha_creacion
+        })
+    
+    return resultado
+
+
+def _listar_ordenes_por_email_sync(email: str) -> List[dict]:
+    """Lista órdenes de un cliente por email (sync)"""
+    from django.db.models import Count, Prefetch
+    
+    cliente = ClienteModel.objects.filter(email=email).first()
+    if not cliente:
+        return []
+    
+    queryset = (OrdenModel.objects
+                .filter(cliente=cliente)
+                .select_related('cliente')
+                .prefetch_related('lineas')
+                .order_by('-fecha_creacion'))
+    
+    ordenes = list(queryset)
+    
+    resultado = []
+    for orden in ordenes:
+        # Obtener items de la orden
+        items = []
+        for linea in orden.lineas.all():
+            items.append({
+                'id': str(linea.id),
+                'producto_id': str(linea.producto.id) if linea.producto else '',
+                'nombre': getattr(linea.producto, 'nombre', '') if linea.producto else '',
+                'cantidad': linea.cantidad,
+                'precio': float(getattr(linea, 'precio_unitario_monto', 0) or 0),
+                'moneda': getattr(linea, 'precio_unitario_moneda', 'USD'),
+                'imagen': linea.producto.imagen_principal if linea.producto and hasattr(linea.producto, 'imagen_principal') else None
+            })
+        
+        resultado.append({
+            'id': str(orden.id),
+            'numero': orden.codigo or f"ORD-{str(orden.id)[:8]}",
+            'estado': orden.estado,
+            'fecha': orden.fecha_creacion,
+            'total': float(orden.total_monto),
+            'subtotal': float(orden.subtotal_monto),
+            'envio': float(orden.envio_monto),
+            'items': items,
+            'metodo_pago': orden.metodo_pago or 'whatsapp'
         })
     
     return resultado
@@ -319,6 +366,26 @@ async def listar_ordenes(estado: Optional[str] = None, limite: int = 50):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al listar órdenes: {str(e)}"
+        )
+
+
+@router.get("/mis-ordenes", response_model=List[dict])
+async def obtener_mis_ordenes(email: str):
+    """
+    Obtiene todas las órdenes del usuario autenticado.
+    
+    Query Parameters:
+    - email: Email del usuario
+    
+    Retorna lista de órdenes con todos sus detalles.
+    """
+    try:
+        resultado = await sync_to_async(_listar_ordenes_por_email_sync)(email)
+        return resultado
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener órdenes: {str(e)}"
         )
 
 
