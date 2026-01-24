@@ -6,8 +6,8 @@
          ======================================== -->
     <header 
       :class="[
-        'fixed top-0 left-0 right-0 z-50 transition-all duration-500',
-        isScrolled ? 'header-luxury-scrolled py-2' : 'header-luxury py-3'
+        'fixed top-0 left-0 right-0 z-50',
+        isScrolled ? 'header-luxury-scrolled py-2' : 'header-luxury py-4'
       ]"
     >
       <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
@@ -18,10 +18,11 @@
               <!-- Glow sutil detrás del logo para mayor presencia -->
               <div class="absolute inset-0 bg-gradient-to-r from-brand-500/5 via-brand-600/8 to-brand-500/5 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full scale-150"></div>
               
+              <!-- Logo dinámico según scroll -->
               <img 
-                src="/logo-kharis.png" 
+                :src="isScrolled ? '/logo-kharis.png' : '/logo blanco.png'" 
                 alt="Kharis Distribuidora" 
-                class="relative h-12 sm:h-16 lg:h-20 w-auto object-contain transition-all duration-300 group-hover:scale-105 drop-shadow-[0_2px_8px_rgba(216,27,96,0.15)]"
+                class="relative h-12 sm:h-16 lg:h-20 w-auto object-contain group-hover:scale-105 drop-shadow-[0_2px_8px_rgba(216,27,96,0.15)] logo-transition"
                 style="filter: contrast(1.1) saturate(1.15);"
               />
             </div>
@@ -2016,7 +2017,7 @@ export default {
     }
 
     const handleScroll = () => {
-      isScrolled.value = window.scrollY > 50
+      isScrolled.value = window.scrollY > 30
     }
 
     const scrollToTop = () => {
