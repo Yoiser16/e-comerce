@@ -30,7 +30,7 @@ export const productosService = {
   // Autocompletar búsqueda
   async autocompletar(termino) {
     const response = await apiClient.get('/productos/autocompletar', {
-      params: { termino }
+      params: { q: termino }
     })
     return response.data
   },

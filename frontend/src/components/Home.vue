@@ -1993,24 +1993,23 @@ export default {
     }
 
     // Función para obtener sugerencias mientras escribe
-    const getSuggestions = () => {
+    const getSuggestions = async () => {
       const query = searchQuery.value.trim().toLowerCase()
-      
       if (query.length < 2) {
         searchSuggestions.value = []
         showSuggestions.value = false
         return
       }
-      
-      // Filtrar productos que coincidan con la búsqueda
-      const matches = productos.value.filter(producto => 
-        producto.nombre.toLowerCase().includes(query) ||
-        producto.descripcion?.toLowerCase().includes(query) ||
-        producto.categoria?.nombre?.toLowerCase().includes(query)
-      ).slice(0, 6) // Máximo 6 sugerencias
-      
-      searchSuggestions.value = matches
-      showSuggestions.value = matches.length > 0
+      try {
+        // Usar autocompletar para sugerencias rápidas
+        const resp = await productosService.autocompletar(query)
+        // productos_rapidos es un array de productos sugeridos
+        searchSuggestions.value = resp?.productos_rapidos || []
+        showSuggestions.value = (resp?.productos_rapidos && resp.productos_rapidos.length > 0)
+      } catch (err) {
+        searchSuggestions.value = []
+        showSuggestions.value = false
+      }
     }
     
     // Función para obtener el total de resultados de búsqueda
@@ -2029,8 +2028,8 @@ export default {
     // Función para ejecutar la búsqueda
     const handleSearch = (selectedProduct = null) => {
       if (selectedProduct) {
-        // Si seleccionó un producto específico, ir directo a él
-        scrollToProducto(selectedProduct.id)
+        // Navegar al detalle del producto
+        router.push(`/producto/${selectedProduct.id}`)
         searchQuery.value = ''
         showSuggestions.value = false
         mobileSearchOpen.value = false
