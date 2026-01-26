@@ -338,15 +338,17 @@ const agregarAlCarrito = async () => {
     mensaje.value = ''
     return
   }
-  if (cantidad.value > stockDisponible.value) {
-    mensajeError.value = 'No hay suficiente stock para esa cantidad'
+  // Sumar la cantidad ya agregada en el carrito local
+  const items = loadCartFromLocal()
+  const idx = items.findIndex((i) => i.producto_id === producto.value.id)
+  const cantidadEnCarrito = idx >= 0 ? items[idx].cantidad : 0
+  const cantidadTotal = cantidadEnCarrito + cantidad.value
+  if (cantidadTotal > stockDisponible.value) {
+    mensajeError.value = `Solo hay ${stockDisponible.value - cantidadEnCarrito} disponibles para agregar (ya tienes ${cantidadEnCarrito} en el carrito)`
     mensaje.value = ''
     return
   }
   try {
-    // Actualizar carrito local para usuarios anónimos y feedback inmediato
-    const items = loadCartFromLocal()
-    const idx = items.findIndex((i) => i.producto_id === producto.value.id)
     const precioUnitario = Number(producto.value.precio_monto || producto.value.precio || 0)
     if (idx >= 0) {
       items[idx].cantidad += cantidad.value
