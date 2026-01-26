@@ -477,18 +477,19 @@ class ExpirarCarritosUseCase(CasoUsoBase[None, int]):
     def ejecutar(self, request: None = None) -> int:
         # Obtener carritos expirados
         carritos_expirados = self._repo.obtener_carritos_expirados(datetime.now())
-        
         count = 0
         for carrito in carritos_expirados:
             try:
                 if carrito.expirar("timeout"):
                     self._repo.guardar(carrito)
+                    # Liberar stock reservado
+                    if hasattr(self._repo, 'liberar_stock_por_expiracion'):
+                        self._repo.liberar_stock_por_expiracion(carrito.id)
                     count += 1
                     # TODO: Emitir evento CarritoExpirado
             except Exception:
                 # Log error pero continuar con otros carritos
                 pass
-        
         return count
 
 
