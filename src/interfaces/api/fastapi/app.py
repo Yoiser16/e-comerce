@@ -68,11 +68,14 @@ def crear_app(config: AppConfig) -> FastAPI:
     # Servir archivos estáticos
     app.mount("/static", StaticFiles(directory="static"), name="static")
     
-    # Montar Django como fallback en "/"
-    # FastAPI procesa primero, Django solo maneja lo que no matcheó
+    # Montar Django SOLO para /admin/
+    # FastAPI maneja todos los endpoints /api/v1/*
     from django.core.wsgi import get_wsgi_application
     from starlette.middleware.wsgi import WSGIMiddleware
     django_app = get_wsgi_application()
-    app.mount("/", WSGIMiddleware(django_app))
+    
+    app.mount("/admin", WSGIMiddleware(django_app))
+    
+    return app
     
     return app

@@ -165,7 +165,7 @@ const formatPrice = (price) => {
 
 const whatsappUrl = computed(() => {
   const productosTexto = productos.value.map(p => `• ${p.nombre || 'Producto'} x${p.cantidad || 1}`).join('%0A')
-  const msg = `Hola, quiero finalizar mi pedido ✨%0A%0A🆔 *Código:* ${codigo.value}%0A%0A📦 *Productos:*%0A${productosTexto}%0A%0A💰 *Total:* $${formatPrice(total.value)} COP%0A%0A👤 *${nombreCliente.value}*%0A📞 ${telefono.value}`
+  const msg = `Hola, quiero finalizar mi pedido%0A%0A*CÓDIGO:* ${codigo.value}%0A%0A*PRODUCTOS:*%0A${productosTexto}%0A%0A*TOTAL:* $${formatPrice(total.value)} COP%0A%0A*${nombreCliente.value}*%0A${telefono.value}`
   return `https://wa.me/${whatsappNumber}?text=${msg}`
 })
 

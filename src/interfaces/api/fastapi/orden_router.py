@@ -98,8 +98,20 @@ class CambiarEstadoInput(BaseModel):
     estado: str
 
 
+class ValidarStockInput(BaseModel):
+    """Input para validar disponibilidad de stock"""
+    items: List[LineaOrdenInput]
+
+
+class ValidarStockResponse(BaseModel):
+    """Response de validacion de stock"""
+    disponible: bool
+    productos: List[dict]
+    mensaje: Optional[str] = None
+
+
 # ═══════════════════════════════════════════════════════════════════════════
-# Funciones SYNC que serán envueltas en async
+# Funciones SYNC que seran envueltas en async
 # ═══════════════════════════════════════════════════════════════════════════
 
 def _listar_ordenes_sync(estado: Optional[str], limite: int) -> List[dict]:
@@ -180,10 +192,64 @@ def _listar_ordenes_por_email_sync(email: str) -> List[dict]:
     return resultado
 
 
+def _validar_stock_sync(items: List[LineaOrdenInput]) -> dict:
+    """Valida disponibilidad de stock sin hacer descuentos (lectura solamente)"""
+    productos_info = []
+    todos_disponibles = True
+    
+    for item in items:
+        if item.producto_id and item.producto_id != '00000000-0000-0000-0000-000000000000':
+            try:
+                producto = ProductoModel.objects.get(id=item.producto_id)
+                disponible = producto.stock_actual >= item.cantidad
+                todos_disponibles = todos_disponibles and disponible
+                
+                productos_info.append({
+                    'producto_id': str(producto.id),
+                    'nombre': producto.nombre,
+                    'stock_solicitado': item.cantidad,
+                    'stock_disponible': producto.stock_actual,
+                    'disponible': disponible,
+                    'mensaje': f'Stock disponible' if disponible else f'Solo hay {producto.stock_actual} disponibles'
+                })
+            except ProductoModel.DoesNotExist:
+                productos_info.append({
+                    'producto_id': item.producto_id,
+                    'nombre': item.nombre or 'Producto desconocido',
+                    'stock_solicitado': item.cantidad,
+                    'stock_disponible': 0,
+                    'disponible': False,
+                    'mensaje': 'Producto no encontrado'
+                })
+                todos_disponibles = False
+    
+    return {
+        'disponible': todos_disponibles,
+        'productos': productos_info,
+        'mensaje': 'Stock disponible para todos los productos' if todos_disponibles else 'Stock insuficiente para algunos productos'
+    }
+
+
 def _crear_orden_sync(data: CrearOrdenInput) -> dict:
-    """Crea una orden (sync)"""
-    # 1. Obtener o crear cliente
-    cliente = ClienteModel.objects.filter(email=data.email).first()
+    """Crea una orden (sync) con validacion atomica de stock"""
+    from django.db import transaction
+    
+    with transaction.atomic():
+        # 0. VALIDAR STOCK PRIMERO (con bloqueo pesimista)
+        for item in data.items:
+            if item.producto_id and item.producto_id != '00000000-0000-0000-0000-000000000000':
+                try:
+                    producto = ProductoModel.objects.select_for_update().get(id=item.producto_id)
+                    if producto.stock_actual < item.cantidad:
+                        raise Exception(
+                            f"Stock insuficiente para {producto.nombre}. "
+                            f"Disponible: {producto.stock_actual}, Solicitado: {item.cantidad}"
+                        )
+                except ProductoModel.DoesNotExist:
+                    raise Exception(f"Producto no encontrado: {item.producto_id}")
+        
+        # 1. Obtener o crear cliente
+        cliente = ClienteModel.objects.filter(email=data.email).first()
     
     if not cliente:
         cliente = ClienteModel.objects.create(
@@ -265,6 +331,13 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
                 subtotal_monto=subtotal,
                 subtotal_moneda='COP'
             )
+            
+            # DESCONTAR STOCK AQUÍ (orden PENDIENTE)
+            # El stock se devuelve solo si se CANCELA la orden
+            stock_anterior = producto.stock_actual
+            producto.stock_actual -= item.cantidad
+            producto.save()
+            print(f'📦 Stock descontado: {producto.nombre} - {item.cantidad} unidades. Stock anterior: {stock_anterior}, Stock nuevo: {producto.stock_actual}')
         
         items_response.append({
             'producto_id': item.producto_id or 'sin-id',
@@ -337,16 +410,42 @@ def _obtener_orden_sync(orden_id: str) -> dict:
 
 
 def _actualizar_estado_sync(orden_id: str, estado: str) -> dict:
-    """Actualiza estado de una orden (sync)"""
+    """Actualiza estado de una orden (sync) y devuelve stock si se CANCELA"""
+    from django.db import transaction
+    
     estados_validos = ['pendiente', 'confirmada', 'en_proceso', 'enviada', 'completada', 'cancelada']
     estado_nuevo = estado.lower()
     
     if estado_nuevo not in estados_validos:
         raise ValueError(f"Estado inválido. Estados válidos: {estados_validos}")
     
-    orden = OrdenModel.objects.get(id=orden_id)
-    orden.estado = estado_nuevo
-    orden.save()
+    with transaction.atomic():
+        orden = OrdenModel.objects.select_for_update().get(id=orden_id)
+        estado_anterior = orden.estado
+        
+        # Si cambia a CANCELADA → Devolver stock
+        if estado_nuevo == 'cancelada' and estado_anterior != 'cancelada':
+            print(f'↩️ Cancelando orden {orden.codigo} - Devolviendo stock...')
+            
+            # Obtener líneas de la orden
+            lineas = LineaOrdenModel.objects.filter(orden=orden).select_related('producto')
+            
+            for linea in lineas:
+                if linea.producto:
+                    # Bloqueo pesimista del producto
+                    producto = ProductoModel.objects.select_for_update().get(id=linea.producto_id)
+                    
+                    # Devolver stock
+                    stock_anterior = producto.stock_actual
+                    producto.stock_actual += linea.cantidad
+                    producto.save()
+                    
+                    print(f'✅ Stock devuelto: {producto.nombre} - {linea.cantidad} unidades. '
+                          f'Stock anterior: {stock_anterior}, Stock nuevo: {producto.stock_actual}')
+        
+        # Actualizar estado
+        orden.estado = estado_nuevo
+        orden.save()
     
     return {"mensaje": "Estado actualizado", "estado": estado_nuevo.upper()}
 
@@ -389,22 +488,52 @@ async def obtener_mis_ordenes(email: str):
         )
 
 
+@router.post("/validar-stock", response_model=ValidarStockResponse)
+async def validar_stock(data: ValidarStockInput):
+    """
+    Valida disponibilidad de stock sin hacer descuentos.
+    Util para mostrar advertencias en carrito/checkout antes de enviar la orden.
+    
+    Response:
+    - disponible: bool - Si hay stock para todos los productos
+    - productos: list - Detalle de cada producto (stock_disponible, stock_solicitado, etc)
+    - mensaje: str - Mensaje amigable
+    """
+    try:
+        resultado = await sync_to_async(_validar_stock_sync)(data.items)
+        return resultado
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al validar stock: {str(e)}"
+        )
+
+
 @router.post("", response_model=OrdenResponse, status_code=status.HTTP_201_CREATED)
 @router.post("/", response_model=OrdenResponse, status_code=status.HTTP_201_CREATED)
 async def crear_orden(data: CrearOrdenInput):
     """
-    Crea una nueva orden desde el checkout.
-    - Si el cliente no existe (por email), lo crea automáticamente.
-    - Genera código único KH-XXXX
+    Crea una nueva orden desde el checkout con validacion atomica de stock.
+    - Valida stock de forma atomica (transaccion con bloqueo pesimista)
+    - Si el cliente no existe (por email), lo crea automaticamente.
+    - Genera codigo unico KH-XXXX
+    - Descuenta stock automaticamente si hay disponible
     - Estado inicial: PENDIENTE
     """
     try:
         resultado = await sync_to_async(_crear_orden_sync)(data)
         return resultado
     except Exception as e:
+        # Diferenciar errores de stock de otros errores
+        error_msg = str(e)
+        if "Stock insuficiente" in error_msg or "Producto no encontrado" in error_msg:
+            raise HTTPException(
+                status_code=status.HTTP_409_CONFLICT,
+                detail=error_msg
+            )
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
-            detail=f"Error al crear la orden: {str(e)}"
+            detail=f"Error al crear la orden: {error_msg}"
         )
 
 
@@ -420,6 +549,28 @@ async def obtener_orden(orden_id: str):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al obtener orden: {str(e)}"
+        )
+
+
+@router.post("/{orden_id}/confirmar")
+async def confirmar_orden(orden_id: str):
+    """
+    Confirma el pago de una orden (cambia estado a CONFIRMADA).
+    
+    Este endpoint es llamado por el admin cuando confirma que el pago fue recibido.
+    El stock ya fue descontado cuando la orden se creó en estado PENDIENTE.
+    """
+    try:
+        resultado = await sync_to_async(_actualizar_estado_sync)(orden_id, 'confirmada')
+        return resultado
+    except OrdenModel.DoesNotExist:
+        raise HTTPException(status_code=404, detail="Orden no encontrada")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al confirmar orden: {str(e)}"
         )
 
 

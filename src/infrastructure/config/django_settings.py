@@ -248,6 +248,7 @@ INSTALLED_APPS = [
     'rest_framework',  # Django REST Framework
     'rest_framework_simplejwt',  # JWT Authentication
     'rest_framework_simplejwt.token_blacklist',  # Blacklist para logout
+    'corsheaders',  # CORS support
     'infrastructure.persistence.django',
     'infrastructure.auth',  # Sistema de autenticación y autorización
     'infrastructure',  # Para los management commands
@@ -255,6 +256,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'corsheaders.middleware.CorsMiddleware',  # CORS (ANTES de CommonMiddleware)
     'interfaces.api.rest.middleware.RateLimitMiddleware',  # Protección anti-abuso (ANTES de auth)
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -549,4 +551,38 @@ if not os.environ.get('DJANGO_SETTINGS_SUPPRESS_INFO'):
     print(f"Cache Backend: {_cache_backend}")
     print(f"JWT Enabled: True (Access: 15min, Refresh: 1day)")
     print(f"Statement Timeout: {os.environ.get('DB_STATEMENT_TIMEOUT_MS', '30000')}ms")
+
+# ============================================================================
+# CORS CONFIGURATION
+# ============================================================================
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",
+    "http://localhost:5173",
+    "http://127.0.0.1:3000",
+    "http://127.0.0.1:5173",
+]
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ALLOW_HEADERS = [
+    'accept',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+]
+CORS_ALLOW_METHODS = [
+    'DELETE',
+    'GET',
+    'OPTIONS',
+    'PATCH',
+    'POST',
+    'PUT',
+]
+
+# Imprimir resumen de configuración (sin datos sensibles)
+if not os.environ.get('DJANGO_SETTINGS_SUPPRESS_INFO'):
     print("=" * 70)

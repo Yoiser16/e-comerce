@@ -183,8 +183,21 @@
 
           <!-- Items -->
           <div class="flex-1 overflow-y-auto p-6">
+            <!-- Advertencia de stock bajo -->
+            <div v-if="carritoItems.length > 0 && tienestockBajo" class="mb-4 bg-yellow-50 border border-yellow-200 rounded-sm p-3">
+              <div class="flex gap-2">
+                <svg class="w-5 h-5 text-yellow-600 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c.866 1.5.92 3.026.302 4.575m19.302-4.929a24.226 24.226 0 00-5.555-6.954m-15.6 3.364a24.225 24.225 0 005.555-6.956m9.303-3.376c-.866-1.5-.92-3.026-.302-4.575m0 0a5.002 5.002 0 005.003 5.003m0 0a5.002 5.002 0 00-5.003-5.003m15.6 3.364a24.224 24.224 0 01-5.555 6.956" />
+                </svg>
+                <div class="text-xs text-yellow-800">
+                  <p class="font-semibold">Stock bajo</p>
+                  <p>Algunos productos tienen poco inventario. Compra ahora para asegurar tu pedido.</p>
+                </div>
+              </div>
+            </div>
+            
             <div v-if="carritoItems.length === 0" class="text-center py-12">
-              <p class="text-text-medium text-sm">Tu carrito está vacío</p>
+              <p class="text-text-medium text-sm">Tu carrito esta vacio</p>
             </div>
             <div v-else class="space-y-4">
               <div 
@@ -307,6 +320,15 @@ const cartSubtotal = computed(() => {
     const precio = item.precio_unitario || item.precio_monto || 0
     return total + (precio * item.cantidad)
   }, 0)
+})
+
+// Detectar si algún producto del carrito tiene stock bajo (<=5)
+const tienestockBajo = computed(() => {
+  if (carritoItems.value.length === 0) return false
+  return carritoItems.value.some(item => {
+    const stockDisp = item.stock_actual || item.stock || 0
+    return stockDisp > 0 && stockDisp <= 5
+  })
 })
 
 const cargarProducto = async () => {

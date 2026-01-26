@@ -707,6 +707,77 @@
       </div>
     </div>
     
+    <!-- Modal de Error de Stock -->
+    <div v-if="showStockModal" class="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4" @click.self="showStockModal = false">
+      <div class="bg-white rounded-sm shadow-2xl max-w-md w-full overflow-hidden animate-fade-in">
+        <!-- Header -->
+        <div class="bg-gradient-to-r from-yellow-50 to-amber-50 px-6 py-5 border-b border-yellow-100">
+          <div class="flex items-start gap-3">
+            <div class="flex-shrink-0 w-10 h-10 bg-yellow-500 rounded-full flex items-center justify-center">
+              <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5-.217 3.374 1.45 4.19.433.212.902.356 1.384.418M21.303 16.126c.865 1.5.217 3.374-1.45 4.19-.433.212-.902.356-1.384.418M4.697 7.874c-.866-1.5-.217-3.374 1.45-4.19.433-.212.902-.356 1.384-.418M19.303 7.874c.865-1.5.217-3.374-1.45-4.19-.433-.212-.902-.356-1.384-.418" />
+              </svg>
+            </div>
+            <div class="flex-1">
+              <h3 class="font-luxury text-xl text-[#1A1A1A]">Stock Insuficiente</h3>
+              <p class="text-sm text-[#7A7A7A] mt-1">{{ stockModalMessage }}</p>
+            </div>
+            <button @click="showStockModal = false" class="text-[#9CA3AF] hover:text-[#1A1A1A] transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+        </div>
+        
+        <!-- Body -->
+        <div class="p-6">
+          <div v-if="stockModalProducts.length > 0" class="space-y-3 mb-6">
+            <p class="text-sm font-medium text-[#4A4A4A] mb-3">Productos afectados:</p>
+            <div 
+              v-for="prod in stockModalProducts" 
+              :key="prod.producto_id"
+              class="flex items-start gap-3 p-3 bg-red-50 border border-red-100 rounded-sm"
+            >
+              <div class="relative flex-shrink-0">
+                <img 
+                  v-if="prod.imagen_url" 
+                  :src="prod.imagen_url" 
+                  :alt="prod.nombre"
+                  class="w-16 h-16 object-cover rounded bg-white"
+                  @error="e => e.target.src = '/placeholder.jpg'"
+                />
+                <div class="absolute -top-1 -right-1 w-5 h-5 bg-red-500 rounded-full flex items-center justify-center shadow-sm">
+                  <svg class="w-3 h-3 text-white" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                  </svg>
+                </div>
+              </div>
+              <div class="flex-1 min-w-0 text-sm">
+                <p class="font-medium text-[#1A1A1A]">{{ prod.nombre }}</p>
+                <p class="text-[#7A7A7A] mt-1.5">
+                  <span class="text-red-600 font-semibold">Disponible: {{ prod.stock_disponible }}</span>
+                  <span class="mx-2">•</span>
+                  <span>Solicitado: {{ prod.stock_solicitado }}</span>
+                </p>
+              </div>
+            </div>
+          </div>
+          
+          <p class="text-sm text-[#7A7A7A] mb-6">
+            Por favor, ajusta las cantidades en tu carrito y vuelve a intentar.
+          </p>
+          
+          <button 
+            @click="showStockModal = false"
+            class="w-full bg-[#1A1A1A] hover:bg-black text-white py-3 px-6 rounded-sm text-sm font-medium tracking-wide uppercase transition-all"
+          >
+            Entendido
+          </button>
+        </div>
+      </div>
+    </div>
+    
     </template><!-- fin v-else -->
   </div>
 </template>
@@ -751,6 +822,11 @@ export default {
     })
     const searchDep = ref('')
     const searchMun = ref('')
+    
+    // Estado del modal de stock
+    const showStockModal = ref(false)
+    const stockModalMessage = ref('')
+    const stockModalProducts = ref([])
     
     const EPAYCO_CONFIG = {
       publicKey: import.meta.env.VITE_EPAYCO_PUBLIC_KEY || '2943652c673afffaa5b7b67829f00a0c',
@@ -1313,6 +1389,49 @@ export default {
         processing.value = true
         
         try {
+          // 0. VALIDAR STOCK ANTES DE CREAR ORDEN
+          console.log('🔍 Validando disponibilidad de stock...')
+          const stockValidationUrl = window.location.hostname === 'localhost' 
+            ? 'http://localhost:8000/api/v1/ordenes/validar-stock'
+            : '/api/v1/ordenes/validar-stock'
+          
+          const stockCheckResponse = await fetch(stockValidationUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+              items: cartItems.value.map(item => ({
+                producto_id: item.id || item.producto_id || '00000000-0000-0000-0000-000000000000',
+                cantidad: item.cantidad || 1,
+                precio_unitario: item.precio_unitario || item.precio || 0,
+                nombre: item.nombre || 'Producto'
+              }))
+            })
+          })
+          
+          const stockValidation = await stockCheckResponse.json()
+          
+          if (!stockValidation.disponible) {
+            console.warn('⚠️ Stock insuficiente:', stockValidation)
+            processing.value = false
+            
+            // Mostrar modal con productos con problemas + imagen del carrito
+            const productosProblema = stockValidation.productos.filter(p => !p.disponible).map(p => {
+              const itemCarrito = cartItems.value.find(item => 
+                (item.id || item.producto_id) === p.producto_id
+              )
+              return {
+                ...p,
+                imagen_url: itemCarrito?.imagen_url || itemCarrito?.imagen_principal || '/placeholder.jpg'
+              }
+            })
+            stockModalMessage.value = 'Algunos productos no están disponibles en la cantidad solicitada.'
+            stockModalProducts.value = productosProblema
+            showStockModal.value = true
+            return
+          }
+          
+          console.log('✅ Stock validado correctamente')
+          
           // 1. Crear orden en el backend con estado PENDIENTE
           // Obtener nombres de departamento y municipio (no IDs)
           const depNombre = getDepName.value || form.value.departamento || ''
@@ -1410,7 +1529,7 @@ export default {
           
           // 2. Construir mensaje de WhatsApp con el código real
           const productos = cartItems.value.map(i => `• ${i.nombre || 'Producto'} x${i.cantidad || 1}`).join('%0A')
-          const msg = `Hola, quiero finalizar mi pedido ✨%0A%0A🆔 *Código:* ${code}%0A%0A📦 *Productos:*%0A${productos}%0A%0A💰 *Total:* $${formatPrice(getTotal())} COP%0A%0A👤 *${form.value.nombre} ${form.value.apellido}*%0A📞 ${form.value.telefono}%0A📍 ${getFullAddress()}`
+          const msg = `Hola, quiero finalizar mi pedido%0A%0A*CÓDIGO:* ${code}%0A%0A*PRODUCTOS:*%0A${productos}%0A%0A*TOTAL:* $${formatPrice(getTotal())} COP%0A%0A*${form.value.nombre} ${form.value.apellido}*%0A${form.value.telefono}%0A${getFullAddress()}`
           
           // 3. Guardar datos de la orden para la página de confirmación
           sessionStorage.setItem('orden_whatsapp', JSON.stringify({
@@ -1440,11 +1559,24 @@ export default {
           window.location.href = '/pedido-confirmado'
           
         } catch (e) {
-          console.error('Error al procesar la orden:', e)
-          // Aunque falle la API, abrir WhatsApp de todos modos para no perder la venta
+          processing.value = false
+          console.error('❌ Error al procesar la orden:', e)
+          
+          // Diferenciar entre errores de stock y otros errores
+          const errorMsg = e.message || String(e)
+          if (errorMsg.includes('409') || errorMsg.includes('Stock insuficiente')) {
+            // Error de stock - mostrar modal amigable
+            stockModalMessage.value = 'Alguien más compró los últimos productos mientras completabas tu compra.'
+            stockModalProducts.value = []
+            showStockModal.value = true
+            return
+          }
+          
+          // Otros errores: intentar abrir WhatsApp de todos modos para no perder la venta
+          console.warn('⚠️ API falló, abriendo WhatsApp de respaldo...')
           const code = `K-${Math.floor(1000 + Math.random() * 9000)}`
           const productos = cartItems.value.map(i => `• ${i.nombre || 'Producto'} x${i.cantidad || 1}`).join('%0A')
-          const msg = `Hola, quiero finalizar mi pedido ✨%0A%0A🆔 *Código:* ${code}%0A%0A📦 *Productos:*%0A${productos}%0A%0A💰 *Total:* $${formatPrice(getTotal())} COP%0A%0A👤 *${form.value.nombre} ${form.value.apellido}*%0A📞 ${form.value.telefono}%0A📍 ${getFullAddress()}`
+          const msg = `Hola, quiero finalizar mi pedido%0A%0A*CÓDIGO:* ${code}%0A%0A*PRODUCTOS:*%0A${productos}%0A%0A*TOTAL:* $${formatPrice(getTotal())} COP%0A%0A*${form.value.nombre} ${form.value.apellido}*%0A${form.value.telefono}%0A${getFullAddress()}`
           const whatsappFinal = '573217355070'
           window.open(`https://wa.me/${whatsappFinal}?text=${msg}`, '_blank')
           clearFormStorage()
@@ -1555,7 +1687,8 @@ export default {
       getFullAddress, saveFormToStorage,
       formatPrice, getItemPrice, getSubtotal, getTotal, processPayment,
       clienteConDatosCompletos,
-      initialLoading
+      initialLoading,
+      showStockModal, stockModalMessage, stockModalProducts
     }
   }
 }
@@ -1779,5 +1912,21 @@ export default {
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* Animación para el modal */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: scale(0.95) translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.2s ease-out;
 }
 </style>
