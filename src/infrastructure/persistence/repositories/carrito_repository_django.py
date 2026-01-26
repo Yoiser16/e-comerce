@@ -141,35 +141,47 @@ class CarritoRepositoryDjango(CarritoRepository):
     @transaction.atomic
     def bloquear_para_checkout(self, carrito_id: UUID, version: int) -> Optional[Carrito]:
         """
-        Bloquea un carrito para checkout usando SELECT FOR UPDATE.
-        
-        Anti-race conditions: asegura que solo un proceso pueda bloquear el carrito.
+        Bloquea un carrito para checkout usando SELECT FOR UPDATE y reserva stock temporalmente.
         """
+        from infrastructure.persistence.django.models import ProductoModel, ItemCarritoModel
         try:
             modelo = CarritoModel.objects.select_for_update(nowait=True).get(
                 id=carrito_id,
                 estado__in=['CREADO', 'ACTIVO']
             )
-            
             # Verificar versión
             if modelo.version != version:
                 raise ConcurrenciaConflicto(
                     f"El carrito fue modificado. Versión esperada: {version}, actual: {modelo.version}"
                 )
-            
-            # Bloquear
+            # Reservar stock de cada producto
+            for item in ItemCarritoModel.objects.filter(carrito_id=carrito_id):
+                producto = ProductoModel.objects.select_for_update().get(id=item.producto_id)
+                if producto.stock_actual < item.cantidad:
+                    raise ConcurrenciaConflicto(f"Stock insuficiente para {producto.nombre}")
+                producto.stock_actual -= item.cantidad
+                producto.save(update_fields=["stock_actual"])
+            # Bloquear carrito
             modelo.estado = 'BLOQUEADO'
             modelo.fecha_bloqueo = datetime.now()
             modelo.version = F('version') + 1
             modelo.save(update_fields=['estado', 'fecha_bloqueo', 'version'])
-            
-            # Refrescar para obtener versión actualizada
             modelo.refresh_from_db()
-            
             return self._modelo_a_entidad(modelo)
-            
         except CarritoModel.DoesNotExist:
             return None
+
+    @transaction.atomic
+    def liberar_stock_por_expiracion(self, carrito_id: UUID) -> None:
+        """
+        Libera el stock reservado de un carrito expirado.
+        """
+        from infrastructure.persistence.django.models import ProductoModel, ItemCarritoModel
+        items = ItemCarritoModel.objects.filter(carrito_id=carrito_id)
+        for item in items:
+            producto = ProductoModel.objects.select_for_update().get(id=item.producto_id)
+            producto.stock_actual += item.cantidad
+            producto.save(update_fields=["stock_actual"])
     
     def obtener_carritos_expirados(self, fecha_limite: datetime) -> List[Carrito]:
         """Obtiene carritos que deberían expirar."""
