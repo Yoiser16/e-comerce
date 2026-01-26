@@ -378,6 +378,9 @@ class OrdenModel(models.Model):
     total_monto = models.DecimalField(max_digits=12, decimal_places=2, default=0)
     total_moneda = models.CharField(max_length=3, default='COP')
     
+    # Email threading (para encadenar notificaciones)
+    email_thread_id = models.CharField(max_length=255, blank=True, default='', help_text='Message-ID del primer email enviado')
+    
     # Control
     activo = models.BooleanField(default=True)
     fecha_creacion = models.DateTimeField(auto_now_add=True)

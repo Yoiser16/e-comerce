@@ -5,10 +5,11 @@
     <header class="bg-white/80 border-b border-nude-100/50 py-5">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <router-link to="/" class="flex items-center gap-3 w-fit">
-          <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-500 to-brand-600 flex items-center justify-center shadow-lg shadow-brand-500/20">
-            <span class="text-white font-luxury text-lg">K</span>
-          </div>
-          <span class="font-luxury text-2xl text-text-dark tracking-wide">Kharis</span>
+          <img 
+            src="/logo-kharis.png" 
+            alt="Kharis" 
+            class="h-16 sm:h-20 w-auto"
+          />
         </router-link>
       </div>
     </header>

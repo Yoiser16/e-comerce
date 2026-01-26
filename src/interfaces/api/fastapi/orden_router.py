@@ -21,6 +21,7 @@ import django
 django.setup()
 
 from infrastructure.persistence.django.models import OrdenModel, LineaOrdenModel, ClienteModel, ProductoModel
+from infrastructure.notifications.email_service import send_order_status_email
 from interfaces.api.fastapi.dependencies import get_current_user_email
 
 
@@ -347,6 +348,50 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
             'subtotal': float(subtotal)
         })
     
+    # Preparar datos de productos para el email (con imágenes)
+    productos_email = []
+    for item in data.items:
+        producto_data = {'nombre': item.nombre or 'Producto', 'cantidad': item.cantidad, 'imagen': ''}
+        if item.producto_id and item.producto_id != '00000000-0000-0000-0000-000000000000':
+            try:
+                producto_obj = ProductoModel.objects.get(id=item.producto_id)
+                producto_data['nombre'] = producto_obj.nombre
+                # Obtener URL de la primera imagen si existe (imagenes es ForeignKey related_name)
+                primera_imagen_obj = producto_obj.imagenes.filter(es_principal=True).first()
+                if not primera_imagen_obj:
+                    primera_imagen_obj = producto_obj.imagenes.order_by('orden').first()
+                
+                if primera_imagen_obj:
+                    url_imagen = primera_imagen_obj.url
+                    producto_data['imagen'] = url_imagen if url_imagen.startswith('http') else f"http://localhost:8000{url_imagen}"
+            except Exception as e:
+                print(f"⚠️ Error obteniendo imagen del producto {item.producto_id}: {e}")
+        productos_email.append(producto_data)
+    
+    try:
+        direccion_completa = ", ".join(filter(None, [orden.direccion_envio, orden.municipio, orden.departamento]))
+        
+        print(f"📧 Enviando email de confirmación a {cliente.email} - Orden: {orden.codigo}")
+        msg_id = send_order_status_email(
+            email=cliente.email,
+            nombre=f"{cliente.nombre} {cliente.apellido}".strip(),
+            codigo=orden.codigo,
+            estado='pendiente',
+            total=float(orden.total_monto),
+            direccion=direccion_completa,
+            productos=productos_email,
+        )
+        # Guardar Message-ID para threading
+        if msg_id:
+            orden.email_thread_id = msg_id
+            orden.save()
+        print(f"✅ Email de confirmación enviado exitosamente - Message ID: {msg_id}")
+    except Exception as e:
+        # No bloquear la creación de la orden por fallos de email
+        print(f"❌ Error enviando email de confirmación: {e}")
+        import traceback
+        traceback.print_exc()
+
     return {
         'id': str(orden.id),
         'codigo': orden.codigo,
@@ -446,6 +491,49 @@ def _actualizar_estado_sync(orden_id: str, estado: str) -> dict:
         # Actualizar estado
         orden.estado = estado_nuevo
         orden.save()
+
+        try:
+            if orden.cliente:
+                # Obtener productos con imágenes
+                lineas_orden = LineaOrdenModel.objects.filter(orden=orden).select_related('producto').prefetch_related('producto__imagenes')
+                productos_email = []
+                for linea in lineas_orden:
+                    producto_data = {
+                        'nombre': linea.producto.nombre if linea.producto else 'Producto',
+                        'cantidad': linea.cantidad,
+                        'imagen': ''
+                    }
+                    if linea.producto:
+                        # Buscar imagen principal o la primera disponible
+                        primera_imagen_obj = linea.producto.imagenes.filter(es_principal=True).first()
+                        if not primera_imagen_obj:
+                            primera_imagen_obj = linea.producto.imagenes.order_by('orden').first()
+                        
+                        if primera_imagen_obj:
+                            url_imagen = primera_imagen_obj.url
+                            producto_data['imagen'] = url_imagen if url_imagen.startswith('http') else f"http://localhost:8000{url_imagen}"
+                    
+                    productos_email.append(producto_data)
+                
+                direccion_completa = ", ".join(filter(None, [orden.direccion_envio, orden.municipio, orden.departamento]))
+                
+                print(f"📧 Enviando email de cambio de estado a {orden.cliente.email} - Estado: {estado_nuevo}")
+                send_order_status_email(
+                    email=orden.cliente.email,
+                    nombre=f"{orden.cliente.nombre} {orden.cliente.apellido}".strip(),
+                    codigo=orden.codigo,
+                    estado=estado_nuevo,
+                    total=float(orden.total_monto),
+                    direccion=direccion_completa,
+                    productos=productos_email,
+                    thread_id=orden.email_thread_id or None,  # Threading: encadenar como respuesta
+                )
+                print(f"✅ Email enviado exitosamente")
+        except Exception as e:
+            # No bloquear el cambio de estado por fallas de email
+            print(f"❌ Error enviando email de cambio de estado: {e}")
+            import traceback
+            traceback.print_exc()
     
     return {"mensaje": "Estado actualizado", "estado": estado_nuevo.upper()}
 
