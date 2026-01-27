@@ -13,11 +13,12 @@
   --color-brand-300: #f8a9c7;
   --color-brand-400: #f272a0;
   --color-brand-500: #e84a7e;
-  --color-brand-600: #D81B60; /* Color principal del logo */
+  --color-brand-600: #D81B60;
+  /* Color principal del logo */
   --color-brand-700: #b91650;
   --color-brand-800: #9a1543;
   --color-brand-900: #81163b;
-  
+
   /* Nude/Blush - Acentos de lujo */
   --color-nude-50: #fdfcfb;
   --color-nude-100: #faf5f2;
@@ -25,7 +26,7 @@
   --color-nude-300: #edddd2;
   --color-nude-400: #e2c9b8;
   --color-nude-500: #d4b29e;
-  
+
   /* Rose Gold */
   --color-rosegold-50: #fdf8f6;
   --color-rosegold-100: #fcf0eb;
@@ -33,7 +34,7 @@
   --color-rosegold-300: #f2c4b0;
   --color-rosegold-400: #e9a68a;
   --color-rosegold-500: #d4886b;
-  
+
   /* Blush suave */
   --color-blush-50: #fefbfc;
   --color-blush-100: #fdf5f7;
@@ -41,7 +42,7 @@
   --color-blush-300: #f7d5dc;
   --color-blush-400: #f0b8c4;
   --color-blush-500: #e69aab;
-  
+
   /* Dorado sutil */
   --color-gold-50: #fdfcf9;
   --color-gold-100: #fbf7ed;
@@ -49,16 +50,16 @@
   --color-gold-300: #eedeb4;
   --color-gold-400: #e4c88c;
   --color-gold-500: #d4a85a;
-  
+
   /* Porcelana - Fondo dominante */
   --color-porcelain: #FAFAFA;
   --color-porcelain-warm: #FAF9F7;
-  
+
   /* Texto oscuro */
   --color-text-dark: #1A1A1A;
   --color-text-medium: #4A4A4A;
   --color-text-light: #7A7A7A;
-  
+
   /* Carbón para sección mayorista */
   --color-carbon-900: #1a1a2e;
   --color-carbon-800: #16213e;
@@ -91,9 +92,9 @@ body {
 
 /* Tipografía blanca para estado transparente */
 .header-luxury * {
-  transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1), 
-              fill 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-              border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+  transition: color 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    fill 0.4s cubic-bezier(0.4, 0, 0.2, 1),
+    border-color 0.4s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 .header-luxury .nav-link-luxury,
@@ -119,8 +120,8 @@ body {
   background: rgba(255, 255, 255, 0.98) !important;
   backdrop-filter: blur(20px);
   -webkit-backdrop-filter: blur(20px);
-  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.08), 
-              0 2px 8px -2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 24px -2px rgba(0, 0, 0, 0.08),
+    0 2px 8px -2px rgba(0, 0, 0, 0.04);
   border-bottom: 1px solid rgba(0, 0, 0, 0.04);
 }
 
@@ -224,30 +225,30 @@ body {
 
 /* Sombras suaves - Soft shadows */
 .shadow-soft {
-  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06), 
-              0 2px 8px -2px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 4px 20px -2px rgba(0, 0, 0, 0.06),
+    0 2px 8px -2px rgba(0, 0, 0, 0.04);
 }
 
 .shadow-soft-lg {
-  box-shadow: 0 8px 40px -4px rgba(0, 0, 0, 0.08), 
-              0 4px 16px -4px rgba(0, 0, 0, 0.04);
+  box-shadow: 0 8px 40px -4px rgba(0, 0, 0, 0.08),
+    0 4px 16px -4px rgba(0, 0, 0, 0.04);
 }
 
 .shadow-soft-xl {
-  box-shadow: 0 16px 60px -8px rgba(0, 0, 0, 0.1), 
-              0 8px 24px -8px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 16px 60px -8px rgba(0, 0, 0, 0.1),
+    0 8px 24px -8px rgba(0, 0, 0, 0.06);
 }
 
 /* Hover suave con elevación */
 .hover-lift {
-  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94), 
-              box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+  transition: transform 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94),
+    box-shadow 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
 }
 
 .hover-lift:hover {
   transform: translateY(-4px);
-  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.12), 
-              0 10px 20px -10px rgba(0, 0, 0, 0.06);
+  box-shadow: 0 20px 50px -10px rgba(0, 0, 0, 0.12),
+    0 10px 20px -10px rgba(0, 0, 0, 0.06);
 }
 
 /* Botón CTA Principal */
@@ -293,11 +294,12 @@ body {
 
 /* Mobile grid dividers for premium ribbon */
 @media (max-width: 1023px) {
+
   .trust-ribbon-premium .trust-item-premium:nth-child(1),
   .trust-ribbon-premium .trust-item-premium:nth-child(2) {
     border-bottom: 1px solid rgba(212, 185, 169, 0.3);
   }
-  
+
   .trust-ribbon-premium .trust-item-premium:nth-child(odd) {
     border-right: 1px solid rgba(212, 185, 169, 0.3);
   }
@@ -363,7 +365,7 @@ body {
 }
 
 .bento-overlay {
-  background: linear-gradient(0deg, rgba(0,0,0,0.6) 0%, rgba(0,0,0,0.1) 50%, transparent 100%);
+  background: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.1) 50%, transparent 100%);
 }
 
 /* Carrusel de testimonios */
@@ -376,9 +378,12 @@ body {
 
 /* Animación flotante suave */
 @keyframes float-soft {
-  0%, 100% {
+
+  0%,
+  100% {
     transform: translateY(0) rotate(0deg);
   }
+
   50% {
     transform: translateY(-12px) rotate(1deg);
   }
@@ -390,9 +395,12 @@ body {
 
 /* Animación de pulso suave */
 @keyframes pulse-soft {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
   }
+
   50% {
     opacity: 0.7;
   }
@@ -447,6 +455,7 @@ html {
     opacity: 0;
     transform: translate3d(0, 40px, 0);
   }
+
   to {
     opacity: 1;
     transform: translate3d(0, 0, 0);
@@ -460,9 +469,11 @@ html {
 .delay-100 {
   animation-delay: 100ms;
 }
+
 .delay-200 {
   animation-delay: 200ms;
 }
+
 .delay-300 {
   animation-delay: 300ms;
 }
@@ -474,7 +485,7 @@ html {
 /* Transición suave del logo con fade elegante */
 .logo-transition {
   transition: opacity 0.4s cubic-bezier(0.4, 0, 0.2, 1),
-              transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
 }
 
 /* Preload de ambos logos para evitar flickering */
@@ -510,6 +521,7 @@ body::after {
     opacity: 0;
     transform: translateY(-8px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -555,6 +567,7 @@ body::after {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -570,6 +583,7 @@ body::after {
     opacity: 0;
     transform: translateY(30px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -578,7 +592,7 @@ body::after {
 
 /* Sombra luxury general */
 .shadow-luxury {
-  box-shadow: 
+  box-shadow:
     0 20px 60px -12px rgba(216, 27, 96, 0.15),
     0 8px 24px -8px rgba(0, 0, 0, 0.12),
     0 0 0 1px rgba(216, 27, 96, 0.05);
@@ -586,13 +600,151 @@ body::after {
 
 /* Sombra luxury para botón CTA con tono rosado */
 .shadow-luxury-brand {
-  box-shadow: 
+  box-shadow:
     0 12px 32px -8px rgba(216, 27, 96, 0.35),
     0 4px 16px -4px rgba(216, 27, 96, 0.25);
 }
 
 .shadow-luxury-brand:hover {
-  box-shadow: 
+  box-shadow:
     0 16px 40px -8px rgba(216, 27, 96, 0.45),
     0 6px 20px -4px rgba(216, 27, 96, 0.35);
+}
+
+/* ========================================
+   DARK MODE: CYBER NEON PALETTE
+   Ref: User Request (Deep Blue/Black + Neon Lime)
+   ======================================== */
+
+.dark {
+  /* Core Colors */
+  --bg-dark-main: #02040A;
+  /* Casi negro/azul profundo */
+  --bg-dark-card: #0B1121;
+  /* Azul medianoche para tarjetas */
+  --color-neon: #CCFF00;
+  /* Lime Neon para acentos */
+
+  /* Text Colors */
+  --color-text-dark: #FFFFFF;
+  --color-text-medium: #94A3B8;
+  /* Slate 400 */
+}
+
+/* 1. Main Background */
+.dark body,
+.dark .min-h-screen,
+.dark .ordenes-layout,
+.dark .detail-view,
+.dark .bg-gray-50,
+.dark .bg-gray-100 {
+  background-color: var(--bg-dark-main) !important;
+  color: #FFFFFF;
+}
+
+/* 2. Card Backgrounds */
+.dark .bg-white,
+.dark .master-list,
+.dark .order-card,
+.dark .bento-box,
+.dark .invoice-section,
+.dark .detail-header,
+.dark aside {
+  background-color: var(--bg-dark-card) !important;
+  border-color: #1E293B !important;
+  /* Slate 800 borders */
+  color: #FFFFFF !important;
+}
+
+/* 3. Typography Overrides */
+.dark h1,
+.dark h2,
+.dark h3,
+.dark h4,
+.dark h5,
+.dark h6,
+.dark .text-gray-900,
+.dark .text-text-dark,
+.dark .master-title,
+.dark .detail-header__title,
+.dark .product-name {
+  color: #FFFFFF !important;
+}
+
+.dark .text-gray-500,
+.dark .text-gray-600,
+.dark .text-text-light,
+.dark .text-text-medium {
+  color: #94A3B8 !important;
+  /* Slate 400 */
+}
+
+/* 4. NEON ACCENTS - Transforming Brand Pink to Neon Lime */
+
+/* Buttons & CTA (Pink -> Neon) */
+.dark .bg-brand-600,
+.dark .bg-pink-600,
+.dark .bg-\[\#D81B60\] {
+  background-color: var(--color-neon) !important;
+  color: #000000 !important;
+  /* Texto negro para contraste con neon */
+  box-shadow: 0 0 15px rgba(204, 255, 0, 0.3);
+  /* Glow Effect */
+}
+
+.dark .bg-brand-600:hover,
+.dark .bg-pink-600:hover {
+  background-color: #B3E600 !important;
+  /* Un poco más oscuro al hover */
+  box-shadow: 0 0 25px rgba(204, 255, 0, 0.5);
+}
+
+/* Text Accents (Pink Text -> Neon Text) */
+.dark .text-brand-600,
+.dark .text-pink-600 {
+  color: var(--color-neon) !important;
+}
+
+/* Stock/Status Indicators (Green -> Neon Green) */
+.dark .text-green-600,
+.dark .bg-green-500 {
+  color: #4ADE80 !important;
+  /* Bright Green text */
+}
+
+.dark .bg-green-500 {
+  background-color: #22C55E !important;
+}
+
+/* 5. Input Fields & Search */
+.dark input,
+.dark select,
+.dark textarea,
+.dark .search-input {
+  background-color: #172033 !important;
+  /* Slightly lighter than card */
+  border-color: #334155 !important;
+  color: #FFFFFF !important;
+}
+
+.dark input::placeholder {
+  color: #64748B !important;
+}
+
+/* 6. Specific Component Fixes */
+.dark .order-card--active {
+  background-color: #161E31 !important;
+  /* Lighter selection */
+  border-left: 3px solid var(--color-neon) !important;
+}
+
+.dark .master-count,
+.dark .chip-count {
+  background-color: #1E293B !important;
+  color: var(--color-neon) !important;
+}
+
+.dark .filter-chip.active {
+  background-color: var(--color-neon) !important;
+  color: #000000 !important;
 }

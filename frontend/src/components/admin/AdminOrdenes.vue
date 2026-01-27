@@ -1,5 +1,5 @@
 <template>
-  <div class="ordenes-layout">
+  <div class="ordenes-layout transition-colors duration-300">
     <!-- ========== MASTER LIST (Panel Izquierdo) ========== -->
     <aside class="master-list">
       <!-- Header del sidebar -->
@@ -154,7 +154,7 @@
             </div>
 
             <!-- Caja 2: Envío -->
-            <div class="bento-box">
+            <div class="bento-box !bg-white dark:!bg-slate-800 dark:!border-slate-700">
               <div class="bento-box__header">
                 <svg class="bento-box__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
@@ -185,7 +185,7 @@
             </div>
 
             <!-- Caja 3: Pago -->
-            <div class="bento-box">
+            <div class="bento-box !bg-white dark:!bg-slate-800 dark:!border-slate-700">
               <div class="bento-box__header">
                 <svg class="bento-box__icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
@@ -947,7 +947,7 @@ defineExpose({ getUnseenCount })
   display: flex;
   height: calc(100vh - 48px);
   margin: -24px -40px;
-  background: #f8fafc;
+  /* background managed by utility classes */
   font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
 }
 
@@ -955,7 +955,7 @@ defineExpose({ getUnseenCount })
 .master-list {
   width: 380px;
   min-width: 380px;
-  background: #ffffff;
+  /* background managed by utility classes */
   border-right: 1px solid #e2e8f0;
   display: flex;
   flex-direction: column;
@@ -1078,7 +1078,7 @@ defineExpose({ getUnseenCount })
   padding: 14px 16px;
   padding-left: 20px;
   margin-bottom: 2px;
-  background: #ffffff;
+  /* background managed by utility classes */
   border-bottom: 1px solid #f3f4f6;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -1248,7 +1248,7 @@ defineExpose({ getUnseenCount })
   display: flex;
   flex-direction: column;
   overflow: hidden;
-  background: #f8fafc;
+  /* background managed by utility classes */
 }
 
 /* Empty State */
@@ -1287,7 +1287,7 @@ defineExpose({ getUnseenCount })
   justify-content: space-between;
   align-items: center;
   padding: 16px 24px;
-  background: #ffffff;
+  /* background managed by utility classes */
   border-bottom: 1px solid #e2e8f0;
   position: sticky;
   top: 0;
@@ -1370,7 +1370,7 @@ defineExpose({ getUnseenCount })
 }
 
 .bento-box {
-  background: #F8FAFC;
+  /* background managed by utility classes */
   border: none;
   border-radius: 16px;
   overflow: hidden;
@@ -1513,7 +1513,7 @@ defineExpose({ getUnseenCount })
   font-size: 12px;
   font-weight: 600;
   color: #111827;
-  background: #ffffff;
+  /* background managed by utility classes */
   outline: none;
   cursor: pointer;
   transition: all 0.15s ease;
@@ -1594,7 +1594,7 @@ defineExpose({ getUnseenCount })
 
 /* ========== INVOICE TABLE ========== */
 .invoice-section {
-  background: #ffffff;
+  /* background managed by utility classes */
   border: 1px solid #e5e7eb;
   border-radius: 12px;
   overflow: hidden;
@@ -2045,5 +2045,160 @@ defineExpose({ getUnseenCount })
 .modal-fade-enter-from .modal-container,
 .modal-fade-leave-to .modal-container {
   transform: scale(0.95);
+}
+
+/* ========================================
+   DARK MODE OVERRIDES (Scoped)
+   Using :global(.dark) to access the root class
+   ======================================== */
+
+:global(.dark) .ordenes-layout {
+  background: #0f172a; /* Slate 900 */
+}
+
+/* Master List */
+:global(.dark) .master-list {
+  background: #1e293b; /* Slate 800 */
+  border-right-color: #334155;
+}
+
+:global(.dark) .master-title {
+  color: #f1f5f9;
+}
+
+:global(.dark) .search-input {
+  background: #334155;
+  border-color: #475569;
+  color: #f1f5f9;
+}
+
+:global(.dark) .search-input:focus {
+  background: #475569;
+  border-color: #94a3b8;
+}
+
+:global(.dark) .filter-chip {
+  background: #334155;
+  color: #94a3b8;
+}
+
+:global(.dark) .filter-chip:hover {
+  background: #475569;
+  color: #f1f5f9;
+}
+
+:global(.dark) .filter-chip.active {
+  background: #f1f5f9;
+  color: #0f172a;
+}
+
+/* Order Cards */
+:global(.dark) .order-card {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+:global(.dark) .order-card:hover {
+  background: #334155;
+}
+
+:global(.dark) .order-card--active {
+  background: #334155;
+  border-left-color: #f1f5f9;
+}
+
+:global(.dark) .order-card__id,
+:global(.dark) .order-card__total,
+:global(.dark) .order-card__client--bold {
+  color: #f1f5f9;
+}
+
+:global(.dark) .order-card__client {
+  color: #94a3b8;
+}
+
+/* Detail View */
+:global(.dark) .detail-view {
+  background: #0f172a;
+}
+
+:global(.dark) .detail-header {
+  background: #1e293b;
+  border-bottom-color: #334155;
+}
+
+:global(.dark) .detail-header__title {
+  color: #f1f5f9;
+}
+
+:global(.dark) .action-btn:hover {
+  background: #334155;
+  color: #f1f5f9;
+}
+
+/* Bento Boxes */
+:global(.dark) .bento-box {
+  background: #1e293b;
+}
+
+:global(.dark) .client-name {
+  color: #f1f5f9;
+}
+
+:global(.dark) .address-line {
+  color: #f1f5f9;
+}
+
+:global(.dark) .compact-select {
+  background-color: #334155;
+  color: #f1f5f9;
+}
+
+:global(.dark) .payment-value {
+  color: #f1f5f9;
+}
+
+/* Invoice Section */
+:global(.dark) .invoice-section {
+  background: #1e293b;
+  border-color: #334155;
+}
+
+:global(.dark) .invoice-title {
+  color: #f1f5f9;
+}
+
+:global(.dark) .invoice-table th {
+  color: #94a3b8;
+  border-bottom-color: #334155;
+}
+
+:global(.dark) .invoice-row td {
+  border-bottom-color: #334155;
+}
+
+:global(.dark) .product-name {
+  color: #f1f5f9;
+}
+
+:global(.dark) .col-price, 
+:global(.dark) .col-subtotal {
+  color: #f1f5f9;
+}
+
+:global(.dark) .totals-label {
+  color: #94a3b8;
+}
+
+:global(.dark) .totals-value {
+  color: #f1f5f9;
+}
+
+:global(.dark) .notes-box {
+  background: #334155;
+}
+
+:global(.dark) .notes-text {
+  color: #f1f5f9;
 }
 </style>
