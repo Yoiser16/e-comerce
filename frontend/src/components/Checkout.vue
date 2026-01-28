@@ -134,10 +134,22 @@
                   
                   <div class="input-group">
                     <label>Teléfono (WhatsApp)</label>
-                    <div class="relative">
-                      <span class="absolute left-4 top-1/2 -translate-y-1/2 text-[#7A7A7A] text-sm">+57</span>
-                      <input type="tel" v-model="form.telefono" placeholder="300 123 4567" class="!pl-12" @input="saveFormToStorage" />
+                    <div class="relative flex">
+                      <!-- Prefijo de país -->
+                      <div class="flex items-center justify-center px-4 bg-[#F5F5F5] border border-r-0 border-[#E5E7EB] rounded-l-lg">
+                        <span class="text-[#4A4A4A] text-sm font-medium">🇨🇴 +57</span>
+                      </div>
+                      <!-- Input de teléfono -->
+                      <input 
+                        type="tel" 
+                        v-model="form.telefono" 
+                        placeholder="300 123 4567" 
+                        class="flex-1 !rounded-l-none !border-l-0" 
+                        @input="formatPhoneNumber"
+                        maxlength="12"
+                      />
                     </div>
+                    <p class="text-xs text-[#9CA3AF] mt-1.5">Te contactaremos por WhatsApp para coordinar tu envío</p>
                   </div>
                   
                   <label class="flex items-center gap-3 cursor-pointer group mt-6">
@@ -471,12 +483,12 @@
                 
                 <!-- Opciones de Pago -->
                 <div class="px-8 pb-8 space-y-4">
-                  <!-- Opción ePayco -->
+                  <!-- Opción Wompi - DESACTIVADA TEMPORALMENTE
                   <div 
-                    @click="selectedPayment = 'epayco'"
+                    @click="selectedPayment = 'wompi'"
                     :class="[
                       'cursor-pointer border-2 p-5 transition-all',
-                      selectedPayment === 'epayco' 
+                      selectedPayment === 'wompi' 
                         ? 'border-[#D81B60] bg-[#FDF2F8]' 
                         : 'border-[#E5E7EB] hover:border-[#9CA3AF]'
                     ]"
@@ -484,24 +496,24 @@
                     <div class="flex items-center gap-4">
                       <div :class="[
                         'w-5 h-5 rounded-full border-2 flex items-center justify-center',
-                        selectedPayment === 'epayco' ? 'border-[#D81B60]' : 'border-[#D1D5DB]'
+                        selectedPayment === 'wompi' ? 'border-[#D81B60]' : 'border-[#D1D5DB]'
                       ]">
-                        <div :class="['w-2.5 h-2.5 rounded-full', selectedPayment === 'epayco' ? 'bg-[#D81B60]' : '']"></div>
+                        <div :class="['w-2.5 h-2.5 rounded-full', selectedPayment === 'wompi' ? 'bg-[#D81B60]' : '']"></div>
                       </div>
                       <div class="flex-1">
                         <p class="font-medium text-[#1A1A1A]">Pago Seguro Inmediato</p>
-                        <p class="text-xs text-[#7A7A7A] mt-0.5">Tarjeta, PSE, Nequi, Daviplata</p>
+                        <p class="text-xs text-[#7A7A7A] mt-0.5">Tarjeta, PSE, Nequi, Daviplata, Bancolombia</p>
                       </div>
                       <div class="flex items-center gap-2">
                         <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" class="h-4" />
                         <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="MC" class="h-5" />
-                        <!-- Icono ePayco SVG en lugar de imagen rota -->
-                        <div class="h-5 px-2 bg-[#00B4DB] rounded text-white text-[10px] font-bold flex items-center">
-                          ePayco
+                        <div class="h-5 px-2 bg-gradient-to-r from-[#00D4AA] to-[#00A3E0] rounded text-white text-[10px] font-bold flex items-center">
+                          Wompi
                         </div>
                       </div>
                     </div>
                   </div>
+                  FIN Opción Wompi -->
                   
                   <!-- Opción Asesora -->
                   <div 
@@ -687,17 +699,17 @@
       </div>
     </footer>
 
-    <!-- Overlay de carga ePayco -->
-    <div v-if="processing && selectedPayment === 'epayco'" class="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center">
+    <!-- Overlay de carga Wompi - DESACTIVADO TEMPORALMENTE
+    <div v-if="processing && selectedPayment === 'wompi'" class="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center">
       <div class="bg-white rounded-lg p-8 max-w-sm mx-4 text-center">
         <div class="mb-4 flex justify-center">
-          <svg class="w-16 h-16 text-[#D81B60] animate-spin" fill="none" viewBox="0 0 24 24">
+          <svg class="w-16 h-16 text-[#00D4AA] animate-spin" fill="none" viewBox="0 0 24 24">
             <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
             <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
         </div>
-        <h3 class="font-luxury text-xl text-[#1A1A1A] mb-2">Abriendo banco...</h3>
-        <p class="text-sm text-[#7A7A7A]">Conectando con la pasarela de pagos segura</p>
+        <h3 class="font-luxury text-xl text-[#1A1A1A] mb-2">Conectando con Wompi...</h3>
+        <p class="text-sm text-[#7A7A7A]">Preparando pasarela de pagos segura</p>
         <div class="mt-6 flex items-center justify-center gap-2 text-xs text-[#9CA3AF]">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
@@ -706,6 +718,7 @@
         </div>
       </div>
     </div>
+    FIN Overlay Wompi -->
     
     <!-- Modal de Error de Stock -->
     <div v-if="showStockModal" class="fixed inset-0 bg-black/60 z-[999] flex items-center justify-center p-4" @click.self="showStockModal = false">
@@ -800,10 +813,10 @@ export default {
     const router = useRouter()
     const currentStep = ref(1)
     const maxStep = ref(1)
-    const selectedPayment = ref(null)
+    const selectedPayment = ref('asesor') // Por defecto WhatsApp (Wompi desactivado temporalmente)
     const processing = ref(false)
     const cupon = ref('')
-    const epaycoLoaded = ref(false)
+    const wompiLoaded = ref(false)
     
     // Estado de carga inicial - mostrar loading mientras determina el paso correcto
     const initialLoading = ref(true)
@@ -828,9 +841,11 @@ export default {
     const stockModalMessage = ref('')
     const stockModalProducts = ref([])
     
-    const EPAYCO_CONFIG = {
-      publicKey: import.meta.env.VITE_EPAYCO_PUBLIC_KEY || '2943652c673afffaa5b7b67829f00a0c',
-      test: import.meta.env.VITE_EPAYCO_TEST_MODE === 'true'
+    // Configuración Wompi
+    const WOMPI_CONFIG = {
+      publicKey: import.meta.env.VITE_WOMPI_PUBLIC_KEY || 'pub_test_ZVH2hPZRCY7iVcPAyCCh53E5cS2SUFmW',
+      currency: 'COP',
+      amountInCents: true // Wompi requiere montos en centavos
     }
     const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '573217355070'
     
@@ -1037,6 +1052,25 @@ export default {
       } catch (e) {
         console.warn('Error saving form to storage', e)
       }
+    }
+    
+    // Formatear número de teléfono mientras escribe
+    const formatPhoneNumber = () => {
+      // Solo dígitos
+      let digits = form.value.telefono.replace(/\D/g, '')
+      
+      // Máximo 10 dígitos (número colombiano sin código de país)
+      digits = digits.slice(0, 10)
+      
+      // Formatear como 300 123 4567
+      if (digits.length > 3 && digits.length <= 6) {
+        digits = digits.slice(0, 3) + ' ' + digits.slice(3)
+      } else if (digits.length > 6) {
+        digits = digits.slice(0, 3) + ' ' + digits.slice(3, 6) + ' ' + digits.slice(6)
+      }
+      
+      form.value.telefono = digits
+      saveFormToStorage()
     }
     
     const loadFormFromStorage = () => {
@@ -1356,17 +1390,31 @@ export default {
       }
     }
     
-    // ePayco
-    const loadEpaycoSDK = () => {
+    // Wompi Widget - Carga del SDK
+    const loadWompiSDK = () => {
       return new Promise((resolve, reject) => {
-        if (window.ePayco) { epaycoLoaded.value = true; resolve(window.ePayco); return }
+        if (window.WidgetCheckout) { 
+          wompiLoaded.value = true
+          resolve(window.WidgetCheckout)
+          return 
+        }
         const script = document.createElement('script')
-        script.src = 'https://checkout.epayco.co/checkout.js'
+        script.src = 'https://checkout.wompi.co/widget.js'
         script.async = true
-        script.onload = () => { epaycoLoaded.value = true; resolve(window.ePayco) }
-        script.onerror = () => reject(new Error('Error cargando ePayco'))
+        script.onload = () => { 
+          wompiLoaded.value = true
+          resolve(window.WidgetCheckout) 
+        }
+        script.onerror = () => reject(new Error('Error cargando Wompi'))
         document.head.appendChild(script)
       })
+    }
+    
+    // Generar referencia única para Wompi
+    const generateWompiReference = () => {
+      const timestamp = Date.now()
+      const random = Math.floor(Math.random() * 10000)
+      return `KH-${timestamp}-${random}`
     }
     
     // Prices
@@ -1584,40 +1632,69 @@ export default {
           processing.value = false
         }
       } else {
+        // Pago con Wompi - Usar Link de Checkout (redirect) en lugar de widget embebido
         processing.value = true
         try {
-          await loadEpaycoSDK()
-          const handler = window.ePayco.checkout.configure({ key: EPAYCO_CONFIG.publicKey, test: EPAYCO_CONFIG.test })
-          const invoiceId = `KH-${Date.now()}-${Math.floor(Math.random() * 1000)}`
+          const reference = generateWompiReference()
+          const amountInCents = Math.round(getTotal() * 100) // Wompi requiere centavos
           
-          // Pequeño delay para mostrar el loader antes de abrir ePayco
-          await new Promise(resolve => setTimeout(resolve, 300))
+          // Limpiar teléfono (solo dígitos, sin +57)
+          const rawPhone = form.value.telefono || ''
+          const cleanPhone = rawPhone.replace(/\D/g, '').slice(-10)
           
-          handler.open({
-            name: 'Kharis Distribuidora',
-            description: cartItems.value.map(i => `${i.nombre || 'Producto'} x${i.cantidad || 1}`).join(', ').substring(0, 250),
-            invoice: invoiceId,
-            currency: 'cop',
-            amount: String(getTotal()),
-            tax_base: '0',
-            tax: '0',
-            country: 'co',
-            lang: 'es',
-            external: 'true',
-            response: `${window.location.origin}/pago-exitoso`,
-            name_billing: `${form.value.nombre} ${form.value.apellido}`,
-            address_billing: getFullAddress(),
-            mobilephone_billing: form.value.telefono,
-            email_billing: form.value.email
+          console.log('📱 Teléfono raw:', rawPhone)
+          console.log('📱 Teléfono limpio:', cleanPhone)
+          
+          // Validar teléfono
+          if (!cleanPhone || cleanPhone.length < 10) {
+            alert('Por favor ingresa un número de teléfono válido de 10 dígitos')
+            processing.value = false
+            return
+          }
+          
+          // Guardar datos de la orden en localStorage para recuperar después del pago
+          const orderData = {
+            reference,
+            items: cartItems.value,
+            total: getTotal(),
+            customer: {
+              email: form.value.email,
+              nombre: form.value.nombre,
+              apellido: form.value.apellido,
+              telefono: cleanPhone,
+              direccion: getFullAddress()
+            },
+            createdAt: new Date().toISOString()
+          }
+          localStorage.setItem('kharis_pending_order', JSON.stringify(orderData))
+          
+          console.log('🔧 Redirigiendo a Wompi con:', {
+            reference,
+            amountInCents,
+            email: form.value.email
           })
           
-          // Esperar un poco más para asegurar que la ventana de ePayco se abre
-          await new Promise(resolve => setTimeout(resolve, 800))
+          // Construir URL de checkout de Wompi (método redirect)
+          const redirectUrl = encodeURIComponent(`${window.location.origin}/pago-exitoso`)
+          const wompiCheckoutUrl = `https://checkout.wompi.co/l/${WOMPI_CONFIG.publicKey}?` + new URLSearchParams({
+            'currency': 'COP',
+            'amount-in-cents': amountInCents.toString(),
+            'reference': reference,
+            'redirect-url': `${window.location.origin}/pago-exitoso`,
+            'customer-data:email': form.value.email,
+            'customer-data:full-name': `${form.value.nombre} ${form.value.apellido}`.trim(),
+            'customer-data:phone-number': cleanPhone,
+            'customer-data:phone-number-prefix': '57'
+          }).toString()
           
-          clearFormStorage()
+          console.log('🔗 URL Wompi:', wompiCheckoutUrl)
+          
+          // Redirigir a Wompi
+          window.location.href = wompiCheckoutUrl
+          
         } catch (e) {
-          alert('Error al conectar con la pasarela de pagos. Intenta de nuevo.')
-        } finally {
+          console.error('Error con Wompi:', e)
+          alert('Error al conectar con la pasarela de pagos. Intenta de nuevo o usa pago por WhatsApp.')
           processing.value = false
         }
       }
@@ -1651,7 +1728,7 @@ export default {
       unlockScroll()
       loadFormFromStorage() // Cargar formulario guardado primero
       loadCart()
-      loadEpaycoSDK().catch(() => {}) // Pre-cargar SDK
+      loadWompiSDK().catch(() => {}) // Pre-cargar SDK de Wompi
       
       // Cargar departamentos de Colombia
       await loadDepartamentos()
@@ -1684,7 +1761,7 @@ export default {
       isStep1Valid, isStep2Valid,
       nextStep, prevStep, goToStep,
       onPaisChange, onDepartamentoChange,
-      getFullAddress, saveFormToStorage,
+      getFullAddress, saveFormToStorage, formatPhoneNumber,
       formatPrice, getItemPrice, getSubtotal, getTotal, processPayment,
       clienteConDatosCompletos,
       initialLoading,

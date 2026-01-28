@@ -183,10 +183,43 @@ export default {
     }
     
     const parseEpaycoResponse = () => {
-      // ePayco envía parámetros en la URL de respuesta
+      // Wompi y otros proveedores envían parámetros en la URL
       const params = route.query
       
-      // Parámetros típicos de ePayco:
+      // Primero verificar si viene de Wompi
+      if (params.ref || params.id) {
+        parseWompiResponse(params)
+        return
+      }
+      
+      // Si tiene status directo (desde nuestro callback)
+      if (params.status) {
+        transactionRef.value = params.ref || `KH-${Date.now()}`
+        
+        switch (params.status) {
+          case 'approved':
+            paymentStatus.value = 'approved'
+            break
+          case 'pending':
+            paymentStatus.value = 'pending'
+            break
+          case 'declined':
+          case 'rejected':
+            paymentStatus.value = 'rejected'
+            transactionMessage.value = 'Transacción rechazada'
+            break
+          default:
+            paymentStatus.value = 'approved'
+        }
+        
+        if (paymentStatus.value === 'approved' || paymentStatus.value === 'pending') {
+          localStorage.removeItem('kharis_cart_cache')
+          localStorage.removeItem('kharis_cart_count')
+        }
+        return
+      }
+      
+      // Parámetros típicos de ePayco (legacy):
       // ref_payco, x_transaction_state, x_amount_ok, x_response, x_id_invoice
       
       if (params.ref_payco) {
@@ -230,6 +263,56 @@ export default {
       
       // Limpiar carrito en caso de éxito
       if (paymentStatus.value === 'approved') {
+        localStorage.removeItem('kharis_cart_cache')
+        localStorage.removeItem('kharis_cart_count')
+      }
+    }
+    
+    // Parser específico para respuestas de Wompi
+    const parseWompiResponse = async (params) => {
+      transactionRef.value = params.ref || params.id || `KH-${Date.now()}`
+      
+      // Si Wompi redirecciona con ID de transacción, consultar estado
+      if (params.id) {
+        try {
+          // Consultar estado de la transacción en Wompi
+          const response = await fetch(`https://sandbox.wompi.co/v1/transactions/${params.id}`)
+          const data = await response.json()
+          
+          if (data.data) {
+            const transaction = data.data
+            transactionRef.value = transaction.reference || params.ref || transactionRef.value
+            transactionAmount.value = (transaction.amount_in_cents || 0) / 100
+            
+            switch (transaction.status) {
+              case 'APPROVED':
+                paymentStatus.value = 'approved'
+                break
+              case 'PENDING':
+                paymentStatus.value = 'pending'
+                break
+              case 'DECLINED':
+              case 'VOIDED':
+              case 'ERROR':
+                paymentStatus.value = 'rejected'
+                transactionMessage.value = transaction.status_message || 'Transacción rechazada'
+                break
+              default:
+                paymentStatus.value = 'pending'
+            }
+          }
+        } catch (e) {
+          console.warn('Error consultando transacción Wompi:', e)
+          // En caso de error, usar los parámetros de la URL
+          paymentStatus.value = params.status === 'approved' ? 'approved' : 'pending'
+        }
+      } else {
+        // Sin ID de transacción, usar status de la URL
+        paymentStatus.value = 'approved'
+      }
+      
+      // Limpiar carrito
+      if (paymentStatus.value === 'approved' || paymentStatus.value === 'pending') {
         localStorage.removeItem('kharis_cart_cache')
         localStorage.removeItem('kharis_cart_count')
       }
