@@ -17,6 +17,7 @@ from .categoria_router import router as categoria_router
 from .upload_router import router as upload_router
 from .orden_router import router as orden_router
 from .inventario_router import router as inventario_router
+from .auth_router import router as auth_router
 from .exception_handlers import exception_handler_dominio
 from domain.exceptions.dominio import ExcepcionDominio
 from infrastructure.config.app_config import AppConfig
@@ -54,6 +55,7 @@ def crear_app(config: AppConfig) -> FastAPI:
     app.add_exception_handler(ExcepcionDominio, exception_handler_dominio)
     
     # IMPORTANTE: Routers de FastAPI - paths específicos antes que dinámicos
+    app.include_router(auth_router)         # Autenticación
     app.include_router(upload_router)     # Upload de imágenes
     app.include_router(cliente_router)
     app.include_router(busqueda_router)   # /productos/buscar, /destacados (específicos)
@@ -75,7 +77,5 @@ def crear_app(config: AppConfig) -> FastAPI:
     django_app = get_wsgi_application()
     
     app.mount("/admin", WSGIMiddleware(django_app))
-    
-    return app
     
     return app
