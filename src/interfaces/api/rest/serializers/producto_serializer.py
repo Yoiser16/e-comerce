@@ -36,3 +36,5 @@ class ProductoSerializer(serializers.Serializer):
     activo = serializers.BooleanField()
     fecha_creacion = serializers.DateTimeField()
     fecha_modificacion = serializers.DateTimeField()
+    imagen_principal = serializers.CharField(required=False, allow_null=True)
+    imagenes = serializers.ListField(child=serializers.CharField(), required=False)
