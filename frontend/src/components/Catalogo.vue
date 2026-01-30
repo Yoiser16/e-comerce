@@ -1106,11 +1106,17 @@
                 class="flex gap-4 p-4 bg-nude-50/50 rounded-xl"
               >
                 <img 
-                  :src="getImageUrl(item.imagen_url)"
+                  v-if="getCartMediaUrl(item)"
+                  :src="getCartMediaUrl(item)"
                   :alt="item.nombre"
                   @error="handleImageError"
                   class="w-20 h-20 object-cover rounded-lg bg-white"
                 >
+                <div v-else class="w-20 h-20 flex items-center justify-center rounded-lg bg-white border border-text-dark/5">
+                  <svg class="w-6 h-6 text-text-light" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01" />
+                  </svg>
+                </div>
                 <div class="flex-1">
                   <h3 class="text-sm font-medium text-text-dark line-clamp-2">{{ item.nombre }}</h3>
                   <p class="text-xs text-text-medium mt-1">Cantidad: {{ item.cantidad }}</p>
@@ -1198,6 +1204,7 @@ const loading = ref(true)
 const cartCount = ref(0)
 const mostrarCarrito = ref(false)
 const carritoItems = ref([])
+const videoPosters = ref({})
 
 // Header
 const isScrolled = ref(false)
@@ -1417,6 +1424,70 @@ const getImageUrl = (url) => {
   if (!url) return ''
   if (url.startsWith('http')) return url
   return `http://localhost:8000${url}`
+}
+
+const isVideo = (url) => {
+  if (!url) return false
+  const cleanUrl = url.split('?')[0].toLowerCase()
+  return ['.mp4', '.webm', '.ogg', '.mov'].some(ext => cleanUrl.endsWith(ext))
+}
+
+const createVideoPoster = (url) => {
+  return new Promise((resolve) => {
+    try {
+      const video = document.createElement('video')
+      video.src = url
+      video.muted = true
+      video.playsInline = true
+      video.crossOrigin = 'anonymous'
+
+      const onError = () => resolve(null)
+
+      video.addEventListener('error', onError, { once: true })
+      video.addEventListener('loadeddata', () => {
+        const seekTo = Math.min(1, video.duration || 1)
+        try {
+          video.currentTime = seekTo
+        } catch {
+          resolve(null)
+        }
+      }, { once: true })
+
+      video.addEventListener('seeked', () => {
+        try {
+          const canvas = document.createElement('canvas')
+          canvas.width = video.videoWidth || 120
+          canvas.height = video.videoHeight || 120
+          const ctx = canvas.getContext('2d')
+          if (!ctx) return resolve(null)
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+          resolve(canvas.toDataURL('image/jpeg', 0.82))
+        } catch {
+          resolve(null)
+        }
+      }, { once: true })
+    } catch {
+      resolve(null)
+    }
+  })
+}
+
+const ensureVideoPoster = async (url) => {
+  if (videoPosters.value[url]) return
+  const poster = await createVideoPoster(url)
+  if (poster) {
+    videoPosters.value = { ...videoPosters.value, [url]: poster }
+  }
+}
+
+const getCartMediaUrl = (item) => {
+  const url = getImageUrl(item?.imagen_url || item?.imagen_principal || item?.imagen)
+  if (!url) return ''
+  if (isVideo(url)) {
+    ensureVideoPoster(url)
+    return videoPosters.value[url] || ''
+  }
+  return url
 }
 
 const handleImageError = (e) => {
