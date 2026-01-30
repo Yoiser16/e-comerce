@@ -762,11 +762,21 @@
                 </svg>
               </button>
 
-              <!-- Image -->
+              <!-- Image / Video -->
               <div class="aspect-[3/4] overflow-hidden bg-nude-100">
+                <video
+                  v-if="isVideo(getProductoMediaUrl(producto))"
+                  :src="getProductoMediaUrl(producto)"
+                  class="w-full h-full object-cover"
+                  autoplay
+                  muted
+                  loop
+                  playsinline
+                  preload="metadata"
+                ></video>
                 <img
-                  v-if="producto.imagen_principal || producto.imagen_url || producto.imagen"
-                  :src="getImageUrl(producto.imagen_principal || producto.imagen_url || producto.imagen)"
+                  v-else-if="getProductoMediaUrl(producto)"
+                  :src="getProductoMediaUrl(producto)"
                   :alt="producto.nombre"
                   class="w-full h-full object-cover img-zoom"
                   @error="handleImageError"
@@ -1568,13 +1578,19 @@
               class="flex gap-4 p-3 bg-white rounded-xl border border-nude-100 hover:border-nude-200 transition-colors"
             >
               <!-- Imagen del producto - Más grande y redondeada -->
-              <div class="w-[90px] h-[90px] bg-gradient-to-br from-nude-50 to-nude-100 rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center">
+              <div class="w-[90px] h-[90px] bg-gradient-to-br from-nude-50 to-nude-100 rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center relative">
                 <img 
-                  v-if="item.imagen_url" 
-                  :src="item.imagen_url" 
+                  v-if="getCartMediaUrl(item)" 
+                  :src="getCartMediaUrl(item)" 
                   :alt="item.nombre"
                   class="w-full h-full object-cover"
+                  @error="handleImageError"
                 />
+                <div v-if="getCartMediaUrl(item) && isVideo(getCartSourceUrl(item))" class="absolute inset-0 flex items-center justify-center bg-black/25">
+                  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                  </svg>
+                </div>
                 <svg v-else class="w-8 h-8 text-nude-300" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
                 </svg>
@@ -1749,6 +1765,7 @@ export default {
     const cartItems = ref([])
     const cartTotal = ref(0)
     const cartLoading = ref(false)
+    const videoPosters = ref({})
     
     // ===== PERSISTENCIA LOCAL DEL CARRITO =====
     const CART_STORAGE_KEY = 'kharis_cart_cache'
@@ -2163,10 +2180,11 @@ export default {
           currentItems[existingIndex].cantidad++
           currentItems[existingIndex].subtotal = currentItems[existingIndex].cantidad * currentItems[existingIndex].precio_unitario
         } else {
+          const imgUrl = producto.imagen_url || producto.imagen_principal || producto.imagen || producto.imagenes?.[0] || null
           currentItems.push({
             producto_id: producto.id,
             nombre: producto.nombre,
-            imagen_url: producto.imagen_url || producto.imagen_principal || producto.imagen || producto.imagenes?.[0] || null,
+            imagen_url: imgUrl ? getImageUrl(imgUrl) : null,
             precio_unitario: precioProducto,
             cantidad: 1,
             subtotal: precioProducto
@@ -2280,6 +2298,79 @@ export default {
           </div>
         `
       }
+    }
+
+    const getProductoMediaUrl = (producto) => {
+      return getImageUrl(producto?.imagen_principal || producto?.imagen_url || producto?.imagen)
+    }
+
+    const isVideo = (url) => {
+      if (!url) return false
+      const cleanUrl = url.split('?')[0].toLowerCase()
+      return ['.mp4', '.webm', '.ogg', '.mov'].some(ext => cleanUrl.endsWith(ext))
+    }
+
+    const createVideoPoster = (url) => {
+      return new Promise((resolve) => {
+        try {
+          const video = document.createElement('video')
+          video.crossOrigin = 'anonymous'
+          video.muted = true
+          video.playsInline = true
+          video.preload = 'metadata'
+          video.src = url
+
+          const onError = () => resolve(null)
+
+          video.addEventListener('error', onError, { once: true })
+          video.addEventListener('loadeddata', () => {
+            const seekTo = Math.min(1, video.duration || 1)
+            try {
+              video.currentTime = seekTo
+            } catch {
+              resolve(null)
+            }
+          }, { once: true })
+
+          video.addEventListener('seeked', () => {
+            try {
+              const canvas = document.createElement('canvas')
+              canvas.width = video.videoWidth || 120
+              canvas.height = video.videoHeight || 120
+              const ctx = canvas.getContext('2d')
+              if (!ctx) return resolve(null)
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+              resolve(canvas.toDataURL('image/jpeg', 0.82))
+            } catch {
+              resolve(null)
+            }
+          }, { once: true })
+        } catch {
+          resolve(null)
+        }
+      })
+    }
+
+    const ensureVideoPoster = async (url) => {
+      if (videoPosters.value[url]) return
+      const poster = await createVideoPoster(url)
+      if (poster) {
+        videoPosters.value = { ...videoPosters.value, [url]: poster }
+      }
+    }
+
+    const getCartSourceUrl = (item) => {
+      return getImageUrl(item?.imagen_url || item?.imagen_principal || item?.imagen)
+    }
+
+    const getCartMediaUrl = (item) => {
+      const url = getCartSourceUrl(item)
+      if (!url) return ''
+      if (isVideo(url)) {
+        ensureVideoPoster(url)
+        return videoPosters.value[url] || ''
+      }
+      return url
     }
 
     const cargarResumenCarrito = async () => {
@@ -2397,7 +2488,11 @@ export default {
       updateQuantity,
       irACheckout,
       handleImageError,
-      getImageUrl
+      getImageUrl,
+      getProductoMediaUrl,
+      getCartSourceUrl,
+      getCartMediaUrl,
+      isVideo
     }
   }
 }
