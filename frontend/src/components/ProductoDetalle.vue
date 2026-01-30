@@ -170,12 +170,22 @@
         
         <!-- LEFT: Gallery -->
         <div class="space-y-4">
-          <!-- Main Image -->
+          <!-- Main Image/Video -->
           <div 
             class="aspect-[4/5] bg-white overflow-hidden cursor-zoom-in relative group"
             @click="openLightbox"
           >
+            <!-- Video principal -->
+            <video 
+              v-if="isVideo(imagenActiva)"
+              :src="getImageUrl(imagenActiva)"
+              class="w-full h-full object-cover"
+              controls
+              muted
+            ></video>
+            <!-- Imagen principal -->
             <img
+              v-else
               :src="getImageUrl(imagenActiva)"
               :alt="producto.nombre"
               class="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
@@ -194,18 +204,35 @@
               :key="idx"
               @click="imagenActiva = thumb"
               :class="[
-                'aspect-square overflow-hidden bg-white transition-all duration-200',
+                'aspect-square overflow-hidden bg-white transition-all duration-200 relative',
                 imagenActiva === thumb 
                   ? 'ring-2 ring-text-dark ring-offset-2' 
                   : 'opacity-70 hover:opacity-100'
               ]"
             >
+              <!-- Video thumbnail -->
+              <video 
+                v-if="isVideo(thumb)"
+                :src="getImageUrl(thumb)"
+                class="w-full h-full object-cover"
+                muted
+              ></video>
+              <!-- Image thumbnail -->
               <img 
+                v-else
                 :src="getImageUrl(thumb)" 
                 :alt="'Vista ' + (idx + 1)" 
                 class="w-full h-full object-cover"
                 @error="handleImageError" 
               />
+              <!-- Play icon for videos -->
+              <div v-if="isVideo(thumb)" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div class="bg-black/40 rounded-full p-1.5">
+                  <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                  </svg>
+                </div>
+              </div>
             </button>
           </div>
         </div>
@@ -572,11 +599,22 @@
             <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
           </svg>
         </button>
+        
+        <!-- Video en lightbox -->
+        <video 
+          v-if="isVideo(imagenActiva)"
+          :src="getImageUrl(imagenActiva)" 
+          class="max-w-full max-h-[85vh] object-contain"
+          controls
+        ></video>
+        <!-- Imagen en lightbox -->
         <img 
+          v-else
           :src="getImageUrl(imagenActiva)" 
           :alt="producto?.nombre"
           class="max-w-full max-h-[85vh] object-contain"
         />
+        
         <!-- Thumbnails in lightbox -->
         <div class="absolute bottom-6 left-1/2 -translate-x-1/2 flex gap-2">
           <button
@@ -584,15 +622,32 @@
             :key="idx"
             @click.stop="imagenActiva = thumb"
             :class="[
-              'w-12 h-12 overflow-hidden transition-all',
+              'w-12 h-12 overflow-hidden transition-all relative',
               imagenActiva === thumb ? 'ring-2 ring-white' : 'opacity-50 hover:opacity-100'
             ]"
           >
+            <!-- Video thumbnail -->
+            <video 
+              v-if="isVideo(thumb)"
+              :src="getImageUrl(thumb)"
+              class="w-full h-full object-cover"
+              muted
+            ></video>
+            <!-- Image thumbnail -->
             <img 
+              v-else
               :src="getImageUrl(thumb)" 
               :alt="'Vista ' + (idx + 1)" 
               class="w-full h-full object-cover"
             />
+            <!-- Play icon for videos -->
+            <div v-if="isVideo(thumb)" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+              <div class="bg-white/30 rounded-full p-1">
+                <svg class="w-3 h-3 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                </svg>
+              </div>
+            </div>
           </button>
         </div>
       </div>
@@ -754,6 +809,13 @@ const toggleAccordion = (key) => {
   accordionOpen.value[key] = !accordionOpen.value[key]
 }
 
+const isVideo = (url) => {
+  if (!url) return false
+  const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov']
+  const lowerUrl = url.toLowerCase()
+  return videoExtensions.some(ext => lowerUrl.endsWith(ext))
+}
+
 const openLightbox = () => {
   lightboxOpen.value = true
 }
@@ -831,7 +893,13 @@ const cargarProducto = async () => {
     // Build gallery
     const galeria = []
     if (data.imagen_principal) galeria.push(data.imagen_principal)
-    if (data.imagenes && Array.isArray(data.imagenes)) galeria.push(...data.imagenes)
+    if (data.imagenes && Array.isArray(data.imagenes)) {
+      const extras = data.imagenes.filter((url) => url && url !== data.imagen_principal)
+      galeria.push(...extras)
+    }
+    if (!imagenActiva.value && galeria.length) {
+      imagenActiva.value = galeria[0]
+    }
     miniaturas.value = galeria.slice(0, 6)
     
     // Set initial variant selections from product data
