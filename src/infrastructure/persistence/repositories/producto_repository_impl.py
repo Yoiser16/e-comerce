@@ -12,7 +12,7 @@ from domain.entities.producto import Producto
 from domain.value_objects.codigo_producto import CodigoProducto
 from domain.value_objects.dinero import Dinero
 from domain.value_objects.criterios_busqueda import CriteriosBusqueda
-from infrastructure.persistence.django.models import ProductoModel
+from infrastructure.persistence.django.models import ProductoModel, ImagenProductoModel
 from infrastructure.auditing.servicio_auditoria import ServicioAuditoria
 from infrastructure.logging.logger_service import LoggerService
 from shared.enums.atributos_producto import OrdenProducto
@@ -40,7 +40,7 @@ class ProductoRepositoryImpl(ProductoRepository):
         if model.categoria_id:
             categoria_nombre = model.categoria.nombre if model.categoria else None
         
-        return Producto(
+        producto = Producto(
             id=model.id,
             codigo=CodigoProducto(model.codigo),
             nombre=model.nombre,
@@ -61,6 +61,15 @@ class ProductoRepositoryImpl(ProductoRepository):
             calidad=model.calidad,
             destacado=model.destacado
         )
+
+        # Incluir imágenes adicionales (excluye principal)
+        try:
+            imagenes_qs = model.imagenes.all()
+            producto.imagenes = [img.url for img in imagenes_qs if not img.es_principal]
+        except Exception:
+            producto.imagenes = []
+
+        return producto
     
     def _to_model(self, entity: Producto) -> ProductoModel:
         """
@@ -75,6 +84,7 @@ class ProductoRepositoryImpl(ProductoRepository):
             monto_precio=entity.precio.monto,
             stock_actual=entity.stock_actual,
             stock_minimo=entity.stock_minimo,
+            stock_reservado=getattr(entity, 'stock_reservado', 0),
             activo=entity.activo,
             fecha_creacion=entity.fecha_creacion,
             fecha_modificacion=entity.fecha_modificacion
@@ -83,7 +93,7 @@ class ProductoRepositoryImpl(ProductoRepository):
     def obtener_por_id(self, id: UUID) -> Optional[Producto]:
         self._logger.info(f"Obteniendo producto por ID", producto_id=str(id))
         try:
-            model = ProductoModel.objects.select_related('categoria').get(id=id)
+            model = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').get(id=id)
             return self._to_domain(model)
         except ProductoModel.DoesNotExist:
             return None
@@ -91,14 +101,14 @@ class ProductoRepositoryImpl(ProductoRepository):
     def obtener_por_codigo(self, codigo: CodigoProducto) -> Optional[Producto]:
         self._logger.info(f"Buscando producto por código", codigo=codigo.valor)
         try:
-            model = ProductoModel.objects.select_related('categoria').get(codigo=codigo.valor)
+            model = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').get(codigo=codigo.valor)
             return self._to_domain(model)
         except ProductoModel.DoesNotExist:
             return None
             
     def buscar_por_nombre(self, nombre: str) -> List[Producto]:
         self._logger.info(f"Buscando productos por nombre", nombre=nombre)
-        models = ProductoModel.objects.select_related('categoria').filter(
+        models = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').filter(
             nombre__icontains=nombre
         )
         return [self._to_domain(model) for model in models]
@@ -108,12 +118,12 @@ class ProductoRepositoryImpl(ProductoRepository):
         # En SQL: WHERE stock_actual <= stock_minimo
         # Django F expression para comparar columnas
         from django.db.models import F
-        models = ProductoModel.objects.select_related('categoria').filter(stock_actual__lte=F('stock_minimo'), activo=True)
+        models = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').filter(stock_actual__lte=F('stock_minimo'), activo=True)
         return [self._to_domain(model) for model in models]
         
     def obtener_disponibles(self) -> List[Producto]:
         self._logger.info("Obteniendo productos disponibles")
-        models = ProductoModel.objects.select_related('categoria').filter(activo=True, stock_actual__gt=0)
+        models = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').filter(activo=True, stock_actual__gt=0)
         return [self._to_domain(model) for model in models]
     
     def obtener_con_bloqueo(self, id: UUID) -> Optional[Producto]:
@@ -223,6 +233,39 @@ class ProductoRepositoryImpl(ProductoRepository):
                         model.destacado = atributos_adicionales['destacado']
             
             model.save()
+
+            # Guardar imágenes adicionales si se proporcionan
+            if atributos_adicionales and 'imagenes' in atributos_adicionales:
+                imagenes = atributos_adicionales.get('imagenes') or []
+                imagenes_limpias = [url for url in imagenes if url]
+
+                # Si no hay imagen principal pero sí imágenes, usar la primera
+                if not model.imagen_principal and imagenes_limpias:
+                    model.imagen_principal = imagenes_limpias[0]
+                    model.save(update_fields=['imagen_principal'])
+
+                # Reemplazar galería completa
+                ImagenProductoModel.objects.filter(producto=model).delete()
+
+                creadas = set()
+                if model.imagen_principal:
+                    ImagenProductoModel.objects.create(
+                        producto=model,
+                        url=model.imagen_principal,
+                        es_principal=True,
+                        orden=0
+                    )
+                    creadas.add(model.imagen_principal)
+
+                for idx, url in enumerate(imagenes_limpias):
+                    if url in creadas:
+                        continue
+                    ImagenProductoModel.objects.create(
+                        producto=model,
+                        url=url,
+                        es_principal=False,
+                        orden=idx + 1
+                    )
             
             datos_nuevos = {
                 "codigo": model.codigo,
@@ -275,7 +318,7 @@ class ProductoRepositoryImpl(ProductoRepository):
 
     def obtener_todos(self, limite: int = 100, offset: int = 0) -> List[Producto]:
         self._logger.info(f"Obteniendo todos los productos", limite=limite, offset=offset)
-        models = ProductoModel.objects.select_related('categoria').all()[offset:offset + limite]
+        models = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').all()[offset:offset + limite]
         return [self._to_domain(model) for model in models]
 
     # ===== MÉTODOS DE BÚSQUEDA AVANZADA =====
@@ -286,7 +329,7 @@ class ProductoRepositoryImpl(ProductoRepository):
         """
         self._logger.info("Ejecutando búsqueda con filtros")
         
-        queryset = ProductoModel.objects.all()
+        queryset = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes')
         filtros = criterios.filtros
         
         # Aplicar filtros de disponibilidad
@@ -497,7 +540,7 @@ class ProductoRepositoryImpl(ProductoRepository):
         """
         Búsqueda rápida para autocompletado con preview de productos.
         """
-        modelos = ProductoModel.objects.filter(
+        modelos = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').filter(
             Q(nombre__icontains=texto) | Q(codigo__icontains=texto),
             activo=True,
             stock_actual__gt=0
@@ -507,7 +550,7 @@ class ProductoRepositoryImpl(ProductoRepository):
     
     def obtener_destacados(self, limite: int = 8) -> List[Producto]:
         """Obtiene productos destacados"""
-        modelos = ProductoModel.objects.filter(
+        modelos = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').filter(
             activo=True,
             destacado=True,
             stock_actual__gt=0
@@ -517,7 +560,7 @@ class ProductoRepositoryImpl(ProductoRepository):
     
     def obtener_mas_vendidos(self, limite: int = 8) -> List[Producto]:
         """Obtiene los productos más vendidos"""
-        modelos = ProductoModel.objects.filter(
+        modelos = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').filter(
             activo=True,
             stock_actual__gt=0
         ).order_by('-total_vendidos')[:limite]
@@ -526,7 +569,7 @@ class ProductoRepositoryImpl(ProductoRepository):
     
     def obtener_nuevos(self, limite: int = 8) -> List[Producto]:
         """Obtiene los productos más recientes"""
-        modelos = ProductoModel.objects.filter(
+        modelos = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').filter(
             activo=True,
             es_nuevo=True,
             stock_actual__gt=0

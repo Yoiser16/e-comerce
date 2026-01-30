@@ -171,6 +171,10 @@ class ProductoModel(models.Model):
     # Stock
     stock_actual = models.IntegerField(default=0)
     stock_minimo = models.IntegerField(default=0)
+    stock_reservado = models.IntegerField(
+        default=0,
+        help_text='Stock temporalmente reservado por ordenes pendientes'
+    )
     
     # Atributos específicos de cabello
     color = models.CharField(max_length=50, choices=COLOR_CHOICES, null=True, blank=True, db_index=True)
