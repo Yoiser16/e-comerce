@@ -39,7 +39,8 @@ User = get_user_model()
 
 class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
     """
-    Serializer personalizado para incluir información adicional del usuario
+    Serializer personalizado para autenticación con EMAIL (no username)
+    Incluye información adicional del usuario en la respuesta
     """
     
     @classmethod
@@ -54,6 +55,23 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         return token
     
     def validate(self, attrs):
+        # El TokenObtainPairSerializer espera 'username' pero nosotros usamos 'email'
+        # Convertir 'email' a 'username' para compatibilidad con DRF JWT
+        email = attrs.get('username') or attrs.get('email')
+        password = attrs.get('password')
+        
+        if not email or not password:
+            raise ValueError('Email y password son requeridos')
+        
+        # Buscar el usuario por email
+        try:
+            user = User.objects.get(email=email)
+            # Reemplazar attrs para que DRF JWT pueda validar
+            attrs['username'] = user.email
+        except User.DoesNotExist:
+            raise ValueError('Usuario no encontrado')
+        
+        # Validar credenciales usando el método de DRF
         data = super().validate(attrs)
         
         # Agregar información extra en la respuesta
