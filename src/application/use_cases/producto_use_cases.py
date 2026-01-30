@@ -38,6 +38,7 @@ class CrearProductoUseCase(CasoUsoBase[CrearProductoDTO, ProductoDTO]):
         # Pasar atributos adicionales al repositorio
         atributos_adicionales = {
             'imagen_principal': request.imagen_principal,
+            'imagenes': request.imagenes,
             'color': request.color,
             'tipo': request.tipo,
             'largo': request.largo,
@@ -119,6 +120,8 @@ class ActualizarProductoUseCase(CasoUsoBase[ActualizarProductoDTO, ProductoDTO])
         atributos_adicionales = {}
         if request.imagen_principal is not None:
             atributos_adicionales['imagen_principal'] = request.imagen_principal
+        if request.imagenes is not None:
+            atributos_adicionales['imagenes'] = request.imagenes
         if request.color is not None:
             atributos_adicionales['color'] = request.color
         if request.tipo is not None:

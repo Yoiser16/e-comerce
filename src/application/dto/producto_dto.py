@@ -22,6 +22,7 @@ class CrearProductoDTO:
     stock_minimo: int = 0
     categoria: Optional[str] = None
     imagen_principal: Optional[str] = None
+    imagenes: List[str] = field(default_factory=list)
     color: Optional[str] = None
     tipo: Optional[str] = None
     largo: Optional[str] = None
@@ -42,6 +43,7 @@ class ActualizarProductoDTO:
     stock_minimo: Optional[int] = None
     categoria: Optional[str] = None
     imagen_principal: Optional[str] = None
+    imagenes: Optional[List[str]] = None
     activo: Optional[bool] = None
     color: Optional[str] = None
     tipo: Optional[str] = None
@@ -69,6 +71,7 @@ class ProductoDTO:
     fecha_modificacion: datetime
     categoria: Optional[str] = None
     imagen_principal: Optional[str] = None
+    imagenes: List[str] = field(default_factory=list)
     color: Optional[str] = None
     tipo: Optional[str] = None
     largo: Optional[str] = None
@@ -96,6 +99,7 @@ class ProductoDTO:
             fecha_modificacion=producto.fecha_modificacion,
             categoria=getattr(producto, 'categoria', None),
             imagen_principal=getattr(producto, 'imagen_principal', None),
+            imagenes=getattr(producto, 'imagenes', []) or [],
             color=getattr(producto, 'color', None),
             tipo=getattr(producto, 'tipo', None),
             largo=getattr(producto, 'largo', None),
