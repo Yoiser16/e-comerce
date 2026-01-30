@@ -597,8 +597,8 @@
                 >
                   <div class="w-20 h-20 bg-white rounded border border-[#E5E7EB] overflow-hidden flex-shrink-0">
                     <img 
-                      v-if="item.imagen_url" 
-                      :src="item.imagen_url" 
+                      v-if="getCartMediaUrl(item)" 
+                      :src="getCartMediaUrl(item)" 
                       :alt="item.nombre"
                       class="w-full h-full object-cover"
                     />
@@ -754,8 +754,8 @@
             >
               <div class="relative flex-shrink-0">
                 <img 
-                  v-if="prod.imagen_url" 
-                  :src="prod.imagen_url" 
+                  v-if="getCartMediaUrl(prod)" 
+                  :src="getCartMediaUrl(prod)" 
                   :alt="prod.nombre"
                   class="w-16 h-16 object-cover rounded bg-white"
                   @error="e => e.target.src = '/placeholder.jpg'"
@@ -798,7 +798,7 @@
 <script>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import apiClient from '@/services/api'
+import apiClient, { getImageUrl } from '@/services/api'
 
 // API de Colombia - Datos oficiales de departamentos y municipios
 const COLOMBIA_API = {
@@ -1422,6 +1422,70 @@ export default {
       const num = Number(price)
       return isNaN(num) ? '0' : new Intl.NumberFormat('es-CO').format(num)
     }
+
+    const isVideo = (url) => {
+      if (!url) return false
+      const cleanUrl = url.split('?')[0].toLowerCase()
+      return ['.mp4', '.webm', '.ogg', '.mov'].some(ext => cleanUrl.endsWith(ext))
+    }
+
+    const createVideoPoster = (url) => {
+      return new Promise((resolve) => {
+        try {
+          const video = document.createElement('video')
+          video.src = url
+          video.muted = true
+          video.playsInline = true
+          video.crossOrigin = 'anonymous'
+
+          const onError = () => resolve(null)
+
+          video.addEventListener('error', onError, { once: true })
+          video.addEventListener('loadeddata', () => {
+            const seekTo = Math.min(1, video.duration || 1)
+            try {
+              video.currentTime = seekTo
+            } catch {
+              resolve(null)
+            }
+          }, { once: true })
+
+          video.addEventListener('seeked', () => {
+            try {
+              const canvas = document.createElement('canvas')
+              canvas.width = video.videoWidth || 120
+              canvas.height = video.videoHeight || 120
+              const ctx = canvas.getContext('2d')
+              if (!ctx) return resolve(null)
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+              resolve(canvas.toDataURL('image/jpeg', 0.82))
+            } catch {
+              resolve(null)
+            }
+          }, { once: true })
+        } catch {
+          resolve(null)
+        }
+      })
+    }
+
+    const ensureVideoPoster = async (url) => {
+      if (videoPosters.value[url]) return
+      const poster = await createVideoPoster(url)
+      if (poster) {
+        videoPosters.value = { ...videoPosters.value, [url]: poster }
+      }
+    }
+
+    const getCartMediaUrl = (item) => {
+      const url = getImageUrl(item?.imagen_url || item?.imagen_principal || item?.imagen)
+      if (!url) return ''
+      if (isVideo(url)) {
+        ensureVideoPoster(url)
+        return videoPosters.value[url] || ''
+      }
+      return url
+    }
     
     const getItemPrice = (item) => {
       const price = item.subtotal || item.precio_unitario || item.precio || 0
@@ -1763,6 +1827,7 @@ export default {
       onPaisChange, onDepartamentoChange,
       getFullAddress, saveFormToStorage, formatPhoneNumber,
       formatPrice, getItemPrice, getSubtotal, getTotal, processPayment,
+      getCartMediaUrl,
       clienteConDatosCompletos,
       initialLoading,
       showStockModal, stockModalMessage, stockModalProducts
