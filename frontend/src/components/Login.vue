@@ -285,13 +285,17 @@ export default {
         console.error('Error de login:', err)
         
         if (err.response?.status === 401) {
-          error.value = 'Credenciales incorrectas. Verifica tu email y contraseña.'
+          error.value = 'Email o contraseña incorrectos. Intenta de nuevo.'
         } else if (err.response?.status === 429) {
           error.value = 'Demasiados intentos. Por favor espera un momento.'
+        } else if (err.response?.status === 400) {
+          error.value = err.response.data?.detail || 'Verifica los datos que ingresaste.'
+        } else if (err.response?.status === 500) {
+          error.value = 'Error del servidor. Por favor intenta más tarde.'
         } else if (err.response?.data?.detail) {
           error.value = err.response.data.detail
         } else {
-          error.value = 'Error de conexión. Intenta de nuevo.'
+          error.value = 'No pudimos conectar. Verifica tu conexión de internet.'
         }
       } finally {
         loading.value = false
@@ -400,11 +404,15 @@ export default {
         console.error('Error de registro:', err)
         
         if (err.response?.status === 400) {
-          error.value = err.response.data.error || 'Verifica los datos ingresados'
+          error.value = err.response.data?.detail || err.response.data?.error || 'Verifica los datos que ingresaste.'
+        } else if (err.response?.status === 409) {
+          error.value = 'Este email ya está registrado. Intenta con otro.'
+        } else if (err.response?.status === 500) {
+          error.value = 'Error del servidor. Por favor intenta más tarde.'
         } else if (err.response?.data?.error) {
           error.value = err.response.data.error
         } else {
-          error.value = 'Error al crear la cuenta. Intenta de nuevo.'
+          error.value = 'No pudimos crear tu cuenta. Intenta de nuevo.'
         }
       } finally {
         loading.value = false
