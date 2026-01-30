@@ -306,73 +306,117 @@
       <!-- Image Card -->
       <div class="bg-white rounded-2xl shadow-sm border border-gray-100 p-6 space-y-6">
         <h3 class="text-lg font-semibold text-gray-900 border-b border-gray-100 pb-3">
-          Imagen del Producto
+          Imágenes del Producto
         </h3>
         
         <div class="space-y-4">
-          <!-- Image URL -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">URL de Imagen</label>
-            <input 
-              v-model="form.imagen_principal"
-              type="url"
-              placeholder="https://ejemplo.com/imagen.jpg"
-              class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20"
+          <!-- Input para agregar URL -->
+          <div class="flex items-center gap-2">
+            <input
+              v-model="newGalleryUrl"
+              type="text"
+              placeholder="Pega una URL de imagen y agrégala"
+              class="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand-500"
             >
+            <button
+              type="button"
+              @click="addGalleryUrl"
+              class="px-6 py-3 bg-gray-900 text-white text-sm rounded-xl hover:bg-black transition-colors"
+            >
+              Agregar
+            </button>
           </div>
 
-          <!-- Divider con OR -->
-          <div class="flex items-center gap-4">
-            <div class="flex-1 h-px bg-gray-200"></div>
-            <span class="text-sm text-gray-500 font-medium">O</span>
-            <div class="flex-1 h-px bg-gray-200"></div>
-          </div>
-
-          <!-- File Upload -->
+          <!-- Botón único para subir imágenes y videos (múltiples) -->
           <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Subir desde tu computadora</label>
-            <div class="flex items-center gap-4">
-              <input 
-                type="file"
-                accept="image/*"
-                @change="handleFileUpload"
-                class="hidden"
-                ref="fileInput"
-              >
-              <button
-                type="button"
-                @click="$refs.fileInput.click()"
-                class="px-4 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-lg transition-colors flex items-center gap-2"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                </svg>
-                Seleccionar archivo
-              </button>
-              <span v-if="uploadingFile" class="text-sm text-gray-500">Subiendo...</span>
-            </div>
-            <p class="text-xs text-gray-500 mt-1">JPG, PNG o WebP (máx. 5MB)</p>
+            <input
+              ref="galleryFileInput"
+              type="file"
+              accept="image/*,video/*"
+              multiple
+              class="hidden"
+              @change="handleGalleryFilesSelect"
+            >
+            <button
+              type="button"
+              @click="$refs.galleryFileInput.click()"
+              class="w-full px-4 py-3 bg-gray-900 hover:bg-black text-white rounded-xl font-medium transition-all flex items-center justify-center gap-2"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+              </svg>
+              Subir Imágenes o Videos
+            </button>
+            <p class="text-xs text-gray-500 text-center mt-2">Imágenes: JPG, PNG, WEBP (máx. 5MB) • Videos: MP4, WEBM (máx. 20MB)</p>
+            <p v-if="galleryUploading" class="text-xs text-brand-500 text-center font-medium mt-1">⏳ Subiendo imágenes...</p>
           </div>
 
-          <!-- Image Preview -->
-          <div>
-            <label class="block text-sm font-medium text-gray-700 mb-2">Vista Previa</label>
-            <div class="w-full max-w-xs h-48 bg-gray-100 rounded-xl overflow-hidden border-2 border-dashed border-gray-300">
-              <img 
-                v-if="form.imagen_principal"
-                :src="form.imagen_principal" 
-                alt="Preview"
-                class="w-full h-full object-cover"
-                @error="handleImageError"
+          <!-- Galería con distintivo de estrella para la principal -->
+          <div v-if="galleryUrls.length" class="grid grid-cols-4 gap-3">
+            <div 
+              v-for="url in galleryUrls" 
+              :key="url" 
+              class="relative aspect-square bg-white border rounded-xl overflow-hidden"
+              :class="form.imagen_principal === url ? 'border-[#D4A85A] border-2' : 'border-gray-200'"
+            >
+              <!-- Estrella dorada para imagen principal -->
+              <div 
+                v-if="form.imagen_principal === url" 
+                class="absolute top-2 left-2 z-10 bg-[#D4A85A] rounded-full p-1.5"
               >
-              <div v-else class="w-full h-full flex flex-col items-center justify-center gap-2">
-                <svg class="w-12 h-12 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                <svg class="w-3 h-3 text-white fill-current" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
                 </svg>
-                <p class="text-sm text-gray-500">Sin imagen</p>
+              </div>
+              
+              <!-- Mostrar video o imagen -->
+              <video v-if="isVideo(url)" :src="url" class="w-full h-full object-cover" muted></video>
+              <img v-else :src="url" class="w-full h-full object-cover" @error="handleImageError" />
+              
+              <!-- Icono de play para videos -->
+              <div v-if="isVideo(url)" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                <div class="bg-black/50 rounded-full p-2">
+                  <svg class="w-6 h-6 text-white" fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                  </svg>
+                </div>
+              </div>
+              
+              <div class="absolute inset-0 bg-black/0 hover:bg-black/20 transition-colors flex items-end justify-between p-2">
+                <button
+                  v-if="form.imagen_principal !== url"
+                  type="button"
+                  @click="setAsPrincipal(url)"
+                  class="text-xs px-3 py-1.5 bg-white/95 text-gray-900 rounded-lg hover:bg-white transition-colors font-medium"
+                >
+                  ⭐ Principal
+                </button>
+                <span v-else class="text-xs px-3 py-1.5 bg-[#D4A85A]/95 text-white rounded-lg font-medium">
+                  Principal
+                </span>
+                <button
+                  type="button"
+                  @click="removeGalleryUrl(url)"
+                  class="text-xs px-3 py-1.5 bg-white/95 text-red-600 rounded-lg hover:bg-white transition-colors font-medium"
+                >
+                  Quitar
+                </button>
               </div>
             </div>
           </div>
+
+          <!-- Mensaje cuando no hay imágenes -->
+          <div v-else class="text-center py-12 border-2 border-dashed border-gray-200 rounded-xl">
+            <svg class="w-16 h-16 mx-auto mb-4 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+            </svg>
+            <p class="text-gray-500">Sin imágenes</p>
+            <p class="text-sm text-gray-400 mt-1">Sube imágenes o agrega una URL</p>
+          </div>
+          
+          <p v-if="galleryUrls.length > 0" class="text-xs text-gray-500">
+            💡 Haz clic en "⭐ Principal" para seleccionar la imagen/video destacado del producto
+          </p>
         </div>
       </div>
 
@@ -463,6 +507,10 @@ export default {
     const error = ref(null)
     const success = ref(null)
     const fileInput = ref(null)
+    const galleryFileInput = ref(null)
+    const galleryUrls = ref([])
+    const newGalleryUrl = ref('')
+    const galleryUploading = ref(false)
     
     const form = ref({
       codigo: '',
@@ -479,6 +527,7 @@ export default {
       origen: '',
       calidad: '',
       imagen_principal: '',
+      imagenes: [],
       activo: true,
       destacado: false
     })
@@ -489,7 +538,12 @@ export default {
     const handleImageError = (e) => {
       e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="400" height="300" viewBox="0 0 400 300"%3E%3Crect fill="%23f3f4f6" width="400" height="300"/%3E%3Ctext x="200" y="150" text-anchor="middle" dy=".3em" fill="%239ca3af" font-size="20"%3ESin Imagen%3C/text%3E%3C/svg%3E'
     }
-
+    const isVideo = (url) => {
+      if (!url) return false
+      const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov']
+      const lowerUrl = url.toLowerCase()
+      return videoExtensions.some(ext => lowerUrl.endsWith(ext))
+    }
     const handleFileUpload = async (event) => {
       const file = event.target.files[0]
       if (!file) return
@@ -528,6 +582,80 @@ export default {
       }
     }
 
+    const addGalleryUrl = () => {
+      const url = newGalleryUrl.value.trim()
+      if (!url) return
+      if (!galleryUrls.value.includes(url)) {
+        galleryUrls.value.push(url)
+      }
+      newGalleryUrl.value = ''
+    }
+
+    const removeGalleryUrl = (url) => {
+      galleryUrls.value = galleryUrls.value.filter((u) => u !== url)
+    }
+
+    const setAsPrincipal = (url) => {
+      form.value.imagen_principal = url
+    }
+
+    const handleGalleryFilesSelect = async (event) => {
+      const files = Array.from(event.target.files || [])
+      if (!files.length) return
+
+      galleryUploading.value = true
+      error.value = null
+
+      try {
+        for (const file of files) {
+          const isImage = file.type.startsWith('image/')
+          const isVideo = file.type.startsWith('video/')
+          
+          if (!isImage && !isVideo) {
+            throw new Error('Solo se permiten archivos de imagen o video')
+          }
+          
+          // Validar tamaño según tipo
+          if (isImage && file.size > 5 * 1024 * 1024) {
+            throw new Error('Cada imagen debe ser menor a 5MB')
+          }
+          if (isVideo && file.size > 20 * 1024 * 1024) {
+            throw new Error('Cada video debe ser menor a 20MB')
+          }
+
+          const formData = new FormData()
+          formData.append('file', file)
+
+          const uploadResponse = await fetch('http://localhost:8000/api/v1/upload/imagen', {
+            method: 'POST',
+            headers: {
+              'Authorization': `Bearer ${localStorage.getItem('access_token')}`
+            },
+            body: formData
+          })
+
+          if (!uploadResponse.ok) {
+            const errorData = await uploadResponse.json()
+            throw new Error(errorData.detail || 'Error al subir la imagen')
+          }
+
+          const result = await uploadResponse.json()
+          const url = result.url || result.imagen_url
+          if (url && !galleryUrls.value.includes(url)) {
+            galleryUrls.value.push(url)
+          }
+        }
+      } catch (uploadErr) {
+        console.error('Error uploading gallery images:', uploadErr)
+        error.value = uploadErr.message || 'Error al subir las imágenes'
+      } finally {
+        galleryUploading.value = false
+        if (galleryFileInput.value) {
+          galleryFileInput.value.value = ''
+        }
+      }
+    }
+
     const loadProduct = async () => {
       if (!isEditing.value) return
       
@@ -556,8 +684,19 @@ export default {
           origen: atributos.origen || '',
           calidad: atributos.calidad || '',
           imagen_principal: producto.imagen_principal || '',
+          imagenes: Array.isArray(producto.imagenes) ? producto.imagenes : [],
           activo: producto.activo !== false,
           destacado: producto.destacado || false
+        }
+
+        // Construir galleryUrls incluyendo la imagen principal
+        const imagenes = Array.isArray(producto.imagenes) ? [...producto.imagenes] : []
+        
+        // Asegurar que la imagen principal esté en la galería
+        if (producto.imagen_principal && !imagenes.includes(producto.imagen_principal)) {
+          galleryUrls.value = [producto.imagen_principal, ...imagenes]
+        } else {
+          galleryUrls.value = imagenes
         }
       } catch (err) {
         console.error('Error loading product:', err)
@@ -582,7 +721,8 @@ export default {
           tipo: form.value.tipo || null,
           origen: form.value.origen || null,
           calidad: form.value.calidad || null,
-          imagen_principal: form.value.imagen_principal || null
+          imagen_principal: form.value.imagen_principal || null,
+          imagenes: galleryUrls.value
         }
 
         if (isEditing.value) {
@@ -619,9 +759,18 @@ export default {
       success,
       isEditing,
       fileInput,
+      galleryFileInput,
+      galleryUrls,
+      newGalleryUrl,
+      galleryUploading,
+      addGalleryUrl,
+      removeGalleryUrl,
+      setAsPrincipal,
+      handleGalleryFilesSelect,
       handleImageError,
       handleFileUpload,
-      submitForm
+      submitForm,
+      isVideo
     }
   }
 }

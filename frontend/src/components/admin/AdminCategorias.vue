@@ -209,15 +209,61 @@
                   ></textarea>
                 </div>
 
-                <!-- Image + Preview -->
-                <div class="grid grid-cols-2 gap-4">
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">
-                      Imagen (URL)
-                      <span v-if="form.imagen" class="text-xs text-gray-500 ml-2">
-                        {{ form.imagen.length }}/2000 caracteres
-                      </span>
-                    </label>
+                <!-- Image Upload / URL -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Imagen</label>
+                  
+                  <!-- Upload / URL Selector -->
+                  <div class="flex gap-2 mb-3">
+                    <button 
+                      type="button"
+                      @click="() => uploadMethod = 'file'"
+                      :class="uploadMethod === 'file' ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                      class="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12" />
+                      </svg>
+                      Subir archivo
+                    </button>
+                    <button 
+                      type="button"
+                      @click="() => uploadMethod = 'url'"
+                      :class="uploadMethod === 'url' ? 'bg-brand-600 text-white' : 'bg-gray-100 text-gray-700 hover:bg-gray-200'"
+                      class="flex-1 py-2 px-3 rounded-lg text-sm font-medium transition-colors flex items-center justify-center gap-2"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                      </svg>
+                      Pegar URL
+                    </button>
+                  </div>
+
+                  <!-- File Upload Input -->
+                  <div v-if="uploadMethod === 'file'" class="space-y-2">
+                    <div class="relative">
+                      <input 
+                        ref="fileInput"
+                        type="file"
+                        accept="image/*"
+                        @change="handleImageFileSelect"
+                        class="absolute inset-0 w-full h-full opacity-0 cursor-pointer"
+                      >
+                      <div class="px-4 py-3 bg-gray-50 border border-gray-200 rounded-lg hover:border-brand-300 hover:bg-brand-50 transition-colors cursor-pointer">
+                        <div class="flex items-center gap-2">
+                          <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                          </svg>
+                          <span v-if="!uploadingImage" class="text-gray-600">Haz click para seleccionar una imagen</span>
+                          <span v-else class="text-brand-600 font-medium">{{ uploadingImage ? 'Subiendo...' : 'Subido ✓' }}</span>
+                        </div>
+                      </div>
+                    </div>
+                    <p class="text-xs text-gray-500">JPG, PNG, WEBP (máx. 5MB)</p>
+                  </div>
+
+                  <!-- URL Input -->
+                  <div v-else class="space-y-2">
                     <input 
                       v-model="form.imagen"
                       type="url"
@@ -225,23 +271,25 @@
                       class="w-full px-4 py-2.5 bg-gray-50 border border-gray-200 rounded-lg focus:outline-none focus:border-brand-500"
                       placeholder="https://ejemplo.com/imagen.jpg"
                     >
-                    <p v-if="form.imagen && form.imagen.length > 1900" class="text-xs text-amber-600 mt-1">
+                    <p v-if="form.imagen && form.imagen.length > 1900" class="text-xs text-amber-600">
                       ⚠️ URL muy larga, considera usar un acortador
                     </p>
                   </div>
-                  <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Vista previa</label>
-                    <div class="h-24 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
-                      <img 
-                        v-if="form.imagen"
-                        :src="form.imagen" 
-                        alt="Preview"
-                        class="w-full h-full object-cover"
-                        @error="e => e.target.src = 'https://via.placeholder.com/200x100?text=Error'"
-                      >
-                      <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
-                        <span class="text-xs">Sin imagen</span>
-                      </div>
+                </div>
+
+                <!-- Image Preview -->
+                <div>
+                  <label class="block text-sm font-medium text-gray-700 mb-2">Vista previa</label>
+                  <div class="h-32 bg-gray-100 rounded-lg overflow-hidden border border-gray-200">
+                    <img 
+                      v-if="form.imagen"
+                      :src="form.imagen" 
+                      alt="Preview"
+                      class="w-full h-full object-cover"
+                      @error="e => e.target.src = 'https://via.placeholder.com/200x150?text=Error'"
+                    >
+                    <div v-else class="w-full h-full flex items-center justify-center text-gray-400">
+                      <span class="text-sm">Sin imagen</span>
                     </div>
                   </div>
                 </div>
@@ -355,6 +403,18 @@
 <script>
 import { ref, onMounted } from 'vue'
 import { categoriasService } from '../../services/categorias'
+import { getImageUrl } from '../../services/api'
+
+// Constants
+const API_BASE_URL = 'http://localhost:8000'
+
+// Get token from localStorage
+const getAuthHeaders = () => {
+  const token = localStorage.getItem('access_token')
+  return {
+    'Authorization': `Bearer ${token}`
+  }
+}
 
 export default {
   name: 'AdminCategorias',
@@ -371,6 +431,10 @@ export default {
     const showDeleteModal = ref(false)
     const categoriaToDelete = ref(null)
     const deleting = ref(false)
+    
+    const fileInput = ref(null)
+    const uploadMethod = ref('file')
+    const uploadingImage = ref(false)
     
     const form = ref({
       nombre: '',
@@ -493,6 +557,60 @@ export default {
       e.target.src = 'data:image/svg+xml,%3Csvg xmlns="http://www.w3.org/2000/svg" width="200" height="100" viewBox="0 0 200 100"%3E%3Crect fill="%23f3f4f6" width="200" height="100"/%3E%3Ctext x="100" y="50" text-anchor="middle" dy=".3em" fill="%239ca3af" font-size="14"%3EError%3C/text%3E%3C/svg%3E'
     }
 
+    const handleImageFileSelect = async (event) => {
+      const file = event.target.files?.[0]
+      if (!file) return
+
+      // Validar tipo
+      if (!file.type.startsWith('image/')) {
+        modalError.value = 'Por favor selecciona una imagen válida'
+        return
+      }
+
+      // Validar tamaño (5MB max)
+      const MAX_SIZE = 5 * 1024 * 1024
+      if (file.size > MAX_SIZE) {
+        modalError.value = 'La imagen no debe superar 5MB'
+        return
+      }
+
+      uploadingImage.value = true
+      modalError.value = null
+
+      try {
+        const formData = new FormData()
+        formData.append('file', file)
+
+        const response = await fetch(
+          `${API_BASE_URL}/api/v1/upload/imagen`,
+          {
+            method: 'POST',
+            headers: getAuthHeaders(),
+            body: formData
+          }
+        )
+
+        if (!response.ok) {
+          const errorData = await response.json()
+          throw new Error(errorData.detail || 'Error al subir la imagen')
+        }
+
+        const data = await response.json()
+        // Convertir URL relativa a absoluta usando getImageUrl()
+        form.value.imagen = getImageUrl(data.url)
+        
+      } catch (err) {
+        console.error('Error uploading image:', err)
+        modalError.value = err.message || 'Error al subir la imagen. Intenta de nuevo.'
+      } finally {
+        uploadingImage.value = false
+        // Reset file input
+        if (fileInput.value) {
+          fileInput.value.value = ''
+        }
+      }
+    }
+
     onMounted(loadCategorias)
 
     return {
@@ -507,6 +625,9 @@ export default {
       showDeleteModal,
       categoriaToDelete,
       deleting,
+      fileInput,
+      uploadMethod,
+      uploadingImage,
       loadCategorias,
       openModal,
       closeModal,
@@ -514,7 +635,8 @@ export default {
       confirmDelete,
       deleteCategoria,
       getPrioridadClass,
-      handleImageError
+      handleImageError,
+      handleImageFileSelect
     }
   }
 }
