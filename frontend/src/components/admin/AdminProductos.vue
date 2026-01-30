@@ -118,15 +118,21 @@
               <td class="px-6 py-4">
                 <div class="flex items-center gap-4">
                   <!-- Thumbnail Cuadrado (56x56px) -->
-                  <div class="w-14 h-14 bg-[#F5F5F5] rounded-lg overflow-hidden flex-shrink-0 border border-text-dark/5">
+                  <div class="w-14 h-14 bg-[#F5F5F5] rounded-lg overflow-hidden flex-shrink-0 border border-text-dark/5 relative">
                     <img 
-                      v-if="producto.imagen_principal"
-                      :src="getImageUrl(producto.imagen_principal)" 
+                      v-if="getProductMediaUrl(producto)"
+                      :src="getProductMediaUrl(producto)" 
                       :alt="producto.nombre"
                       class="w-full h-full object-cover"
                       @error="handleImageError"
                     >
-                    <div v-else class="w-full h-full flex items-center justify-center">
+                    <!-- Play icon para videos -->
+                    <div v-if="isVideo(getImageUrl(producto.imagen_principal))" class="absolute inset-0 flex items-center justify-center bg-black/30">
+                      <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
+                      </svg>
+                    </div>
+                    <div v-else-if="!getProductMediaUrl(producto)" class="w-full h-full flex items-center justify-center">
                       <svg class="w-6 h-6 text-text-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                       </svg>
@@ -344,6 +350,7 @@ export default {
     const productToDelete = ref(null)
     const showEditModal = ref(false)
     const editingProductId = ref(null)
+    const videoPosters = ref({})
 
     const filteredProducts = computed(() => {
       let result = productos.value
@@ -403,6 +410,70 @@ export default {
         return metodoLabels[producto.metodo] || 'Extensiones'
       }
       return 'Sin categoría'
+    }
+
+    const isVideo = (url) => {
+      if (!url) return false
+      const cleanUrl = url.split('?')[0].toLowerCase()
+      return ['.mp4', '.webm', '.ogg', '.mov'].some(ext => cleanUrl.endsWith(ext))
+    }
+
+    const createVideoPoster = (url) => {
+      return new Promise((resolve) => {
+        try {
+          const video = document.createElement('video')
+          video.src = url
+          video.muted = true
+          video.playsInline = true
+          video.crossOrigin = 'anonymous'
+
+          const onError = () => resolve(null)
+
+          video.addEventListener('error', onError, { once: true })
+          video.addEventListener('loadeddata', () => {
+            const seekTo = Math.min(1, video.duration || 1)
+            try {
+              video.currentTime = seekTo
+            } catch {
+              resolve(null)
+            }
+          }, { once: true })
+
+          video.addEventListener('seeked', () => {
+            try {
+              const canvas = document.createElement('canvas')
+              canvas.width = video.videoWidth || 120
+              canvas.height = video.videoHeight || 120
+              const ctx = canvas.getContext('2d')
+              if (!ctx) return resolve(null)
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+              resolve(canvas.toDataURL('image/jpeg', 0.82))
+            } catch {
+              resolve(null)
+            }
+          }, { once: true })
+        } catch {
+          resolve(null)
+        }
+      })
+    }
+
+    const ensureVideoPoster = async (url) => {
+      if (videoPosters.value[url]) return
+      const poster = await createVideoPoster(url)
+      if (poster) {
+        videoPosters.value = { ...videoPosters.value, [url]: poster }
+      }
+    }
+
+    const getProductMediaUrl = (producto) => {
+      const url = getImageUrl(producto?.imagen_principal)
+      if (!url) return ''
+      if (isVideo(url)) {
+        ensureVideoPoster(url)
+        return videoPosters.value[url] || ''
+      }
+      return url
     }
 
     const handleImageError = (e) => {
@@ -504,7 +575,9 @@ export default {
       deleteProduct,
       clearFilters,
       loadProducts,
-      getImageUrl
+      getImageUrl,
+      isVideo,
+      getProductMediaUrl
     }
   }
 }
