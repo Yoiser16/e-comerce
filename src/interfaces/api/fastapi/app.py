@@ -78,4 +78,34 @@ def crear_app(config: AppConfig) -> FastAPI:
     
     app.mount("/admin", WSGIMiddleware(django_app))
     
+    # Servir frontend Vue (debe ser lo último para no interferir con otras rutas)
+    import os
+    from pathlib import Path
+    frontend_path = Path(__file__).resolve().parent.parent.parent.parent.parent / "frontend" / "dist"
+    if frontend_path.exists():
+        from fastapi.responses import FileResponse
+        
+        # Servir assets del frontend
+        app.mount("/assets", StaticFiles(directory=str(frontend_path / "assets")), name="frontend-assets")
+        
+        # Servir archivos estáticos del frontend (imágenes, videos, etc.)
+        for file in frontend_path.iterdir():
+            if file.is_file() and file.suffix in ['.jpg', '.jpeg', '.png', '.webp', '.svg', '.mp4', '.webm']:
+                @app.get(f"/{file.name}")
+                async def serve_media(filename: str = file.name):
+                    return FileResponse(str(frontend_path / filename))
+        
+        # Servir index.html para todas las rutas no manejadas (SPA routing)
+        @app.get("/{full_path:path}")
+        async def serve_frontend(full_path: str):
+            # Si es una ruta de API o admin, no sirvas el frontend
+            if full_path.startswith("api/") or full_path.startswith("admin/") or full_path.startswith("static/"):
+                return {"detail": "Not Found"}
+            
+            # Sirve index.html para rutas del frontend
+            index_file = frontend_path / "index.html"
+            if index_file.exists():
+                return FileResponse(str(index_file))
+            return {"detail": "Frontend not built"}
+    
     return app
