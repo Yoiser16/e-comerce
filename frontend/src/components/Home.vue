@@ -113,6 +113,7 @@
 
           <!-- Navegación Desktop - Más legible -->
           <nav class="hidden lg:flex items-center gap-7">
+            <router-link to="/catalogo" class="nav-link-luxury">CATÁLOGO</router-link>
             <a href="#categorias" class="nav-link-luxury">CATEGORÍAS</a>
             <a href="#productos" class="nav-link-luxury">PRODUCTOS</a>
             <a href="#mayoreo" class="nav-link-luxury">MAYOREO</a>
@@ -378,6 +379,7 @@
         >
           <nav v-if="mobileMenuOpen" class="lg:hidden mt-6 pb-4">
             <div class="flex flex-col gap-0.5 bg-white/90 backdrop-blur-xl rounded-2xl p-3 shadow-soft border border-nude-200/30">
+              <router-link to="/catalogo" @click="mobileMenuOpen = false" class="py-3.5 px-5 text-[11px] tracking-[0.2em] uppercase text-text-dark/80 hover:text-text-dark hover:bg-nude-100/50 rounded-xl font-medium transition-all">CATÁLOGO</router-link>
               <a href="#categorias" @click="mobileMenuOpen = false" class="py-3.5 px-5 text-[11px] tracking-[0.2em] uppercase text-text-dark/80 hover:text-text-dark hover:bg-nude-100/50 rounded-xl font-medium transition-all">CATEGORÍAS</a>
               <a href="#productos" @click="mobileMenuOpen = false" class="py-3.5 px-5 text-[11px] tracking-[0.2em] uppercase text-text-dark/80 hover:text-text-dark hover:bg-nude-100/50 rounded-xl font-medium transition-all">PRODUCTOS</a>
               <a href="#mayoreo" @click="mobileMenuOpen = false" class="py-3.5 px-5 text-[11px] tracking-[0.2em] uppercase text-text-dark/80 hover:text-text-dark hover:bg-nude-100/50 rounded-xl font-medium transition-all">MAYOREO</a>
@@ -1691,8 +1693,8 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import { productosService, carritoService, authService, favoritosService } from '../services/productos'
 import { categoriasService } from '../services/categorias'
 import { getImageUrl } from '../services/api'
@@ -1701,6 +1703,7 @@ export default {
   name: 'Home',
   setup() {
     const router = useRouter()
+    const route = useRoute()
     const productos = ref([])
     const categorias = ref([])
     const loading = ref(true)
@@ -1786,9 +1789,24 @@ export default {
         const count = localStorage.getItem(CART_COUNT_KEY)
         if (cached) {
           const data = JSON.parse(cached)
+          const items = Array.isArray(data)
+            ? data
+            : (data?.items || [])
+
+          // Compatibilidad con formato antiguo (sin timestamp/total)
+          const timestamp = typeof data?.timestamp === 'number' ? data.timestamp : Date.now()
+          const total = typeof data?.total === 'number'
+            ? data.total
+            : items.reduce((acc, item) => {
+              const unit = item?.precio_unitario ?? item?.precio_monto ?? item?.precio ?? 0
+              const qty = item?.cantidad ?? 1
+              const subtotal = item?.subtotal
+              return acc + (typeof subtotal === 'number' ? subtotal : unit * qty)
+            }, 0)
+
           // Solo usar cache si tiene menos de 30 minutos
-          if (Date.now() - data.timestamp < 30 * 60 * 1000) {
-            return { items: data.items || [], total: data.total || 0, count: parseInt(count) || 0 }
+          if (Date.now() - timestamp < 30 * 60 * 1000) {
+            return { items, total, count: parseInt(count) || 0 }
           }
         }
       } catch (e) {
@@ -2415,8 +2433,8 @@ export default {
     }
 
     onMounted(() => {
-      cargarCategorias()
-      cargarProductos()
+      const categoriasPromise = cargarCategorias()
+      const productosPromise = cargarProductos()
       cargarResumenCarrito()
       window.addEventListener('scroll', handleScroll)
       window.addEventListener('user-logged-in', handleUserLoggedIn)
@@ -2424,6 +2442,21 @@ export default {
       document.addEventListener('click', handleClickOutsideSearch)
       handleScroll()
       startSlideshow()
+      
+      // Manejar scroll al hash cuando venimos de otra página
+      if (route.hash) {
+        Promise.allSettled([categoriasPromise, productosPromise]).then(async () => {
+          await nextTick()
+          requestAnimationFrame(() => {
+            const element = document.querySelector(route.hash)
+            if (!element) return
+
+            const headerOffset = 100
+            const y = element.getBoundingClientRect().top + window.scrollY - headerOffset
+            window.scrollTo({ top: y, behavior: 'smooth' })
+          })
+        })
+      }
     })
 
     onUnmounted(() => {

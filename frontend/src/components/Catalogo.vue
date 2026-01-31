@@ -200,9 +200,11 @@
 
             <!-- Navegación Desktop -->
             <nav class="flex items-center gap-8">
-              <router-link to="/" class="text-[11px] font-medium tracking-[1.5px] text-text-dark hover:text-brand-600 transition-colors">INICIO</router-link>
-              <router-link to="/catalogo" class="text-[11px] font-medium tracking-[1.5px] text-brand-600">COLECCIÓN</router-link>
+              <router-link to="/catalogo" class="text-[11px] font-medium tracking-[1.5px] text-brand-600">CATÁLOGO</router-link>
+              <router-link to="/#categorias" class="text-[11px] font-medium tracking-[1.5px] text-text-dark hover:text-brand-600 transition-colors">CATEGORÍAS</router-link>
+              <router-link to="/#productos" class="text-[11px] font-medium tracking-[1.5px] text-text-dark hover:text-brand-600 transition-colors">PRODUCTOS</router-link>
               <router-link to="/#mayoreo" class="text-[11px] font-medium tracking-[1.5px] text-text-dark hover:text-brand-600 transition-colors">MAYOREO</router-link>
+              <router-link to="/#testimonios" class="text-[11px] font-medium tracking-[1.5px] text-text-dark hover:text-brand-600 transition-colors">RESEÑAS</router-link>
               <router-link to="/#contacto" class="text-[11px] font-medium tracking-[1.5px] text-text-dark hover:text-brand-600 transition-colors">CONTACTO</router-link>
             </nav>
 
@@ -262,10 +264,11 @@
           
           <!-- Menu Links -->
           <nav class="flex-1 py-4">
-            <router-link to="/" @click="mobileMenuOpen = false" class="block px-6 py-3 text-sm font-medium text-text-dark">Inicio</router-link>
             <router-link to="/catalogo" @click="mobileMenuOpen = false" class="block px-6 py-3 text-sm font-medium text-brand-600">Catálogo</router-link>
             <router-link to="/#categorias" @click="mobileMenuOpen = false" class="block px-6 py-3 text-sm font-medium text-text-dark">Categorías</router-link>
+            <router-link to="/#productos" @click="mobileMenuOpen = false" class="block px-6 py-3 text-sm font-medium text-text-dark">Productos</router-link>
             <router-link to="/#mayoreo" @click="mobileMenuOpen = false" class="block px-6 py-3 text-sm font-medium text-text-dark">Mayoreo</router-link>
+            <router-link to="/#testimonios" @click="mobileMenuOpen = false" class="block px-6 py-3 text-sm font-medium text-text-dark">Reseñas</router-link>
             <router-link to="/#contacto" @click="mobileMenuOpen = false" class="block px-6 py-3 text-sm font-medium text-text-dark">Contacto</router-link>
           </nav>
           
@@ -453,10 +456,10 @@
                   <!-- Single Range Slider -->
                   <div class="relative h-1.5 mb-4">
                     <!-- Track Background -->
-                    <div class="absolute inset-0 bg-text-dark/10 rounded-full"></div>
+                    <div class="absolute inset-0 bg-[#F0E6DC] rounded-full"></div>
                     <!-- Active Track -->
                     <div 
-                      class="absolute h-full bg-text-dark rounded-full"
+                      class="absolute h-full bg-[#D4A85A] rounded-full"
                       :style="{
                         width: ((precioRangoMax - precioMinDisponible) / (precioMaxDisponible - precioMinDisponible)) * 100 + '%'
                       }"
@@ -478,7 +481,7 @@
                       @click="setQuickPrice(0, 200000)"
                       :class="[
                         'px-3 py-1.5 text-xs rounded-full border transition-colors',
-                        precioRangoMax <= 200000 ? 'border-text-dark bg-text-dark text-white' : 'border-text-dark/15 hover:border-text-dark/40'
+                        precioRangoMax <= 200000 ? 'border-[#D4A85A] bg-[#FAF5F2] text-text-dark' : 'border-[#D4A85A]/30 hover:border-[#D4A85A]/60 text-text-medium'
                       ]"
                     >
                       Hasta $200K
@@ -487,7 +490,7 @@
                       @click="setQuickPrice(0, 500000)"
                       :class="[
                         'px-3 py-1.5 text-xs rounded-full border transition-colors',
-                        precioRangoMax > 200000 && precioRangoMax <= 500000 ? 'border-text-dark bg-text-dark text-white' : 'border-text-dark/15 hover:border-text-dark/40'
+                        precioRangoMax > 200000 && precioRangoMax <= 500000 ? 'border-[#D4A85A] bg-[#FAF5F2] text-text-dark' : 'border-[#D4A85A]/30 hover:border-[#D4A85A]/60 text-text-medium'
                       ]"
                     >
                       Hasta $500K
@@ -496,7 +499,7 @@
                       @click="setQuickPrice(0, precioMaxDisponible)"
                       :class="[
                         'px-3 py-1.5 text-xs rounded-full border transition-colors',
-                        precioRangoMax > 500000 ? 'border-text-dark bg-text-dark text-white' : 'border-text-dark/15 hover:border-text-dark/40'
+                        precioRangoMax > 500000 ? 'border-[#D4A85A] bg-[#FAF5F2] text-text-dark' : 'border-[#D4A85A]/30 hover:border-[#D4A85A]/60 text-text-medium'
                       ]"
                     >
                       Todos
@@ -914,7 +917,7 @@
                 <div class="relative h-2 mt-4">
                   <div class="absolute inset-0 bg-nude-200 rounded-full"></div>
                   <div 
-                    class="absolute h-full bg-brand-500 rounded-full"
+                    class="absolute h-full bg-[#D4A85A] rounded-full"
                     :style="{
                       left: ((precioRangoMin - precioMinDisponible) / (precioMaxDisponible - precioMinDisponible)) * 100 + '%',
                       right: (100 - ((precioRangoMax - precioMinDisponible) / (precioMaxDisponible - precioMinDisponible)) * 100) + '%'
@@ -1406,7 +1409,17 @@ const loadCartFromLocal = () => {
     const cart = localStorage.getItem('kharis_cart_cache')
     if (cart) {
       const parsed = JSON.parse(cart)
-      carritoItems.value = parsed.items ? parsed.items : parsed
+      const rawItems = parsed?.items ? parsed.items : parsed
+      const normalized = Array.isArray(rawItems) ? rawItems : []
+      carritoItems.value = normalized.map((item) => {
+        const productoId = item?.producto_id ?? item?.id
+        return {
+          ...item,
+          producto_id: productoId,
+          id: productoId,
+          precio_unitario: item?.precio_unitario ?? item?.precio_monto ?? item?.precio ?? 0
+        }
+      })
     } else {
       carritoItems.value = []
     }
@@ -1622,12 +1635,13 @@ const addToCart = (producto) => {
   // Cargar carrito actual
   loadCartFromLocal()
   
-  const existingIdx = carritoItems.value.findIndex(item => item.id === producto.id)
+  const existingIdx = carritoItems.value.findIndex(item => (item.producto_id ?? item.id) === producto.id)
   
   if (existingIdx > -1) {
     carritoItems.value[existingIdx].cantidad += 1
   } else {
     carritoItems.value.push({
+      producto_id: producto.id,
       id: producto.id,
       nombre: producto.nombre,
       precio_monto: producto.precio_monto,
@@ -1637,8 +1651,13 @@ const addToCart = (producto) => {
     })
   }
   
-  // Guardar en localStorage
-  localStorage.setItem('kharis_cart_cache', JSON.stringify({ items: carritoItems.value }))
+  // Guardar en localStorage (mismo formato que Home.vue espera)
+  const total = carritoItems.value.reduce((acc, item) => {
+    const unit = item.precio_unitario ?? item.precio_monto ?? item.precio ?? 0
+    const qty = item.cantidad ?? 1
+    return acc + unit * qty
+  }, 0)
+  localStorage.setItem('kharis_cart_cache', JSON.stringify({ items: carritoItems.value, total, timestamp: Date.now() }))
   cartCount.value = carritoItems.value.reduce((acc, item) => acc + item.cantidad, 0)
   localStorage.setItem('kharis_cart_count', cartCount.value.toString())
   
@@ -1789,9 +1808,9 @@ watch(
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #D81B60 0%, #e84a7e 100%);
+  background: linear-gradient(135deg, #D4A85A 0%, #C9A962 100%);
   border: 3px solid white;
-  box-shadow: 0 2px 8px rgba(216, 27, 96, 0.3);
+  box-shadow: 0 2px 10px rgba(201, 169, 98, 0.28);
   cursor: pointer;
   margin-top: -8px;
   transition: transform 0.2s, box-shadow 0.2s;
@@ -1799,23 +1818,23 @@ watch(
 
 .range-slider::-webkit-slider-thumb:hover {
   transform: scale(1.15);
-  box-shadow: 0 4px 12px rgba(216, 27, 96, 0.4);
+  box-shadow: 0 4px 14px rgba(201, 169, 98, 0.36);
 }
 
 .range-slider::-moz-range-thumb {
   width: 20px;
   height: 20px;
   border-radius: 50%;
-  background: linear-gradient(135deg, #D81B60 0%, #e84a7e 100%);
+  background: linear-gradient(135deg, #D4A85A 0%, #C9A962 100%);
   border: 3px solid white;
-  box-shadow: 0 2px 8px rgba(216, 27, 96, 0.3);
+  box-shadow: 0 2px 10px rgba(201, 169, 98, 0.28);
   cursor: pointer;
   transition: transform 0.2s, box-shadow 0.2s;
 }
 
 .range-slider::-moz-range-thumb:hover {
   transform: scale(1.15);
-  box-shadow: 0 4px 12px rgba(216, 27, 96, 0.4);
+  box-shadow: 0 4px 14px rgba(201, 169, 98, 0.36);
 }
 
 /* Range Slider Simple - Neutral/Elegant */
@@ -1832,9 +1851,9 @@ watch(
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #1A1A1A;
+  background: linear-gradient(135deg, #D4A85A 0%, #C9A962 100%);
   border: 2px solid white;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 10px rgba(201, 169, 98, 0.22);
   cursor: pointer;
   margin-top: -7px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
@@ -1842,34 +1861,34 @@ watch(
 
 .range-slider-simple::-webkit-slider-thumb:hover {
   transform: scale(1.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 14px rgba(201, 169, 98, 0.32);
 }
 
 .range-slider-simple::-moz-range-thumb {
   width: 18px;
   height: 18px;
   border-radius: 50%;
-  background: #1A1A1A;
+  background: linear-gradient(135deg, #D4A85A 0%, #C9A962 100%);
   border: 2px solid white;
-  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 2px 10px rgba(201, 169, 98, 0.22);
   cursor: pointer;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .range-slider-simple::-moz-range-thumb:hover {
   transform: scale(1.1);
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.25);
+  box-shadow: 0 4px 14px rgba(201, 169, 98, 0.32);
 }
 
 .range-slider-simple::-webkit-slider-runnable-track {
   height: 4px;
-  background: #E5E5E5;
+  background: #F0E6DC;
   border-radius: 2px;
 }
 
 .range-slider-simple::-moz-range-track {
   height: 4px;
-  background: #E5E5E5;
+  background: #F0E6DC;
   border-radius: 2px;
 }
 

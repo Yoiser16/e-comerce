@@ -138,14 +138,13 @@ const router = createRouter({
   history: createWebHistory(),
   routes,
   scrollBehavior(to, from, savedPosition) {
-    if (to.hash) {
-      return {
-        el: to.hash,
-        behavior: 'smooth'
-      }
-    }
     if (savedPosition) {
       return savedPosition
+    }
+    // Evitar doble-scroll con hashes (p.ej. navegar desde /catalogo a /#mayoreo).
+    // El componente Home se encarga del scroll cuando exista y el layout esté estable.
+    if (to.hash) {
+      return false
     }
     return { top: 0 }
   }
