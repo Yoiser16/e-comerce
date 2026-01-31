@@ -538,11 +538,12 @@ const mapEstadoEnvio = (estado) => {
   return map[e] || 'NO_ENVIADO'
 }
 
-// Cargar órdenes
+// Cargar órdenes - Versión optimizada con items incluidos
 const cargarOrdenes = async (silent = false) => {
   try {
     if (!silent) loading.value = true
-    const data = await ordenesService.obtenerTodas()
+    // Cargar con items incluidos para evitar segunda llamada
+    const data = await ordenesService.obtenerTodas(true)
     
     const nuevasOrdenes = data.map(orden => ({
       id: orden.id,
@@ -550,12 +551,23 @@ const cargarOrdenes = async (silent = false) => {
       cliente_nombre: orden.cliente_nombre || 'Sin cliente',
       cliente_email: orden.cliente_email || '',
       cliente_telefono: orden.cliente_telefono || '',
+      cliente_tipo_doc: orden.cliente_tipo_doc || '',
+      cliente_num_doc: orden.cliente_num_doc || '',
       total_items: orden.total_items || 0,
       total: orden.total || 0,
+      subtotal_monto: orden.subtotal_monto || 0,
+      envio_monto: orden.envio_monto || 0,
+      direccion_envio: orden.direccion_envio || '',
+      departamento: orden.departamento || '',
+      municipio: orden.municipio || '',
+      barrio: orden.barrio || '',
+      notas_envio: orden.notas_envio || '',
       estado_pago: mapEstadoPago(orden.estado),
       estado_envio: mapEstadoEnvio(orden.estado),
       metodo_pago: orden.metodo_pago || 'whatsapp',
-      fecha_creacion: orden.fecha_creacion
+      fecha_creacion: orden.fecha_creacion,
+      // Guardar items pre-cargados
+      items: orden.items || null
     })).sort((a, b) => new Date(b.fecha_creacion) - new Date(a.fecha_creacion))
     
     // Detectar nuevas órdenes y reproducir sonido
@@ -629,25 +641,53 @@ const getUnseenCount = () => {
   return ordenes.value.filter(o => !seen.includes(o.id)).length
 }
 
-// Seleccionar orden
+// Seleccionar orden - Versión optimizada usando datos pre-cargados
 const selectOrder = async (orden) => {
   selectedOrder.value = { ...orden }
   // Guardar estados originales para detectar cambios
   selectedOrder.value._estadoOriginal = orden.estado_pago
   selectedOrder.value._estadoEnvioOriginal = orden.estado_envio
-  orderDetail.value = null
   
   // Marcar como vista
   markOrderAsSeen(orden.id)
   
-  try {
-    loadingDetail.value = true
-    const detail = await ordenesService.obtenerPorId(orden.id)
-    orderDetail.value = detail
-  } catch (error) {
-    console.error('Error:', error)
-  } finally {
+  // Usar datos pre-cargados si están disponibles (optimización)
+  if (orden.items && orden.items.length > 0) {
+    // Los datos ya vienen del listado optimizado
+    orderDetail.value = {
+      id: orden.id,
+      codigo: orden.codigo,
+      estado: orden.estado_pago,
+      cliente_nombre: orden.cliente_nombre,
+      cliente_email: orden.cliente_email,
+      cliente_telefono: orden.cliente_telefono,
+      cliente_tipo_doc: orden.cliente_tipo_doc || '',
+      cliente_num_doc: orden.cliente_num_doc || '',
+      direccion_envio: orden.direccion_envio || '',
+      departamento: orden.departamento || '',
+      municipio: orden.municipio || '',
+      barrio: orden.barrio || '',
+      notas_envio: orden.notas_envio || '',
+      subtotal_monto: orden.subtotal_monto || 0,
+      envio_monto: orden.envio_monto || 0,
+      total: orden.total || 0,
+      metodo_pago: orden.metodo_pago || 'whatsapp',
+      items: orden.items,
+      fecha_creacion: orden.fecha_creacion
+    }
     loadingDetail.value = false
+  } else {
+    // Fallback: cargar desde API si no hay items pre-cargados
+    orderDetail.value = null
+    try {
+      loadingDetail.value = true
+      const detail = await ordenesService.obtenerPorId(orden.id)
+      orderDetail.value = detail
+    } catch (error) {
+      console.error('Error:', error)
+    } finally {
+      loadingDetail.value = false
+    }
   }
 }
 

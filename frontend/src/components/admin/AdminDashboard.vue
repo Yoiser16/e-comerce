@@ -461,72 +461,53 @@ export default {
       }
     }
 
-    // Data Loading Functions
-    const fetchData = async (endpoint, targetRef, defaultVal = []) => {
-      try {
-        const res = await apiClient.get(endpoint)
-        targetRef.value = res.data || defaultVal
-      } catch (e) {
-        console.error(`Error fetching ${endpoint}:`, e)
-        // Keep default/previous value
-      }
-    }
-
+    // Data Loading Functions - OPTIMIZADO: Una sola llamada al backend
     const cargarDatos = async (silent = false) => {
       if(!silent) { loading.value = true; error.value = null }
       
       try {
-        // Usamos una estrategia de "intento" individual para que si falla un endpoint
-        // no se caiga todo el dashboard.
-        await Promise.allSettled([
-          // Estadísticas - Convertir snake_case a camelCase
-          apiClient.get('/dashboard/estadisticas')
-            .then(r => {
-              const data = r.data || {}
-              stats.value = {
-                totalVentas: data.total_ventas || 0,
-                totalOrdenes: data.total_ordenes || 0,
-                ordenesPendientes: data.ordenes_pendientes || 0,
-                totalProductos: data.total_productos || 0,
-                productosActivos: data.productos_activos || 0,
-                stockBajo: data.stock_bajo || 0,
-                totalClientes: data.total_clientes || 0,
-                clientesNuevos: data.clientes_nuevos || 0
-              }
-              console.log('📊 Stats cargadas:', stats.value)
-            })
-            .catch(e => {
-              console.warn('Fallo estadísticas:', e)
-              stats.value = defaultStats
-            }),
-
-          // Órdenes Recientes
-          apiClient.get('/dashboard/ordenes/recientes?limite=5')
-            .then(r => {
-               recentOrders.value = (r.data || []).map(o => ({
-                id: o.id || '---',
-                cliente: o.cliente_nombre || 'Invitado',
-                estado: o.estado || 'PENDIENTE',
-                total: o.total || 0,
-                fecha: o.tiempo_transcurrido || 'Reciente'
-              }))
-            })
-            .catch(e => console.warn('Fallo ordenes:', e)),
-
-          // Gráfico Ventas
-          apiClient.get(`/dashboard/ventas/por-periodo?periodo=${selectedPeriod.value}`)
-            .then(r => {
-               ventasPorPeriodo.value = { labels: r.data.labels || [], data: r.data.data || [] }
-            })
-            .catch(e => console.warn('Fallo grafico ventas:', e)),
-
-          // Top Productos (ya usa fetchData interno, pero lo aseguramos)
-          fetchData('/dashboard/top-productos?limite=5', topProducts),
-          
-          // Stock Bajo
-          fetchData('/dashboard/productos/stock-bajo?umbral=5&limite=10', lowStockProducts)
-        ])
-
+        // Una sola llamada optimizada que trae todo el dashboard
+        const res = await apiClient.get(`/dashboard/completo?periodo=${selectedPeriod.value}`)
+        const data = res.data || {}
+        
+        // Estadísticas
+        stats.value = {
+          totalVentas: data.estadisticas?.total_ventas || 0,
+          totalOrdenes: data.estadisticas?.total_ordenes || 0,
+          ordenesPendientes: data.estadisticas?.ordenes_pendientes || 0,
+          totalProductos: data.estadisticas?.total_productos || 0,
+          productosActivos: data.estadisticas?.productos_activos || 0,
+          stockBajo: data.estadisticas?.stock_bajo || 0,
+          totalClientes: data.estadisticas?.total_clientes || 0,
+          clientesNuevos: data.estadisticas?.clientes_nuevos || 0
+        }
+        
+        // Órdenes recientes
+        recentOrders.value = (data.ordenes_recientes || []).map(o => ({
+          id: o.id || '---',
+          cliente: o.cliente_nombre || 'Invitado',
+          estado: o.estado || 'PENDIENTE',
+          total: o.total || 0,
+          fecha: o.tiempo_transcurrido || 'Reciente'
+        }))
+        
+        // Ventas por período
+        ventasPorPeriodo.value = {
+          labels: data.ventas_por_periodo?.labels || [],
+          data: data.ventas_por_periodo?.data || []
+        }
+        
+        // Top productos
+        topProducts.value = data.top_productos || []
+        
+        // Stock bajo
+        lowStockProducts.value = data.productos_stock_bajo || []
+        
+        // Log de rendimiento
+        if (data._meta) {
+          console.log(`📊 Dashboard cargado en ${data._meta.tiempo_carga_ms}ms`)
+        }
+        
       } catch (e) {
         console.error('Error crítico dashboard:', e)
         if(!silent) error.value = 'Hubo un problema cargando la información.'
@@ -541,16 +522,22 @@ export default {
       chartLoading.value = true
       
       try {
-        // Fetch only sales data
-        const res = await apiClient.get(`/dashboard/ventas/por-periodo?periodo=${periodo}`)
-        ventasPorPeriodo.value = { labels: res.data.labels || [], data: res.data.data || [] }
+        // Recargar dashboard completo con nuevo período
+        const res = await apiClient.get(`/dashboard/completo?periodo=${periodo}`)
+        const data = res.data || {}
+        
+        ventasPorPeriodo.value = {
+          labels: data.ventas_por_periodo?.labels || [],
+          data: data.ventas_por_periodo?.data || []
+        }
       } catch(e) { console.error(e) } 
       finally { setTimeout(() => chartLoading.value = false, 300) }
     }
 
     onMounted(() => {
       cargarDatos()
-      pollingInterval.value = setInterval(() => cargarDatos(true), 15000) // Poll faster for live feel
+      // Polling cada 30 segundos (reducido de 15s para mejor rendimiento)
+      pollingInterval.value = setInterval(() => cargarDatos(true), 30000)
     })
 
     onUnmounted(() => clearInterval(pollingInterval.value))

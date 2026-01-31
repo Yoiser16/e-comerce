@@ -4,6 +4,7 @@ Router de productos - FastAPI
 from fastapi import APIRouter, HTTPException, status, Depends
 from typing import List, Optional
 from uuid import UUID
+import time
 
 from .dependencies import get_producto_repository
 from domain.repositories.producto_repository import ProductoRepository
@@ -21,6 +22,23 @@ from domain.exceptions.dominio import ExcepcionDominio
 
 router = APIRouter(prefix="/api/v1/productos", tags=["productos"])
 
+# ═══════════════════════════════════════════════════════════════════════════
+# CACHÉ DE PRODUCTOS - Reduce consultas repetidas
+# ═══════════════════════════════════════════════════════════════════════════
+_productos_cache = {
+    'lista': None,
+    'timestamp': 0,
+    'todos': None,
+    'todos_timestamp': 0
+}
+PRODUCTOS_CACHE_TTL = 60  # 60 segundos para productos
+
+
+def invalidar_cache_productos():
+    """Invalida el caché de productos (llamar después de crear/actualizar/eliminar)"""
+    _productos_cache['lista'] = None
+    _productos_cache['todos'] = None
+
 
 @router.post("/", response_model=ProductoDTO, status_code=status.HTTP_201_CREATED)
 def crear_producto(
@@ -32,7 +50,9 @@ def crear_producto(
     """
     try:
         use_case = CrearProductoUseCase(repo)
-        return use_case.ejecutar(datos)
+        resultado = use_case.ejecutar(datos)
+        invalidar_cache_productos()  # Invalidar caché
+        return resultado
     except ExcepcionDominio as e:
         raise e
     except Exception as e:
@@ -45,10 +65,22 @@ def listar_productos(
 ):
     """
     Lista todos los productos disponibles para la venta.
+    Usa caché para mejorar rendimiento.
     """
     try:
+        # Verificar caché
+        if (_productos_cache['lista'] is not None and 
+            time.time() - _productos_cache['timestamp'] < PRODUCTOS_CACHE_TTL):
+            return _productos_cache['lista']
+        
         use_case = ListarProductosUseCase(repo)
-        return use_case.ejecutar()
+        resultado = use_case.ejecutar()
+        
+        # Guardar en caché
+        _productos_cache['lista'] = resultado
+        _productos_cache['timestamp'] = time.time()
+        
+        return resultado
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -76,11 +108,24 @@ def listar_todos_productos(
 ):
     """
     Lista TODOS los productos (para administración).
-    Incluye activos e inactivos.
+    Incluye activos e inactivos. Usa caché para mejorar rendimiento.
     """
     try:
+        # Verificar caché (solo si offset=0 y limite estándar)
+        if (offset == 0 and limite >= 100 and 
+            _productos_cache['todos'] is not None and 
+            time.time() - _productos_cache['todos_timestamp'] < PRODUCTOS_CACHE_TTL):
+            return _productos_cache['todos']
+        
         use_case = ListarTodosProductosUseCase(repo)
-        return use_case.ejecutar({'limite': limite, 'offset': offset})
+        resultado = use_case.ejecutar({'limite': limite, 'offset': offset})
+        
+        # Guardar en caché solo para consultas base
+        if offset == 0 and limite >= 100:
+            _productos_cache['todos'] = resultado
+            _productos_cache['todos_timestamp'] = time.time()
+        
+        return resultado
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
@@ -113,7 +158,9 @@ def actualizar_producto(
         # Asegurar que el ID del path coincida con el DTO
         datos.id = producto_id
         use_case = ActualizarProductoUseCase(repo)
-        return use_case.ejecutar(datos)
+        resultado = use_case.ejecutar(datos)
+        invalidar_cache_productos()  # Invalidar caché
+        return resultado
     except ExcepcionDominio as e:
         raise e
     except Exception as e:
@@ -131,6 +178,7 @@ def eliminar_producto(
     try:
         use_case = EliminarProductoUseCase(repo)
         use_case.ejecutar(producto_id)
+        invalidar_cache_productos()  # Invalidar caché
         return None
     except ExcepcionDominio as e:
         raise e

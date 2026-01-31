@@ -93,6 +93,17 @@ class OrdenListItem(BaseModel):
     total_items: int
     metodo_pago: str
     fecha_creacion: datetime
+    # Campos adicionales para evitar segunda llamada
+    subtotal_monto: Optional[float] = 0.0
+    envio_monto: Optional[float] = 0.0
+    direccion_envio: Optional[str] = ''
+    departamento: Optional[str] = ''
+    municipio: Optional[str] = ''
+    barrio: Optional[str] = ''
+    notas_envio: Optional[str] = ''
+    cliente_tipo_doc: Optional[str] = ''
+    cliente_num_doc: Optional[str] = ''
+    items: Optional[List[dict]] = None  # Solo se incluye si include_items=true
 
 
 class CambiarEstadoInput(BaseModel):
@@ -115,34 +126,82 @@ class ValidarStockResponse(BaseModel):
 # Funciones SYNC que seran envueltas en async
 # ═══════════════════════════════════════════════════════════════════════════
 
-def _listar_ordenes_sync(estado: Optional[str], limite: int) -> List[dict]:
-    """Lista órdenes (sync) - Optimizado con annotate"""
-    from django.db.models import Count
+def _listar_ordenes_sync(estado: Optional[str], limite: int, include_items: bool = False) -> List[dict]:
+    """Lista órdenes (sync) - Optimizado con annotate y prefetch_related"""
+    from django.db.models import Count, Prefetch
     
+    # Query base optimizada con select_related para cliente
     queryset = (OrdenModel.objects
                 .select_related('cliente')
                 .annotate(num_items=Count('lineas'))
                 .order_by('-fecha_creacion'))
     
+    # Si se incluyen items, hacer prefetch optimizado
+    if include_items:
+        queryset = queryset.prefetch_related(
+            Prefetch('lineas', queryset=LineaOrdenModel.objects.select_related('producto').only(
+                'id', 'orden_id', 'producto_id', 'cantidad', 
+                'precio_unitario_monto', 'subtotal_monto',
+                'producto__id', 'producto__nombre', 'producto__codigo'
+            ))
+        )
+    
     if estado:
         queryset = queryset.filter(estado=estado.lower())
+    
+    # Usar only() para traer solo los campos necesarios
+    queryset = queryset.only(
+        'id', 'codigo', 'estado', 'metodo_pago', 'fecha_creacion',
+        'total_monto', 'subtotal_monto', 'envio_monto',
+        'direccion_envio', 'departamento', 'municipio', 'barrio', 'notas_envio',
+        'cliente__id', 'cliente__nombre', 'cliente__apellido', 
+        'cliente__email', 'cliente__telefono',
+        'cliente__tipo_documento', 'cliente__numero_documento'
+    )
     
     ordenes = list(queryset[:limite])
     
     resultado = []
     for orden in ordenes:
-        resultado.append({
+        orden_data = {
             'id': str(orden.id),
             'codigo': orden.codigo or f"ORD-{str(orden.id)[:8]}",
-            'estado': orden.estado,
-            'cliente_nombre': f"{orden.cliente.nombre} {orden.cliente.apellido}" if orden.cliente else "Sin cliente",
+            'estado': orden.estado.upper(),
+            'cliente_nombre': f"{orden.cliente.nombre} {orden.cliente.apellido}".strip() if orden.cliente else "Sin cliente",
             'cliente_email': orden.cliente.email if orden.cliente else "",
             'cliente_telefono': orden.cliente.telefono if orden.cliente else "",
+            'cliente_tipo_doc': orden.cliente.tipo_documento if orden.cliente else "",
+            'cliente_num_doc': orden.cliente.numero_documento if orden.cliente else "",
             'total': float(orden.total_monto),
+            'subtotal_monto': float(orden.subtotal_monto),
+            'envio_monto': float(orden.envio_monto),
+            'direccion_envio': orden.direccion_envio or '',
+            'departamento': orden.departamento or '',
+            'municipio': orden.municipio or '',
+            'barrio': orden.barrio or '',
+            'notas_envio': orden.notas_envio or '',
             'total_items': orden.num_items,
             'metodo_pago': orden.metodo_pago or 'whatsapp',
-            'fecha_creacion': orden.fecha_creacion
-        })
+            'fecha_creacion': orden.fecha_creacion,
+            'items': None
+        }
+        
+        # Incluir items si se solicitó
+        if include_items:
+            items = []
+            for linea in orden.lineas.all():
+                items.append({
+                    'id': str(linea.id),
+                    'producto_id': str(linea.producto_id),
+                    'sku': linea.producto.codigo if linea.producto else 'N/A',
+                    'nombre': linea.producto.nombre if linea.producto else 'Producto',
+                    'cantidad': linea.cantidad,
+                    'precio_unitario': float(linea.precio_unitario_monto),
+                    'subtotal': float(linea.subtotal_monto)
+                })
+            orden_data['items'] = items
+        
+        resultado.append(orden_data)
     
     return resultado
 
@@ -544,10 +603,21 @@ def _actualizar_estado_sync(orden_id: str, estado: str) -> dict:
 
 @router.get("", response_model=List[OrdenListItem])
 @router.get("/", response_model=List[OrdenListItem])
-async def listar_ordenes(estado: Optional[str] = None, limite: int = 50):
-    """Lista todas las órdenes (para admin)"""
+async def listar_ordenes(
+    estado: Optional[str] = None, 
+    limite: int = 50,
+    include_items: bool = False
+):
+    """
+    Lista todas las órdenes (para admin).
+    
+    Parámetros:
+    - estado: Filtrar por estado (pendiente, confirmada, etc.)
+    - limite: Número máximo de órdenes a retornar
+    - include_items: Si es True, incluye los items de cada orden (evita segunda llamada)
+    """
     try:
-        resultado = await sync_to_async(_listar_ordenes_sync)(estado, limite)
+        resultado = await sync_to_async(_listar_ordenes_sync)(estado, limite, include_items)
         return resultado
     except Exception as e:
         raise HTTPException(

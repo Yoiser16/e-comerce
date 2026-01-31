@@ -400,6 +400,12 @@ class OrdenModel(models.Model):
             models.Index(fields=['estado']),
             models.Index(fields=['fecha_creacion']),
             models.Index(fields=['codigo']),
+            # Índices compuestos para consultas frecuentes del admin
+            models.Index(fields=['estado', '-fecha_creacion']),
+            models.Index(fields=['activo', '-fecha_creacion']),
+            models.Index(fields=['cliente', '-fecha_creacion']),
+            # Índice para ordenar por fecha (desc) - muy usado en listados
+            models.Index(fields=['-fecha_creacion', 'estado']),
         ]
 
     def __str__(self) -> str:
@@ -411,8 +417,8 @@ class LineaOrdenModel(models.Model):
     Modelo ORM para Línea de Orden.
     """
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
-    orden = models.ForeignKey(OrdenModel, on_delete=models.CASCADE, related_name='lineas')
-    producto = models.ForeignKey(ProductoModel, on_delete=models.PROTECT, related_name='lineas_orden')
+    orden = models.ForeignKey(OrdenModel, on_delete=models.CASCADE, related_name='lineas', db_index=True)
+    producto = models.ForeignKey(ProductoModel, on_delete=models.PROTECT, related_name='lineas_orden', db_index=True)
     cantidad = models.IntegerField()
     precio_unitario_monto = models.DecimalField(max_digits=10, decimal_places=2)
     precio_unitario_moneda = models.CharField(max_length=3)
@@ -424,6 +430,12 @@ class LineaOrdenModel(models.Model):
         verbose_name = 'Línea de Orden'
         verbose_name_plural = 'Líneas de Orden'
         ordering = ['orden', 'producto']
+        indexes = [
+            # Índice compuesto para JOINs frecuentes orden+producto
+            models.Index(fields=['orden', 'producto']),
+            # Índice para búsquedas por orden (ya tiene FK pero reforzamos)
+            models.Index(fields=['orden_id']),
+        ]
 
     def __str__(self) -> str:
         return f"{self.cantidad}x {self.producto} en Orden {self.orden_id}"

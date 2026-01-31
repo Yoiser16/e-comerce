@@ -2,10 +2,11 @@ import apiClient from './api'
 
 export const ordenesService = {
   /**
-   * Obtener todas las órdenes (admin)
+   * Obtener todas las órdenes (admin) - Versión optimizada con items incluidos
+   * @param {boolean} includeItems - Si es true, incluye los items de cada orden
    */
-  async obtenerTodas() {
-    const response = await apiClient.get('/ordenes')
+  async obtenerTodas(includeItems = true) {
+    const response = await apiClient.get(`/ordenes?include_items=${includeItems}`)
     return response.data
   },
 
@@ -35,6 +36,8 @@ export const ordenesService = {
 
   /**
    * Obtener detalles de una orden
+   * NOTA: Si ya tienes los datos del listado con include_items=true,
+   * no necesitas llamar este endpoint
    */
   async obtenerPorId(ordenId) {
     const response = await apiClient.get(`/ordenes/${ordenId}`)
