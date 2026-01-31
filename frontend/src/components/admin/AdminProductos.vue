@@ -6,7 +6,7 @@
       <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6">
         <div>
           <h2 class="text-2xl font-bold text-text-dark">Gestión de Productos</h2>
-          <p class="text-text-light dark:text-gray-400 text-sm mt-1">{{ productos.length }} productos en inventario</p>
+          <p class="text-text-light text-sm mt-1">{{ productos.length }} productos en inventario</p>
         </div>
         <button 
           @click="openCreateModal"
@@ -30,14 +30,14 @@
             v-model="searchQuery"
             type="text"
             placeholder="Buscar por nombre, SKU o descripción..."
-            class="w-full pl-10 pr-4 py-2.5 text-sm bg-[#FAFAFA] dark:bg-gray-700 dark:text-white border border-text-dark/10 dark:border-gray-600 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white dark:focus:bg-gray-600 transition-all"
+            class="w-full pl-10 pr-4 py-2.5 text-sm bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white transition-all"
           >
         </div>
 
         <!-- Category Filter -->
         <select 
           v-model="filterCategory"
-          class="px-3 py-2.5 text-sm bg-[#FAFAFA] dark:bg-gray-700 dark:text-gray-200 border border-text-dark/10 dark:border-gray-600 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white dark:focus:bg-gray-600 min-w-[160px] transition-all"
+          class="px-3 py-2.5 text-sm bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white min-w-[160px] transition-all"
         >
           <option value="">Todas las categorías</option>
           <option value="extensiones">Extensiones</option>
@@ -48,7 +48,7 @@
         <!-- Stock Filter -->
         <select 
           v-model="filterStock"
-          class="px-3 py-2.5 text-sm bg-[#FAFAFA] dark:bg-gray-700 dark:text-gray-200 border border-text-dark/10 dark:border-gray-600 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white dark:focus:bg-gray-600 min-w-[140px] transition-all"
+          class="px-3 py-2.5 text-sm bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white min-w-[140px] transition-all"
         >
           <option value="">Todo el stock</option>
           <option value="available">Disponible</option>
@@ -142,12 +142,12 @@
                   <!-- Jerarquía de Texto -->
                   <div class="min-w-0 flex-1">
                     <!-- Línea 1: Nombre (Negrita, Oscuro) -->
-                    <p class="font-semibold text-[#111827] dark:text-gray-100 text-sm truncate mb-0.5">{{ producto.nombre }}</p>
+                    <p class="font-semibold text-[#111827] text-sm truncate mb-0.5">{{ producto.nombre }}</p>
                     
                     <!-- Línea 2: SKU + Categoría (Pequeño, Gris) -->
-                    <div class="flex items-center gap-2 text-xs text-[#6B7280] dark:text-gray-400">
+                    <div class="flex items-center gap-2 text-xs text-[#6B7280]">
                       <span class="font-mono">SKU: {{ producto.codigo }}</span>
-                      <span class="text-text-light dark:text-gray-500">•</span>
+                      <span class="text-text-light">•</span>
                       <span>{{ getCategoryLabel(producto) }}</span>
                     </div>
                   </div>
@@ -156,7 +156,7 @@
               
               <!-- Precio - ALINEADO A LA DERECHA, FUENTE TABULAR -->
               <td class="px-6 py-4 text-right">
-                <span class="font-semibold text-text-dark dark:text-gray-200 text-sm tabular-nums">${{ formatNumber(producto.precio_monto) }}</span>
+                <span class="font-semibold text-text-dark text-sm tabular-nums">${{ formatNumber(producto.precio_monto) }}</span>
               </td>
               
               <!-- Stock - INDICADORES VISUALES DE SALUD -->
@@ -390,9 +390,9 @@ export default {
     }
 
     const getStockClass = (stock, stockMinimo) => {
-      if (stock === 0) return 'text-red-600 dark:text-red-400'
-      if (stock <= stockMinimo) return 'text-orange-600 dark:text-orange-400'
-      return 'text-gray-900 dark:text-gray-200'
+      if (stock === 0) return 'text-red-600'
+      if (stock <= stockMinimo) return 'text-orange-600'
+      return 'text-gray-900'
     }
 
     const getCategoryLabel = (producto) => {

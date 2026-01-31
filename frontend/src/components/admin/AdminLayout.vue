@@ -1,7 +1,7 @@
 <template>
-  <div class="min-h-screen bg-gray-50 dark:bg-gray-900 transition-colors duration-300">
+  <div class="min-h-screen bg-gray-50">
     <!-- Header - YouTube/Google Cloud Style -->
-    <header class="fixed top-0 left-0 right-0 z-50 h-16 bg-white dark:bg-gray-800 border-b border-gray-200 dark:border-gray-700 transition-colors duration-300">
+    <header class="fixed top-0 left-0 right-0 z-50 h-16 bg-white border-b border-gray-200">
       <div class="flex items-center justify-between h-full px-4">
         <!-- Left Zone: Toggle + Logo -->
         <div class="flex items-center gap-3">
@@ -25,22 +25,6 @@
 
         <!-- Right Zone: Actions -->
         <div class="flex items-center gap-2">
-          <!-- Dark Mode Toggle -->
-          <button 
-            @click="toggleDarkMode" 
-            class="w-10 h-10 flex items-center justify-center rounded-full transition-all text-text-medium hover:text-text-dark hover:bg-gray-100 dark:text-gray-400 dark:hover:text-white dark:hover:bg-gray-800"
-            :title="isDarkMode ? 'Modo Claro' : 'Modo Oscuro'"
-          >
-            <!-- Sun Icon (for Dark Mode) -->
-            <svg v-if="isDarkMode" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M12 3v2.25m6.364.386l-1.591 1.591M21 12h-2.25m-.386 6.364l-1.591-1.591M12 18.75V21m-4.773-4.227l-1.591 1.591M5.25 12H3m4.227-4.773L5.636 5.636M15.75 12a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0z" />
-            </svg>
-            <!-- Moon Icon (for Light Mode) -->
-            <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M21.752 15.002A9.718 9.718 0 0118 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 003 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 009.002-5.998z" />
-            </svg>
-          </button>
-
           <!-- Mini Radio Player - Cuando está reproduciendo -->
           <div 
             v-if="isPlaying && currentStation"
@@ -199,7 +183,7 @@
     <!-- Sidebar - YouTube/Google Cloud Style -->
     <aside 
       :class="[
-        'fixed top-16 bottom-0 left-0 z-40 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 transform transition-all duration-300 ease-in-out overflow-y-auto',
+        'fixed top-16 bottom-0 left-0 z-40 bg-white border-r border-gray-200 transform transition-all duration-300 ease-in-out overflow-y-auto',
         sidebarCollapsed ? 'w-[70px]' : 'w-60'
       ]"
     >
@@ -277,7 +261,7 @@
       </nav>
 
       <!-- User Profile (Bottom) -->
-      <div class="absolute bottom-0 left-0 right-0 border-t border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 transition-colors duration-300">
+      <div class="absolute bottom-0 left-0 right-0 border-t border-gray-200 bg-white">
         <!-- Expanded State -->
         <div v-if="!sidebarCollapsed" class="p-3">
           <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50">
@@ -456,28 +440,6 @@ export default {
     }
     
     const sidebarCollapsed = ref(getSidebarState())
-    
-    // Dark Mode Logic
-    const isDarkMode = ref(localStorage.getItem('darkMode') === 'true')
-    
-    const toggleDarkMode = () => {
-      isDarkMode.value = !isDarkMode.value
-      localStorage.setItem('darkMode', isDarkMode.value)
-      updateTheme()
-    }
-    
-    const updateTheme = () => {
-      if (isDarkMode.value) {
-        document.documentElement.classList.add('dark')
-      } else {
-        document.documentElement.classList.remove('dark')
-      }
-    }
-    
-    onMounted(() => {
-      updateTheme()
-      // ... existing onMounted code
-    })
 
     const showRadio = ref(false)
     const isPlaying = ref(false)
@@ -962,10 +924,7 @@ export default {
       formatNumber,
       showPermissionModal,
       enableNotifications,
-      enableNotifications,
-      skipPermissions,
-      isDarkMode,
-      toggleDarkMode
+      skipPermissions
     }
   }
 }
