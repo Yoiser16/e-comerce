@@ -315,6 +315,132 @@ def obtener_dashboard_completo(
             })
         
         # ═══════════════════════════════════════════════════════════════════
+        # 6. VENTAS POR CATEGORÍA
+        # ═══════════════════════════════════════════════════════════════════
+        ventas_categoria = defaultdict(float)
+        
+        for orden in ordenes:
+            if get_estado_str(orden) not in estados_pagados:
+                continue
+            
+            if hasattr(orden, 'lineas') and orden.lineas:
+                for linea in orden.lineas:
+                    producto_id = str(linea.producto_id)
+                    producto = productos_map.get(producto_id)
+                    
+                    category_name = "Sin Categoría"
+                    if producto and producto.categoria:
+                        category_name = producto.categoria
+                    
+                    # Calcular subtotal (reutilizando lógica segura)
+                    cantidad = linea.cantidad if hasattr(linea, 'cantidad') else 1
+                    if hasattr(linea, 'subtotal'):
+                         if hasattr(linea.subtotal, 'monto'):
+                            subtotal = float(linea.subtotal.monto)
+                         else:
+                            subtotal = float(linea.subtotal) if linea.subtotal else 0
+                    elif hasattr(linea, 'precio_unitario'):
+                         if hasattr(linea.precio_unitario, 'monto'):
+                            subtotal = float(linea.precio_unitario.monto) * cantidad
+                         else:
+                            subtotal = float(linea.precio_unitario) * cantidad if linea.precio_unitario else 0
+                    else:
+                        subtotal = 0
+
+                    ventas_categoria[category_name] += subtotal
+        
+        categorias_data = {
+            "labels": list(ventas_categoria.keys()),
+            "data": list(ventas_categoria.values())
+        }
+
+        # ═══════════════════════════════════════════════════════════════════
+        # 7. DISTRIBUCIÓN DE ESTADOS
+        # ═══════════════════════════════════════════════════════════════════
+        conteo_estados = defaultdict(int)
+        for o in ordenes:
+             estado = get_estado_str(o)
+             conteo_estados[estado] += 1
+             
+        estados_data = {
+            "labels": list(conteo_estados.keys()),
+            "data": list(conteo_estados.values())
+        }
+
+        # ═══════════════════════════════════════════════════════════════════
+        # 8. TICKET PROMEDIO
+        # ═══════════════════════════════════════════════════════════════════
+        ticket_promedio = 0.0
+        ventas_totales_monto = estadisticas['total_ventas']
+        # Usar conteo de órdenes pagadas, no totales, para ser precisos
+        ordenes_pagadas_count = sum(1 for o in ordenes if get_estado_str(o) in estados_pagados)
+        
+        if ordenes_pagadas_count > 0:
+            ticket_promedio = ventas_totales_monto / ordenes_pagadas_count
+            
+        estadisticas['ticket_promedio'] = ticket_promedio
+        
+        # ═══════════════════════════════════════════════════════════════════
+        # 9. CRECIMIENTO DE CLIENTES (Ultimos 6 meses)
+        # ═══════════════════════════════════════════════════════════════════
+        clientes_por_mes = defaultdict(int)
+        meses_labels = []
+        
+        # Generar labels para últimos 6 meses
+        for i in range(5, -1, -1):
+            fecha = datetime.now() - timedelta(days=i*30)
+            mes_key = f"{fecha.year}-{fecha.month:02d}"
+            meses_labels.append(fecha.strftime("%b")) # Ene, Feb, etc.
+            clientes_por_mes[mes_key] = 0
+            
+        # Contar clientes
+        for c in clientes:
+            fecha_creacion = hacer_fecha_comparable(c.fecha_creacion)
+            if fecha_creacion:
+                 mes_key = f"{fecha_creacion.year}-{fecha_creacion.month:02d}"
+                 # Solo si entra en nuestra ventana de tiempo (aprox)
+                 if mes_key in clientes_por_mes or len(clientes_por_mes) < 6: # Simplificado
+                     clientes_por_mes[mes_key] += 1
+        
+        # Como los meses pueden no coincidir exacto con keys si no hay clientes, 
+        # hacemos una aproximación simple basada en orden histórico
+        crecimiento_clientes_data = {
+            "labels": meses_labels,
+            "data": [0] * 6 # Placeholder, la lógica real requeriría alineación exacta de fechas
+        }
+        
+        # Lógica corregida para mapear a los últimos 6 meses de forma robusta
+        datos_meses = [0] * 6
+        hoy = datetime.now()
+        for c in clientes:
+            fecha = hacer_fecha_comparable(c.fecha_creacion)
+            if fecha:
+                meses_atras = (hoy.year - fecha.year) * 12 + hoy.month - fecha.month
+                if 0 <= meses_atras < 6:
+                    idx = 5 - meses_atras
+                    datos_meses[idx] += 1
+        
+        crecimiento_clientes_data["data"] = datos_meses
+
+        # ═══════════════════════════════════════════════════════════════════
+        # 10. SALUD DE INVENTARIO
+        # ═══════════════════════════════════════════════════════════════════
+        # Agotar (0), Bajo (<5), Saludable (>5)
+        inventario_stats = {
+            "agotado": 0,
+            "bajo": 0,
+            "saludable": 0
+        }
+        
+        for p in productos_activos:
+            if p.stock_actual == 0:
+                inventario_stats["agotado"] += 1
+            elif p.stock_actual < 5:
+                 inventario_stats["bajo"] += 1
+            else:
+                 inventario_stats["saludable"] += 1
+                 
+        # ═══════════════════════════════════════════════════════════════════
         # RESPUESTA UNIFICADA
         # ═══════════════════════════════════════════════════════════════════
         elapsed = time.time() - start_time
@@ -325,6 +451,10 @@ def obtener_dashboard_completo(
             'productos_stock_bajo': stock_bajo_data,
             'ventas_por_periodo': ventas_periodo,
             'top_productos': top_productos_data,
+            'ventas_por_categoria': categorias_data,
+            'distribucion_estados': estados_data,
+            'crecimiento_clientes': crecimiento_clientes_data,
+            'salud_inventario': inventario_stats,
             '_meta': {
                 'tiempo_carga_ms': round(elapsed * 1000, 2),
                 'periodo': periodo,

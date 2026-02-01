@@ -30,7 +30,7 @@
     <div v-else class="space-y-10">
 
       <!-- Header & Quick Actions -->
-      <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-8">
+      <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-8 animate-card delay-0">
         <div>
           <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold tracking-wide border border-emerald-100 mb-4 shadow-sm">
             <span class="relative flex h-2 w-2">
@@ -62,6 +62,11 @@
             <svg class="w-6 h-6 transform group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           </button>
 
+          <button @click="exportReport" class="px-5 py-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-gray-700 font-medium hover:text-brand-600">
+             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+             <span>Exportar</span>
+          </button>
+
           <router-link to="/admin/productos/nuevo" class="px-6 py-3 rounded-2xl bg-gray-900 text-white font-medium shadow-lg shadow-gray-900/20 hover:bg-black hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
             Nueva Venta
@@ -70,10 +75,10 @@
       </div>
 
       <!-- Stats Masonry Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-card delay-100">
         
         <!-- Revenue Card (Primary) -->
-        <div class="col-span-1 md:col-span-2 bg-gradient-to-br from-gray-900 to-gray-800 rounded-[2.5rem] p-6 text-white relative overflow-hidden group shadow-2xl shadow-gray-900/20">
+        <div class="col-span-1 md:col-span-2 bg-gradient-to-br from-gray-900 to-gray-800 rounded-[2.5rem] p-6 text-white relative overflow-hidden group shadow-2xl shadow-gray-900/20 hover-card-effect cursor-default">
           <div class="absolute top-0 right-0 w-64 h-64 bg-white/5 rounded-full blur-3xl -mr-16 -mt-16 pointer-events-none"></div>
           <div class="absolute bottom-0 left-0 w-48 h-48 bg-brand-500/20 rounded-full blur-3xl -ml-10 -mb-10 pointer-events-none"></div>
           
@@ -85,8 +90,9 @@
                   <span class="text-4xl font-luxury tracking-tight">${{ formatNumber(stats.totalVentas) }}</span>
                 </div>
               </div>
-              <div class="p-3 bg-white/10 backdrop-blur-md rounded-2xl border border-white/10">
-                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+              <div class="text-right">
+                  <p class="text-white/40 text-[10px] uppercase tracking-wider mb-1">Ticket Promedio</p>
+                  <span class="text-xl font-bold text-brand-300">${{ formatNumber(stats.ticketPromedio) }}</span>
               </div>
             </div>
 
@@ -108,56 +114,41 @@
           </div>
         </div>
 
-        <!-- Orders Card -->
-        <div class="bg-white rounded-[2rem] p-4 border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between group">
+        <!-- Orders Card & Inventory Health -->
+        <div class="bg-white rounded-[2rem] p-4 border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover-card-effect flex flex-col justify-between group cursor-default">
           <div class="flex justify-between items-start mb-3">
-            <div class="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600 group-hover:scale-110 transition-transform duration-300">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
-            </div>
-            <span class="px-2 py-0.5 rounded-full bg-gray-50 text-gray-600 text-xs font-bold border border-gray-100">{{ stats.ordenesPendientes }} pendientes</span>
-          </div>
-          <div>
-            <h3 class="text-2xl font-bold text-gray-900 mb-1">{{ stats.totalOrdenes }}</h3>
-            <p class="text-gray-400 font-medium text-xs">Órdenes Totales</p>
-          </div>
-        </div>
-
-        <!-- Products Card -->
-        <div class="bg-white rounded-[2rem] p-4 border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover:shadow-[0_20px_40px_rgba(0,0,0,0.06)] transition-all duration-300 flex flex-col justify-between group">
-          <div class="flex justify-between items-start mb-3">
-            <div class="w-10 h-10 rounded-2xl bg-purple-50 flex items-center justify-center text-purple-600 group-hover:scale-110 transition-transform duration-300">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
-            </div>
-            <span :class="stats.stockBajo > 0 ? 'bg-amber-50 text-amber-600 border-amber-100' : 'bg-emerald-50 text-emerald-600 border-emerald-100'" class="px-2 py-0.5 rounded-full text-xs font-bold border">
-              {{ stats.stockBajo }} Alertas
-            </span>
-          </div>
-          <div>
-            <h3 class="text-2xl font-bold text-gray-900 mb-1">{{ stats.totalProductos }}</h3>
-            <p class="text-gray-400 font-medium text-xs">Productos Activos</p>
-          </div>
-        </div>
-
-        <!-- Clients Card -->
-        <div class="col-span-1 md:col-span-2 lg:col-span-3 xl:col-span-4 bg-white rounded-[2rem] p-4 border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] flex items-center justify-between relative overflow-hidden">
-          <div class="absolute inset-0 bg-gradient-to-r from-pink-50/50 to-transparent pointer-events-none"></div>
-          <div class="relative z-10 flex items-center gap-4">
-            <div class="w-12 h-12 rounded-3xl bg-pink-50 flex items-center justify-center text-pink-600 shadow-sm border border-pink-100">
-               <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"/></svg>
-            </div>
-             <div>
-              <h3 class="text-xl font-bold text-gray-900">{{ stats.totalClientes }} Clientes</h3>
-              <p class="text-gray-500 text-xs">Registrados en la plataforma</p>
-            </div>
-          </div>
-          <div class="relative z-10 flex items-center gap-4 pr-4">
-             <div class="flex -space-x-3">
-               <div v-for="i in 4" :key="i" class="w-10 h-10 rounded-full border-2 border-white bg-gray-100 flex items-center justify-center text-xs font-bold text-gray-400">
-                 <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 9a3 3 0 100-6 3 3 0 000 6zm-7 9a7 7 0 1114 0H3z" clip-rule="evenodd"/></svg>
-               </div>
+             <div class="w-10 h-10 rounded-2xl bg-blue-50 flex items-center justify-center text-blue-600">
+               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
              </div>
-             <span class="text-sm font-semibold text-pink-600 bg-pink-50 px-3 py-1 rounded-full">+{{ stats.clientesNuevos }} nuevos este mes</span>
+             <span class="text-2xl font-bold text-gray-900">{{ stats.totalOrdenes }}</span>
           </div>
+          <div>
+            <p class="text-gray-400 font-medium text-xs mb-3">Salud Inventario</p>
+            <div class="flex gap-1 h-2 rounded-full overflow-hidden bg-gray-100">
+                <div class="bg-emerald-500 transition-all duration-1000" :style="`width: ${(saludInventario.saludable / (stats.totalProductos || 1)) * 100}%`"></div>
+                <div class="bg-amber-400 transition-all duration-1000" :style="`width: ${(saludInventario.bajo / (stats.totalProductos || 1)) * 100}%`"></div>
+                <div class="bg-red-500 transition-all duration-1000" :style="`width: ${(saludInventario.agotado / (stats.totalProductos || 1)) * 100}%`"></div>
+            </div>
+            <div class="flex justify-between mt-2 text-[10px] text-gray-400">
+                <span>{{ saludInventario.saludable }} OK</span>
+                <span v-if="saludInventario.bajo > 0" class="text-amber-600 font-bold">{{ saludInventario.bajo }} Bajo</span>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Customer Growth -->
+        <div class="bg-white rounded-[2rem] p-4 border border-gray-100 shadow-[0_10px_30px_rgba(0,0,0,0.02)] hover-card-effect flex flex-col justify-between group cursor-default">
+             <div class="flex justify-between items-center mb-2">
+                 <p class="text-gray-400 text-xs font-bold uppercase">Nuevos Clientes</p>
+                 <span class="text-emerald-500 font-bold text-sm">+{{ stats.clientesNuevos }}</span>
+             </div>
+             <div class="h-20 -mx-2">
+                 <Bar :data="growthChartData" :options="growthChartOptions" />
+             </div>
+             <div class="flex items-center gap-2 mt-2">
+                 <span class="text-2xl font-bold text-gray-900">{{ stats.totalClientes }}</span>
+                 <span class="text-xs text-gray-400">total activos</span>
+             </div>
         </div>
 
       </div>
@@ -165,8 +156,8 @@
       <!-- Content Grid -->
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
-        <!-- Main Chart Section -->
-        <div class="lg:col-span-2 bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-8 relative">
+        <!-- Main Chart Section: Revenue -->
+        <div class="lg:col-span-2 bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-8 relative flex flex-col animate-card delay-200 hover-card-effect">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
             <div>
               <h3 class="text-2xl font-luxury font-bold text-gray-900">Análisis de Ingresos</h3>
@@ -186,8 +177,8 @@
             </div>
           </div>
 
-          <div class="relative h-[400px] w-full">
-            <!-- Loading Overlay -->
+          <div class="relative flex-1 w-full min-h-[300px]">
+             <!-- Loading Overlay -->
             <transition name="fade">
               <div v-if="chartLoading" class="absolute inset-0 bg-white/60 backdrop-blur-[2px] z-20 flex items-center justify-center rounded-2xl">
                 <div class="flex items-center gap-3 bg-white px-6 py-3 rounded-full shadow-lg border border-gray-100">
@@ -198,45 +189,108 @@
               </div>
             </transition>
             
-            <Line :data="salesChartData" :options="salesChartOptions" />
+            <!-- Custom Allocation-style Chart -->
+            <div class="bg-[#111111] rounded-3xl p-6 h-[300px] flex items-end gap-2 md:gap-4 overflow-x-auto relative shadow-inner">
+               <!-- Background Pattern (Diagonal Lines) -->
+               <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(45deg, #ffffff 5%, transparent 5%, transparent 50%, #ffffff 50%, #ffffff 55%, transparent 55%, transparent); background-size: 20px 20px;"></div>
+
+               <!-- Bars -->
+               <div v-for="item in pSalesData" :key="item.label" class="flex-1 min-w-[60px] flex flex-col justify-end h-full z-10 group cursor-pointer">
+                  <!-- Bar Container (Dark Track) -->
+                  <div class="w-full bg-white/5 rounded-2xl h-full relative overflow-hidden flex items-end transition-all duration-300 group-hover:bg-white/10">
+                      <!-- Filled Bar -->
+                      <div 
+                        class="w-full rounded-2xl transition-all duration-500 ease-out relative p-3 flex flex-col justify-start group-hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] group-hover:scale-y-[1.02] origin-bottom"
+                        :class="item.color"
+                        :style="`height: ${item.heightPercent}%`"
+                      >
+                         <span class="text-xs font-bold leading-none mb-1 opacity-90" :class="item.textColor">{{ '$' + item.valueFormatted }}</span>
+                         <span class="text-[10px] font-medium leading-none opacity-75" :class="item.textColor">{{ Math.round((item.value / (stats.totalVentas || 1)) * 100) }}%</span>
+                      </div>
+                  </div>
+                  <!-- Label -->
+                  <p class="text-gray-500 text-xs font-medium text-center mt-3 group-hover:text-white transition-colors">{{ item.label }}</p>
+               </div>
+            </div>
           </div>
         </div>
 
-        <!-- Right Column: Top Products -->
-        <div class="bg-gray-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-2xl flex flex-col">
-          <div class="absolute top-0 right-0 w-64 h-64 bg-brand-500/20 rounded-full blur-3xl -mr-20 -mt-20"></div>
-          
-          <div class="relative z-10 mb-8">
-            <h3 class="text-2xl font-luxury font-bold text-white">Top Ventas</h3>
-            <p class="text-white/40 text-sm mt-1">Distribución mejores productos</p>
-          </div>
+        <!-- Sales by Category -->
+        <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-8 relative flex flex-col animate-card delay-300 hover-card-effect">
+             <div class="mb-6">
+               <h3 class="text-xl font-luxury font-bold text-gray-900">Por Categoría</h3>
+               <p class="text-gray-400 text-sm mt-1">Ventas por segmento</p>
+             </div>
+             <div class="flex-1 relative min-h-[250px] flex items-center justify-center">
+                 <Doughnut :data="categoryChartData" :options="donutChartOptions" />
+                 <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none pr-20 md:pr-0 lg:pr-24 xl:pr-0">
+                   <!-- Center text is tricky with legend on right, leaving empty for now -->
+                 </div>
+             </div>
+        </div>
 
-          <div class="relative z-10 flex-1 flex flex-col justify-center items-center">
-            <div class="w-64 h-64 relative">
-              <Doughnut :data="topProductsChartData" :options="donutChartOptions" />
-              <div class="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
-                 <span class="text-4xl font-luxury">{{ topProducts.length }}</span>
-                 <span class="text-[10px] uppercase tracking-[0.2em] text-white/40 mt-1">Items</span>
-              </div>
+        <!-- Status Distribution -->
+        <div class="bg-gray-50 rounded-[2.5rem] border border-gray-100 p-8 animate-card delay-400 hover-card-effect">
+             <div class="mb-6 flex justify-between items-end">
+               <div>
+                 <h3 class="text-xl font-luxury font-bold text-gray-900">Estado de Órdenes</h3>
+                 <p class="text-gray-400 text-sm mt-1">Flujo actual de pedidos</p>
+               </div>
+               <span class="text-3xl font-bold text-gray-900">{{ stats.totalOrdenes }}</span>
+             </div>
+             <div class="space-y-4">
+               <div v-for="item in pStatusData" :key="item.label" class="group hover:translate-x-2 transition-transform duration-300 cursor-default">
+                 <div class="flex justify-between items-end mb-1">
+                   <span class="text-sm font-semibold text-gray-700">{{ item.label }}</span>
+                   <div class="text-right">
+                     <span class="text-sm font-bold text-gray-900">{{ item.count }}</span>
+                     <span class="text-xs text-gray-400 ml-1">({{ item.percent }}%)</span>
+                   </div>
+                 </div>
+                 <div class="w-full h-3 bg-gray-200 rounded-full overflow-hidden">
+                   <div 
+                     class="h-full rounded-full transition-all duration-1000 ease-out group-hover:opacity-90 relative overflow-hidden"
+                     :class="item.color"
+                     :style="`width: ${item.relativeWidth}%`"
+                   >
+                      <div class="absolute inset-0 bg-white/20 transform -skew-x-12 -translate-x-full group-hover:animate-shimmer"></div>
+                   </div>
+                 </div>
+               </div>
+             </div>
+        </div>
+
+        <!-- Top Products List -->
+        <div class="lg:col-span-2 bg-gray-900 rounded-[2.5rem] p-8 text-white relative overflow-hidden shadow-2xl flex flex-col animate-card delay-500 hover-card-effect">
+          <div class="absolute top-0 right-0 w-96 h-96 bg-brand-500/10 rounded-full blur-3xl -mr-20 -mt-20 pointer-events-none"></div>
+          
+          <div class="relative z-10 mb-8 flex items-center justify-between">
+            <div>
+              <h3 class="text-2xl font-luxury font-bold text-white">Top Productos</h3>
+              <p class="text-white/40 text-sm mt-1">Los más vendidos del periodo</p>
             </div>
           </div>
 
-          <div class="relative z-10 mt-8 space-y-4">
-             <div v-for="(product, index) in topProducts.slice(0,3)" :key="product.id" class="flex items-center justify-between p-3 rounded-2xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors">
-               <div class="flex items-center gap-3 overflow-hidden">
-                 <span class="w-2 h-8 rounded-full flex-shrink-0" :style="{ backgroundColor: chartColors[index] }"></span>
-                 <span class="text-sm font-medium text-white/90 truncate">{{ product.nombre }}</span>
+          <div class="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-4">
+             <div v-for="(product, index) in topProducts" :key="product.id" class="flex items-center gap-4 p-4 rounded-3xl bg-white/5 border border-white/5 hover:bg-white/10 transition-colors group">
+               <div class="w-12 h-12 rounded-2xl bg-white/10 flex items-center justify-center text-lg font-bold">
+                  {{ index + 1 }}
                </div>
-               <span class="text-white font-bold text-sm">{{ product.ventas }}</span>
+               <div class="flex-1 min-w-0">
+                 <h4 class="text-white font-medium truncate">{{ product.nombre }}</h4>
+                 <p class="text-white/40 text-xs">{{ product.cantidad }} unidades vendidas</p>
+               </div>
+               <div class="text-right">
+                 <span class="text-brand-400 font-bold block">${{ formatNumber(product.ventas) }}</span>
+               </div>
              </div>
           </div>
-
         </div>
 
       </div>
 
       <!-- Recent Orders Table -->
-      <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden p-8">
+      <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-sm overflow-hidden p-8 animate-card delay-600 hover-card-effect">
         <div class="flex items-center justify-between mb-8">
           <div>
             <h3 class="text-2xl font-luxury font-bold text-gray-900">Transacciones Recientes</h3>
@@ -259,7 +313,7 @@
               </tr>
             </thead>
             <tbody class="divide-y divide-gray-50">
-              <tr v-for="orden in recentOrders" :key="orden.id" class="group hover:bg-gray-50/50 transition-colors">
+              <tr v-for="orden in recentOrders" :key="orden.id" class="group hover:bg-white hover:shadow-md hover:scale-[1.01] transition-all duration-200 cursor-pointer border-b border-transparent hover:border-gray-100 rounded-xl relative z-0 hover:z-10">
                  <td class="py-4 px-4">
                    <span class="font-mono text-xs font-bold bg-gray-100 text-gray-600 px-2 py-1 rounded-md group-hover:bg-gray-200 transition-colors">
                      #{{ orden.id.slice(0,6).toUpperCase() }}
@@ -302,13 +356,14 @@
 
 <script>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
-import { Line, Doughnut } from 'vue-chartjs'
+import { Line, Doughnut, Bar } from 'vue-chartjs'
 import {
   Chart as ChartJS,
   CategoryScale,
   LinearScale,
   PointElement,
   LineElement,
+  BarElement,
   Title,
   Tooltip,
   Legend,
@@ -317,11 +372,11 @@ import {
 } from 'chart.js'
 import apiClient from '../../services/api'
 
-ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend, Filler, ArcElement)
+ChartJS.register(CategoryScale, LinearScale, PointElement, LineElement, BarElement, Title, Tooltip, Legend, Filler, ArcElement)
 
 export default {
   name: 'AdminDashboard',
-  components: { Line, Doughnut },
+  components: { Line, Doughnut, Bar },
   setup() {
     // Definimos una paleta de colores personalizada y moderna
     const brandColors = {
@@ -333,11 +388,15 @@ export default {
       info: '#3B82F6'
     }
 
-    const chartColors = [brandColors.accent, brandColors.gold, '#8B5CF6', brandColors.info, brandColors.success]
+    const chartColors = [brandColors.accent, brandColors.gold, '#8B5CF6', brandColors.info, brandColors.success, '#EC4899', '#6366F1']
     
     const stats = ref({})
     // Valores por defecto para evitar errores al cargar parcialmente
-    const defaultStats = { totalVentas: 0, totalOrdenes: 0, ordenesPendientes: 0, totalProductos: 0, productosActivos: 0, stockBajo: 0, totalClientes: 0, clientesNuevos: 0 }
+    const defaultStats = { 
+        totalVentas: 0, totalOrdenes: 0, ordenesPendientes: 0, 
+        totalProductos: 0, productosActivos: 0, stockBajo: 0, 
+        totalClientes: 0, clientesNuevos: 0, ticketPromedio: 0 
+    }
     stats.value = { ...defaultStats }
 
     const loading = ref(true)
@@ -350,6 +409,10 @@ export default {
     const lowStockProducts = ref([])
     const topProducts = ref([])
     const ventasPorPeriodo = ref({ labels: [], data: [] })
+    const ventasPorCategoria = ref({ labels: [], data: [] })
+    const distribucionEstados = ref({ labels: [], data: [] })
+    const crecimientoClientes = ref({ labels: [], data: [] })
+    const saludInventario = ref({ agotado: 0, bajo: 0, saludable: 0 })
 
     const fechaActual = computed(() => {
       const options = { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' }
@@ -357,39 +420,34 @@ export default {
       return date.charAt(0).toUpperCase() + date.slice(1)
     })
 
-    // Sales Chart Configuration
-    const salesChartData = computed(() => {
-      // Fallback labels
-      let defaultLabels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-      if (selectedPeriod.value === '24H') defaultLabels = ['00h', '04h', '08h', '12h', '16h', '20h']
-      if (selectedPeriod.value === '30D') defaultLabels = ['Sem 1', 'Sem 2', 'Sem 3', 'Sem 4']
+    // Processed Sales Data for Custom Block Chart
+    const pSalesData = computed(() => {
+       // Labels logic (copied from chart logic)
+       let defaultLabels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
+       if (selectedPeriod.value === '24H') defaultLabels = ['00h', '04h', '08h', '12h', '16h', '20h']
+       if (selectedPeriod.value === '30D') defaultLabels = ['S1', 'S2', 'S3', 'S4'] // Simplified for space
 
-      const labels = ventasPorPeriodo.value.labels?.length ? ventasPorPeriodo.value.labels : defaultLabels
-      const data = ventasPorPeriodo.value.data?.length ? ventasPorPeriodo.value.data : labels.map(() => 0)
+       const labels = ventasPorPeriodo.value.labels?.length ? ventasPorPeriodo.value.labels : defaultLabels
+       const data = ventasPorPeriodo.value.data?.length ? ventasPorPeriodo.value.data : labels.map(() => 0)
+       
+       const max = Math.max(...data) || 1
 
-      return {
-        labels,
-        datasets: [{
-          label: 'Ingresos',
-          data,
-          fill: true,
-          borderColor: brandColors.accent,
-          borderWidth: 4,
-          tension: 0.45, // Super smooth
-          pointRadius: 0,
-          pointHoverRadius: 8,
-          pointHoverBackgroundColor: '#fff',
-          pointHoverBorderColor: brandColors.accent,
-          pointHoverBorderWidth: 3,
-          backgroundColor: (context) => {
-            const ctx = context.chart.ctx
-            const gradient = ctx.createLinearGradient(0, 0, 0, 350)
-            gradient.addColorStop(0, 'rgba(216, 27, 96, 0.15)')
-            gradient.addColorStop(1, 'rgba(216, 27, 96, 0)')
-            return gradient
-          },
-        }]
-      }
+       // Colores vibrantes del diseño solicitado
+       const colors = ['bg-orange-500', 'bg-yellow-400', 'bg-white', 'bg-gray-400', 'bg-emerald-400', 'bg-cyan-400', 'bg-rose-400']
+       
+       return labels.map((label, index) => {
+          const value = data[index] || 0
+          const percent = Math.round((value / max) * 100)
+          
+          return {
+             label,
+             value,
+             valueFormatted: formatNumber(value),
+             heightPercent: Math.max(percent, 15), // Min height for text
+             color: colors[index % colors.length],
+             textColor: colors[index % colors.length] === 'bg-white' ? 'text-gray-900' : 'text-white'
+          }
+       })
     })
 
     const salesChartOptions = {
@@ -441,12 +499,142 @@ export default {
       }]
     }))
 
+
+
+    // Category Chart Config
+    const categoryChartData = computed(() => ({
+      labels: ventasPorCategoria.value.labels || [],
+      datasets: [{
+        data: ventasPorCategoria.value.data || [],
+        backgroundColor: chartColors,
+        borderWidth: 0,
+        hoverOffset: 20
+      }]
+    }))
+
+    // Customer Growth Chart (Standard Bar for Readability)
+    const growthChartData = computed(() => ({
+      labels: crecimientoClientes.value.labels || [],
+      datasets: [{
+        label: 'Nuevos Clientes',
+        data: crecimientoClientes.value.data || [],
+        backgroundColor: '#10B981', // Solid Emerald
+        hoverBackgroundColor: '#059669',
+        borderRadius: 4,
+        barPercentage: 0.6
+      }]
+    }))
+
+     // Status Chart Config (Bar)
+     // Processed Status Data for Custom HTML List
+    const pStatusData = computed(() => {
+       const labels = distribucionEstados.value.labels || []
+       const data = distribucionEstados.value.data || []
+       
+       if (!labels.length) return []
+
+       const total = data.reduce((a, b) => a + b, 0) || 1
+       const max = Math.max(...data) || 1
+
+       return labels.map((label, index) => {
+          const l = label.toLowerCase()
+          let color = 'bg-gray-500'
+          
+          // Paleta "Enterprise": Menos saturada, más elegante
+          if(l.includes('completada') || l.includes('ok')) color = 'bg-teal-600' // Teal elegante
+          else if(l.includes('pendiente')) color = 'bg-amber-500' // Amber cálido
+          else if(l.includes('confirmada')) color = 'bg-indigo-600' // Indigo profundo
+          else if(l.includes('proceso')) color = 'bg-blue-600' // Azul corporativo
+          else if(l.includes('enviada')) color = 'bg-sky-500' // Sky
+          else if(l.includes('cancelada')) color = 'bg-slate-400' // Gris neutro (menos alarmante que rojo)
+
+          return {
+             label,
+             count: data[index],
+             percent: Math.round((data[index] / total) * 100),
+             relativeWidth: Math.round((data[index] / max) * 100),
+             color
+          }
+       }).sort((a, b) => b.count - a.count) // Ordenar por cantidad
+    })
+
+    const basicChartOptions = {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { grid: { display: false } },
+            y: { grid: { borderDash: [5, 5] }, ticks: { stepSize: 1 } }
+        }
+    }
+
+    const growthChartOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: { legend: { display: false } },
+        scales: {
+            x: { 
+                display: true, 
+                grid: { display: false },
+                ticks: { font: { size: 10 }, color: '#9CA3AF' }
+            },
+            y: { 
+                display: true,
+                min: 0,
+                grid: { borderDash: [4, 4], color: '#F3F4F6' },
+                ticks: { stepSize: 1, font: { size: 10 }, color: '#9CA3AF' } 
+            }
+        }
+    }
+
+    const statusChartOptions = {
+      indexAxis: 'y', // Convertir a gráfico de barras horizontales
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: {
+          backgroundColor: '#111827',
+          padding: 12,
+          displayColors: true,
+          boxWidth: 8,
+          boxHeight: 8,
+          usePointStyle: true,
+          callbacks: { 
+            title: (items) => items[0].label.toUpperCase(),
+            label: c => ` ${c.raw} órdenes` 
+          }
+        }
+      },
+      scales: {
+        x: { 
+            display: false, // Ocultar eje X
+            grid: { display: false } 
+        },
+        y: { 
+            display: true,
+            grid: { display: false },
+            ticks: { 
+                font: { size: 12, weight: '600', family: 'Inter, sans-serif' },
+                color: '#4B5563',
+                mirror: false // Labels fuera de la barra
+            } 
+        }
+      },
+      layout: {
+        padding: { left: 0, right: 20, top: 0, bottom: 0 }
+      }
+    }
+
     const donutChartOptions = {
       responsive: true,
       maintainAspectRatio: false,
-      cutout: '80%',
+      cutout: '75%',
       plugins: {
-        legend: { display: false },
+        legend: { 
+          display: true, 
+          position: 'right',
+          labels: { boxWidth: 10, font: { size: 11 }, color: '#9CA3AF', padding: 15 }
+        },
         tooltip: {
           backgroundColor: '#fff',
           titleColor: '#111827',
@@ -479,7 +667,8 @@ export default {
           productosActivos: data.estadisticas?.productos_activos || 0,
           stockBajo: data.estadisticas?.stock_bajo || 0,
           totalClientes: data.estadisticas?.total_clientes || 0,
-          clientesNuevos: data.estadisticas?.clientes_nuevos || 0
+          clientesNuevos: data.estadisticas?.clientes_nuevos || 0,
+          ticketPromedio: data.estadisticas?.ticket_promedio || 0
         }
         
         // Órdenes recientes
@@ -496,6 +685,27 @@ export default {
           labels: data.ventas_por_periodo?.labels || [],
           data: data.ventas_por_periodo?.data || []
         }
+
+        // Ventas por categoría
+        ventasPorCategoria.value = {
+          labels: data.ventas_por_categoria?.labels || [],
+          data: data.ventas_por_categoria?.data || []
+        }
+
+        // Distribución de estados
+        distribucionEstados.value = {
+          labels: (data.distribucion_estados?.labels || []).map(l => getStatusLabel(l)), // Traducir labels
+          data: data.distribucion_estados?.data || []
+        }
+
+        // Crecimiento clientes
+        crecimientoClientes.value = {
+            labels: data.crecimiento_clientes?.labels || [],
+            data: data.crecimiento_clientes?.data || []
+        }
+
+        // Salud inventario
+        saludInventario.value = data.salud_inventario || { agotado: 0, bajo: 0, saludable: 0}
         
         // Top productos
         topProducts.value = data.top_productos || []
@@ -565,9 +775,15 @@ export default {
       return map[status] || status
     }
 
+    const exportReport = () => {
+        alert('Generando reporte PDF... (Simulación)')
+    }
+
     return {
       stats, loading, chartLoading, error, selectedPeriod, recentOrders, topProducts, lowStockProducts,
-      salesChartData, salesChartOptions, topProductsChartData, donutChartOptions, chartColors,
+      topProductsChartData, donutChartOptions, chartColors,
+      categoryChartData, growthChartData, growthChartOptions,
+      saludInventario, exportReport, pStatusData, pSalesData,
       fechaActual, cargarDatos, cambiarPeriodo, formatNumber, getStatusClass, getStatusLabel
     }
   }
@@ -578,14 +794,39 @@ export default {
 .font-luxury { font-family: 'Playfair Display', serif; }
 
 .animate-fade-in {
-  animation: fadeIn 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+  /* Removed simple fadeIn to use staggered animate-card instead */
 }
 
-@keyframes fadeIn {
-  from { opacity: 0; transform: translateY(20px); filter: blur(10px); }
-  to { opacity: 1; transform: translateY(0); filter: blur(0); }
+/* Entrance Animations */
+@keyframes slideUpFade {
+  from { opacity: 0; transform: translateY(30px) scale(0.98); }
+  to { opacity: 1; transform: translateY(0) scale(1); }
 }
 
-.delay-75 { animation-delay: 75ms; }
-.delay-150 { animation-delay: 150ms; }
+.animate-card {
+  opacity: 0; /* Star hidden */
+  animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.delay-0 { animation-delay: 0ms; }
+.delay-100 { animation-delay: 100ms; }
+.delay-200 { animation-delay: 200ms; }
+.delay-300 { animation-delay: 300ms; }
+.delay-400 { animation-delay: 400ms; }
+.delay-500 { animation-delay: 500ms; }
+.delay-600 { animation-delay: 600ms; }
+
+/* Shimmer Effect for graphs/loading */
+@keyframes shimmer {
+  100% { transform: skewX(-12deg) translateX(150%); }
+}
+.animate-shimmer { animation: shimmer 2s infinite; }
+/* Global Hover Effect */
+.hover-card-effect {
+  transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+}
+.hover-card-effect:hover {
+  transform: translateY(-8px); /* Lift up notably */
+  box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.15), 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+}
 </style>
