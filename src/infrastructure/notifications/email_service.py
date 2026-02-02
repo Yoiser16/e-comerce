@@ -9,13 +9,31 @@ import time
 
 # Mapeo de estados a texto amigable
 ESTADO_HUMANO = {
-    "pendiente": "pendiente de pago",
+    "pendiente": "pendiente de confirmación",
     "confirmada": "aprobada",
     "en_proceso": "en proceso",
     "enviada": "enviada",
     "completada": "completada",
     "cancelada": "cancelada",
 }
+
+# Mapeo de títulos para emails según estado
+def _get_email_title(estado: str, codigo: str) -> str:
+    """Generar título del email según el estado de la orden."""
+    if estado == "pendiente":
+        return f"SOLICITUD DE PEDIDO REGISTRADA #{codigo}"
+    elif estado == "confirmada":
+        return f"PEDIDO CONFIRMADO #{codigo}"
+    elif estado == "en_proceso":
+        return f"PEDIDO EN PROCESO #{codigo}"
+    elif estado == "enviada":
+        return f"PEDIDO ENVIADO #{codigo}"
+    elif estado == "completada":
+        return f"PEDIDO COMPLETADO #{codigo}"
+    elif estado == "cancelada":
+        return f"PEDIDO CANCELADO #{codigo}"
+    else:
+        return f"ESTADO DE PEDIDO #{codigo}"
 
 
 def _build_subject(codigo: str, estado: str) -> str:
@@ -103,7 +121,7 @@ def _build_body(
             </div>
 
             <div class="order-title">
-                CONFIRMACIÓN DE PEDIDO #{codigo}
+                {_get_email_title(estado, codigo)}
             </div>
 
             <div class="card">
