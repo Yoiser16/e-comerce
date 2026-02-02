@@ -70,14 +70,125 @@
           
           <!-- Right: User + Cart -->
           <div class="flex items-center gap-0.5">
-            <router-link 
-              to="/login"
-              class="w-10 h-10 flex items-center justify-center"
-            >
-              <svg class="w-5 h-5 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-              </svg>
-            </router-link>
+            <!-- Usuario con dropdown -->
+            <div class="relative" ref="userMenuRefMobile">
+              <button 
+                @click="toggleUserMenu"
+                class="w-10 h-10 flex items-center justify-center rounded-full transition-colors"
+                :class="[
+                  isLoggedIn 
+                    ? 'border border-text-dark/20'
+                    : 'hover:bg-black/5'
+                ]"
+              >
+                <!-- Si está logueado, mostrar inicial -->
+                <span v-if="isLoggedIn" class="text-xs font-medium text-text-dark">
+                  {{ userInitial }}
+                </span>
+                <!-- Si no está logueado, mostrar icono -->
+                <svg v-else class="w-5 h-5 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                </svg>
+              </button>
+              
+              <!-- Dropdown Menu -->
+              <Teleport to="body">
+                <transition
+                  enter-active-class="transition duration-150 ease-out"
+                  enter-from-class="opacity-0 scale-95"
+                  enter-to-class="opacity-100 scale-100"
+                  leave-active-class="transition duration-100 ease-in"
+                  leave-from-class="opacity-100 scale-100"
+                  leave-to-class="opacity-0 scale-95"
+                >
+                  <div 
+                    v-if="showUserMenu"
+                    class="fixed w-52 bg-white rounded-lg shadow-[0_16px_48px_rgb(0,0,0,0.25)] py-2 border border-black/10"
+                    :style="{
+                      top: ((userMenuRefMobile?.getBoundingClientRect().bottom || userMenuRefDesktop?.getBoundingClientRect().bottom || 0) + 12) + 'px',
+                      left: ((userMenuRefMobile?.getBoundingClientRect().right || userMenuRefDesktop?.getBoundingClientRect().right || 0) - 208) + 'px',
+                      zIndex: 99999
+                    }"
+                  >
+                    <!-- Si está logueado -->
+                    <template v-if="isLoggedIn">
+                      <div class="px-4 py-3 border-b border-black/10 bg-nude-50/30">
+                        <p class="text-xs text-text-medium mb-0.5">Hola,</p>
+                        <p class="text-sm text-text-dark font-semibold truncate">{{ currentUser?.nombre || currentUser?.email }}</p>
+                      </div>
+                      <router-link 
+                        to="/mi-cuenta"
+                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-text-dark font-medium hover:bg-nude-100 transition-colors"
+                        @click="showUserMenu = false"
+                      >
+                        <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                        </svg>
+                        Mi Cuenta
+                      </router-link>
+                      <button 
+                        @click="handleMenuAction('pedidos')"
+                        class="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-text-dark font-medium hover:bg-nude-100 transition-colors"
+                      >
+                        <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                        </svg>
+                        Mis Pedidos
+                      </button>
+                      <button 
+                        @click="handleMenuAction('favoritos')"
+                        class="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-text-dark font-medium hover:bg-nude-100 transition-colors border-b border-black/10"
+                      >
+                        <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                        </svg>
+                        Ver Favoritos
+                      </button>
+                      <button 
+                        @click="cerrarSesion"
+                        class="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors mt-1"
+                      >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9" />
+                        </svg>
+                        Cerrar Sesión
+                      </button>
+                    </template>
+                    
+                    <!-- Si NO está logueado -->
+                    <template v-else>
+                      <button 
+                        @click="handleMenuAction('login')"
+                        class="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-text-dark font-medium hover:bg-nude-100 transition-colors"
+                      >
+                        <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15M12 9l-3 3m0 0l3 3m-3-3h12.75" />
+                        </svg>
+                        Inicia sesión
+                      </button>
+                      <button 
+                        @click="handleMenuAction('pedidos')"
+                        class="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-text-dark font-medium hover:bg-nude-100 transition-colors"
+                      >
+                        <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+                        </svg>
+                        Mi pedido
+                      </button>
+                      <button 
+                        @click="handleMenuAction('favoritos')"
+                        class="flex items-center gap-3 w-full text-left px-4 py-2.5 text-sm text-text-dark font-medium hover:bg-nude-100 transition-colors"
+                      >
+                        <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                        </svg>
+                        Ver Favoritos
+                      </button>
+                    </template>
+                  </div>
+                </transition>
+              </Teleport>
+            </div>
             <button 
               class="relative w-10 h-10 flex items-center justify-center -mr-2"
               @click="mostrarCarrito = true"
@@ -210,14 +321,27 @@
 
             <!-- Acciones Desktop -->
             <div class="flex items-center gap-1 ml-6">
-              <router-link 
-                to="/login"
-                class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#f5f5f5] transition-colors"
-              >
-                <svg class="w-5 h-5 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-                </svg>
-              </router-link>
+              <!-- Usuario con dropdown -->
+              <div class="relative" ref="userMenuRefDesktop">
+                <button 
+                  @click="toggleUserMenu"
+                  class="w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#f5f5f5] transition-colors"
+                  :class="[
+                    isLoggedIn 
+                      ? 'border border-text-dark/20'
+                      : ''
+                  ]"
+                >
+                  <!-- Si está logueado, mostrar inicial -->
+                  <span v-if="isLoggedIn" class="text-xs font-medium text-text-dark">
+                    {{ userInitial }}
+                  </span>
+                  <!-- Si no está logueado, mostrar icono -->
+                  <svg v-else class="w-5 h-5 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                  </svg>
+                </button>
+              </div>
               <button 
                 class="relative w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#f5f5f5] transition-colors"
                 @click="mostrarCarrito = true"
@@ -1196,6 +1320,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
+import { authService, carritoService as carritoServiceImport } from '../services/productos'
 
 const router = useRouter()
 const route = useRoute()
@@ -1208,6 +1333,13 @@ const cartCount = ref(0)
 const mostrarCarrito = ref(false)
 const carritoItems = ref([])
 const videoPosters = ref({})
+
+// Usuario y menú
+const isLoggedIn = ref(authService.isAuthenticated())
+const currentUser = ref(JSON.parse(localStorage.getItem('user') || 'null'))
+const showUserMenu = ref(false)
+const userMenuRefMobile = ref(null)
+const userMenuRefDesktop = ref(null)
 
 // Header
 const isScrolled = ref(false)
@@ -1271,6 +1403,12 @@ const toastMessage = ref('')
 const coloresDisponibles = ref(['Negro', 'Castaño', 'Rubio', 'Rojo', 'Borgogña', 'Platino', 'Rubio Ceniza'])
 const tiposDisponibles = ref(['Liso', 'Ondulado', 'Rizado', 'Afro'])
 const largosDisponibles = ref(['30cm', '40cm', '45cm', '50cm', '55cm', '60cm', '65cm', '70cm'])
+
+// Computed para usuario
+const userInitial = computed(() => {
+  if (!currentUser.value) return ''
+  return (currentUser.value.nombre || currentUser.value.email || 'U')[0].toUpperCase()
+})
 
 // Contador de filtros activos
 const activeFiltersCount = computed(() => {
@@ -1693,10 +1831,54 @@ const handleSearch = () => {
   // Implementar búsqueda completa si es necesario
 }
 
-// Click outside handler for search
-const handleClickOutside = (e) => {
-  if (searchInputRef.value && !searchInputRef.value.contains(e.target)) {
+// Menú de usuario
+const toggleUserMenu = () => {
+  showUserMenu.value = !showUserMenu.value
+}
+
+const handleMenuAction = (action) => {
+  showUserMenu.value = false
+  
+  if (!isLoggedIn.value) {
+    router.push('/login')
+    return
+  }
+  
+  switch(action) {
+    case 'pedidos':
+      router.push('/mi-cuenta?tab=compras')
+      break
+    case 'favoritos':
+      router.push('/mi-cuenta')
+      break
+    case 'login':
+      router.push('/login')
+      break
+  }
+}
+
+const cerrarSesion = () => {
+  localStorage.removeItem('access_token')
+  localStorage.removeItem('refresh_token')
+  localStorage.removeItem('user')
+  localStorage.removeItem('carrito')
+  localStorage.removeItem('wishlist')
+  currentUser.value = null
+  isLoggedIn.value = false
+  showUserMenu.value = false
+  cartCount.value = 0
+  carritoItems.value = []
+  wishlist.value = []
+  router.push('/')
+}
+
+const handleClickOutside = (event) => {
+  if (searchInputRef.value && !searchInputRef.value.contains(event.target)) {
     showSuggestions.value = false
+  }
+  if ((userMenuRefMobile.value && !userMenuRefMobile.value.contains(event.target)) &&
+      (userMenuRefDesktop.value && !userMenuRefDesktop.value.contains(event.target))) {
+    showUserMenu.value = false
   }
 }
 
