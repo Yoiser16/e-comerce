@@ -840,6 +840,9 @@ export default {
     const showStockModal = ref(false)
     const stockModalMessage = ref('')
     const stockModalProducts = ref([])
+
+    // Cache de posters para videos en carrito
+    const videoPosters = ref({})
     
     // Configuración Wompi
     const WOMPI_CONFIG = {
@@ -847,7 +850,7 @@ export default {
       currency: 'COP',
       amountInCents: true // Wompi requiere montos en centavos
     }
-    const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '573217355070'
+    const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '4796657763'
     
     // Form con nuevos campos
     const form = ref({
@@ -1332,6 +1335,52 @@ export default {
       
       return `${addr}${munName ? ', ' + munName : ''}${depName ? ', ' + depName : ''}`
     }
+
+    // Función para construir el mensaje de WhatsApp de forma segura
+    const buildWhatsAppMessage = () => {
+      const productos = cartItems.value.map(i => `• ${i.nombre || 'Producto'} x${i.cantidad || 1}`).join('\n')
+      const direccion = getWhatsAppAddress().replaceAll('%0A', '\n')
+      
+      const msg = `Hola, quiero finalizar mi pedido\n\n*CÓDIGO:* ${sessionStorage.getItem('temp_order_code') || 'KH-0000'}\n\n*PRODUCTOS:*\n${productos}\n\n*TOTAL:* $${formatPrice(getTotal())} COP\n\n${form.value.nombre} ${form.value.apellido}\n${form.value.telefono}\n\n*DIRECCIÓN:*\n${direccion}`
+      
+      return encodeURIComponent(msg)
+    }
+    const getWhatsAppAddress = () => {
+      const depValue = typeof form.value.departamento === 'string' ? form.value.departamento : ''
+      const munValue = typeof form.value.municipio === 'string' ? form.value.municipio : ''
+      
+      const dep = departamentos.value.find(d => 
+        d.codigo === depValue || 
+        d.id === Number(depValue) ||
+        d.nombre === depValue ||
+        (depValue && d.nombre?.toLowerCase() === depValue.toLowerCase())
+      )
+      
+      const mun = municipios.value.find(m => 
+        m.codigo === munValue || 
+        m.id === Number(munValue) ||
+        m.nombre === munValue ||
+        (munValue && m.nombre?.toLowerCase() === munValue.toLowerCase())
+      )
+      
+      const depName = dep?.nombre || depValue || ''
+      const munName = mun?.nombre || munValue || ''
+      const direccion = form.value.direccion || ''
+      const apartamento = form.value.apartamento || ''
+      const barrio = form.value.barrio || ''
+      const indicacionesRural = form.value.indicacionesRural || ''
+      
+      // Formato para WhatsApp: cada elemento en su línea
+      let parts = []
+      if (depName) parts.push(depName)
+      if (munName) parts.push(munName)
+      if (direccion) parts.push(direccion)
+      if (apartamento) parts.push(`Apartamento: ${apartamento}`)
+      if (barrio) parts.push(`Barrio: ${barrio}`)
+      if (indicacionesRural) parts.push(`Indicaciones: ${indicacionesRural}`)
+      
+      return parts.length > 0 ? parts.join('%0A') : 'Sin dirección registrada'
+    }
     
     // Navigation
     const nextStep = async () => {
@@ -1639,11 +1688,12 @@ export default {
             // No fallar la orden por esto
           }
           
-          // 2. Construir mensaje de WhatsApp con el código real
-          const productos = cartItems.value.map(i => `• ${i.nombre || 'Producto'} x${i.cantidad || 1}`).join('%0A')
-          const msg = `Hola, quiero finalizar mi pedido%0A%0A*CÓDIGO:* ${code}%0A%0A*PRODUCTOS:*%0A${productos}%0A%0A*TOTAL:* $${formatPrice(getTotal())} COP%0A%0A*${form.value.nombre} ${form.value.apellido}*%0A${form.value.telefono}%0A${getFullAddress()}`
+          // 2. Guardar código temporal para usarlo en buildWhatsAppMessage
+          sessionStorage.setItem('temp_order_code', code)
           
-          // 3. Guardar datos de la orden para la página de confirmación
+          // 3. Construir mensaje de WhatsApp de forma segura
+          const msg = buildWhatsAppMessage()
+          const whatsappFinal = '4796657763'
           sessionStorage.setItem('orden_whatsapp', JSON.stringify({
             codigo: code,
             total: getTotal(),
@@ -1652,18 +1702,18 @@ export default {
               nombre: form.value.nombre,
               apellido: form.value.apellido,
               telefono: form.value.telefono,
-              email: form.value.email
-            }
+              email: form.value.email,
+              departamento: form.value.departamento,
+              municipio: form.value.municipio,
+              direccion: form.value.direccion,
+              apartamento: form.value.apartamento,
+              barrio: form.value.barrio,
+              indicacionesRural: form.value.indicacionesRural
+            },
+            whatsappUrl: `https://wa.me/${whatsappFinal}?text=${msg}`
           }))
           
-          // 4. Abrir WhatsApp - Número fijo para desarrollo
-          const whatsappFinal = '573217355070'
-          window.open(`https://wa.me/${whatsappFinal}?text=${msg}`, '_blank')
-          
-          // 5. Esperar un momento para que se abra WhatsApp y luego redirigir
-          await new Promise(resolve => setTimeout(resolve, 500))
-          
-          // 6. Limpiar carrito y formulario
+          // 4. Limpiar carrito y formulario
           localStorage.removeItem('kharis_cart_cache')
           clearFormStorage()
           
@@ -1687,11 +1737,28 @@ export default {
           // Otros errores: intentar abrir WhatsApp de todos modos para no perder la venta
           console.warn('⚠️ API falló, abriendo WhatsApp de respaldo...')
           const code = `K-${Math.floor(1000 + Math.random() * 9000)}`
-          const productos = cartItems.value.map(i => `• ${i.nombre || 'Producto'} x${i.cantidad || 1}`).join('%0A')
-          const msg = `Hola, quiero finalizar mi pedido%0A%0A*CÓDIGO:* ${code}%0A%0A*PRODUCTOS:*%0A${productos}%0A%0A*TOTAL:* $${formatPrice(getTotal())} COP%0A%0A*${form.value.nombre} ${form.value.apellido}*%0A${form.value.telefono}%0A${getFullAddress()}`
-          const whatsappFinal = '573217355070'
-          window.open(`https://wa.me/${whatsappFinal}?text=${msg}`, '_blank')
-          clearFormStorage()
+          sessionStorage.setItem('temp_order_code', code)
+          const msg = buildWhatsAppMessage()
+          const whatsappFinal = '4796657763'
+          sessionStorage.setItem('orden_whatsapp', JSON.stringify({
+            codigo: code,
+            total: getTotal(),
+            productos: cartItems.value,
+            cliente: {
+              nombre: form.value.nombre,
+              apellido: form.value.apellido,
+              telefono: form.value.telefono,
+              email: form.value.email,
+              departamento: form.value.departamento,
+              municipio: form.value.municipio,
+              direccion: form.value.direccion,
+              apartamento: form.value.apartamento,
+              barrio: form.value.barrio,
+              indicacionesRural: form.value.indicacionesRural
+            },
+            whatsappUrl: `https://wa.me/${whatsappFinal}?text=${msg}`
+          }))
+          window.location.href = '/pedido-confirmado'
         } finally {
           processing.value = false
         }
@@ -1825,8 +1892,8 @@ export default {
       isStep1Valid, isStep2Valid,
       nextStep, prevStep, goToStep,
       onPaisChange, onDepartamentoChange,
-      getFullAddress, saveFormToStorage, formatPhoneNumber,
-      formatPrice, getItemPrice, getSubtotal, getTotal, processPayment,
+      getFullAddress, getWhatsAppAddress, saveFormToStorage, formatPhoneNumber,
+      buildWhatsAppMessage, formatPrice, getItemPrice, getSubtotal, getTotal, processPayment,
       getCartMediaUrl,
       clienteConDatosCompletos,
       initialLoading,
