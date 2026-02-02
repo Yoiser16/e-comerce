@@ -154,7 +154,8 @@ const total = ref(0)
 const productos = ref([])
 const nombreCliente = ref('Cliente')
 const telefono = ref('')
-const whatsappNumber = '573217355070'
+const whatsappNumber = '4796657763'
+const whatsappUrlGuardado = ref('')
 
 const totalProductos = computed(() => {
   return productos.value.reduce((sum, p) => sum + (p.cantidad || 1), 0)
@@ -165,8 +166,13 @@ const formatPrice = (price) => {
 }
 
 const whatsappUrl = computed(() => {
+  // Si tenemos el URL guardado en sessionStorage, usarlo
+  if (whatsappUrlGuardado.value) {
+    return whatsappUrlGuardado.value
+  }
+  // Si no, reconstruir el mensaje (fallback)
   const productosTexto = productos.value.map(p => `• ${p.nombre || 'Producto'} x${p.cantidad || 1}`).join('%0A')
-  const msg = `Hola, quiero finalizar mi pedido%0A%0A*CÓDIGO:* ${codigo.value}%0A%0A*PRODUCTOS:*%0A${productosTexto}%0A%0A*TOTAL:* $${formatPrice(total.value)} COP%0A%0A*${nombreCliente.value}*%0A${telefono.value}`
+  const msg = `Hola, quiero finalizar mi pedido%0A%0A*CÓDIGO:* ${codigo.value}%0A%0A*PRODUCTOS:*%0A${productosTexto}%0A%0A*TOTAL:* $${formatPrice(total.value)} COP%0A%0A${nombreCliente.value}%0A${telefono.value}`
   return `https://wa.me/${whatsappNumber}?text=${msg}`
 })
 
@@ -180,6 +186,12 @@ onMounted(() => {
       productos.value = orden.productos || []
       nombreCliente.value = `${orden.cliente?.nombre || ''} ${orden.cliente?.apellido || ''}`.trim() || 'Cliente'
       telefono.value = orden.cliente?.telefono || ''
+      
+      // Guardar el URL de WhatsApp que ya incluye la dirección
+      if (orden.whatsappUrl) {
+        whatsappUrlGuardado.value = orden.whatsappUrl
+        window.open(orden.whatsappUrl, '_blank')
+      }
       
       // Limpiar datos de sesión
       sessionStorage.removeItem('orden_whatsapp')
