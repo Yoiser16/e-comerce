@@ -278,7 +278,7 @@
 
 <script>
 import { ref, computed, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { useRouter, useRoute } from 'vue-router'
 import { favoritosService } from '../services/productos'
 import { ordenesService } from '../services/ordenes'
 import { getImageUrl } from '../services/api'
@@ -287,6 +287,7 @@ export default {
   name: 'MiCuenta',
   setup() {
     const router = useRouter()
+    const route = useRoute()
     
     // Estado
     const activeTab = ref('favoritos')
@@ -427,6 +428,13 @@ export default {
         router.push('/')
         return
       }
+      
+      // Establecer tab según parámetro de query
+      const tabParam = route.query.tab
+      if (tabParam && ['favoritos', 'compras', 'datos'].includes(tabParam)) {
+        activeTab.value = tabParam
+      }
+      
       cargarFavoritos()
       cargarCompras()
     })

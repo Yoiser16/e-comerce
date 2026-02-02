@@ -2271,10 +2271,10 @@ export default {
       // Si está logueado, redirigir según acción
       switch(action) {
         case 'pedidos':
-          router.push('/mi-cuenta')
+          router.push('/mi-cuenta?tab=compras')
           break
         case 'favoritos':
-          router.push('/catalogo?favoritos=true')
+          router.push('/mi-cuenta')
           break
         case 'login':
           router.push('/login')
