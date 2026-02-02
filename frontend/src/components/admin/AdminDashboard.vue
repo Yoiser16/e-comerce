@@ -58,7 +58,7 @@
             <span class="font-medium">Pedidos</span>
           </router-link>
 
-          <button @click="cargarDatos" class="p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all text-gray-400 hover:text-brand-600 group">
+          <button @click="() => cargarDatos(false)" class="p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all text-gray-400 hover:text-brand-600 group">
             <svg class="w-6 h-6 transform group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           </button>
 
@@ -69,7 +69,7 @@
 
           <router-link to="/admin/productos/nuevo" class="px-6 py-3 rounded-2xl bg-gray-900 text-white font-medium shadow-lg shadow-gray-900/20 hover:bg-black hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-            Nueva Venta
+            Nuevo Producto
           </router-link>
         </div>
       </div>
@@ -160,7 +160,7 @@
         <div class="lg:col-span-2 bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-8 relative flex flex-col animate-card delay-200 hover-card-effect">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
             <div>
-              <h3 class="text-2xl font-luxury font-bold text-gray-900">Análisis de Ingresos</h3>
+              <h3 class="text-2xl font-luxury font-bold text-gray-900">Análisis de Ventas</h3>
               <p class="text-gray-400 text-sm mt-1">Tendencia de ventas en el tiempo</p>
             </div>
             
@@ -189,28 +189,8 @@
               </div>
             </transition>
             
-            <!-- Custom Allocation-style Chart -->
-            <div class="bg-[#111111] rounded-3xl p-6 h-[300px] flex items-end gap-2 md:gap-4 overflow-x-auto relative shadow-inner">
-               <!-- Background Pattern (Diagonal Lines) -->
-               <div class="absolute inset-0 opacity-10 pointer-events-none" style="background-image: linear-gradient(45deg, #ffffff 5%, transparent 5%, transparent 50%, #ffffff 50%, #ffffff 55%, transparent 55%, transparent); background-size: 20px 20px;"></div>
-
-               <!-- Bars -->
-               <div v-for="item in pSalesData" :key="item.label" class="flex-1 min-w-[60px] flex flex-col justify-end h-full z-10 group cursor-pointer">
-                  <!-- Bar Container (Dark Track) -->
-                  <div class="w-full bg-white/5 rounded-2xl h-full relative overflow-hidden flex items-end transition-all duration-300 group-hover:bg-white/10">
-                      <!-- Filled Bar -->
-                      <div 
-                        class="w-full rounded-2xl transition-all duration-500 ease-out relative p-3 flex flex-col justify-start group-hover:shadow-[0_0_20px_rgba(255,255,255,0.3)] group-hover:scale-y-[1.02] origin-bottom"
-                        :class="item.color"
-                        :style="`height: ${item.heightPercent}%`"
-                      >
-                         <span class="text-xs font-bold leading-none mb-1 opacity-90" :class="item.textColor">{{ '$' + item.valueFormatted }}</span>
-                         <span class="text-[10px] font-medium leading-none opacity-75" :class="item.textColor">{{ Math.round((item.value / (stats.totalVentas || 1)) * 100) }}%</span>
-                      </div>
-                  </div>
-                  <!-- Label -->
-                  <p class="text-gray-500 text-xs font-medium text-center mt-3 group-hover:text-white transition-colors">{{ item.label }}</p>
-               </div>
+            <div class="h-[300px] w-full">
+               <Line :data="salesChartData" :options="salesChartOptions" />
             </div>
           </div>
         </div>
@@ -420,71 +400,63 @@ export default {
       return date.charAt(0).toUpperCase() + date.slice(1)
     })
 
-    // Processed Sales Data for Custom Block Chart
-    const pSalesData = computed(() => {
-       // Labels logic (copied from chart logic)
-       let defaultLabels = ['Lun', 'Mar', 'Mié', 'Jue', 'Vie', 'Sáb', 'Dom']
-       if (selectedPeriod.value === '24H') defaultLabels = ['00h', '04h', '08h', '12h', '16h', '20h']
-       if (selectedPeriod.value === '30D') defaultLabels = ['S1', 'S2', 'S3', 'S4'] // Simplified for space
-
-       const labels = ventasPorPeriodo.value.labels?.length ? ventasPorPeriodo.value.labels : defaultLabels
-       const data = ventasPorPeriodo.value.data?.length ? ventasPorPeriodo.value.data : labels.map(() => 0)
-       
-       const max = Math.max(...data) || 1
-
-       // Colores vibrantes del diseño solicitado
-       const colors = ['bg-orange-500', 'bg-yellow-400', 'bg-white', 'bg-gray-400', 'bg-emerald-400', 'bg-cyan-400', 'bg-rose-400']
-       
-       return labels.map((label, index) => {
-          const value = data[index] || 0
-          const percent = Math.round((value / max) * 100)
-          
-          return {
-             label,
-             value,
-             valueFormatted: formatNumber(value),
-             heightPercent: Math.max(percent, 15), // Min height for text
-             color: colors[index % colors.length],
-             textColor: colors[index % colors.length] === 'bg-white' ? 'text-gray-900' : 'text-white'
-          }
-       })
-    })
+    // Revenue Chart Config (Restored Pink Spline)
+    const salesChartData = computed(() => ({
+      labels: ventasPorPeriodo.value.labels || [],
+      datasets: [{
+        label: 'Ventas',
+        data: ventasPorPeriodo.value.data || [],
+        borderColor: '#EC4899', // Pink 500
+        backgroundColor: (context) => {
+          const ctx = context.chart.ctx
+          const gradient = ctx.createLinearGradient(0, 0, 0, 300)
+          gradient.addColorStop(0, 'rgba(236, 72, 153, 0.2)')
+          gradient.addColorStop(1, 'rgba(236, 72, 153, 0)')
+          return gradient
+        },
+        borderWidth: 3,
+        tension: 0.4, // Smooth curve
+        fill: true,
+        pointBackgroundColor: '#EC4899',
+        pointBorderColor: '#fff',
+        pointBorderWidth: 2,
+        pointRadius: 4,
+        pointHoverRadius: 6
+      }]
+    }))
 
     const salesChartOptions = {
       responsive: true,
       maintainAspectRatio: false,
-      interaction: { intersect: false, mode: 'index' },
       plugins: {
         legend: { display: false },
         tooltip: {
-          enabled: true,
           backgroundColor: '#111827',
-          padding: 16,
-          titleFont: { size: 14, family: "'Playfair Display', serif" },
-          bodyFont: { size: 13, weight: 'bold' },
-          cornerRadius: 10,
-          displayColors: false,
+          padding: 12,
           callbacks: {
-            label: (context) => `$${new Intl.NumberFormat('es-CO').format(context.raw)}`
+            label: (context) => ` ${new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP' }).format(context.raw)}`
           }
         }
       },
       scales: {
-        x: {
+        x: { 
           grid: { display: false },
-          ticks: { color: '#9CA3AF', font: { size: 12 }, padding: 10 }
+          ticks: { font: { size: 12 }, color: '#9CA3AF' }
         },
-        y: {
+        y: { 
           border: { display: false },
-          grid: { color: '#F3F4F6', drawTicks: false },
+          grid: { color: '#F3F4F6' },
           ticks: { 
-            color: '#9CA3AF', 
-            font: { size: 11, weight: '500' },
-            callback: val => `$${val >= 1000 ? val/1000 + 'k' : val}`,
-            padding: 12
-          }
+            font: { size: 11 }, 
+            color: '#9CA3AF',
+            callback: (val) => val >= 1000 ? `$${val/1000}k` : `$${val}` 
+          } 
         }
-      }
+      },
+      interaction: {
+        intersect: false,
+        mode: 'index',
+      },
     }
 
     // Donut Chart Configuration
@@ -776,14 +748,43 @@ export default {
     }
 
     const exportReport = () => {
-        alert('Generando reporte PDF... (Simulación)')
+        // 1. Headers del CSV
+        const headers = ['Order ID', 'Cliente', 'Items', 'Estado', 'Total', 'Fecha']
+        
+        // 2. Mapear datos de órdenes recientes
+        const rows = recentOrders.value.map(o => [
+            o.id,
+            `"${o.cliente}"`, // Escapar comillas
+            o.items,
+            o.estado,
+            o.total,
+            `"${o.fecha}"`
+        ])
+
+        // 3. Unir todo en string CSV
+        const csvContent = [
+            headers.join(','),
+            ...rows.map(r => r.join(','))
+        ].join('\n')
+
+        // 4. Crear Blob y descargar
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' })
+        const link = document.createElement('a')
+        const url = URL.createObjectURL(blob)
+        
+        link.setAttribute('href', url)
+        link.setAttribute('download', `reporte_ventas_${new Date().toISOString().slice(0,10)}.csv`)
+        link.style.visibility = 'hidden'
+        document.body.appendChild(link)
+        link.click()
+        document.body.removeChild(link)
     }
 
     return {
       stats, loading, chartLoading, error, selectedPeriod, recentOrders, topProducts, lowStockProducts,
       topProductsChartData, donutChartOptions, chartColors,
-      categoryChartData, growthChartData, growthChartOptions,
-      saludInventario, exportReport, pStatusData, pSalesData,
+      categoryChartData, growthChartData, growthChartOptions, salesChartData, salesChartOptions,
+      saludInventario, exportReport,
       fechaActual, cargarDatos, cambiarPeriodo, formatNumber, getStatusClass, getStatusLabel
     }
   }
@@ -828,5 +829,16 @@ export default {
 .hover-card-effect:hover {
   transform: translateY(-8px); /* Lift up notably */
   box-shadow: 0 20px 40px -5px rgba(0, 0, 0, 0.15), 0 10px 20px -5px rgba(0, 0, 0, 0.1);
+  animation: slideUpFade 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+/* Custom User-Requested Neon Theme */
+.bg-neon-lime {
+  background-color: #C6FF00;
+  box-shadow: 0 0 15px rgba(198, 255, 0, 0.4);
+}
+.text-neon-glow {
+  color: #C6FF00;
+  text-shadow: 0 0 8px #C6FF00, 0 0 16px #C6FF00;
 }
 </style>
