@@ -735,6 +735,7 @@ import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { productosService, carritoService, authService } from '@/services/productos'
 import { getImageUrl } from '@/services/api'
+import { addProductToBackend, loadCartFromBackend, saveCartToLocalStorage } from '@/services/cartService'
 
 const route = useRoute()
 const router = useRouter()
@@ -830,6 +831,18 @@ const formatearPrecio = (precio) => {
 
 const handleImageError = (e) => {
   e.target.src = 'https://dummyimage.com/600x600/f3f4f6/9ca3af&text=Sin+imagen'
+}
+
+const handleUserLoggedIn = async () => {
+  try {
+    const cart = await loadCartFromBackend()
+    carritoItems.value = cart.items
+    cartCount.value = cart.items.reduce((acc, item) => acc + item.cantidad, 0)
+    const total = cart.items.reduce((acc, item) => acc + (item.subtotal || 0), 0)
+    saveCartToLocalStorage(cart.items, total)
+  } catch (error) {
+    console.error('Error recargando carrito tras login:', error)
+  }
 }
 
 // Cart Functions
@@ -940,49 +953,58 @@ const agregarAlCarrito = async () => {
     mensaje.value = ''
     return
   }
-  
-  const items = loadCartFromLocal()
-  const idx = items.findIndex((i) => i.producto_id === producto.value.id)
-  const cantidadEnCarrito = idx >= 0 ? items[idx].cantidad : 0
-  const cantidadTotal = cantidadEnCarrito + cantidad.value
-  
-  if (cantidadTotal > stockDisponible.value) {
-    mensajeError.value = `Solo hay ${stockDisponible.value - cantidadEnCarrito} disponibles para agregar`
-    mensaje.value = ''
-    return
-  }
-  
+
   try {
     const precioUnitario = Number(producto.value.precio_monto || producto.value.precio || 0)
+    const token = localStorage.getItem('access_token')
     
-    if (idx >= 0) {
-      items[idx].cantidad += cantidad.value
-      items[idx].subtotal = items[idx].cantidad * (items[idx].precio_unitario || precioUnitario)
+    if (token) {
+      // Usuario autenticado - usar backend
+      await addProductToBackend(producto.value.id, cantidad.value)
+      
+      // Recargar carrito del backend
+      const cart = await loadCartFromBackend()
+      carritoItems.value = cart.items
+      
+      // Guardar también en localStorage como cache
+      const total = cart.items.reduce((acc, item) => acc + (item.subtotal || 0), 0)
+      saveCartToLocalStorage(cart.items, total)
+      
+      cartCount.value = cart.items.reduce((acc, item) => acc + item.cantidad, 0)
     } else {
-      items.push({
-        producto_id: producto.value.id,
-        nombre: producto.value.nombre,
-        imagen_url: getImageUrl(producto.value.imagen_principal),
-        precio_unitario: precioUnitario,
-        cantidad: cantidad.value,
-        subtotal: precioUnitario * cantidad.value,
-      })
-    }
-    
-    const count = items.reduce((sum, i) => sum + (i.cantidad || 1), 0)
-    saveCartToLocal(items, count)
-
-    if (isLoggedIn.value) {
-      try {
-        await carritoService.agregarProducto(producto.value.id, cantidad.value)
-      } catch (backendErr) {
-        console.warn('No se pudo sincronizar carrito con backend:', backendErr)
+      // Usuario no autenticado - usar localStorage
+      const items = loadCartFromLocal()
+      const idx = items.findIndex((i) => i.producto_id === producto.value.id)
+      const cantidadEnCarrito = idx >= 0 ? items[idx].cantidad : 0
+      const cantidadTotal = cantidadEnCarrito + cantidad.value
+      
+      if (cantidadTotal > stockDisponible.value) {
+        mensajeError.value = `Solo hay ${stockDisponible.value - cantidadEnCarrito} disponibles para agregar`
+        mensaje.value = ''
+        return
       }
+      
+      if (idx >= 0) {
+        items[idx].cantidad += cantidad.value
+        items[idx].subtotal = items[idx].cantidad * (items[idx].precio_unitario || precioUnitario)
+      } else {
+        items.push({
+          producto_id: producto.value.id,
+          nombre: producto.value.nombre,
+          imagen_url: getImageUrl(producto.value.imagen_principal),
+          precio_unitario: precioUnitario,
+          cantidad: cantidad.value,
+          subtotal: precioUnitario * cantidad.value,
+        })
+      }
+      
+      const count = items.reduce((sum, i) => sum + (i.cantidad || 1), 0)
+      saveCartToLocal(items, count)
+      carritoItems.value = loadCartFromLocal()
     }
 
     mensaje.value = '¡Agregado al carrito!'
     mensajeError.value = ''
-    carritoItems.value = loadCartFromLocal()
     showCartDrawer.value = true
     
     // Clear message after 3 seconds
@@ -1011,16 +1033,37 @@ watch(() => route.params.id, (newId) => {
   }
 })
 
-onMounted(() => {
+onMounted(async () => {
   cargarProducto()
-  loadCartCount()
-  carritoItems.value = loadCartFromLocal()
+  
+  // Cargar carrito según autenticación
+  const token = localStorage.getItem('access_token')
+  if (token) {
+    try {
+      const cart = await loadCartFromBackend()
+      carritoItems.value = cart.items
+      cartCount.value = cart.items.reduce((acc, item) => acc + item.cantidad, 0)
+      // Guardar también en localStorage como cache
+      const total = cart.items.reduce((acc, item) => acc + (item.subtotal || 0), 0)
+      saveCartToLocalStorage(cart.items, total)
+    } catch (error) {
+      console.error('Error cargando carrito:', error)
+      loadCartCount()
+      carritoItems.value = loadCartFromLocal()
+    }
+  } else {
+    loadCartCount()
+    carritoItems.value = loadCartFromLocal()
+  }
+  
   window.addEventListener('scroll', handleScroll)
+  window.addEventListener('user-logged-in', handleUserLoggedIn)
   handleScroll()
 })
 
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
+  window.removeEventListener('user-logged-in', handleUserLoggedIn)
 })
 </script>
 

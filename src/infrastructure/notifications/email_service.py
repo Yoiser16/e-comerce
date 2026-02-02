@@ -53,13 +53,22 @@ def _build_body(
     total_str = f"${total:,.0f} COP".replace(",", ".")
     
     # Texto plano
-    text = (
-        f"Hola {cliente},\n\n"
-        f"Tu orden {codigo} ahora está *{estado_texto}*.\n"
-        f"Total: {total_str}\n"
-        f"Dirección de entrega: {direccion}\n\n"
-        "Gracias por comprar con Kharis Distribuidora."
-    )
+    if estado == "cancelada":
+        text = (
+            f"Hola {cliente},\n\n"
+            f"Te informamos que tu orden {codigo} fue *{estado_texto}*.\n"
+            f"Total: {total_str}\n"
+            f"Dirección de entrega: {direccion}\n\n"
+            "Si tienes dudas o necesitas ayuda, contáctanos."
+        )
+    else:
+        text = (
+            f"Hola {cliente},\n\n"
+            f"Tu orden {codigo} ahora está *{estado_texto}*.\n"
+            f"Total: {total_str}\n"
+            f"Dirección de entrega: {direccion}\n\n"
+            "Gracias por comprar con Kharis Distribuidora."
+        )
     
     # HTML Estilo Floral - Kharis Distribuidora
     
@@ -127,7 +136,8 @@ def _build_body(
             <div class="card">
                 <p class="info-text">
                     Hola, <strong>{cliente}</strong>.<br>
-                    Gracias por tu compra. Tu pedido está <strong>{estado_texto}</strong>.
+                    {"Te informamos que tu pedido fue" if estado == "cancelada" else "Gracias por tu compra. Tu pedido está"}
+                    <strong>{estado_texto}</strong>.
                 </p>
 
                 <table class="product-table">
