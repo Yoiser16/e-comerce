@@ -1717,6 +1717,11 @@ export default {
           localStorage.removeItem('kharis_cart_cache')
           clearFormStorage()
           
+          // 5. Limpiar sessionStorage después de un pequeño delay para asegurar que PedidoConfirmado puede leer los datos
+          setTimeout(() => {
+            sessionStorage.removeItem('temp_order_code')
+          }, 2000)
+          
           // 7. Redirigir a página de confirmación
           window.location.href = '/pedido-confirmado'
           
@@ -1856,9 +1861,21 @@ export default {
     }
     
     onMounted(async () => {
+      const router = useRouter()
+      
+      // Validar que hay carrito - si no, redirigir al inicio
+      await loadCart()
+      if (!cartItems.value || cartItems.value.length === 0) {
+        console.warn('⚠️ No hay carrito, redirigiendo al inicio')
+        // Limpiar sessionStorage si existe
+        sessionStorage.removeItem('orden_whatsapp')
+        sessionStorage.removeItem('temp_order_code')
+        router.push('/')
+        return
+      }
+      
       unlockScroll()
       loadFormFromStorage() // Cargar formulario guardado primero
-      loadCart()
       loadWompiSDK().catch(() => {}) // Pre-cargar SDK de Wompi
       
       // Cargar departamentos de Colombia
