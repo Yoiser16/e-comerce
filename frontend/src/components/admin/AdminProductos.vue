@@ -10,7 +10,7 @@
         </div>
         <button 
           @click="openCreateModal"
-          class="inline-flex items-center gap-2 bg-[#D81B60] hover:bg-[#C2185B] text-white font-medium text-sm px-6 py-3 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md"
+          class="inline-flex w-full sm:w-auto justify-center items-center gap-2 bg-[#D81B60] hover:bg-[#C2185B] text-white font-medium text-sm px-6 py-3 rounded-lg transition-all duration-300 shadow-sm hover:shadow-md"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -37,7 +37,7 @@
         <!-- Category Filter -->
         <select 
           v-model="filterCategory"
-          class="px-3 py-2.5 text-sm bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white min-w-[160px] transition-all"
+          class="w-full lg:w-auto px-3 py-2.5 text-sm bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white min-w-[160px] transition-all"
         >
           <option value="">Todas las categorías</option>
           <option value="extensiones">Extensiones</option>
@@ -48,7 +48,7 @@
         <!-- Stock Filter -->
         <select 
           v-model="filterStock"
-          class="px-3 py-2.5 text-sm bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white min-w-[140px] transition-all"
+          class="w-full lg:w-auto px-3 py-2.5 text-sm bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white min-w-[140px] transition-all"
         >
           <option value="">Todo el stock</option>
           <option value="available">Disponible</option>
@@ -59,7 +59,7 @@
         <!-- Refresh button -->
         <button
           @click="loadProducts"
-          class="px-3 py-2.5 bg-[#FAFAFA] hover:bg-gray-100 border border-text-dark/10 rounded-lg transition-all"
+          class="w-full lg:w-auto px-3 py-2.5 bg-[#FAFAFA] hover:bg-gray-100 border border-text-dark/10 rounded-lg transition-all"
           :disabled="loading"
           title="Actualizar"
         >
@@ -102,7 +102,7 @@
 
       <!-- Table - Estilo Smart Inventory -->
       <div v-else class="overflow-x-auto">
-        <table class="w-full">
+        <table class="w-full min-w-[700px]">
           <thead class="bg-[#FAFAFA] border-b border-text-dark/5">
             <tr>
               <th class="px-6 py-3.5 text-left text-xs font-semibold text-text-medium uppercase tracking-wide">Producto</th>

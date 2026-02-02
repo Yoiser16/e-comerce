@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    <div class="flex items-center justify-between">
+    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
       <div>
         <h2 class="text-2xl font-bold text-gray-900">Configuración</h2>
         <p class="text-gray-500">Ajustes del sistema y preferencias</p>
@@ -16,7 +16,7 @@
             :key="section.id"
             @click="activeSection = section.id"
             :class="[
-              'w-full flex items-center gap-3 px-5 py-4 text-left transition-colors',
+              'w-full flex items-center gap-3 px-4 sm:px-5 py-3 sm:py-4 text-left transition-colors text-sm sm:text-base',
               activeSection === section.id ? 'bg-brand-50 text-brand-700 border-l-4 border-brand-600' : 'hover:bg-gray-50 text-gray-700'
             ]"
           >
@@ -208,7 +208,7 @@
 
         <!-- Botón Guardar -->
         <div class="flex justify-end">
-          <button class="inline-flex items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors">
+          <button class="inline-flex w-full sm:w-auto justify-center items-center gap-2 bg-brand-600 hover:bg-brand-700 text-white font-semibold px-8 py-3 rounded-xl transition-colors">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>

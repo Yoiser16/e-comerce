@@ -28,7 +28,7 @@
           <!-- Mini Radio Player - Cuando está reproduciendo -->
           <div 
             v-if="isPlaying && currentStation"
-            class="flex items-center gap-2 px-3 py-2 bg-white rounded-xl border border-emerald-200 shadow-sm"
+            class="hidden sm:flex items-center gap-2 px-3 py-2 bg-white rounded-xl border border-emerald-200 shadow-sm"
           >
             <!-- Barras animadas -->
             <div class="flex items-center gap-0.5 h-4">
@@ -183,12 +183,13 @@
     <!-- Sidebar - YouTube/Google Cloud Style -->
     <aside 
       :class="[
-        'fixed top-16 bottom-0 left-0 z-40 bg-white border-r border-gray-200 transform transition-all duration-300 ease-in-out overflow-y-auto',
-        sidebarCollapsed ? 'w-[70px]' : 'w-60'
+        'fixed top-16 bottom-0 left-0 z-50 bg-white border-r border-gray-200 transform transition-all duration-300 ease-in-out overflow-y-auto w-60 lg:translate-x-0',
+        sidebarOpen ? 'translate-x-0' : '-translate-x-full',
+        isSidebarCollapsed ? 'lg:w-[70px]' : 'lg:w-60'
       ]"
     >
       <!-- Navigation Menu -->
-      <nav class="py-3" :class="sidebarCollapsed ? 'px-2' : 'px-3'">
+      <nav class="py-3" :class="isSidebarCollapsed ? 'px-2' : 'px-3'">
         <div class="space-y-0.5">
           <router-link 
             v-for="item in menuItems" 
@@ -196,12 +197,12 @@
             :to="item.path"
             :class="[
               'flex items-center gap-3 rounded-lg transition-all duration-200 group relative',
-              sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5',
+              isSidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5',
               isActive(item.path) 
                 ? 'bg-gray-100 text-text-dark font-medium' 
                 : 'text-text-medium hover:text-text-dark hover:bg-gray-50'
             ]"
-            :title="sidebarCollapsed ? item.name : ''"
+            :title="isSidebarCollapsed ? item.name : ''"
           >
             <!-- Active Indicator (Left Border) -->
             <div 
@@ -213,11 +214,11 @@
             <span v-html="item.icon" class="w-5 h-5 flex-shrink-0"></span>
             
             <!-- Label -->
-            <span v-if="!sidebarCollapsed" class="flex-1 text-sm">{{ item.name }}</span>
+            <span v-if="!isSidebarCollapsed" class="flex-1 text-sm">{{ item.name }}</span>
             
             <!-- Badge (expanded) -->
             <span 
-              v-if="getItemBadge(item) && !sidebarCollapsed" 
+              v-if="getItemBadge(item) && !isSidebarCollapsed" 
               class="bg-brand-500 text-white text-[10px] font-bold px-1.5 py-0.5 rounded-full min-w-[18px] text-center"
             >
               {{ getItemBadge(item) }}
@@ -225,14 +226,14 @@
             
             <!-- Badge Dot (collapsed) -->
             <span 
-              v-if="getItemBadge(item) && sidebarCollapsed" 
+              v-if="getItemBadge(item) && isSidebarCollapsed" 
               class="absolute top-2 right-2 w-2 h-2 bg-brand-500 rounded-full ring-2 ring-white"
             ></span>
           </router-link>
         </div>
 
         <!-- Separator -->
-        <div class="my-4 border-t border-gray-200" :class="sidebarCollapsed ? 'mx-2' : 'mx-3'"></div>
+        <div class="my-4 border-t border-gray-200" :class="isSidebarCollapsed ? 'mx-2' : 'mx-3'"></div>
 
         <!-- Secondary Menu (Config) -->
         <div class="space-y-0.5">
@@ -240,12 +241,12 @@
             to="/admin/config"
             :class="[
               'flex items-center gap-3 rounded-lg transition-all duration-200 group relative',
-              sidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5',
+              isSidebarCollapsed ? 'justify-center px-2 py-3' : 'px-3 py-2.5',
               isActive('/admin/config') 
                 ? 'bg-gray-100 text-text-dark font-medium' 
                 : 'text-text-medium hover:text-text-dark hover:bg-gray-50'
             ]"
-            :title="sidebarCollapsed ? 'Configuración' : ''"
+            :title="isSidebarCollapsed ? 'Configuración' : ''"
           >
             <div 
               v-if="isActive('/admin/config')"
@@ -255,15 +256,15 @@
               <path stroke-linecap="round" stroke-linejoin="round" d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
               <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
             </svg>
-            <span v-if="!sidebarCollapsed" class="text-sm">Configuración</span>
+            <span v-if="!isSidebarCollapsed" class="text-sm">Configuración</span>
           </router-link>
         </div>
       </nav>
 
       <!-- User Profile (Bottom) -->
-      <div class="absolute bottom-0 left-0 right-0 border-t border-gray-200 bg-white">
+        <div class="absolute bottom-0 left-0 right-0 border-t border-gray-200 bg-white">
         <!-- Expanded State -->
-        <div v-if="!sidebarCollapsed" class="p-3">
+          <div v-if="!isSidebarCollapsed" class="p-3">
           <div class="flex items-center gap-3 px-3 py-2 rounded-lg bg-gray-50">
             <!-- Avatar -->
             <div class="w-9 h-9 bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center text-white font-semibold text-xs">
@@ -288,7 +289,7 @@
         </div>
 
         <!-- Collapsed State -->
-        <div v-else class="flex flex-col items-center gap-3 py-4">
+          <div v-else class="flex flex-col items-center gap-3 py-4">
           <!-- Avatar -->
           <div class="w-9 h-9 bg-gradient-to-br from-gray-300 to-gray-400 rounded-full flex items-center justify-center text-white font-semibold text-xs">
             {{ userInitials }}
@@ -311,13 +312,13 @@
     <div 
       v-if="sidebarOpen"
       @click="sidebarOpen = false"
-      class="fixed inset-0 z-40 bg-black/20 lg:hidden"
+      class="fixed inset-0 z-30 bg-black/20 lg:hidden"
     ></div>
 
     <!-- Main Content -->
-    <div :class="sidebarCollapsed ? 'lg:ml-[70px]' : 'lg:ml-60'" class="pt-16 transition-all duration-300">
+    <div :class="isSidebarCollapsed ? 'lg:ml-[70px]' : 'lg:ml-60'" class="pt-16 transition-all duration-300">
       <!-- Page Content -->
-      <main class="p-6 lg:p-8">
+      <main class="p-4 sm:p-6 lg:p-8">
         <router-view />
       </main>
     </div>
@@ -414,7 +415,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import RadioPlayer from './RadioPlayer.vue'
 import { ordenesService } from '@/services/ordenes'
@@ -440,6 +441,8 @@ export default {
     }
     
     const sidebarCollapsed = ref(getSidebarState())
+    const isMobile = ref(false)
+    const isSidebarCollapsed = computed(() => sidebarCollapsed.value && !isMobile.value)
 
     const showRadio = ref(false)
     const isPlaying = ref(false)
@@ -447,10 +450,35 @@ export default {
     const radioPlayerRef = ref(null)
 
     const toggleSidebar = () => {
+      if (window.innerWidth < 1024) {
+        sidebarOpen.value = !sidebarOpen.value
+        return
+      }
+
       sidebarCollapsed.value = !sidebarCollapsed.value
       // Guardar estado en localStorage
       localStorage.setItem('sidebarCollapsed', sidebarCollapsed.value.toString())
     }
+
+    const updateIsMobile = () => {
+      isMobile.value = window.innerWidth < 1024
+    }
+
+    watch(
+      () => route.fullPath,
+      () => {
+        sidebarOpen.value = false
+      }
+    )
+
+    onMounted(() => {
+      updateIsMobile()
+      window.addEventListener('resize', updateIsMobile)
+    })
+
+    onUnmounted(() => {
+      window.removeEventListener('resize', updateIsMobile)
+    })
 
     const togglePlayback = () => {
       // Si hay una emisora actual, hacer toggle del play/pause
@@ -903,6 +931,7 @@ export default {
     return {
       sidebarOpen,
       sidebarCollapsed,
+      isSidebarCollapsed,
       toggleSidebar,
       showRadio,
       isPlaying,

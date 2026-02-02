@@ -1405,8 +1405,22 @@ defineExpose({ getUnseenCount })
 /* ========== BENTO GRID ========== */
 .bento-grid {
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .bento-grid {
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .bento-grid {
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+  }
 }
 
 .bento-box {
@@ -1894,12 +1908,15 @@ defineExpose({ getUnseenCount })
 @media (max-width: 768px) {
   .ordenes-layout {
     flex-direction: column;
+    height: auto;
+    margin: 0;
   }
   
   .master-list {
     width: 100%;
     min-width: 100%;
-    height: 280px;
+    height: auto;
+    max-height: 45vh;
     border-right: none;
     border-bottom: 1px solid #e2e8f0;
   }
@@ -1911,6 +1928,28 @@ defineExpose({ getUnseenCount })
   
   .bento-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 640px) {
+  .detail-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 8px;
+  }
+
+  .detail-header__title {
+    font-size: 20px;
+  }
+
+  .detail-header__actions {
+    width: 100%;
+    justify-content: flex-start;
+    flex-wrap: wrap;
+  }
+
+  .detail-body {
+    padding: 12px;
   }
 }
 

@@ -1,5 +1,5 @@
 <template>
-  <div class="space-y-8 animate-fade-in font-sans pb-12">
+  <div class="space-y-4 sm:space-y-8 animate-fade-in font-sans pb-6 sm:pb-12">
     
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center min-h-[600px]">
@@ -27,55 +27,56 @@
     </div>
 
     <!-- Main Content -->
-    <div v-else class="space-y-10">
+    <div v-else class="space-y-6 sm:space-y-10">
 
       <!-- Header & Quick Actions -->
-      <div class="flex flex-col xl:flex-row xl:items-end justify-between gap-8 animate-card delay-0">
+      <div class="flex flex-col lg:flex-row lg:items-end justify-between gap-4 sm:gap-8 animate-card delay-0">
         <div>
-          <span class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold tracking-wide border border-emerald-100 mb-4 shadow-sm">
+          <span class="inline-flex items-center gap-2 px-2 sm:px-3 py-1 rounded-full bg-emerald-50 text-emerald-700 text-xs font-bold tracking-wide border border-emerald-100 mb-2 sm:mb-4 shadow-sm">
             <span class="relative flex h-2 w-2">
               <span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
               <span class="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
             </span>
             SISTEMA OPERATIVO
           </span>
-          <h1 class="font-luxury text-5xl text-gray-900 mb-2 tracking-tight">Panel de Control</h1>
-          <p class="text-gray-500 text-lg">Resumen global de <span class="text-brand-600 font-medium">{{ fechaActual }}</span></p>
+          <h1 class="font-luxury text-3xl sm:text-4xl lg:text-5xl text-gray-900 mb-1 sm:mb-2 tracking-tight">Panel de Control</h1>
+          <p class="text-gray-500 text-sm sm:text-base lg:text-lg">Resumen global de <span class="text-brand-600 font-medium">{{ fechaActual }}</span></p>
         </div>
 
-        <div class="flex flex-wrap gap-4">
-          <router-link to="/admin/productos" class="pl-4 pr-6 py-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all flex items-center gap-3 group text-gray-600 hover:text-gray-900 hover:border-gray-200">
-            <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+        <div class="flex flex-wrap gap-2 sm:gap-4">
+          <router-link to="/admin/productos" class="px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all flex items-center gap-2 group text-gray-600 hover:text-gray-900 hover:border-gray-200 text-sm">
+            <div class="w-6 sm:w-8 h-6 sm:h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+              <svg class="w-3 sm:w-4 h-3 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
             </div>
-            <span class="font-medium">Inventario</span>
+            <span class="font-medium hidden sm:inline">Inventario</span>
           </router-link>
           
-          <router-link to="/admin/ordenes" class="pl-4 pr-6 py-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all flex items-center gap-3 group text-gray-600 hover:text-gray-900 hover:border-gray-200">
-            <div class="w-8 h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
+          <router-link to="/admin/ordenes" class="px-3 sm:px-4 py-2 sm:py-3 rounded-lg sm:rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all flex items-center gap-2 group text-gray-600 hover:text-gray-900 hover:border-gray-200 text-sm">
+            <div class="w-6 sm:w-8 h-6 sm:h-8 rounded-lg bg-gray-50 flex items-center justify-center group-hover:bg-gray-100 transition-colors">
+              <svg class="w-3 sm:w-4 h-3 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
             </div>
-            <span class="font-medium">Pedidos</span>
+            <span class="font-medium hidden sm:inline">Pedidos</span>
           </router-link>
 
-          <button @click="() => cargarDatos(false)" class="p-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all text-gray-400 hover:text-brand-600 group">
-            <svg class="w-6 h-6 transform group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+          <button @click="() => cargarDatos(false)" class="p-2 sm:p-3 rounded-lg sm:rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all text-gray-400 hover:text-brand-600 group">
+            <svg class="w-4 sm:w-6 h-4 sm:h-6 transform group-hover:rotate-180 transition-transform duration-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
           </button>
 
-          <button @click="exportReport" class="px-5 py-3 rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-gray-700 font-medium hover:text-brand-600">
-             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
-             <span>Exportar</span>
+          <button @click="exportReport" class="px-3 sm:px-5 py-2 sm:py-3 rounded-lg sm:rounded-2xl bg-white border border-gray-100 shadow-sm hover:shadow-md transition-all flex items-center gap-2 text-gray-700 font-medium hover:text-brand-600 text-sm">
+             <svg class="w-4 sm:w-5 h-4 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"/></svg>
+             <span class="hidden sm:inline">Exportar</span>
           </button>
 
-          <router-link to="/admin/productos/nuevo" class="px-6 py-3 rounded-2xl bg-gray-900 text-white font-medium shadow-lg shadow-gray-900/20 hover:bg-black hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
-            Nuevo Producto
+          <router-link to="/admin/productos/nuevo" class="px-4 sm:px-6 py-2 sm:py-3 rounded-lg sm:rounded-2xl bg-gray-900 text-white font-medium text-sm shadow-lg shadow-gray-900/20 hover:bg-black hover:scale-105 active:scale-95 transition-all flex items-center gap-2">
+            <svg class="w-4 sm:w-5 h-4 sm:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"/></svg>
+            <span class="hidden sm:inline">Nuevo Producto</span>
+            <span class="sm:hidden">+</span>
           </router-link>
         </div>
       </div>
 
       <!-- Stats Masonry Grid -->
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6 animate-card delay-100">
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-3 sm:gap-6 animate-card delay-100">
         
         <!-- Revenue Card (Primary) -->
         <div class="col-span-1 md:col-span-2 bg-gradient-to-br from-gray-900 to-gray-800 rounded-[2.5rem] p-6 text-white relative overflow-hidden group shadow-2xl shadow-gray-900/20 hover-card-effect cursor-default">
@@ -157,7 +158,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         
         <!-- Main Chart Section: Revenue -->
-        <div class="lg:col-span-2 bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-8 relative flex flex-col animate-card delay-200 hover-card-effect">
+        <div class="lg:col-span-2 bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-4 sm:p-8 relative flex flex-col animate-card delay-200 hover-card-effect">
           <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-8 gap-4">
             <div>
               <h3 class="text-2xl font-luxury font-bold text-gray-900">Análisis de Ventas</h3>
@@ -196,7 +197,7 @@
         </div>
 
         <!-- Sales by Category -->
-        <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-8 relative flex flex-col animate-card delay-300 hover-card-effect">
+        <div class="bg-white rounded-[2.5rem] border border-gray-100 shadow-[0_20px_50px_rgba(0,0,0,0.04)] p-4 sm:p-8 relative flex flex-col animate-card delay-300 hover-card-effect">
              <div class="mb-6">
                <h3 class="text-xl font-luxury font-bold text-gray-900">Por Categoría</h3>
                <p class="text-gray-400 text-sm mt-1">Ventas por segmento</p>
@@ -210,7 +211,7 @@
         </div>
 
         <!-- Status Distribution -->
-        <div class="bg-gray-50 rounded-[2.5rem] border border-gray-100 p-8 animate-card delay-400 hover-card-effect">
+        <div class="bg-gray-50 rounded-[2.5rem] border border-gray-100 p-4 sm:p-8 animate-card delay-400 hover-card-effect">
              <div class="mb-6 flex justify-between items-end">
                <div>
                  <h3 class="text-xl font-luxury font-bold text-gray-900">Estado de Órdenes</h3>

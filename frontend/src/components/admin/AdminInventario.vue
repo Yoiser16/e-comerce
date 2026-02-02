@@ -701,8 +701,22 @@ export default {
 /* ========== KPI CARDS ========== */
 .kpi-grid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  gap: 16px;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+}
+
+@media (min-width: 640px) {
+  .kpi-grid {
+    grid-template-columns: repeat(2, 1fr);
+    gap: 16px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .kpi-grid {
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+  }
 }
 
 .kpi-card {
@@ -804,12 +818,27 @@ export default {
   background: #ffffff;
   border: 1px solid #e5e7eb;
   border-radius: 16px;
-  overflow: hidden;
+  overflow: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+@media (max-width: 640px) {
+  .inventory-table-container {
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
 }
 
 .inventory-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 800px;
+}
+
+@media (max-width: 640px) {
+  .inventory-table {
+    font-size: 12px;
+  }
 }
 
 .inventory-table thead {
@@ -1035,6 +1064,19 @@ export default {
     flex-direction: column;
     align-items: flex-start;
     gap: 16px;
+  }
+
+  .btn-primary {
+    width: 100%;
+    justify-content: center;
+  }
+
+  .inventory-table-container {
+    overflow-x: auto;
+  }
+
+  .inventory-table {
+    min-width: 720px;
   }
   
   .tabs-nav {
