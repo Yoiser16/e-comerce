@@ -45,6 +45,8 @@ class CrearOrdenInput(BaseModel):
     nombre: str
     apellido: Optional[str] = ''
     telefono: str
+    tipo_documento: Optional[str] = 'CC'
+    numero_documento: Optional[str] = ''
     direccion: str
     departamento: str
     municipio: str
@@ -312,14 +314,18 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
         cliente = ClienteModel.objects.filter(email=data.email).first()
     
     if not cliente:
+        # Validar número de documento
+        numero_doc = data.numero_documento if data.numero_documento else f"AUTO-{uuid4().hex[:8].upper()}"
+        tipo_doc = data.tipo_documento if data.tipo_documento else 'CC'
+        
         cliente = ClienteModel.objects.create(
             id=uuid4(),
             email=data.email,
             nombre=data.nombre,
             apellido=data.apellido,
             telefono=data.telefono,
-            tipo_documento='CC',
-            numero_documento=f"AUTO-{uuid4().hex[:8].upper()}",
+            tipo_documento=tipo_doc,
+            numero_documento=numero_doc,
             activo=True
         )
     else:
@@ -334,6 +340,14 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
         if cliente.telefono != data.telefono:
             cliente.telefono = data.telefono
             actualizado = True
+        # Actualizar documento si se proporciona uno nuevo
+        if data.numero_documento:
+            if cliente.numero_documento != data.numero_documento:
+                cliente.numero_documento = data.numero_documento
+                actualizado = True
+            if data.tipo_documento and cliente.tipo_documento != data.tipo_documento:
+                cliente.tipo_documento = data.tipo_documento
+                actualizado = True
         if actualizado:
             cliente.save()
     
