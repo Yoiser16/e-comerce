@@ -172,8 +172,9 @@
                         placeholder="Ingresa tu número de documento" 
                         inputmode="numeric"
                         pattern="[0-9]*"
-                        @input="formatDocumentNumber"
+                        minlength="5"
                         maxlength="15"
+                        @input="formatDocumentNumber"
                       />
                     </div>
                   </div>
@@ -1060,9 +1061,10 @@ export default {
     // Validations
     const isStep1Valid = computed(() => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+      const documentoValido = form.value.numeroDocumento && form.value.numeroDocumento.length >= 5
       return form.value.email && emailRegex.test(form.value.email) &&
              form.value.nombre && form.value.telefono &&
-             form.value.tipoDocumento && form.value.numeroDocumento
+             form.value.tipoDocumento && documentoValido
     })
     
     const isStep2Valid = computed(() => {
