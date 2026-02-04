@@ -313,6 +313,55 @@ class ProductoRepositoryImpl(ProductoRepository):
         except ProductoModel.DoesNotExist:
             return False
 
+    def eliminar_permanentemente(self, id: UUID) -> bool:
+        """
+        Elimina permanentemente un producto de la base de datos (hard delete).
+        NO permite eliminar productos con historial de órdenes para preservar integridad de datos.
+        """
+        self._logger.info(f"Intentando eliminar permanentemente producto", producto_id=str(id))
+        try:
+            from infrastructure.persistence.django.models import LineaOrdenModel
+            
+            model = ProductoModel.objects.get(id=id)
+            nombre_producto = model.nombre
+            
+            # Verificar si el producto tiene líneas de orden asociadas
+            lineas_count = LineaOrdenModel.objects.filter(producto_id=id).count()
+            
+            if lineas_count > 0:
+                # NO permitir eliminar productos con historial de ventas
+                self._logger.warning(
+                    f"Intento de eliminar producto con historial de órdenes bloqueado",
+                    producto_id=str(id),
+                    lineas_count=lineas_count
+                )
+                self._auditoria.registrar(
+                    entidad_tipo="Producto",
+                    entidad_id=id,
+                    accion="DELETE_PERMANENT_BLOCKED",
+                    resultado="RECHAZADO",
+                    mensaje=f"Producto '{nombre_producto}' tiene {lineas_count} líneas de orden. No se puede eliminar para preservar historial."
+                )
+                raise ValueError(
+                    f"No se puede eliminar el producto '{nombre_producto}' porque tiene {lineas_count} órdenes asociadas. "
+                    f"Los productos con historial de ventas solo pueden desactivarse para preservar la integridad del historial."
+                )
+            
+            # Solo si no tiene órdenes asociadas, eliminar permanentemente
+            model.delete()
+            
+            self._auditoria.registrar(
+                entidad_tipo="Producto",
+                entidad_id=id,
+                accion="DELETE_PERMANENT",
+                resultado="EXITO",
+                mensaje=f"Producto '{nombre_producto}' eliminado permanentemente de la BD (sin historial de órdenes)"
+            )
+            return True
+        except ProductoModel.DoesNotExist:
+            self._logger.warning(f"Intento de eliminar producto inexistente", producto_id=str(id))
+            return False
+
     def existe(self, id: UUID) -> bool:
         return ProductoModel.objects.filter(id=id).exists()
 

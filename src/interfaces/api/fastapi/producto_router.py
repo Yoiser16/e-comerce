@@ -170,16 +170,28 @@ def actualizar_producto(
 @router.delete("/{producto_id}", status_code=status.HTTP_204_NO_CONTENT)
 def eliminar_producto(
     producto_id: UUID,
+    permanente: bool = False,
     repo: ProductoRepository = Depends(get_producto_repository)
 ):
     """
-    Elimina (desactiva) un producto.
+    Elimina un producto.
+    - Si permanente=False: Desactiva el producto (soft delete)
+    - Si permanente=True: Elimina permanentemente de la BD (hard delete) - SOLO si no tiene historial de órdenes
     """
     try:
-        use_case = EliminarProductoUseCase(repo)
-        use_case.ejecutar(producto_id)
+        if permanente:
+            # Eliminación permanente (hard delete) - valida que no tenga historial
+            repo.eliminar_permanentemente(producto_id)
+        else:
+            # Eliminación suave (soft delete) - solo desactiva
+            use_case = EliminarProductoUseCase(repo)
+            use_case.ejecutar(producto_id)
+        
         invalidar_cache_productos()  # Invalidar caché
         return None
+    except ValueError as e:
+        # Error de validación (ej: producto con historial de órdenes)
+        raise HTTPException(status_code=400, detail=str(e))
     except ExcepcionDominio as e:
         raise e
     except Exception as e:

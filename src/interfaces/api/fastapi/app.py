@@ -6,6 +6,8 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.middleware.wsgi import WSGIMiddleware
 from fastapi.staticfiles import StaticFiles
 from django.core.wsgi import get_wsgi_application
+from starlette.middleware.base import BaseHTTPMiddleware
+from starlette.requests import Request
 
 from .cliente_router import router as cliente_router
 from .producto_router import router as producto_router
@@ -21,6 +23,22 @@ from .auth_router import router as auth_router
 from .exception_handlers import exception_handler_dominio
 from domain.exceptions.dominio import ExcepcionDominio
 from infrastructure.config.app_config import AppConfig
+
+
+class StaticFilesCORSMiddleware(BaseHTTPMiddleware):
+    """Middleware para agregar headers CORS a archivos estáticos"""
+    
+    async def dispatch(self, request: Request, call_next):
+        response = await call_next(request)
+        
+        # Si la ruta es de archivos estáticos, agregar headers CORS
+        if request.url.path.startswith("/static/"):
+            response.headers["Access-Control-Allow-Origin"] = "http://localhost:5173"
+            response.headers["Access-Control-Allow-Credentials"] = "true"
+            response.headers["Access-Control-Allow-Methods"] = "GET, HEAD, OPTIONS"
+            response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        
+        return response
 
 
 def crear_app(config: AppConfig) -> FastAPI:
@@ -55,6 +73,9 @@ def crear_app(config: AppConfig) -> FastAPI:
         allow_methods=["*"],
         allow_headers=["*"],
     )
+    
+    # Middleware para CORS en archivos estáticos (agregar DESPUÉS de CORSMiddleware)
+    app.add_middleware(StaticFilesCORSMiddleware)
     
     # Exception handlers
     app.add_exception_handler(ExcepcionDominio, exception_handler_dominio)

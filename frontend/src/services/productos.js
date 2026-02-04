@@ -69,6 +69,12 @@ export const productosService = {
     return true
   },
 
+  // Eliminar producto permanentemente (hard delete - solo para inactivos)
+  async eliminarPermanentemente(id) {
+    await apiClient.delete(`/productos/${id}?permanente=true`)
+    return true
+  },
+
   // Subir imagen de producto
   async subirImagen(file) {
     const formData = new FormData()

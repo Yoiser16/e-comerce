@@ -19,6 +19,24 @@
         </button>
       </div>
 
+      <!-- Tabs -->
+      <div class="flex gap-4 mb-6 border-b border-text-dark/10">
+        <button
+          @click="activeTab = 'activos'"
+          :class="activeTab === 'activos' ? 'border-b-2 border-[#D81B60] text-[#D81B60]' : 'text-text-medium hover:text-text-dark'"
+          class="pb-3 font-medium text-sm transition-colors"
+        >
+          Productos Activos ({{ productosActivos.length }})
+        </button>
+        <button
+          @click="activeTab = 'inactivos'"
+          :class="activeTab === 'inactivos' ? 'border-b-2 border-[#D81B60] text-[#D81B60]' : 'text-text-medium hover:text-text-dark'"
+          class="pb-3 font-medium text-sm transition-colors"
+        >
+          Productos Inactivos ({{ productosInactivos.length }})
+        </button>
+      </div>
+
       <!-- Barra de Filtros Cohesiva -->
       <div class="flex flex-col lg:flex-row gap-3">
         <!-- Search -->
@@ -113,7 +131,7 @@
             </tr>
           </thead>
           <tbody class="divide-y divide-text-dark/5">
-            <tr v-for="producto in filteredProducts" :key="producto.id" class="hover:bg-[#FAFAFA] transition-colors">
+            <tr v-for="producto in displayedProducts" :key="producto.id" class="hover:bg-[#FAFAFA] transition-colors">
               <!-- Product - COLUMNA PRINCIPAL CON JERARQUÍA VISUAL -->
               <td class="px-6 py-4">
                 <div class="flex items-center gap-4">
@@ -205,8 +223,9 @@
                   </button>
                   <button 
                     @click="confirmDelete(producto)"
-                    class="p-2 text-text-medium hover:text-red-600 hover:bg-red-50 rounded-lg transition-all"
-                    title="Eliminar"
+                    :class="activeTab === 'inactivos' ? 'text-red-600 hover:bg-red-50' : 'text-text-medium hover:text-red-600 hover:bg-red-50'"
+                    class="p-2 rounded-lg transition-all"
+                    :title="activeTab === 'inactivos' ? 'Eliminar permanentemente' : 'Desactivar'"
                     :disabled="deleting === producto.id"
                   >
                     <svg v-if="deleting !== producto.id" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -222,7 +241,7 @@
             </tr>
 
             <!-- Empty State -->
-            <tr v-if="filteredProducts.length === 0 && !loading">
+            <tr v-if="displayedProducts.length === 0 && !loading">
               <td colspan="5" class="px-6 py-16 text-center">
                 <div class="flex flex-col items-center">
                   <svg class="w-16 h-16 text-text-light mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -258,7 +277,7 @@
       <!-- Pagination -->
       <div v-if="productos.length > 0" class="flex items-center justify-between p-4 border-t border-text-dark/5 bg-[#FAFAFA]">
         <p class="text-sm text-text-medium">
-          Mostrando <span class="font-medium text-text-dark">{{ filteredProducts.length }}</span> de <span class="font-medium text-text-dark">{{ productos.length }}</span> productos
+          Mostrando <span class="font-medium text-text-dark">{{ displayedProducts.length }}</span> de <span class="font-medium text-text-dark">{{ productos.length }}</span> productos
         </p>
         <div class="flex items-center gap-2">
           <button 
@@ -303,7 +322,12 @@
         </div>
         
         <p class="text-gray-700">
-          ¿Estás seguro de que deseas eliminar <span class="font-semibold">{{ productToDelete?.nombre }}</span>?
+          <template v-if="productToDelete?.activo">
+            ¿Estás seguro de que deseas eliminar <span class="font-semibold">{{ productToDelete?.nombre }}</span>? Se marcará como inactivo.
+          </template>
+          <template v-else>
+            ¿Estás seguro de que deseas <span class="text-red-600 font-semibold">ELIMINAR PERMANENTEMENTE</span> <span class="font-semibold">{{ productToDelete?.nombre }}</span> de la base de datos? Esta acción no se puede deshacer.
+          </template>
         </p>
         
         <div class="flex gap-3 justify-end">
@@ -319,6 +343,100 @@
             class="px-4 py-2 text-white bg-red-600 hover:bg-red-700 rounded-lg font-medium transition-colors disabled:opacity-50"
           >
             {{ deleting ? 'Eliminando...' : 'Eliminar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- History Warning Modal (Elegant) -->
+    <div v-if="showHistoryWarningModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
+      <div class="bg-gradient-to-br from-white to-gray-50 rounded-3xl max-w-lg w-full shadow-2xl transform transition-all">
+        <!-- Header con icono elegante -->
+        <div class="relative overflow-hidden rounded-t-3xl bg-gradient-to-r from-amber-500 to-orange-500 p-8">
+          <div class="absolute top-0 right-0 w-32 h-32 bg-white/10 rounded-full -mr-16 -mt-16"></div>
+          <div class="absolute bottom-0 left-0 w-24 h-24 bg-white/10 rounded-full -ml-12 -mb-12"></div>
+          <div class="relative flex items-center gap-4">
+            <div class="w-16 h-16 bg-white/20 backdrop-blur-xl rounded-2xl flex items-center justify-center shadow-lg">
+              <svg class="w-9 h-9 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+              </svg>
+            </div>
+            <div class="flex-1">
+              <h3 class="text-2xl font-bold text-white drop-shadow-sm">Producto con Historial</h3>
+              <p class="text-white/90 text-sm mt-1">Protección de datos activa</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Content -->
+        <div class="p-8 space-y-6">
+          <!-- Producto Info -->
+          <div class="bg-white rounded-2xl p-5 border border-gray-200 shadow-sm">
+            <div class="flex items-center gap-3 mb-3">
+              <div class="w-10 h-10 bg-gradient-to-br from-pink-500 to-rose-500 rounded-xl flex items-center justify-center">
+                <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-xs text-gray-500 font-medium uppercase tracking-wider">Producto</p>
+                <p class="text-gray-900 font-semibold text-lg">{{ historyWarningData?.productoNombre }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Stats -->
+          <div class="bg-gradient-to-br from-amber-50 to-orange-50 rounded-2xl p-5 border border-amber-200">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-gradient-to-br from-amber-400 to-orange-500 rounded-xl flex items-center justify-center shadow-md">
+                <svg class="w-6 h-6 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-3xl font-bold text-gray-900">{{ historyWarningData?.numOrdenes }}</p>
+                <p class="text-sm text-gray-600 font-medium">{{ historyWarningData?.numOrdenes === 1 ? 'Orden registrada' : 'Órdenes registradas' }}</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Mensaje explicativo -->
+          <div class="space-y-3">
+            <div class="flex items-start gap-3">
+              <div class="w-6 h-6 bg-blue-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-4 h-4 text-blue-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-gray-700 leading-relaxed">
+                  Este producto tiene <strong class="text-gray-900">historial de ventas</strong> y no puede eliminarse permanentemente para preservar la <strong class="text-gray-900">integridad del sistema</strong>.
+                </p>
+              </div>
+            </div>
+
+            <div class="flex items-start gap-3">
+              <div class="w-6 h-6 bg-green-100 rounded-lg flex items-center justify-center flex-shrink-0 mt-0.5">
+                <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                  <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                </svg>
+              </div>
+              <div class="flex-1">
+                <p class="text-gray-700 leading-relaxed">
+                  <strong class="text-gray-900">Recomendación:</strong> Mantén el producto <span class="text-amber-600 font-semibold">desactivado</span> para que no aparezca en la tienda pero se conserve el historial.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Footer con botón -->
+        <div class="px-8 pb-8">
+          <button
+            @click="showHistoryWarningModal = false; historyWarningData = null"
+            class="w-full py-4 bg-gradient-to-r from-gray-800 to-gray-900 hover:from-gray-900 hover:to-black text-white font-semibold rounded-xl transition-all duration-300 shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
+          >
+            Entendido
           </button>
         </div>
       </div>
@@ -351,9 +469,20 @@ export default {
     const showEditModal = ref(false)
     const editingProductId = ref(null)
     const videoPosters = ref({})
+    const activeTab = ref('activos')
+    const showHistoryWarningModal = ref(false)
+    const historyWarningData = ref(null)
+
+    const productosActivos = computed(() => {
+      return productos.value.filter(p => p.activo)
+    })
+
+    const productosInactivos = computed(() => {
+      return productos.value.filter(p => !p.activo)
+    })
 
     const filteredProducts = computed(() => {
-      let result = productos.value
+      let result = activeTab.value === 'activos' ? productosActivos.value : productosInactivos.value
 
       // Search filter
       if (searchQuery.value) {
@@ -383,6 +512,10 @@ export default {
       }
 
       return result
+    })
+
+    const displayedProducts = computed(() => {
+      return filteredProducts.value
     })
 
     const formatNumber = (num) => {
@@ -509,17 +642,58 @@ export default {
       if (!productToDelete.value) return
       
       deleting.value = productToDelete.value.id
+      const productoId = productToDelete.value.id
+      const productoNombre = productToDelete.value.nombre
+      const esActivo = productToDelete.value.activo
+      
       try {
-        await productosService.eliminar(productToDelete.value.id)
-        // Remover de la lista local
-        productos.value = productos.value.filter(p => p.id !== productToDelete.value.id)
+        if (esActivo) {
+          // Si está activo, solo desactivar (soft delete)
+          await productosService.eliminar(productoId)
+          // Actualizar el estado en el array local sin remover
+          const producto = productos.value.find(p => p.id === productoId)
+          if (producto) {
+            producto.activo = false
+          }
+          console.log(`✓ ${productoNombre} desactivado correctamente`)
+        } else {
+          // Si está inactivo, intentar eliminar permanentemente (hard delete)
+          await productosService.eliminarPermanentemente(productoId)
+          // Remover completamente de la lista
+          productos.value = productos.value.filter(p => p.id !== productoId)
+          console.log(`✓ ${productoNombre} eliminado permanentemente`)
+        }
+        
+        // Cerrar modal
         showDeleteModal.value = false
         productToDelete.value = null
+        
       } catch (err) {
         console.error('Error deleting product:', err)
-        error.value = 'Error al eliminar el producto: ' + (err.response?.data?.detail || err.message)
+        
+        // Si el error es 400, es porque el producto tiene historial de órdenes
+        if (err.response?.status === 400) {
+          // Cerrar modal de confirmación
+          showDeleteModal.value = false
+          
+          // Extraer el número de órdenes del mensaje de error
+          const errorMsg = err.response.data.detail || ''
+          const ordenesMatch = errorMsg.match(/(\d+)\s+órdenes?/i)
+          const numOrdenes = ordenesMatch ? parseInt(ordenesMatch[1]) : 0
+          
+          // Mostrar modal elegante con información del historial
+          historyWarningData.value = {
+            productoNombre: productoNombre,
+            numOrdenes: numOrdenes,
+            mensaje: errorMsg
+          }
+          showHistoryWarningModal.value = true
+        } else {
+          error.value = 'Error al eliminar el producto: ' + (err.response?.data?.detail || err.message)
+        }
       } finally {
         deleting.value = null
+        productToDelete.value = null
       }
     }
 
@@ -558,11 +732,17 @@ export default {
       filterStock,
       currentPage,
       filteredProducts,
+      displayedProducts,
       deleting,
       showDeleteModal,
       productToDelete,
       showEditModal,
       editingProductId,
+      activeTab,
+      showHistoryWarningModal,
+      historyWarningData,
+      productosActivos,
+      productosInactivos,
       formatNumber,
       getStockClass,
       getCategoryLabel,

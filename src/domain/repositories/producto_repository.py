@@ -124,3 +124,8 @@ class ProductoRepository(RepositorioBase[Producto]):
     def obtener_todos(self, limite: int = 100, offset: int = 0) -> List[Producto]:
         """Obtiene TODOS los productos (incluyendo inactivos) para administración"""
         pass
+    
+    @abstractmethod
+    def eliminar_permanentemente(self, id: Any) -> None:
+        """Elimina permanentemente un producto de la base de datos (hard delete)"""
+        pass
