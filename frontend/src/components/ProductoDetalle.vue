@@ -735,7 +735,6 @@ import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { productosService, carritoService, authService } from '@/services/productos'
 import { getImageUrl } from '@/services/api'
-import { addProductToBackend, loadCartFromBackend, saveCartToLocalStorage } from '@/services/cartService'
 
 const route = useRoute()
 const router = useRouter()
@@ -960,17 +959,13 @@ const agregarAlCarrito = async () => {
     
     if (token) {
       // Usuario autenticado - usar backend
-      await addProductToBackend(producto.value.id, cantidad.value)
+      await carritoService.agregarProducto(producto.value.id, cantidad.value)
       
       // Recargar carrito del backend
-      const cart = await loadCartFromBackend()
-      carritoItems.value = cart.items
+      const cart = await carritoService.obtenerCarrito()
+      carritoItems.value = cart.items || []
       
-      // Guardar también en localStorage como cache
-      const total = cart.items.reduce((acc, item) => acc + (item.subtotal || 0), 0)
-      saveCartToLocalStorage(cart.items, total)
-      
-      cartCount.value = cart.items.reduce((acc, item) => acc + item.cantidad, 0)
+      cartCount.value = (cart.items || []).reduce((acc, item) => acc + item.cantidad, 0)
     } else {
       // Usuario no autenticado - usar localStorage
       const items = loadCartFromLocal()
