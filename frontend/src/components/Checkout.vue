@@ -152,6 +152,33 @@
                     <p class="text-xs text-[#9CA3AF] mt-1.5">Te contactaremos por WhatsApp para coordinar tu envío</p>
                   </div>
                   
+                  <div class="grid sm:grid-cols-2 gap-5">
+                    <div class="input-group">
+                      <label>Tipo de Documento</label>
+                      <select v-model="form.tipoDocumento" @change="saveFormToStorage" class="!p-3">
+                        <option value="">Selecciona...</option>
+                        <option value="CC">Cédula de Ciudadanía (CC)</option>
+                        <option value="CE">Cédula de Extranjería (CE)</option>
+                        <option value="TI">Tarjeta de Identidad (TI)</option>
+                        <option value="PASAPORTE">Pasaporte</option>
+                        <option value="NIT">NIT</option>
+                      </select>
+                    </div>
+                    <div class="input-group">
+                      <label>Número de Documento</label>
+                      <input 
+                        type="text" 
+                        v-model="form.numeroDocumento" 
+                        placeholder="Ingresa tu número de documento" 
+                        inputmode="numeric"
+                        pattern="[0-9]*"
+                        @input="formatDocumentNumber"
+                        maxlength="15"
+                      />
+                    </div>
+                  </div>
+                  <p class="text-xs text-[#9CA3AF] -mt-3">📦 Requerido por la transportadora para realizar la entrega</p>
+                  
                   <label class="flex items-center gap-3 cursor-pointer group mt-6">
                     <div class="relative">
                       <input type="checkbox" v-model="form.newsletter" class="sr-only peer" @change="saveFormToStorage" />
@@ -858,6 +885,8 @@ export default {
       nombre: '',
       apellido: '',
       telefono: '',
+      tipoDocumento: 'CC',
+      numeroDocumento: '',
       newsletter: false,
       pais: '',
       departamento: '',
@@ -1032,7 +1061,8 @@ export default {
     const isStep1Valid = computed(() => {
       const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
       return form.value.email && emailRegex.test(form.value.email) &&
-             form.value.nombre && form.value.telefono
+             form.value.nombre && form.value.telefono &&
+             form.value.tipoDocumento && form.value.numeroDocumento
     })
     
     const isStep2Valid = computed(() => {
@@ -1073,6 +1103,13 @@ export default {
       }
       
       form.value.telefono = digits
+      saveFormToStorage()
+    }
+    
+    // Formatear número de documento (solo números)
+    const formatDocumentNumber = () => {
+      // Eliminar todo excepto dígitos
+      form.value.numeroDocumento = form.value.numeroDocumento.replace(/\D/g, '')
       saveFormToStorage()
     }
     
@@ -1603,6 +1640,8 @@ export default {
             nombre: form.value.nombre,
             apellido: form.value.apellido || '',
             telefono: form.value.telefono,
+            tipo_documento: form.value.tipoDocumento || 'CC',
+            numero_documento: form.value.numeroDocumento || '',
             direccion: form.value.direccion,
             departamento: depNombre,
             municipio: munNombre,
@@ -1619,6 +1658,11 @@ export default {
             total: getTotal(),
             metodo_pago: 'whatsapp'
           }
+          
+          console.log('📄 Datos de documento a enviar:', {
+            tipo_documento: ordenData.tipo_documento,
+            numero_documento: ordenData.numero_documento
+          })
           
           // Usar URL completa para evitar problemas de proxy
           const apiUrl = window.location.hostname === 'localhost' 
@@ -1909,7 +1953,7 @@ export default {
       isStep1Valid, isStep2Valid,
       nextStep, prevStep, goToStep,
       onPaisChange, onDepartamentoChange,
-      getFullAddress, getWhatsAppAddress, saveFormToStorage, formatPhoneNumber,
+      getFullAddress, getWhatsAppAddress, saveFormToStorage, formatPhoneNumber, formatDocumentNumber,
       buildWhatsAppMessage, formatPrice, getItemPrice, getSubtotal, getTotal, processPayment,
       getCartMediaUrl,
       clienteConDatosCompletos,
