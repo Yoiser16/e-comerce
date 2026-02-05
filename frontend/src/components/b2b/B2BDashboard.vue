@@ -1,6 +1,9 @@
 <template>
   <div class="min-h-screen bg-[#F8F8F8]">
     
+    <!-- Toast notifications -->
+    <B2BToast />
+    
     <!-- =========================================================================
          HERO BANNER - Beauty Brand with Hair Focus
     ========================================================================== -->
@@ -419,22 +422,36 @@
       </div>
       
       <!-- Scroll horizontal de productos habituales -->
-      <div class="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
+      <div v-if="isLoading" class="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
+        <B2BSkeleton 
+          v-for="n in 5" 
+          :key="`skeleton-${n}`"
+          variant="rounded" 
+          class="flex-shrink-0 w-[150px] sm:w-[168px] h-[280px]" 
+        />
+      </div>
+      
+      <div v-else class="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
         <div 
-          v-for="product in frequentProducts" 
+          v-for="(product, index) in frequentProducts" 
           :key="product.id"
-          class="flex-shrink-0 w-[150px] sm:w-[168px] bg-white rounded-xl border border-gray-100/80 overflow-hidden hover:shadow-md hover:shadow-gray-200/50 hover:-translate-y-0.5 transition-all duration-300 ease-out group"
+          :style="{ 
+            animationDelay: getAnimationDelay(index),
+            opacity: hasAnimated ? 1 : 0
+          }"
+          class="flex-shrink-0 w-[150px] sm:w-[168px] bg-white rounded-xl border border-gray-100/80 overflow-hidden hover:shadow-md hover:shadow-gray-200/50 hover:-translate-y-0.5 transition-all duration-300 ease-out group animate-fade-in-up"
         >
           <!-- Imagen del producto -->
           <div class="relative aspect-[4/5] bg-gray-50 overflow-hidden">
             <img 
               :src="product.image" 
               :alt="product.name"
-              class="w-full h-full object-cover group-hover:scale-103 transition-transform duration-500 ease-out"
+              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
               @error="handleProductImageError($event, product)"
+              loading="lazy"
             />
             <!-- Badge de cantidad - más pequeño y sutil -->
-            <div class="absolute top-2 right-2 bg-gray-900/60 text-white text-[10px] px-1.5 py-0.5 rounded font-medium">
+            <div class="absolute top-2 right-2 bg-gray-900/60 text-white text-[10px] px-1.5 py-0.5 rounded font-medium backdrop-blur-sm">
               ×{{ product.lastQty }}
             </div>
           </div>
@@ -448,12 +465,13 @@
               ${{ product.price.toLocaleString() }}
             </p>
             
-            <!-- Botón agregar - más ligero -->
+            <!-- Botón agregar - con animación y accesibilidad -->
             <button 
               @click="quickAddToCart(product)"
-              class="w-full py-2 bg-gray-100 hover:bg-gray-900 text-gray-700 hover:text-white text-xs font-medium rounded-lg flex items-center justify-center gap-1.5 transition-all duration-250"
+              class="w-full py-2 bg-gray-100 hover:bg-gray-900 text-gray-700 hover:text-white text-xs font-medium rounded-lg flex items-center justify-center gap-1.5 transition-all duration-250 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2 active:scale-95"
+              :aria-label="`Agregar ${product.name} al carrito`"
             >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <svg class="w-3.5 h-3.5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
               </svg>
               Agregar
@@ -498,11 +516,24 @@
       </div>
       
       <!-- Grid de productos destacados -->
-      <div class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+      <div v-if="isLoading" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
+        <B2BSkeleton 
+          v-for="n in 10" 
+          :key="`skeleton-featured-${n}`"
+          variant="rounded" 
+          class="aspect-[4/5] h-[320px]" 
+        />
+      </div>
+      
+      <div v-else-if="featuredProducts.length > 0" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
         <div 
-          v-for="product in featuredProducts" 
+          v-for="(product, index) in featuredProducts" 
           :key="product.id"
-          class="group bg-white rounded-xl overflow-hidden border border-gray-100/80 hover:shadow-lg hover:shadow-gray-200/60 hover:-translate-y-0.5 transition-all duration-300 ease-out"
+          :style="{ 
+            animationDelay: getAnimationDelay(index),
+            opacity: hasAnimated ? 1 : 0
+          }"
+          class="group bg-white rounded-xl overflow-hidden border border-gray-100/80 hover:shadow-lg hover:shadow-gray-200/60 hover:-translate-y-0.5 transition-all duration-300 ease-out animate-fade-in-up"
         >
           <!-- Imagen grande -->
           <div class="relative aspect-[4/5] bg-gray-50 overflow-hidden">
@@ -511,43 +542,45 @@
               :alt="product.name"
               class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
               @error="handleProductImageError($event, product)"
+              loading="lazy"
             />
             
             <!-- Badges más sutiles -->
             <div class="absolute top-2 left-2 flex flex-col gap-1.5">
               <span 
                 v-if="product.badge === 'new'"
-                class="px-2 py-0.5 bg-emerald-500/90 text-white text-[10px] font-semibold rounded"
+                class="px-2 py-0.5 bg-emerald-500/90 text-white text-[10px] font-semibold rounded backdrop-blur-sm"
               >
                 Nuevo
               </span>
               <span 
                 v-if="product.badge === 'low'"
-                class="px-2 py-0.5 bg-amber-500/90 text-white text-[10px] font-semibold rounded"
+                class="px-2 py-0.5 bg-amber-500/90 text-white text-[10px] font-semibold rounded backdrop-blur-sm"
               >
                 Últimas uds.
               </span>
               <span 
                 v-if="product.badge === 'hot'"
-                class="px-2 py-0.5 bg-rose-500/90 text-white text-[10px] font-semibold rounded"
+                class="px-2 py-0.5 bg-rose-500/90 text-white text-[10px] font-semibold rounded backdrop-blur-sm"
               >
                 Top ventas
               </span>
               <span 
                 v-if="product.discount"
-                class="px-2 py-0.5 bg-gray-900/80 text-white text-[10px] font-semibold rounded"
+                class="px-2 py-0.5 bg-gray-900/80 text-white text-[10px] font-semibold rounded backdrop-blur-sm"
               >
                 -{{ product.discount }}%
               </span>
             </div>
             
-            <!-- Quick add overlay -->
+            <!-- Quick add overlay - con mejoras de accesibilidad -->
             <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-3">
               <button 
                 @click="quickAddToCart(product)"
-                class="px-4 py-2 bg-white/95 text-gray-900 text-xs font-semibold rounded-lg shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 flex items-center gap-1.5 hover:bg-white"
+                class="px-4 py-2 bg-white/95 text-gray-900 text-xs font-semibold rounded-lg shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 flex items-center gap-1.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900 active:scale-95"
+                :aria-label="`Agregar ${product.name} al carrito rápidamente`"
               >
-                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-3.5 h-3.5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
                 Agregar
@@ -582,11 +615,34 @@
         </div>
       </div>
       
-      <!-- Botón ver más - más sutil -->
-      <div class="text-center mt-10">
+      <!-- Empty state si no hay productos -->
+      <div v-else class="flex flex-col items-center justify-center py-16 px-4">
+        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
+          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
+          </svg>
+        </div>
+        <h3 class="text-lg font-semibold text-gray-800 mb-2">No hay productos disponibles</h3>
+        <p class="text-gray-500 text-sm mb-6 text-center max-w-sm">
+          Actualmente no hay productos en esta sección. Vuelve más tarde o explora el catálogo completo.
+        </p>
         <router-link 
           to="/portal/catalogo"
-          class="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-all duration-300 group hover:shadow-lg hover:shadow-gray-900/20"
+          class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
+        >
+          Ver catálogo completo
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+          </svg>
+        </router-link>
+      </div>
+      
+      <!-- Botón ver más - con accesibilidad mejorada -->
+      <div v-if="featuredProducts.length > 0" class="text-center mt-10">
+        <router-link 
+          to="/portal/catalogo"
+          class="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-all duration-300 group hover:shadow-lg hover:shadow-gray-900/20 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
+          aria-label="Ver catálogo completo con todos los productos"
         >
           Explorar catálogo completo
           <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -637,9 +693,15 @@
 
 <script>
 import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { B2BToast, useToast } from './ui'
+import B2BSkeleton from './ui/B2BSkeleton.vue'
 
 export default {
   name: 'B2BDashboard',
+  components: {
+    B2BToast,
+    B2BSkeleton
+  },
   setup() {
     // =========================================================================
     // STATE
@@ -650,7 +712,12 @@ export default {
 
     const cartCount = ref(0)
     const currentSlide = ref(0)
+    const isLoading = ref(true)
+    const hasAnimated = ref(false)
     let slideInterval = null
+    
+    // Toast notifications
+    const toast = useToast()
 
     // Productos habituales (simulados - en producción vendrían de API)
     const frequentProducts = ref([
@@ -705,8 +772,20 @@ export default {
       cartCount.value++
       console.log('Agregado al carrito:', product.name)
       
-      // Feedback visual temporal
-      alert(`✓ ${product.name} agregado al carrito`)
+      // Feedback visual elegante con toast
+      toast.success(`${product.name} agregado al carrito`, 3000)
+      
+      // Animación del botón (manejado por CSS transition)
+      const button = event.target.closest('button')
+      if (button) {
+        button.classList.add('scale-95')
+        setTimeout(() => button.classList.remove('scale-95'), 150)
+      }
+    }
+    
+    // Staggered animation delay helper
+    function getAnimationDelay(index) {
+      return `${index * 100}ms`
     }
 
     // =========================================================================
@@ -714,6 +793,12 @@ export default {
     // =========================================================================
     onMounted(() => {
       startSlideshow()
+      
+      // Simular carga de datos
+      setTimeout(() => {
+        isLoading.value = false
+        hasAnimated.value = true
+      }, 800)
       
       // Cargar contador del carrito desde localStorage
       const savedCart = localStorage.getItem('b2b_cart')
@@ -740,12 +825,15 @@ export default {
       user,
       cartCount,
       currentSlide,
+      isLoading,
+      hasAnimated,
       frequentProducts,
       featuredProducts,
       nextSlide,
       prevSlide,
       handleProductImageError,
-      quickAddToCart
+      quickAddToCart,
+      getAnimationDelay
     }
   }
 }
@@ -767,5 +855,61 @@ export default {
   -webkit-line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* ============================================
+   ANIMACIONES STAGGERED Y TRANSICIONES FLUIDAS
+   ============================================ */
+
+/* Fade in up animation para productos */
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in-up {
+  animation: fadeInUp 0.6s cubic-bezier(0.4, 0, 0.2, 1) forwards;
+}
+
+/* Hover transitions más suaves */
+.group:hover .group-hover\:scale-105 {
+  transform: scale(1.05);
+}
+
+.group:hover .group-hover\:rotate-90 {
+  transform: rotate(90deg);
+}
+
+/* Focus states mejorados para accesibilidad WCAG AAA */
+button:focus,
+a:focus {
+  outline: none;
+}
+
+button:focus-visible,
+a:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 2px;
+}
+
+/* Active state para feedback táctil */
+.active\:scale-95:active {
+  transform: scale(0.95);
+}
+
+/* Backdrop blur para badges */
+.backdrop-blur-sm {
+  backdrop-filter: blur(4px);
+}
+
+/* Transición del slider más cinematográfica */
+[style*="transform: translateX"] {
+  transition: transform 700ms cubic-bezier(0.4, 0, 0.2, 1);
 }
 </style>
