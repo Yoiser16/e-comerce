@@ -162,5 +162,9 @@ def get_current_user_admin(
     return {"user_id": "admin", "rol": "ADMIN"}
 
 
+# Alias para compatibilidad
+get_current_admin_user = get_current_user_admin
+
+
 # --- Services / Otros ---
 # Aquí se agregarían otros servicios como EmailService, etc.

@@ -32,8 +32,21 @@ export const APP_CONTEXT = {
  * - "pro.localhost" → "pro"
  * - "localhost" → null
  * - "127.0.0.1" → null
+ * 
+ * DEV MODE: Usa ?app=b2b o ?app=b2c en la URL para forzar el modo
  */
 export function getSubdomain() {
+  // =========================================================================
+  // DEV MODE: Permitir forzar el contexto via URL params
+  // Ejemplo: http://localhost:5173/?app=b2b
+  // =========================================================================
+  if (typeof window !== 'undefined') {
+    const urlParams = new URLSearchParams(window.location.search)
+    const forceApp = urlParams.get('app')
+    if (forceApp === 'b2b') return SUBDOMAINS.PRO
+    if (forceApp === 'b2c') return null
+  }
+  
   const hostname = window.location.hostname
   
   // Caso: IP directa (desarrollo local)

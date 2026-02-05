@@ -44,6 +44,37 @@ async def login(request: LoginRequest):
         if not await sync_to_async(user.check_password)(request.password):
             raise HTTPException(status_code=401, detail="Credenciales incorrectas")
         
+        # Validar estado de mayoristas ANTES de verificar is_active
+        # porque cuando se rechaza un mayorista, is_active se pone en False
+        if user.tipo == 'MAYORISTA':
+            estado = user.estado_mayorista
+            if estado == 'PENDIENTE':
+                raise HTTPException(
+                    status_code=403, 
+                    detail="Tu solicitud está pendiente de aprobación. Te notificaremos cuando sea revisada."
+                )
+            elif estado == 'EN_REVISION':
+                raise HTTPException(
+                    status_code=403, 
+                    detail="Tu solicitud está siendo revisada. Te contactaremos pronto."
+                )
+            elif estado == 'RECHAZADO':
+                raise HTTPException(
+                    status_code=403, 
+                    detail="Tu solicitud de cuenta mayorista fue rechazada. Contacta a soporte para más información."
+                )
+            elif estado == 'SUSPENDIDO':
+                raise HTTPException(
+                    status_code=403, 
+                    detail="Tu cuenta de mayorista ha sido suspendida. Contacta a soporte."
+                )
+            elif estado != 'APROBADO':
+                raise HTTPException(
+                    status_code=403, 
+                    detail="Tu cuenta no está activa. Contacta a soporte."
+                )
+        
+        # Para usuarios no mayoristas, verificar is_active
         if not user.is_active:
             raise HTTPException(status_code=401, detail="Usuario inactivo")
         
@@ -60,7 +91,14 @@ async def login(request: LoginRequest):
         return LoginResponse(
             access=tokens['access'],
             refresh=tokens['refresh'],
-            user={'id': str(user.id), 'email': user.email, 'nombre': user.nombre, 'rol': user.rol}
+            user={
+                'id': str(user.id), 
+                'email': user.email, 
+                'nombre': user.nombre, 
+                'rol': user.rol,
+                'tipo': user.tipo,
+                'es_mayorista': user.tipo == 'MAYORISTA'
+            }
         )
     except HTTPException:
         raise
@@ -97,6 +135,35 @@ async def login_google(request: GoogleLoginRequest):
                 )
         
         user = await get_or_create()
+        
+        # Validar estado de mayoristas
+        if user.tipo == 'MAYORISTA':
+            estado = user.estado_mayorista
+            if estado == 'PENDIENTE':
+                raise HTTPException(
+                    status_code=403, 
+                    detail="Tu solicitud está pendiente de aprobación. Te notificaremos cuando sea revisada."
+                )
+            elif estado == 'EN_REVISION':
+                raise HTTPException(
+                    status_code=403, 
+                    detail="Tu solicitud está siendo revisada. Te contactaremos pronto."
+                )
+            elif estado == 'RECHAZADO':
+                raise HTTPException(
+                    status_code=403, 
+                    detail="Tu solicitud de cuenta mayorista fue rechazada. Contacta a soporte para más información."
+                )
+            elif estado == 'SUSPENDIDO':
+                raise HTTPException(
+                    status_code=403, 
+                    detail="Tu cuenta de mayorista ha sido suspendida. Contacta a soporte."
+                )
+            elif estado != 'APROBADO':
+                raise HTTPException(
+                    status_code=403, 
+                    detail="Tu cuenta no está activa. Contacta a soporte."
+                )
         
         def _gen_tokens():
             refresh = RefreshToken.for_user(user)

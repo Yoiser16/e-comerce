@@ -326,6 +326,10 @@ USE_TZ = True
 STATIC_URL = '/static/'
 STATIC_ROOT = BASE_DIR / 'static'
 
+# Media files (User uploads: cédulas, imágenes de productos, etc.)
+MEDIA_URL = '/media/'
+MEDIA_ROOT = BASE_DIR / 'media'
+
 # Default primary key field type
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
@@ -560,6 +564,9 @@ CORS_ALLOWED_ORIGINS = [
     "http://localhost:5173",
     "http://127.0.0.1:3000",
     "http://127.0.0.1:5173",
+    # B2B subdomain
+    "http://pro.localhost:5173",
+    "http://pro.localhost:3000",
 ]
 
 CORS_ALLOW_CREDENTIALS = True

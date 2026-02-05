@@ -6,6 +6,10 @@ IMPORTANTE:
 - Es infraestructura para seguridad de la API
 - NO confundir con Cliente del dominio
 - Los clientes del negocio siguen siendo entidades de dominio
+
+TIPOS DE USUARIO:
+- STAFF: Personal interno (admin, operadores)
+- MAYORISTA: Clientes B2B (distribuidores, requieren aprobación)
 """
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
@@ -13,9 +17,20 @@ from django.utils import timezone
 import uuid
 
 
+class TipoUsuario(models.TextChoices):
+    """
+    Tipos de usuario en el sistema
+    
+    STAFF: Personal interno - accede al admin panel
+    MAYORISTA: Clientes B2B - accede al portal mayorista (pro.*)
+    """
+    STAFF = 'STAFF', 'Staff Interno'
+    MAYORISTA = 'MAYORISTA', 'Mayorista'
+
+
 class RolUsuario(models.TextChoices):
     """
-    Roles básicos del sistema para control de acceso
+    Roles básicos del sistema para control de acceso (solo STAFF)
     
     ADMIN: Acceso total - crear, modificar, eliminar
     OPERADOR: Operaciones de negocio - crear, modificar
@@ -24,6 +39,23 @@ class RolUsuario(models.TextChoices):
     ADMIN = 'ADMIN', 'Administrador'
     OPERADOR = 'OPERADOR', 'Operador'
     LECTURA = 'LECTURA', 'Solo Lectura'
+
+
+class EstadoMayorista(models.TextChoices):
+    """
+    Estados de aprobación para mayoristas
+    
+    PENDIENTE: Solicitud recibida, esperando revisión
+    EN_REVISION: Documentos siendo verificados
+    APROBADO: Cuenta activa, puede operar
+    RECHAZADO: Solicitud rechazada
+    SUSPENDIDO: Cuenta suspendida temporalmente
+    """
+    PENDIENTE = 'PENDIENTE', 'Pendiente de Revisión'
+    EN_REVISION = 'EN_REVISION', 'En Revisión'
+    APROBADO = 'APROBADO', 'Aprobado'
+    RECHAZADO = 'RECHAZADO', 'Rechazado'
+    SUSPENDIDO = 'SUSPENDIDO', 'Suspendido'
 
 
 class UsuarioManager(BaseUserManager):
@@ -54,20 +86,81 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     """
     Usuario del sistema para autenticación
     
-    NOTA: Este NO es el Cliente del dominio.
+    Soporta dos tipos de usuarios:
+    - STAFF: Personal interno (admin panel)
+    - MAYORISTA: Clientes B2B (portal mayorista)
+    
+    NOTA: Este NO es el Cliente retail del dominio.
     - Usuario: Autenticación y autorización (infraestructura)
-    - Cliente: Entidad de negocio (dominio)
+    - Cliente: Entidad de negocio para retail B2C (dominio)
     """
     
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     email = models.EmailField(unique=True, max_length=255)
     nombre = models.CharField(max_length=150)
+    apellido = models.CharField(max_length=150, blank=True, default='')
+    
+    # Tipo de usuario (STAFF o MAYORISTA)
+    tipo = models.CharField(
+        max_length=20,
+        choices=TipoUsuario.choices,
+        default=TipoUsuario.STAFF
+    )
+    
+    # Rol (solo aplica para STAFF)
     rol = models.CharField(
         max_length=20,
         choices=RolUsuario.choices,
         default=RolUsuario.LECTURA
     )
     
+    # =========================================================================
+    # CAMPOS ESPECÍFICOS PARA MAYORISTAS
+    # =========================================================================
+    telefono = models.CharField(max_length=20, blank=True, default='')
+    
+    # Documento de identidad
+    tipo_documento = models.CharField(max_length=20, blank=True, default='CC')  # CC, NIT, CE
+    numero_documento = models.CharField(max_length=50, blank=True, default='', db_index=True)
+    
+    # Imágenes de verificación (archivos de imagen)
+    cedula_frente = models.ImageField(upload_to='cedulas/', blank=True, null=True)
+    cedula_dorso = models.ImageField(upload_to='cedulas/', blank=True, null=True)
+    
+    # Información de empresa (opcional para mayoristas)
+    nombre_empresa = models.CharField(max_length=200, blank=True, default='')
+    nit_empresa = models.CharField(max_length=50, blank=True, default='')
+    
+    # Estado de aprobación (solo mayoristas)
+    estado_mayorista = models.CharField(
+        max_length=20,
+        choices=EstadoMayorista.choices,
+        default=EstadoMayorista.PENDIENTE,
+        blank=True
+    )
+    
+    # Notas de revisión (para el admin)
+    notas_revision = models.TextField(blank=True, default='')
+    fecha_revision = models.DateTimeField(null=True, blank=True)
+    revisado_por = models.ForeignKey(
+        'self',
+        on_delete=models.SET_NULL,
+        null=True,
+        blank=True,
+        related_name='revisiones_realizadas'
+    )
+    
+    # Nivel de descuento para mayoristas (porcentaje)
+    descuento_mayorista = models.DecimalField(
+        max_digits=5, 
+        decimal_places=2, 
+        default=0,
+        help_text='Porcentaje de descuento para este mayorista'
+    )
+    
+    # =========================================================================
+    # CAMPOS COMUNES
+    # =========================================================================
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     
@@ -84,31 +177,98 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         verbose_name = 'Usuario'
         verbose_name_plural = 'Usuarios'
         ordering = ['-fecha_creacion']
+        indexes = [
+            models.Index(fields=['tipo', 'estado_mayorista']),
+            models.Index(fields=['numero_documento']),
+        ]
     
     def __str__(self):
+        if self.tipo == TipoUsuario.MAYORISTA:
+            return f"{self.nombre} {self.apellido} - Mayorista ({self.get_estado_mayorista_display()})"
         return f"{self.email} ({self.get_rol_display()})"
+    
+    # =========================================================================
+    # PROPIEDADES
+    # =========================================================================
+    
+    @property
+    def nombre_completo(self) -> str:
+        """Retorna el nombre completo del usuario"""
+        return f"{self.nombre} {self.apellido}".strip()
+    
+    @property
+    def es_staff(self) -> bool:
+        """Verifica si es usuario staff (interno)"""
+        return self.tipo == TipoUsuario.STAFF
+    
+    @property
+    def es_mayorista(self) -> bool:
+        """Verifica si es usuario mayorista"""
+        return self.tipo == TipoUsuario.MAYORISTA
+    
+    @property
+    def mayorista_aprobado(self) -> bool:
+        """Verifica si el mayorista está aprobado para operar"""
+        return self.es_mayorista and self.estado_mayorista == EstadoMayorista.APROBADO
+    
+    @property
+    def mayorista_pendiente(self) -> bool:
+        """Verifica si el mayorista está pendiente de aprobación"""
+        return self.es_mayorista and self.estado_mayorista in [
+            EstadoMayorista.PENDIENTE, 
+            EstadoMayorista.EN_REVISION
+        ]
     
     @property
     def es_admin(self) -> bool:
         """Verifica si el usuario es administrador"""
-        return self.rol == RolUsuario.ADMIN
+        return self.es_staff and self.rol == RolUsuario.ADMIN
     
     @property
     def es_operador(self) -> bool:
         """Verifica si el usuario es operador"""
-        return self.rol == RolUsuario.OPERADOR
+        return self.es_staff and self.rol == RolUsuario.OPERADOR
     
     @property
     def es_lectura(self) -> bool:
         """Verifica si el usuario solo tiene permisos de lectura"""
-        return self.rol == RolUsuario.LECTURA
+        return self.es_staff and self.rol == RolUsuario.LECTURA
     
     @property
     def puede_escribir(self) -> bool:
         """Verifica si el usuario puede crear/modificar"""
-        return self.rol in [RolUsuario.ADMIN, RolUsuario.OPERADOR]
+        return self.es_staff and self.rol in [RolUsuario.ADMIN, RolUsuario.OPERADOR]
     
     @property
     def puede_eliminar(self) -> bool:
         """Verifica si el usuario puede eliminar"""
-        return self.rol == RolUsuario.ADMIN
+        return self.es_staff and self.rol == RolUsuario.ADMIN
+    
+    # =========================================================================
+    # MÉTODOS
+    # =========================================================================
+    
+    def aprobar_mayorista(self, aprobado_por: 'Usuario', notas: str = ''):
+        """Aprueba la solicitud de mayorista"""
+        self.estado_mayorista = EstadoMayorista.APROBADO
+        self.revisado_por = aprobado_por
+        self.notas_revision = notas
+        self.fecha_revision = timezone.now()
+        self.save()
+    
+    def rechazar_mayorista(self, rechazado_por: 'Usuario', motivo: str):
+        """Rechaza la solicitud de mayorista"""
+        self.estado_mayorista = EstadoMayorista.RECHAZADO
+        self.revisado_por = rechazado_por
+        self.notas_revision = motivo
+        self.fecha_revision = timezone.now()
+        self.is_active = False
+        self.save()
+    
+    def suspender_mayorista(self, suspendido_por: 'Usuario', motivo: str):
+        """Suspende temporalmente la cuenta de mayorista"""
+        self.estado_mayorista = EstadoMayorista.SUSPENDIDO
+        self.revisado_por = suspendido_por
+        self.notas_revision = motivo
+        self.fecha_revision = timezone.now()
+        self.save()

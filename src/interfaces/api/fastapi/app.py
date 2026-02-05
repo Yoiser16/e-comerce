@@ -20,6 +20,7 @@ from .upload_router import router as upload_router
 from .orden_router import router as orden_router
 from .inventario_router import router as inventario_router
 from .auth_router import router as auth_router
+from .mayoristas_router import router as mayoristas_router
 from .exception_handlers import exception_handler_dominio
 from domain.exceptions.dominio import ExcepcionDominio
 from infrastructure.config.app_config import AppConfig
@@ -68,6 +69,9 @@ def crear_app(config: AppConfig) -> FastAPI:
             "http://127.0.0.1:5173",
             "http://localhost:3000",
             "http://127.0.0.1:3000",
+            # B2B subdomain
+            "http://pro.localhost:5173",
+            "http://pro.localhost:3000",
         ],
         allow_credentials=True,
         allow_methods=["*"],
@@ -92,9 +96,19 @@ def crear_app(config: AppConfig) -> FastAPI:
     app.include_router(categoria_router)  # Categorías
     app.include_router(orden_router)      # Órdenes
     app.include_router(inventario_router) # Inventario y movimientos
+    app.include_router(mayoristas_router) # Admin mayoristas B2B
     
     # Servir archivos estáticos
     app.mount("/static", StaticFiles(directory="static"), name="static")
+    
+    # Servir archivos de media (uploads de usuarios)
+    import os
+    media_path = os.path.join(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(os.path.dirname(__file__))))), 'media')
+    if os.path.exists(media_path):
+        app.mount("/media", StaticFiles(directory=media_path), name="media")
+    else:
+        os.makedirs(media_path, exist_ok=True)
+        app.mount("/media", StaticFiles(directory=media_path), name="media")
     
     # Montar Django SOLO para /admin/
     # FastAPI maneja todos los endpoints /api/v1/*
