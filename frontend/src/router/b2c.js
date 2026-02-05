@@ -162,6 +162,16 @@ const router = createRouter({
 
 // Navigation guard for auth routes
 router.beforeEach((to, from, next) => {
+  // =========================================================================
+  // REDIRECCIÓN B2B: Si intenta acceder a /portal en B2C, redirigir a B2B login
+  // =========================================================================
+  if (to.path.startsWith('/portal')) {
+    console.log('⚠️ Intento de acceso a /portal en contexto B2C - Redirigiendo a B2B login')
+    // Redirigir a login B2B con parámetro app=b2b
+    window.location.href = `/login?app=b2b&redirect=${encodeURIComponent(to.fullPath)}`
+    return
+  }
+  
   // Capturar tokens de la URL (para login de admin en nueva pestaña)
   if (to.query.token && to.query.refresh) {
     console.log('Procesando tokens de URL para admin...')
