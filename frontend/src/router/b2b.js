@@ -18,6 +18,8 @@ const B2BPedidos = () => import('../components/b2b/B2BPedidos.vue')
 const B2BCuenta = () => import('../components/b2b/B2BCuenta.vue')
 const B2BRegistro = () => import('../components/b2b/B2BRegistro.vue')
 
+// Variable global para acceder al router desde listeners
+let routerInstance = null
 const routes = [
   // =========================================================================
   // RUTAS PÚBLICAS B2B
@@ -111,6 +113,34 @@ const router = createRouter({
   }
 })
 
+// Guardar referencia al router para uso en listeners
+routerInstance = router
+
+// =============================================================================
+// SINCRONIZACIÓN ENTRE PESTAÑAS
+// Detectar cuando la sesión se cierra en otra pestaña
+// =============================================================================
+if (typeof window !== 'undefined') {
+  window.addEventListener('storage', (event) => {
+    // Detectar cuando se elimina el token en otra pestaña
+    if (event.key === 'b2b_access_token' && !event.newValue) {
+      console.log('🔐 Sesión cerrada en otra pestaña - redirigiendo a login')
+      
+      // Limpiar estado
+      localStorage.removeItem('b2b_user')
+      localStorage.removeItem('b2b_refresh_token')
+      
+      // Redirigir a login si estamos en una ruta protegida
+      if (routerInstance && routerInstance.currentRoute.value.meta?.requiresB2BAuth) {
+        routerInstance.push({
+          name: 'B2BLogin',
+          query: { app: 'b2b' }
+        })
+      }
+    }
+  })
+}
+
 // =============================================================================
 // NAVIGATION GUARDS B2B
 // =============================================================================
@@ -127,26 +157,35 @@ router.beforeEach((to, from, next) => {
     return
   }
 
-  // Verificar autenticación B2B
+  // Verificar autenticación B2B - RUTAS PROTEGIDAS
   if (to.meta.requiresB2BAuth) {
     const b2bToken = localStorage.getItem('b2b_access_token')
-    const b2bUser = JSON.parse(localStorage.getItem('b2b_user') || '{}')
+    const b2bUserStr = localStorage.getItem('b2b_user')
+    const b2bUser = JSON.parse(b2bUserStr || '{}')
 
-    if (!b2bToken) {
-      // No autenticado → redirigir a login
+    // Sin token → acceso denegado
+    if (!b2bToken || !b2bUserStr) {
+      console.log(`🔐 Acceso denegado a ${to.path} - No autenticado - Redirigiendo a login`)
       next({ 
-        name: 'B2BLogin', 
-        query: { redirect: to.fullPath } 
+        name: 'B2BLogin',
+        query: { 
+          redirect: to.fullPath,
+          app: 'b2b'
+        } 
       })
       return
     }
 
-    // Verificar que el usuario tenga rol de mayorista
-    if (!b2bUser.es_mayorista && b2bUser.tipo !== 'MAYORISTA') {
-      console.warn('Acceso denegado: Se requiere cuenta de mayorista')
+    // Token existe pero sin usuario válido → acceso denegado
+    if (!b2bUser.id && !b2bUser.es_mayorista && b2bUser.tipo !== 'MAYORISTA') {
+      console.warn(`🔐 Acceso denegado a ${to.path} - Usuario inválido`)
       localStorage.removeItem('b2b_access_token')
       localStorage.removeItem('b2b_user')
-      next({ name: 'B2BLogin' })
+      localStorage.removeItem('b2b_refresh_token')
+      next({ 
+        name: 'B2BLogin',
+        query: { app: 'b2b' }
+      })
       return
     }
   }
