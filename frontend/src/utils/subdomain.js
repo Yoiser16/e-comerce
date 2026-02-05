@@ -45,6 +45,18 @@ export function getSubdomain() {
     const forceApp = urlParams.get('app')
     if (forceApp === 'b2b') return SUBDOMAINS.PRO
     if (forceApp === 'b2c') return null
+    
+    // =========================================================================
+    // PERSISTENCIA DE CONTEXTO: Si estamos logueado en B2B, mantener el contexto
+    // =========================================================================
+    if (forceApp === null) {
+      // Verificar si existe usuario B2B en localStorage
+      const b2bUser = localStorage.getItem('b2b_user')
+      if (b2bUser) {
+        // Usuario B2B logueado - usar contexto B2B
+        return SUBDOMAINS.PRO
+      }
+    }
   }
   
   const hostname = window.location.hostname
