@@ -12,3 +12,5 @@ export { default as B2BProductCard } from './B2BProductCard.vue'
 export { default as B2BStatsCard } from './B2BStatsCard.vue'
 export { default as B2BEmptyState } from './B2BEmptyState.vue'
 export { default as B2BSkeleton } from './B2BSkeleton.vue'
+export { default as B2BToast, useToast } from './B2BToast.vue'
+
