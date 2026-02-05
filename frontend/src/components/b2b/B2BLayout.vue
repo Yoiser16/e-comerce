@@ -1,14 +1,35 @@
 <template>
   <div class="min-h-screen bg-[#FAFAFA] flex flex-col">
     <!-- =========================================================================
-         TOP NAVIGATION BAR - Enterprise B2B Header (Compacto)
+         TOP NAVIGATION BAR - Beauty Brand B2B Header
     ========================================================================== -->
     <header class="bg-[#0F0F0F] text-white sticky top-0 z-50">
       <div class="max-w-[1600px] mx-auto">
+        <!-- Top utility bar -->
+        <div class="hidden lg:flex items-center justify-between px-4 sm:px-6 lg:px-8 py-1.5 border-b border-white/5 text-[11px]">
+          <div class="flex items-center gap-4 text-white/50">
+            <a href="#" class="flex items-center gap-1.5 hover:text-white/80 transition-colors">
+              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
+              </svg>
+              <span>Ingresa tu ubicación para ver tiempos de entrega</span>
+            </a>
+          </div>
+          <div class="flex items-center gap-4 text-white/50">
+            <a href="#" class="hover:text-[#C9A962] transition-colors">Centro de ayuda</a>
+            <span class="text-white/20">|</span>
+            <a href="https://wa.me/573001234567" target="_blank" class="flex items-center gap-1.5 hover:text-emerald-400 transition-colors">
+              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
+              WhatsApp B2B
+            </a>
+          </div>
+        </div>
+
         <div class="flex items-center justify-between h-14 px-4 sm:px-6 lg:px-8">
           
           <!-- Left: Logo + Nav -->
-          <div class="flex items-center gap-8">
+          <div class="flex items-center gap-6 lg:gap-8">
             <!-- Logo -->
             <router-link to="/portal" class="flex items-center gap-3 group">
               <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#C9A962] to-[#A8893D] p-0.5">
@@ -22,17 +43,45 @@
               </div>
             </router-link>
 
-            <!-- Desktop Navigation -->
-            <nav class="hidden lg:flex items-center gap-1">
+            <!-- Desktop Navigation - Beauty Categories -->
+            <nav class="hidden lg:flex items-center">
+              <!-- Main Categories with hover effect -->
               <router-link 
-                v-for="item in navItems" 
-                :key="item.to"
-                :to="item.to"
-                class="relative px-4 py-2 text-sm font-medium text-white/70 hover:text-white rounded-lg hover:bg-white/5 transition-all duration-200"
-                :class="{ 'text-white bg-white/5': isActiveRoute(item.to) }"
+                to="/portal/catalogo?categoria=pelucas"
+                class="relative px-3 py-2 text-[13px] font-medium text-white/70 hover:text-white transition-all duration-200 group"
               >
-                {{ item.label }}
-                <span v-if="isActiveRoute(item.to)" class="absolute bottom-0 left-1/2 -translate-x-1/2 w-6 h-0.5 bg-[#C9A962] rounded-full"></span>
+                PELUCAS
+                <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#C9A962] rounded-full group-hover:w-6 transition-all duration-300"></span>
+              </router-link>
+              <router-link 
+                to="/portal/catalogo?categoria=extensiones"
+                class="relative px-3 py-2 text-[13px] font-medium text-white/70 hover:text-white transition-all duration-200 group"
+              >
+                EXTENSIONES
+                <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#C9A962] rounded-full group-hover:w-6 transition-all duration-300"></span>
+              </router-link>
+              <router-link 
+                to="/portal/catalogo?categoria=sistemas-capilares"
+                class="relative px-3 py-2 text-[13px] font-medium text-white/70 hover:text-white transition-all duration-200 group"
+              >
+                SISTEMAS
+                <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#C9A962] rounded-full group-hover:w-6 transition-all duration-300"></span>
+              </router-link>
+              
+              <span class="w-px h-5 bg-white/10 mx-2"></span>
+              
+              <router-link 
+                to="/portal/catalogo?nuevo=true"
+                class="relative px-3 py-2 text-[13px] font-medium text-[#E8B4B8] hover:text-[#F0C4C8] transition-all duration-200 group flex items-center gap-1.5"
+              >
+                NUEVOS
+                <span class="w-1.5 h-1.5 bg-[#E8B4B8] rounded-full animate-pulse"></span>
+              </router-link>
+              <router-link 
+                to="/portal/catalogo?oferta=true"
+                class="relative px-3 py-2 text-[13px] font-medium text-rose-400 hover:text-rose-300 transition-all duration-200"
+              >
+                OFERTAS
               </router-link>
             </nav>
           </div>
@@ -116,10 +165,39 @@
           </div>
         </div>
 
-        <!-- Mobile Navigation -->
+        <!-- Mobile Navigation - Beauty Categories -->
         <transition name="slide">
           <nav v-if="showMobileMenu" class="lg:hidden border-t border-white/5 pb-4">
             <div class="px-4 pt-4 space-y-1">
+              <!-- Beauty Categories -->
+              <p class="px-4 py-2 text-[10px] text-white/30 uppercase tracking-widest font-medium">Categorías</p>
+              <router-link to="/portal/catalogo?categoria=pelucas" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" @click="showMobileMenu = false">
+                <svg class="w-5 h-5 text-[#C9A962]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
+                Pelucas
+              </router-link>
+              <router-link to="/portal/catalogo?categoria=extensiones" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" @click="showMobileMenu = false">
+                <svg class="w-5 h-5 text-[#E8B4B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>
+                Extensiones
+              </router-link>
+              <router-link to="/portal/catalogo?categoria=sistemas-capilares" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" @click="showMobileMenu = false">
+                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" /></svg>
+                Sistemas Capilares
+              </router-link>
+              
+              <div class="border-t border-white/5 my-3"></div>
+              
+              <router-link to="/portal/catalogo?nuevo=true" class="flex items-center gap-3 px-4 py-3 text-[#E8B4B8] hover:text-[#F0C4C8] hover:bg-white/5 rounded-lg transition-colors" @click="showMobileMenu = false">
+                <span class="w-2 h-2 bg-[#E8B4B8] rounded-full animate-pulse"></span>
+                Nuevos Lanzamientos
+              </router-link>
+              <router-link to="/portal/catalogo?oferta=true" class="flex items-center gap-3 px-4 py-3 text-rose-400 hover:text-rose-300 hover:bg-white/5 rounded-lg transition-colors" @click="showMobileMenu = false">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 6h.008v.008H6V6z" /></svg>
+                Ofertas
+              </router-link>
+              
+              <div class="border-t border-white/5 my-3"></div>
+              <p class="px-4 py-2 text-[10px] text-white/30 uppercase tracking-widest font-medium">Mi cuenta</p>
+              
               <router-link v-for="item in navItems" :key="item.to" :to="item.to" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" :class="{ 'text-white bg-white/5': isActiveRoute(item.to) }" @click="showMobileMenu = false">
                 {{ item.label }}
               </router-link>

@@ -2,60 +2,111 @@
   <div class="min-h-screen bg-[#F8F8F8]">
     
     <!-- =========================================================================
-         HERO BANNER - Elegante y Minimalista
+         HERO BANNER - Beauty Brand with Hair Focus
     ========================================================================== -->
-    <div class="relative mb-12 -mx-4 sm:-mx-6 overflow-hidden rounded-b-3xl">
+    <div class="relative mb-8 -mx-4 sm:-mx-6 overflow-hidden rounded-b-3xl">
       <!-- Slider Container -->
       <div 
         class="flex transition-transform duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]"
         :style="{ transform: `translateX(-${currentSlide * 100}%)` }"
       >
-        <!-- Slide 1 - Nueva Colección -->
+        <!-- Slide 1 - PELUCAS Y EXTENSIONES (Principal - Beauty Focus) -->
         <div class="w-full flex-shrink-0 relative">
-          <div class="relative h-[220px] sm:h-[280px] lg:h-[320px] bg-gradient-to-br from-[#18181B] via-[#1F1F23] to-[#18181B] overflow-hidden">
-            <!-- Imagen de fondo -->
+          <div class="relative h-[280px] sm:h-[340px] lg:h-[400px] bg-gradient-to-br from-[#1A1318] via-[#1F1A1E] to-[#18181B] overflow-hidden">
+            <!-- Decorative Hair Texture Background -->
+            <div class="absolute inset-0">
+              <!-- Soft flowing curves simulating hair -->
+              <svg class="absolute right-0 top-0 h-full w-2/3 opacity-10" viewBox="0 0 400 500" fill="none">
+                <path d="M200 0 Q350 100 300 250 T250 500" stroke="url(#hairGradient1)" stroke-width="1" fill="none"/>
+                <path d="M250 0 Q400 150 320 300 T280 500" stroke="url(#hairGradient1)" stroke-width="0.5" fill="none"/>
+                <path d="M300 0 Q450 120 350 280 T310 500" stroke="url(#hairGradient1)" stroke-width="0.5" fill="none"/>
+                <path d="M150 0 Q300 80 280 200 T220 500" stroke="url(#hairGradient1)" stroke-width="1" fill="none"/>
+                <defs>
+                  <linearGradient id="hairGradient1" x1="0%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stop-color="#C9A962" stop-opacity="0.8"/>
+                    <stop offset="50%" stop-color="#E8D5B0" stop-opacity="0.4"/>
+                    <stop offset="100%" stop-color="#C9A962" stop-opacity="0.2"/>
+                  </linearGradient>
+                </defs>
+              </svg>
+              <!-- Silk/shine effect overlay -->
+              <div class="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-[#C9A962]/8 via-[#E8D5B0]/5 to-transparent rounded-full blur-3xl"></div>
+              <div class="absolute bottom-0 right-0 w-80 h-80 bg-gradient-to-tl from-rose-500/5 via-transparent to-transparent rounded-full blur-3xl"></div>
+            </div>
+            
+            <!-- Imagen de fondo - Pelo/Beauty -->
             <img 
               src="/img2.jpg" 
-              alt="Extensiones" 
-              class="absolute inset-0 w-full h-full object-cover object-center opacity-70"
+              alt="Pelucas y Extensiones Premium" 
+              class="absolute inset-0 w-full h-full object-cover object-center opacity-40"
             />
-            <!-- Overlay oscuro -->
-            <div class="absolute inset-0 bg-gradient-to-r from-[#18181B]/95 via-[#18181B]/80 to-transparent"></div>
+            <!-- Overlay con gradiente elegante -->
+            <div class="absolute inset-0 bg-gradient-to-r from-[#1A1318]/98 via-[#1A1318]/85 to-[#1A1318]/40"></div>
+            <div class="absolute inset-0 bg-gradient-to-t from-[#1A1318]/60 via-transparent to-transparent"></div>
             
-            <!-- Contenido -->
-            <div class="relative h-full flex flex-col justify-center px-6 sm:px-10 lg:px-16 max-w-xl">
-              <span class="inline-flex items-center gap-3 text-[#C9A962]/80 text-[11px] font-medium tracking-[0.2em] uppercase mb-4">
-                <span class="w-6 h-px bg-[#C9A962]/50"></span>
-                Colección 2026
+            <!-- Contenido Principal -->
+            <div class="relative h-full flex flex-col justify-center px-6 sm:px-10 lg:px-16 max-w-2xl">
+              <!-- Label elegante -->
+              <span class="inline-flex items-center gap-3 text-[#E8B4B8] text-[10px] sm:text-[11px] font-medium tracking-[0.25em] uppercase mb-4 sm:mb-5">
+                <span class="w-8 h-px bg-gradient-to-r from-[#E8B4B8] to-transparent"></span>
+                Belleza profesional
               </span>
-              <h2 class="text-2xl sm:text-3xl lg:text-4xl font-semibold text-white/95 leading-tight mb-3 tracking-tight">
-                Extensiones<br class="hidden sm:block"/>
-                <span class="text-[#C9A962]">100% Humanas</span>
+              
+              <!-- Headline Principal -->
+              <h2 class="text-2xl sm:text-3xl lg:text-4xl xl:text-5xl font-semibold text-white leading-[1.15] mb-4 sm:mb-5 tracking-tight">
+                Pelucas y extensiones<br class="hidden sm:block"/>
+                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#C9A962] via-[#E8D5B0] to-[#C9A962]">
+                  que elevan tu belleza
+                </span>
               </h2>
-              <p class="text-white/50 text-sm mb-6 max-w-sm leading-relaxed">
-                Calidad premium. Stock disponible para entrega inmediata.
+              
+              <!-- Subtítulo con beneficios -->
+              <p class="text-white/60 text-sm sm:text-base mb-6 sm:mb-8 max-w-md leading-relaxed">
+                Calidad premium · Venta mayorista · Envíos rápidos a todo el país
               </p>
-              <router-link 
-                to="/portal/catalogo?categoria=extensiones"
-                class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#C9A962] hover:bg-[#D4AF6A] text-[#18181B] text-sm font-semibold rounded-lg transition-all duration-300 w-fit group hover:shadow-lg hover:shadow-[#C9A962]/20"
-              >
-                Ver inventario
-                <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </router-link>
+              
+              <!-- CTAs -->
+              <div class="flex flex-wrap items-center gap-3">
+                <router-link 
+                  to="/portal/catalogo?categoria=pelucas"
+                  class="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#C9A962] hover:bg-[#D4AF6A] text-[#18181B] text-sm font-semibold rounded-full transition-all duration-300 group hover:shadow-lg hover:shadow-[#C9A962]/25"
+                >
+                  Ver pelucas
+                  <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </router-link>
+                <router-link 
+                  to="/portal/catalogo?categoria=extensiones"
+                  class="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-white/10 hover:bg-white/15 text-white text-sm font-medium rounded-full border border-white/20 hover:border-white/30 transition-all duration-300 group"
+                >
+                  Explorar extensiones
+                  <svg class="w-4 h-4 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+                  </svg>
+                </router-link>
+              </div>
+            </div>
+            
+            <!-- Decorative Element Right Side - Hair silhouette -->
+            <div class="absolute right-0 bottom-0 w-1/3 h-full hidden lg:flex items-end justify-end opacity-20 pointer-events-none">
+              <svg viewBox="0 0 200 400" class="h-full w-auto" fill="none">
+                <path d="M100 400 Q120 300 90 200 Q60 100 100 0" stroke="#C9A962" stroke-width="0.5" fill="none"/>
+                <path d="M120 400 Q140 280 110 180 Q80 80 120 0" stroke="#E8D5B0" stroke-width="0.5" fill="none"/>
+                <path d="M80 400 Q100 320 70 220 Q40 120 80 0" stroke="#C9A962" stroke-width="0.3" fill="none"/>
+              </svg>
             </div>
           </div>
         </div>
         
         <!-- Slide 2 - Ofertas -->
         <div class="w-full flex-shrink-0 relative">
-          <div class="relative h-[220px] sm:h-[280px] lg:h-[320px] bg-gradient-to-br from-[#1C1820] via-[#211E26] to-[#18181B] overflow-hidden">
+          <div class="relative h-[280px] sm:h-[340px] lg:h-[400px] bg-gradient-to-br from-[#1C1820] via-[#211E26] to-[#18181B] overflow-hidden">
             <!-- Imagen de fondo -->
             <img 
               src="/promocion.webp" 
-              alt="Promoción Maquillaje" 
-              class="absolute inset-0 w-full h-full object-cover object-center opacity-65"
+              alt="Ofertas en Extensiones" 
+              class="absolute inset-0 w-full h-full object-cover object-center opacity-50"
             />
             <!-- Overlay oscuro con tono rosado -->
             <div class="absolute inset-0 bg-gradient-to-r from-[#1C1820]/95 via-[#1C1820]/80 to-rose-900/30"></div>
@@ -67,14 +118,14 @@
               </span>
               <h2 class="text-2xl sm:text-3xl lg:text-4xl font-semibold text-white/95 leading-tight mb-3 tracking-tight">
                 Hasta <span class="text-rose-400">30% OFF</span><br class="hidden sm:block"/>
-                en Maquillaje
+                en Extensiones
               </h2>
               <p class="text-white/50 text-sm mb-6 max-w-sm leading-relaxed">
-                Descuentos exclusivos en las marcas más vendidas.
+                Descuentos exclusivos para mayoristas en cabello 100% humano.
               </p>
               <router-link 
                 to="/portal/catalogo?oferta=true"
-                class="inline-flex items-center gap-2 px-5 py-2.5 bg-rose-500/90 hover:bg-rose-500 text-white text-sm font-semibold rounded-lg transition-all duration-300 w-fit group hover:shadow-lg hover:shadow-rose-500/20"
+                class="inline-flex items-center gap-2 px-5 py-2.5 bg-rose-500/90 hover:bg-rose-500 text-white text-sm font-semibold rounded-full transition-all duration-300 w-fit group hover:shadow-lg hover:shadow-rose-500/20"
               >
                 Ver ofertas
                 <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -87,7 +138,7 @@
         
         <!-- Slide 3 - Envío Gratis -->
         <div class="w-full flex-shrink-0 relative">
-          <div class="relative h-[220px] sm:h-[280px] lg:h-[320px] bg-gradient-to-br from-[#141D1A] via-[#182420] to-[#18181B] overflow-hidden">
+          <div class="relative h-[280px] sm:h-[340px] lg:h-[400px] bg-gradient-to-br from-[#141D1A] via-[#182420] to-[#18181B] overflow-hidden">
             <!-- Decoración sutil -->
             <div class="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-emerald-500/15 to-transparent rounded-full blur-3xl"></div>
             <div class="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-emerald-500/10 to-transparent rounded-full blur-2xl"></div>
@@ -112,9 +163,9 @@
               </p>
               <router-link 
                 to="/portal/catalogo"
-                class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500/90 hover:bg-emerald-500 text-white text-sm font-semibold rounded-lg transition-all duration-300 w-fit group hover:shadow-lg hover:shadow-emerald-500/20"
+                class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500/90 hover:bg-emerald-500 text-white text-sm font-semibold rounded-full transition-all duration-300 w-fit group hover:shadow-lg hover:shadow-emerald-500/20"
               >
-                Explorar
+                Explorar catálogo
                 <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
@@ -155,8 +206,201 @@
     </div>
 
     <!-- =========================================================================
-         SECCIÓN RECOMPRA - Tus Habituales
+         TRUST STRIP - Credibilidad y Confianza
     ========================================================================== -->
+    <div class="mb-10 -mx-4 sm:-mx-6 px-4 sm:px-6">
+      <div class="bg-gradient-to-r from-[#FDFBF9] via-white to-[#FDFBF9] border border-gray-100 rounded-2xl py-5 px-4 sm:px-8">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
+          <!-- Envíos rápidos -->
+          <div class="flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#E8F5E9] to-[#C8E6C9] flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+              <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-gray-800">Envíos rápidos</p>
+              <p class="text-xs text-gray-500">24-48 horas</p>
+            </div>
+          </div>
+          
+          <!-- Calidad profesional -->
+          <div class="flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FFF8E1] to-[#FFECB3] flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+              <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-gray-800">Calidad profesional</p>
+              <p class="text-xs text-gray-500">100% cabello humano</p>
+            </div>
+          </div>
+          
+          <!-- Compra segura -->
+          <div class="flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#E3F2FD] to-[#BBDEFB] flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-gray-800">Compra segura</p>
+              <p class="text-xs text-gray-500">Pago protegido</p>
+            </div>
+          </div>
+          
+          <!-- Atención personalizada -->
+          <div class="flex items-center gap-3 group">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FCE4EC] to-[#F8BBD9] flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
+              <svg class="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+              </svg>
+            </div>
+            <div>
+              <p class="text-sm font-semibold text-gray-800">Atención VIP</p>
+              <p class="text-xs text-gray-500">Asesoría experta</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- =========================================================================
+         CATEGORÍAS RÁPIDAS - Visual Beauty Categories
+    ========================================================================== -->
+    <div class="mb-12">
+      <div class="flex items-center justify-between mb-6">
+        <div>
+          <h2 class="text-lg sm:text-xl font-semibold text-gray-800 tracking-tight">Categorías</h2>
+          <p class="text-gray-400 text-sm mt-0.5">Explora nuestro catálogo profesional</p>
+        </div>
+      </div>
+      
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+        <!-- Pelucas Naturales -->
+        <router-link 
+          to="/portal/catalogo?categoria=pelucas"
+          class="group relative overflow-hidden rounded-2xl aspect-[4/3] sm:aspect-[3/2]"
+        >
+          <div class="absolute inset-0 bg-gradient-to-br from-[#2D2328] via-[#1F1A1E] to-[#1A1318]"></div>
+          <!-- Decorative hair waves -->
+          <div class="absolute inset-0 opacity-20">
+            <svg class="w-full h-full" viewBox="0 0 200 150" fill="none" preserveAspectRatio="xMidYMid slice">
+              <path d="M0 75 Q50 50 100 75 T200 75" stroke="#C9A962" stroke-width="0.5" fill="none"/>
+              <path d="M0 85 Q50 60 100 85 T200 85" stroke="#E8D5B0" stroke-width="0.5" fill="none"/>
+              <path d="M0 95 Q50 70 100 95 T200 95" stroke="#C9A962" stroke-width="0.3" fill="none"/>
+            </svg>
+          </div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+          <div class="relative h-full flex flex-col justify-end p-4 sm:p-5">
+            <div class="w-10 h-10 rounded-full bg-[#C9A962]/20 border border-[#C9A962]/30 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-[#C9A962]/30 transition-all duration-300">
+              <svg class="w-5 h-5 text-[#C9A962]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              </svg>
+            </div>
+            <h3 class="text-white font-semibold text-base sm:text-lg mb-1 group-hover:text-[#E8D5B0] transition-colors">Pelucas naturales</h3>
+            <p class="text-white/50 text-xs sm:text-sm">Cabello 100% humano</p>
+          </div>
+          <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </div>
+          </div>
+        </router-link>
+        
+        <!-- Extensiones Premium -->
+        <router-link 
+          to="/portal/catalogo?categoria=extensiones"
+          class="group relative overflow-hidden rounded-2xl aspect-[4/3] sm:aspect-[3/2]"
+        >
+          <div class="absolute inset-0 bg-gradient-to-br from-[#1F2428] via-[#1A1E22] to-[#181B1E]"></div>
+          <div class="absolute inset-0 opacity-15">
+            <svg class="w-full h-full" viewBox="0 0 200 150" fill="none" preserveAspectRatio="xMidYMid slice">
+              <path d="M20 0 Q20 75 20 150" stroke="#E8B4B8" stroke-width="0.5" fill="none"/>
+              <path d="M40 0 Q40 75 40 150" stroke="#E8B4B8" stroke-width="0.3" fill="none"/>
+              <path d="M60 0 Q60 75 60 150" stroke="#E8B4B8" stroke-width="0.5" fill="none"/>
+              <path d="M80 0 Q80 75 80 150" stroke="#E8B4B8" stroke-width="0.3" fill="none"/>
+            </svg>
+          </div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+          <div class="relative h-full flex flex-col justify-end p-4 sm:p-5">
+            <div class="w-10 h-10 rounded-full bg-[#E8B4B8]/20 border border-[#E8B4B8]/30 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-[#E8B4B8]/30 transition-all duration-300">
+              <svg class="w-5 h-5 text-[#E8B4B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
+              </svg>
+            </div>
+            <h3 class="text-white font-semibold text-base sm:text-lg mb-1 group-hover:text-[#E8B4B8] transition-colors">Extensiones premium</h3>
+            <p class="text-white/50 text-xs sm:text-sm">Clip-in, tape & más</p>
+          </div>
+          <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </div>
+          </div>
+        </router-link>
+        
+        <!-- Sistemas Capilares -->
+        <router-link 
+          to="/portal/catalogo?categoria=sistemas-capilares"
+          class="group relative overflow-hidden rounded-2xl aspect-[4/3] sm:aspect-[3/2]"
+        >
+          <div class="absolute inset-0 bg-gradient-to-br from-[#1E2420] via-[#1A1E1C] to-[#181A19]"></div>
+          <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-emerald-500/10 to-transparent rounded-full blur-2xl"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+          <div class="relative h-full flex flex-col justify-end p-4 sm:p-5">
+            <div class="w-10 h-10 rounded-full bg-emerald-500/20 border border-emerald-500/30 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-emerald-500/30 transition-all duration-300">
+              <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
+              </svg>
+            </div>
+            <h3 class="text-white font-semibold text-base sm:text-lg mb-1 group-hover:text-emerald-300 transition-colors">Sistemas capilares</h3>
+            <p class="text-white/50 text-xs sm:text-sm">Soluciones profesionales</p>
+          </div>
+          <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </div>
+          </div>
+        </router-link>
+        
+        <!-- Nuevos Lanzamientos -->
+        <router-link 
+          to="/portal/catalogo?nuevo=true"
+          class="group relative overflow-hidden rounded-2xl aspect-[4/3] sm:aspect-[3/2]"
+        >
+          <div class="absolute inset-0 bg-gradient-to-br from-[#26202A] via-[#1E1A22] to-[#1A181C]"></div>
+          <div class="absolute top-0 right-0 w-32 h-32 bg-gradient-to-bl from-purple-500/10 to-transparent rounded-full blur-2xl"></div>
+          <div class="absolute bottom-0 left-0 w-24 h-24 bg-gradient-to-tr from-[#C9A962]/10 to-transparent rounded-full blur-xl"></div>
+          <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-black/20 to-transparent"></div>
+          <div class="relative h-full flex flex-col justify-end p-4 sm:p-5">
+            <div class="w-10 h-10 rounded-full bg-purple-500/20 border border-purple-400/30 flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-purple-500/30 transition-all duration-300">
+              <svg class="w-5 h-5 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
+              </svg>
+            </div>
+            <div class="flex items-center gap-2 mb-1">
+              <h3 class="text-white font-semibold text-base sm:text-lg group-hover:text-purple-300 transition-colors">Nuevos</h3>
+              <span class="px-2 py-0.5 bg-purple-500/80 text-white text-[10px] font-bold rounded-full animate-pulse">NEW</span>
+            </div>
+            <p class="text-white/50 text-xs sm:text-sm">Últimos lanzamientos</p>
+          </div>
+          <div class="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+            <div class="w-8 h-8 rounded-full bg-white/10 flex items-center justify-center">
+              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+              </svg>
+            </div>
+          </div>
+        </router-link>
+      </div>
+    </div>
     <div class="mb-14">
       <div class="flex items-center justify-between mb-6">
         <div>
