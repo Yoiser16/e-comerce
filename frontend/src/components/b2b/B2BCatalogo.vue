@@ -368,13 +368,17 @@
 </template>
 
 <script>
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, onMounted } from 'vue'
 import { B2BProductCard, B2BEmptyState } from './ui'
+import { obtenerProductos } from '@/services/mayoristas'
+import { useToast } from './ui'
 
 export default {
   name: 'B2BCatalogo',
   components: { B2BProductCard, B2BEmptyState },
   setup() {
+    const toast = useToast()
+    
     // State
     const searchQuery = ref('')
     const sortBy = ref('relevance')
@@ -383,6 +387,7 @@ export default {
     const itemsPerPage = 20
     const showMobileFilters = ref(false)
     const brandSearch = ref('')
+    const isLoadingProducts = ref(true)
 
     // Filtros
     const filters = reactive({
@@ -428,17 +433,44 @@ export default {
       { label: '+$200K', min: 200000, max: null }
     ]
 
-    // Productos mock
-    const products = ref([
-      { id: 1, name: 'Extensión Tape-in Premium 60cm Rubio #613', category: 'Extensiones', sku: 'EXT-001', image: 'https://placehold.co/400x400/f5f5f5/1a1a1a?text=EXT', retailPrice: 290000, wholesalePrice: 245000, stock: 28, minOrder: 2, inStock: true, isNew: true, isBestSeller: false },
-      { id: 2, name: 'Shampoo Profesional Sin Sulfatos 1L', category: 'Tratamientos', sku: 'SHP-002', image: 'https://placehold.co/400x400/f5f5f5/1a1a1a?text=SHP', retailPrice: 85000, wholesalePrice: 68000, stock: 45, minOrder: 6, inStock: true, isNew: false, isBestSeller: true },
-      { id: 3, name: 'Plancha Profesional Titanio 450°F', category: 'Herramientas', sku: 'PLN-003', image: 'https://placehold.co/400x400/f5f5f5/1a1a1a?text=PLN', retailPrice: 420000, wholesalePrice: 320000, stock: 12, minOrder: 1, inStock: true, isNew: false, isBestSeller: false },
-      { id: 4, name: 'Kit Balayage Profesional 6 Tonos', category: 'Coloración', sku: 'BAL-004', image: 'https://placehold.co/400x400/f5f5f5/1a1a1a?text=BAL', retailPrice: 245000, wholesalePrice: 189000, stock: 8, minOrder: 1, inStock: true, isNew: true, isBestSeller: true },
-      { id: 5, name: 'Aceite de Argán Puro 100ml', category: 'Tratamientos', sku: 'ARG-005', image: 'https://placehold.co/400x400/f5f5f5/1a1a1a?text=ARG', retailPrice: 55000, wholesalePrice: 38000, stock: 65, minOrder: 12, inStock: true, isNew: false, isBestSeller: false },
-      { id: 6, name: 'Secador Iónico Profesional 2400W', category: 'Herramientas', sku: 'SEC-006', image: 'https://placehold.co/400x400/f5f5f5/1a1a1a?text=SEC', retailPrice: 380000, wholesalePrice: 285000, stock: 4, minOrder: 1, inStock: true, isNew: false, isBestSeller: false },
-      { id: 7, name: 'Mascarilla Hidratante Pro 1L', category: 'Tratamientos', sku: 'MSK-007', image: 'https://placehold.co/400x400/f5f5f5/1a1a1a?text=MSK', retailPrice: 95000, wholesalePrice: 68000, stock: 34, minOrder: 4, inStock: true, isNew: false, isBestSeller: true },
-      { id: 8, name: 'Extensión Clip-in Natural 50cm', category: 'Extensiones', sku: 'EXT-008', image: 'https://placehold.co/400x400/f5f5f5/1a1a1a?text=CLN', retailPrice: 185000, wholesalePrice: 145000, stock: 22, minOrder: 3, inStock: true, isNew: true, isBestSeller: false }
-    ])
+    // Productos (cargados desde API)
+    const products = ref([])
+
+    // =========================================================================
+    // NORMALIZAR DATOS DE PRODUCTOS
+    // =========================================================================
+    function normalizarProducto(producto) {
+      return {
+        id: producto.id || producto.producto_id,
+        name: producto.nombre || producto.name,
+        category: producto.categoria || producto.category,
+        sku: producto.sku || '',
+        image: producto.imagen || producto.image || 'https://placehold.co/400x400',
+        retailPrice: producto.precio_retail || producto.retailPrice || 0,
+        wholesalePrice: producto.precio_mayorista || producto.wholesalePrice || 0,
+        stock: producto.stock || 0,
+        minOrder: producto.cantidad_minima || producto.minOrder || 1,
+        inStock: (producto.stock || 0) > 0,
+        isNew: producto.is_new || producto.isNew || false,
+        isBestSeller: producto.is_bestseller || producto.isBestSeller || false
+      }
+    }
+
+    // =========================================================================
+    // CARGAR PRODUCTOS DESDE API
+    // =========================================================================
+    async function cargarProductos() {
+      try {
+        isLoadingProducts.value = true
+        const data = await obtenerProductos()
+        products.value = (Array.isArray(data) ? data : []).map(normalizarProducto)
+      } catch (error) {
+        console.error('Error al cargar productos:', error)
+        toast.error('Error al cargar el catálogo. Intenta recargar la página.', 5000)
+      } finally {
+        isLoadingProducts.value = false
+      }
+    }
 
     // Computed
     const filteredBrands = computed(() => {
@@ -567,9 +599,16 @@ export default {
       alert(`✓ ${quantity} unidades de "${product.name}" agregadas al carrito`)
     }
 
+    // =========================================================================
+    // LIFECYCLE
+    // =========================================================================
+    onMounted(() => {
+      cargarProductos()
+    })
+
     return {
       searchQuery, sortBy, viewMode, currentPage, itemsPerPage, showMobileFilters, brandSearch,
-      filters, openSections, categories, brands, priceRanges, products,
+      filters, openSections, categories, brands, priceRanges, products, isLoadingProducts,
       filteredBrands, filteredProducts, totalProducts, totalPages,
       hasActiveFilters, activeFilterCount, activeFilterTags,
       toggleSection, setPriceRange, isPriceRangeActive, removeFilter, clearAllFilters, handleAddToCart

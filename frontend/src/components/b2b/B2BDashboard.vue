@@ -695,6 +695,7 @@
 import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { B2BToast, useToast } from './ui'
 import B2BSkeleton from './ui/B2BSkeleton.vue'
+import { obtenerProductos, obtenerProductosDestacados } from '@/services/mayoristas'
 
 export default {
   name: 'B2BDashboard',
@@ -719,28 +720,9 @@ export default {
     // Toast notifications
     const toast = useToast()
 
-    // Productos habituales (simulados - en producción vendrían de API)
-    const frequentProducts = ref([
-      { id: 1, name: 'Extensión Clip-in Rubio #613', price: 185000, image: 'https://placehold.co/300x300/1a1a1a/C9A962?text=EXT', lastQty: 5 },
-      { id: 2, name: 'Shampoo Sin Sulfatos 500ml', price: 45000, image: 'https://placehold.co/300x300/1a1a1a/C9A962?text=SHP', lastQty: 12 },
-      { id: 3, name: 'Tratamiento Keratina Pro', price: 125000, image: 'https://placehold.co/300x300/1a1a1a/C9A962?text=KRT', lastQty: 3 },
-      { id: 4, name: 'Plancha Profesional Titanio', price: 320000, image: 'https://placehold.co/300x300/1a1a1a/C9A962?text=PLN', lastQty: 2 },
-      { id: 5, name: 'Aceite de Argán 100ml', price: 38000, image: 'https://placehold.co/300x300/1a1a1a/C9A962?text=ARG', lastQty: 8 },
-    ])
-
-    // Productos destacados (simulados - en producción vendrían de API)
-    const featuredProducts = ref([
-      { id: 101, name: 'Extensión Tape-in Premium 60cm', price: 245000, originalPrice: 290000, discount: 15, category: 'Extensiones', badge: 'new', stock: 28, image: 'https://placehold.co/400x500/f5f5f5/1a1a1a?text=TAPE' },
-      { id: 102, name: 'Kit Balayage Profesional', price: 189000, category: 'Coloración', badge: 'hot', stock: 12, image: 'https://placehold.co/400x500/f5f5f5/1a1a1a?text=BAL' },
-      { id: 103, name: 'Secador Ionico 2400W', price: 285000, category: 'Herramientas', badge: 'low', stock: 4, image: 'https://placehold.co/400x500/f5f5f5/1a1a1a?text=SEC' },
-      { id: 104, name: 'Mascarilla Hidratante 1L', price: 68000, originalPrice: 85000, discount: 20, category: 'Tratamientos', stock: 45, image: 'https://placehold.co/400x500/f5f5f5/1a1a1a?text=MSK' },
-      { id: 105, name: 'Peluca Lace Front Natural', price: 520000, category: 'Pelucas', badge: 'new', stock: 8, image: 'https://placehold.co/400x500/f5f5f5/1a1a1a?text=PLC' },
-      { id: 106, name: 'Tinte Orgánico Sin Amoniaco', price: 42000, category: 'Coloración', stock: 65, image: 'https://placehold.co/400x500/f5f5f5/1a1a1a?text=TNT' },
-      { id: 107, name: 'Cepillo Térmico Cerámico', price: 95000, category: 'Herramientas', badge: 'hot', stock: 22, image: 'https://placehold.co/400x500/f5f5f5/1a1a1a?text=CEP' },
-      { id: 108, name: 'Serum Reparador Puntas', price: 55000, category: 'Tratamientos', badge: 'low', stock: 6, image: 'https://placehold.co/400x500/f5f5f5/1a1a1a?text=SRM' },
-      { id: 109, name: 'Extensión Microlink 50cm', price: 198000, category: 'Extensiones', badge: 'new', stock: 18, image: 'https://placehold.co/400x500/f5f5f5/1a1a1a?text=MCL' },
-      { id: 110, name: 'Decolorante Premium 500g', price: 75000, originalPrice: 95000, discount: 21, category: 'Coloración', stock: 34, image: 'https://placehold.co/400x500/f5f5f5/1a1a1a?text=DEC' },
-    ])
+    // Productos (se cargan desde API)
+    const frequentProducts = ref([])
+    const featuredProducts = ref([])
 
     // =========================================================================
     // SLIDER AUTO-PLAY
@@ -789,16 +771,59 @@ export default {
     }
 
     // =========================================================================
+    // NORMALIZAR DATOS DE PRODUCTOS
+    // =========================================================================
+    function normalizarProducto(producto) {
+      return {
+        id: producto.id || producto.producto_id,
+        name: producto.nombre || producto.name,
+        category: producto.categoria || producto.category || 'Sin categoría',
+        price: producto.precio_mayorista || producto.wholesalePrice || producto.price || 0,
+        originalPrice: producto.precio_retail || producto.retailPrice || producto.originalPrice || 0,
+        stock: producto.stock || 0,
+        image: producto.imagen || producto.image || 'https://placehold.co/400x400',
+        badge: producto.stock < 5 ? 'low' : null,
+        discount: null
+      }
+    }
+
+    // =========================================================================
+    // CARGAR DATOS DESDE API
+    // =========================================================================
+    async function cargarProductos() {
+      try {
+        isLoading.value = true
+        
+        // Cargar productos destacados
+        const destacados = await obtenerProductosDestacados()
+        featuredProducts.value = (Array.isArray(destacados) ? destacados : [])
+          .slice(0, 10)
+          .map(normalizarProducto)
+        
+        // Cargar productos frecuentes (últimos productos)
+        const productos = await obtenerProductos({ limit: 5 })
+        frequentProducts.value = (Array.isArray(productos) ? productos : [])
+          .map(normalizarProducto)
+        
+        // Activar animaciones después de cargar
+        setTimeout(() => {
+          hasAnimated.value = true
+        }, 100)
+        
+      } catch (error) {
+        console.error('Error al cargar productos:', error)
+        toast.error('Error al cargar productos. Intenta recargar la página.', 5000)
+      } finally {
+        isLoading.value = false
+      }
+    }
+
+    // =========================================================================
     // LIFECYCLE
     // =========================================================================
     onMounted(() => {
       startSlideshow()
-      
-      // Simular carga de datos
-      setTimeout(() => {
-        isLoading.value = false
-        hasAnimated.value = true
-      }, 800)
+      cargarProductos()
       
       // Cargar contador del carrito desde localStorage
       const savedCart = localStorage.getItem('b2b_cart')

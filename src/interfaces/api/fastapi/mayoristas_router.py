@@ -12,8 +12,8 @@ from infrastructure.auth.models import Usuario
 from .dependencies import get_current_admin_user
 
 router = APIRouter(
-    prefix="/api/v1/mayoristas",
-    tags=["Admin Mayoristas"]
+    prefix="/api/v1",
+    tags=["Mayoristas B2B"]
 )
 
 
@@ -47,7 +47,93 @@ class DescuentoRequest(BaseModel):
     descuento: float
 
 
-@router.get("", response_model=List[MayoristaResponse])
+# ═══════════════════════════════════════════════════════════════════════════
+# ENDPOINTS B2B - Productos para Mayoristas
+# ═══════════════════════════════════════════════════════════════════════════
+
+class ProductoB2B(BaseModel):
+    id: str
+    nombre: str
+    categoria: Optional[str] = None
+    codigo: str
+    imagen: Optional[str] = None
+    precio_retail: float
+    precio_mayorista: float
+    stock: int
+    cantidad_minima: int = 1
+
+
+@router.get("/b2b/productos", response_model=List[ProductoB2B])
+def obtener_productos_b2b(limit: int = 20, offset: int = 0):
+    """
+    Obtiene productos reales de la base de datos para mayoristas.
+    Endpoint público para B2B.
+    """
+    try:
+        from infrastructure.persistence.django.models import ProductoModel
+        
+        # Consultar productos activos de la BD
+        productos = ProductoModel.objects.filter(
+            activo=True,
+            stock_actual__gt=0
+        ).order_by('-total_vendidos', '-fecha_creacion')[offset:offset+limit]
+        
+        result = []
+        for p in productos:
+            result.append(ProductoB2B(
+                id=str(p.id),
+                nombre=p.nombre,
+                categoria=p.categoria.nombre if p.categoria else None,
+                codigo=p.codigo,
+                imagen=p.imagen_principal,
+                precio_retail=float(p.monto_precio_original or p.monto_precio),
+                precio_mayorista=float(p.monto_precio) * 0.85,  # 15% descuento mayorista
+                stock=p.stock_actual - p.stock_reservado,
+                cantidad_minima=5 if p.metodo == 'bundle' else 1
+            ))
+        
+        return result
+    except Exception as e:
+        print(f"❌ Error al obtener productos B2B: {e}")
+        raise HTTPException(status_code=500, detail=f"Error al cargar productos: {str(e)}")
+
+
+@router.get("/b2b/productos/destacados", response_model=List[ProductoB2B])
+def obtener_productos_destacados_b2b(limit: int = 10):
+    """
+    Obtiene productos destacados reales de la base de datos para mayoristas.
+    Ordena por total de ventas (bestsellers).
+    """
+    try:
+        from infrastructure.persistence.django.models import ProductoModel
+        
+        # Consultar productos más vendidos
+        productos = ProductoModel.objects.filter(
+            activo=True,
+            stock_actual__gt=0
+        ).order_by('-total_vendidos', '-valoracion_promedio')[:limit]
+        
+        result = []
+        for p in productos:
+            result.append(ProductoB2B(
+                id=str(p.id),
+                nombre=p.nombre,
+                categoria=p.categoria.nombre if p.categoria else None,
+                codigo=p.codigo,
+                imagen=p.imagen_principal,
+                precio_retail=float(p.monto_precio_original or p.monto_precio),
+                precio_mayorista=float(p.monto_precio) * 0.85,  # 15% descuento mayorista
+                stock=p.stock_actual - p.stock_reservado,
+                cantidad_minima=5 if p.metodo == 'bundle' else 1
+            ))
+        
+        return result
+    except Exception as e:
+        print(f"❌ Error al obtener productos destacados B2B: {e}")
+        raise HTTPException(status_code=500, detail=f"Error al cargar productos: {str(e)}")
+
+
+@router.get("/mayoristas", response_model=List[MayoristaResponse])
 async def listar_mayoristas(admin = Depends(get_current_admin_user)):
     """
     Lista todas las solicitudes de mayoristas (usuarios tipo MAYORISTA).
@@ -86,7 +172,7 @@ async def listar_mayoristas(admin = Depends(get_current_admin_user)):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/{mayorista_id}/aprobar")
+@router.post("/mayoristas/{mayorista_id}/aprobar")
 async def aprobar_mayorista(
     mayorista_id: UUID,
     admin = Depends(get_current_admin_user)
@@ -116,7 +202,7 @@ async def aprobar_mayorista(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/{mayorista_id}/rechazar")
+@router.post("/mayoristas/{mayorista_id}/rechazar")
 async def rechazar_mayorista(
     mayorista_id: UUID,
     request: RejectRequest,
@@ -147,7 +233,7 @@ async def rechazar_mayorista(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.post("/{mayorista_id}/suspender")
+@router.post("/mayoristas/{mayorista_id}/suspender")
 async def suspender_mayorista(
     mayorista_id: UUID,
     admin = Depends(get_current_admin_user)
@@ -176,7 +262,7 @@ async def suspender_mayorista(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.patch("/{mayorista_id}/descuento")
+@router.patch("/mayoristas/{mayorista_id}/descuento")
 async def actualizar_descuento(
     mayorista_id: UUID,
     request: DescuentoRequest,
@@ -207,7 +293,7 @@ async def actualizar_descuento(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/{mayorista_id}")
+@router.get("/mayoristas/{mayorista_id}")
 async def obtener_mayorista(
     mayorista_id: UUID,
     admin = Depends(get_current_admin_user)

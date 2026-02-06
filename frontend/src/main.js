@@ -19,23 +19,7 @@ if (import.meta.env.DEV) {
  * Bootstrap de la aplicación según el contexto detectado
  */
 async function bootstrap() {
-  let context = getAppContext()
-  
-  // =========================================================================
-  // MEJORA: Si no estamos en B2B pero existe usuario B2B en localStorage,
-  // cambiar a contexto B2B. Esto permite que si la sesión persiste,
-  // el usuario acceda a rutas B2B incluso sin ?app=b2b
-  // =========================================================================
-  if (context === APP_CONTEXT.B2C) {
-    const b2bUser = localStorage.getItem('b2b_user')
-    const b2bToken = localStorage.getItem('b2b_access_token')
-    
-    if (b2bUser && b2bToken) {
-      // Usuario B2B detectado en localStorage - cambiar contexto
-      console.log('👤 Usuario B2B detectado en localStorage - Usando contexto B2B')
-      context = APP_CONTEXT.B2B
-    }
-  }
+  const context = getAppContext()
   
   let App, router
 

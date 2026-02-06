@@ -320,83 +320,22 @@
 </template>
 
 <script>
-import { ref, computed } from 'vue'
+import { ref, computed, onMounted } from 'vue'
+import { obtenerMisPedidos } from '@/services/mayoristas'
+import { useToast } from './ui'
 
 export default {
   name: 'B2BPedidos',
   setup() {
+    const toast = useToast()
     const selectedStatus = ref('all')
     const searchQuery = ref('')
     const showDetailModal = ref(false)
     const selectedOrder = ref(null)
+    const isLoadingOrders = ref(true)
 
-    // Mock orders - TODO: Conectar con API
-    const orders = ref([
-      { 
-        id: 'B2B-001245', 
-        date: '2 Feb 2026', 
-        total: 1250000, 
-        savings: 187500,
-        items: 12, 
-        status: 'Entregado', 
-        tracking: null,
-        invoice: '#',
-        products: [
-          { name: 'Extensión Tape-in Premium 60cm', quantity: 4, price: 245000, image: null },
-          { name: 'Shampoo Profesional 1L', quantity: 8, price: 68000, image: null },
-        ]
-      },
-      { 
-        id: 'B2B-001244', 
-        date: '28 Ene 2026', 
-        total: 680000, 
-        savings: 102000,
-        items: 18, 
-        status: 'En Camino', 
-        tracking: 'TRK-2026-00874',
-        estimatedDelivery: '30 Ene 2026',
-        invoice: '#',
-        products: [
-          { name: 'Kit Coloración Profesional', quantity: 3, price: 189000, image: null },
-          { name: 'Mascarilla Reparadora 500ml', quantity: 15, price: 45000, image: null },
-        ]
-      },
-      { 
-        id: 'B2B-001243', 
-        date: '25 Ene 2026', 
-        total: 320000, 
-        savings: 48000,
-        items: 8, 
-        status: 'Procesando', 
-        tracking: null,
-        invoice: null,
-        products: [
-          { name: 'Aceite Argán Premium 100ml', quantity: 8, price: 40000, image: null },
-        ]
-      },
-      { 
-        id: 'B2B-001242', 
-        date: '20 Ene 2026', 
-        total: 920000, 
-        savings: 138000,
-        items: 15, 
-        status: 'Entregado', 
-        tracking: null,
-        invoice: '#',
-        products: []
-      },
-      { 
-        id: 'B2B-001241', 
-        date: '15 Ene 2026', 
-        total: 540000, 
-        savings: 81000,
-        items: 7, 
-        status: 'Entregado', 
-        tracking: null,
-        invoice: '#',
-        products: []
-      },
-    ])
+    // Órdenes (cargadas desde API)
+    const orders = ref([])
 
     // Stats
     const stats = computed(() => ({
@@ -437,6 +376,24 @@ export default {
       return classes[status] || classes['Pendiente']
     }
 
+    // =========================================================================
+    // NORMALIZAR DATOS DE ÓRDENES
+    // =========================================================================
+    function normalizarOrden(orden) {
+      return {
+        id: orden.id || orden.numero_orden,
+        date: orden.fecha || orden.date || new Date().toLocaleDateString('es-CO'),
+        total: orden.total || orden.monto_total || 0,
+        savings: orden.ahorro || orden.savings || 0,
+        items: (orden.items?.length || orden.cantidad_items || 0),
+        status: orden.estado || orden.status || 'Pendiente',
+        tracking: orden.numero_seguimiento || orden.tracking || null,
+        estimatedDelivery: orden.fecha_entrega_estimada || orden.estimatedDelivery,
+        invoice: orden.numero_factura || orden.invoice,
+        products: orden.items || []
+      }
+    }
+
     function formatPrice(value) {
       return value?.toLocaleString('es-CO') || '0'
     }
@@ -460,9 +417,42 @@ export default {
       alert(`Rastreando envío: ${order.tracking}`)
     }
 
+    // =========================================================================
+    // CARGAR PEDIDOS DESDE API
+    // =========================================================================
+    async function cargarPedidos() {
+      try {
+        isLoadingOrders.value = true
+        
+        // Obtener email del usuario desde localStorage
+        const userStr = localStorage.getItem('b2b_user')
+        if (!userStr) {
+          toast.error('Sesión expirada. Por favor inicia sesión nuevamente.', 5000)
+          return
+        }
+        
+        const user = JSON.parse(userStr)
+        const pedidos = await obtenerMisPedidos(user.email)
+        orders.value = (Array.isArray(pedidos) ? pedidos : []).map(normalizarOrden)
+        
+      } catch (error) {
+        console.error('Error al cargar pedidos:', error)
+        toast.error('Error al cargar tus pedidos. Intenta recargar la página.', 5000)
+      } finally {
+        isLoadingOrders.value = false
+      }
+    }
+
+    // =========================================================================
+    // LIFECYCLE
+    // =========================================================================
+    onMounted(() => {
+      cargarPedidos()
+    })
+
     return {
       selectedStatus, searchQuery, stats, statuses, filteredOrders,
-      showDetailModal, selectedOrder,
+      showDetailModal, selectedOrder, isLoadingOrders,
       getStatusClass, formatPrice, formatCompact,
       viewOrderDetail, reorderItems, trackOrder
     }
