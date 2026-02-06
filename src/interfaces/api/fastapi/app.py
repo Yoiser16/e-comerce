@@ -14,6 +14,7 @@ from .producto_router import router as producto_router
 from .carrito_router import router as carrito_router
 from .busqueda_router import router as busqueda_router
 from .favoritos_router import router as favoritos_router
+from .vistos_router import router as vistos_router
 from .dashboard_router import router as dashboard_router
 from .categoria_router import router as categoria_router
 from .upload_router import router as upload_router
@@ -92,6 +93,7 @@ def crear_app(config: AppConfig) -> FastAPI:
     app.include_router(producto_router)   # /productos/{id} (dinámico)
     app.include_router(carrito_router)
     app.include_router(favoritos_router)
+    app.include_router(vistos_router)     # Productos vistos recientemente
     app.include_router(dashboard_router)  # Dashboard administrativo
     app.include_router(categoria_router)  # Categorías
     app.include_router(orden_router)      # Órdenes

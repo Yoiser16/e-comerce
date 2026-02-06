@@ -4,7 +4,10 @@
     :class="{ 'opacity-60': !product.inStock }"
   >
     <!-- Image Section -->
-    <div class="relative aspect-square bg-gray-50 overflow-hidden">
+    <router-link 
+      :to="`/portal/producto/${product.id}`"
+      class="block relative aspect-square bg-gray-50 overflow-hidden cursor-pointer"
+    >
       <img 
         :src="product.image || placeholderImage"
         :alt="product.name"
@@ -101,7 +104,7 @@
           </button>
         </div>
       </div>
-    </div>
+    </router-link>
 
     <!-- Product Info -->
     <div class="p-4">
@@ -109,9 +112,11 @@
       <p class="text-gray-400 text-xs uppercase tracking-wider mb-1">{{ product.category }}</p>
       
       <!-- Name -->
-      <h3 class="font-semibold text-gray-900 text-sm line-clamp-2 min-h-[2.5rem] mb-2 leading-snug">
-        {{ product.name }}
-      </h3>
+      <router-link :to="`/portal/producto/${product.id}`" class="block">
+        <h3 class="font-semibold text-gray-900 text-sm line-clamp-2 min-h-[2.5rem] mb-2 leading-snug hover:text-[#C9A962] transition-colors">
+          {{ product.name }}
+        </h3>
+      </router-link>
 
       <!-- SKU -->
       <p v-if="product.sku" class="text-gray-400 text-xs mb-2">SKU: {{ product.sku }}</p>

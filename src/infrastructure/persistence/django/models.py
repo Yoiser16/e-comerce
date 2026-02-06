@@ -687,3 +687,41 @@ class FavoritoModel(models.Model):
     
     def __str__(self) -> str:
         return f"Favorito: {self.producto.nombre} - Usuario {self.usuario_id}"
+
+
+class ProductoVistoModel(models.Model):
+    """
+    Modelo para historial de productos vistos por usuarios.
+    Similar a "Inspirado en lo último que viste" de MercadoLibre.
+    Almacena los últimos productos que el usuario ha visto.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    usuario_id = models.UUIDField(db_index=True)  # ID del Usuario (puede ser cliente B2B o retail)
+    email = models.EmailField(db_index=True, null=True, blank=True)  # Email como alternativa
+    producto = models.ForeignKey(ProductoModel, on_delete=models.CASCADE, related_name='vistos')
+    fecha_visto = models.DateTimeField(auto_now=True)  # Se actualiza cada vez que lo ve
+    veces_visto = models.PositiveIntegerField(default=1)  # Contador de cuántas veces lo vio
+    
+    class Meta:
+        db_table = 'productos_vistos'
+        verbose_name = 'Producto Visto'
+        verbose_name_plural = 'Productos Vistos'
+        ordering = ['-fecha_visto']
+        indexes = [
+            models.Index(fields=['usuario_id', '-fecha_visto']),
+            models.Index(fields=['email', '-fecha_visto']),
+        ]
+        constraints = [
+            models.UniqueConstraint(
+                fields=['usuario_id', 'producto'],
+                name='unique_visto_por_usuario'
+            ),
+        ]
+    
+    def registrar_vista(self):
+        """Incrementa el contador de vistas y actualiza la fecha"""
+        self.veces_visto += 1
+        self.save()
+    
+    def __str__(self) -> str:
+        return f"Visto: {self.producto.nombre} - Usuario {self.usuario_id} ({self.veces_visto}x)"

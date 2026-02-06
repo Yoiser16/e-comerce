@@ -193,3 +193,42 @@ export const favoritosService = {
     return response.data.es_favorito
   }
 }
+
+// ===== SERVICIO DE PRODUCTOS VISTOS =====
+export const vistosService = {
+  /**
+   * Listar productos vistos recientemente
+   * @param {string} email - Email del usuario
+   * @param {number} limit - Cantidad máxima (default: 10)
+   */
+  async listar(email, limit = 10) {
+    const response = await apiClient.get('/productos-vistos/', {
+      params: { email, limit }
+    })
+    return response.data
+  },
+
+  /**
+   * Registrar vista de un producto
+   * @param {string} productoId - UUID del producto
+   * @param {string} email - Email del usuario
+   */
+  async registrar(productoId, email) {
+    const response = await apiClient.post('/productos-vistos/registrar', {
+      producto_id: productoId,
+      email: email
+    })
+    return response.data
+  },
+
+  /**
+   * Limpiar historial de vistos
+   * @param {string} email - Email del usuario
+   */
+  async limpiar(email) {
+    const response = await apiClient.delete('/productos-vistos/limpiar', {
+      params: { email }
+    })
+    return response.data
+  }
+}

@@ -100,6 +100,16 @@
               <kbd class="hidden lg:inline ml-2 px-1.5 py-0.5 bg-white/10 rounded text-[10px] font-mono">⌘K</kbd>
             </button>
 
+            <!-- Favorites -->
+            <router-link to="/portal/favoritos" class="relative p-2 text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+              <span v-if="favoritosCount > 0" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-pink-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
+                {{ favoritosCount > 99 ? '99+' : favoritosCount }}
+              </span>
+            </router-link>
+
             <!-- Cart -->
             <router-link to="/portal/carrito" class="relative p-2 text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
               <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -329,6 +339,14 @@ export default {
       return 0
     })
 
+    const favoritosCount = ref(0)
+    
+    function updateFavoritosCount() {
+      const fav = localStorage.getItem('b2b_favoritos')
+      if (fav) { try { favoritosCount.value = JSON.parse(fav).length || 0 } catch { favoritosCount.value = 0 } }
+      else { favoritosCount.value = 0 }
+    }
+
     const retailUrl = computed(() => getCrossContextUrl(APP_CONTEXT.B2C))
 
     function isActiveRoute(path) {
@@ -359,14 +377,17 @@ export default {
     onMounted(() => {
       document.addEventListener('click', handleClickOutside)
       document.addEventListener('keydown', handleKeyboard)
+      window.addEventListener('favoritos-updated', updateFavoritosCount)
+      updateFavoritosCount() // Initial load
     })
 
     onUnmounted(() => {
       document.removeEventListener('click', handleClickOutside)
       document.removeEventListener('keydown', handleKeyboard)
+      window.removeEventListener('favoritos-updated', updateFavoritosCount)
     })
 
-    return { userMenuRef, searchInput, showUserMenu, showMobileMenu, showSearchModal, searchQuery, navItems, user, userInitials, cartCount, cartTotal, accountBalance, retailUrl, isActiveRoute, formatPrice, handleLogout }
+    return { userMenuRef, searchInput, showUserMenu, showMobileMenu, showSearchModal, searchQuery, navItems, user, userInitials, cartCount, favoritosCount, cartTotal, accountBalance, retailUrl, isActiveRoute, formatPrice, handleLogout }
   }
 }
 </script>

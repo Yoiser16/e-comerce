@@ -660,6 +660,95 @@ async def obtener_mis_ordenes(email: str):
         )
 
 
+def _obtener_productos_frecuentes_sync(email: str, limit: int = 10) -> List[dict]:
+    """
+    Obtiene los productos más comprados por un cliente basado en su historial de órdenes.
+    Solo incluye órdenes confirmadas/completadas.
+    """
+    from django.db.models import Sum, Count
+    from collections import defaultdict
+    
+    cliente = ClienteModel.objects.filter(email=email).first()
+    if not cliente:
+        return []
+    
+    # Estados válidos para considerar como compras reales
+    estados_validos = ['confirmada', 'enviada', 'entregada', 'completada', 'procesando']
+    
+    # Obtener todas las órdenes del cliente con estados válidos
+    ordenes = OrdenModel.objects.filter(
+        cliente=cliente,
+        estado__in=estados_validos
+    ).prefetch_related('lineas', 'lineas__producto')
+    
+    # Agregar productos y sus cantidades
+    productos_frecuentes = defaultdict(lambda: {
+        'cantidad_total': 0,
+        'veces_comprado': 0,
+        'ultima_compra': None,
+        'producto': None
+    })
+    
+    for orden in ordenes:
+        for linea in orden.lineas.all():
+            if linea.producto:
+                prod_id = str(linea.producto.id)
+                productos_frecuentes[prod_id]['cantidad_total'] += linea.cantidad
+                productos_frecuentes[prod_id]['veces_comprado'] += 1
+                productos_frecuentes[prod_id]['producto'] = linea.producto
+                # Guardar la fecha más reciente
+                if (productos_frecuentes[prod_id]['ultima_compra'] is None or 
+                    orden.fecha_creacion > productos_frecuentes[prod_id]['ultima_compra']):
+                    productos_frecuentes[prod_id]['ultima_compra'] = orden.fecha_creacion
+    
+    # Ordenar por cantidad total comprada (descendente)
+    productos_ordenados = sorted(
+        productos_frecuentes.items(),
+        key=lambda x: x[1]['cantidad_total'],
+        reverse=True
+    )[:limit]
+    
+    resultado = []
+    for prod_id, data in productos_ordenados:
+        producto = data['producto']
+        if producto:
+            resultado.append({
+                'id': str(producto.id),
+                'name': producto.nombre,
+                'category': getattr(producto.categoria, 'nombre', 'Sin categoría') if producto.categoria else 'Sin categoría',
+                'price': float(producto.precio_mayorista or producto.precio or 0),
+                'originalPrice': float(producto.precio or 0),
+                'stock': producto.stock_actual,
+                'image': producto.imagen_principal or '',
+                'lastQty': data['cantidad_total'],
+                'timesOrdered': data['veces_comprado'],
+                'lastOrderDate': data['ultima_compra'].isoformat() if data['ultima_compra'] else None
+            })
+    
+    return resultado
+
+
+@router.get("/mis-productos-frecuentes", response_model=List[dict])
+async def obtener_mis_productos_frecuentes(email: str, limit: int = 10):
+    """
+    Obtiene los productos más comprados por el usuario autenticado.
+    
+    Query Parameters:
+    - email: Email del usuario
+    - limit: Cantidad máxima de productos a retornar (default: 10)
+    
+    Retorna lista de productos ordenados por cantidad total comprada.
+    """
+    try:
+        resultado = await sync_to_async(_obtener_productos_frecuentes_sync)(email, limit)
+        return resultado
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al obtener productos frecuentes: {str(e)}"
+        )
+
+
 @router.post("/validar-stock", response_model=ValidarStockResponse)
 async def validar_stock(data: ValidarStockInput):
     """

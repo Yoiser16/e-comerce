@@ -53,6 +53,17 @@ export const ordenesService = {
   },
 
   /**
+   * Obtener productos frecuentes del usuario (basado en historial de compras)
+   * @param {string} email - Email del usuario
+   * @param {number} limit - Cantidad máxima de productos (default: 10)
+   * @returns {Promise<Array>} Lista de productos frecuentes con cantidad total comprada
+   */
+  async obtenerProductosFrecuentes(email, limit = 10) {
+    const response = await apiClient.get(`/ordenes/mis-productos-frecuentes?email=${encodeURIComponent(email)}&limit=${limit}`)
+    return response.data
+  },
+
+  /**
    * Obtener órdenes recientes (dashboard)
    */
   async obtenerRecientes(limite = 5) {

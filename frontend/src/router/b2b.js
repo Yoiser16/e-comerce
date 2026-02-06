@@ -14,8 +14,11 @@ const B2BDashboard = () => import('../components/b2b/B2BDashboard.vue')
 const B2BCatalogo = () => import('../components/b2b/B2BCatalogo.vue')
 const B2BProductoDetalle = () => import('../components/b2b/B2BProductoDetalle.vue')
 const B2BCarrito = () => import('../components/b2b/B2BCarrito.vue')
+const B2BCheckoutPending = () => import('../components/b2b/B2BCheckoutPending.vue')
+const B2BCheckout = () => import('../components/b2b/B2BCheckout.vue')
 const B2BPedidos = () => import('../components/b2b/B2BPedidos.vue')
 const B2BCuenta = () => import('../components/b2b/B2BCuenta.vue')
+const B2BFavoritos = () => import('../components/b2b/B2BFavoritos.vue')
 const B2BRegistro = () => import('../components/b2b/B2BRegistro.vue')
 
 // Variable global para acceder al router desde listeners
@@ -89,10 +92,28 @@ const routes = [
         meta: { title: 'Mi Pedido | Kharis Pro' }
       },
       {
+        path: 'checkout',
+        name: 'B2BCheckoutPending',
+        component: B2BCheckoutPending,
+        meta: { title: 'Procesando... | Kharis Pro' }
+      },
+      {
+        path: 'checkout/confirmar',
+        name: 'B2BCheckout',
+        component: B2BCheckout,
+        meta: { title: 'Confirmar Pedido | Kharis Pro' }
+      },
+      {
         path: 'pedidos',
         name: 'B2BPedidos',
         component: B2BPedidos,
         meta: { title: 'Mis Pedidos | Kharis Pro' }
+      },
+      {
+        path: 'favoritos',
+        name: 'B2BFavoritos',
+        component: B2BFavoritos,
+        meta: { title: 'Mis Favoritos | Kharis Pro' }
       },
       {
         path: 'cuenta',

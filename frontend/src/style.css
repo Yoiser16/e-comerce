@@ -288,21 +288,8 @@ body {
    TRUST RIBBON - Premium Editorial Style
    ======================================== */
 .trust-ribbon-premium {
-  /* Elegant blush background */
-  background: linear-gradient(180deg, #FAF7F5 0%, #FDF9F7 100%);
-}
-
-/* Mobile grid dividers for premium ribbon */
-@media (max-width: 1023px) {
-
-  .trust-ribbon-premium .trust-item-premium:nth-child(1),
-  .trust-ribbon-premium .trust-item-premium:nth-child(2) {
-    border-bottom: 1px solid rgba(212, 185, 169, 0.3);
-  }
-
-  .trust-ribbon-premium .trust-item-premium:nth-child(odd) {
-    border-right: 1px solid rgba(212, 185, 169, 0.3);
-  }
+  /* Sin fondo - círculos libres */
+  background: transparent;
 }
 
 /* Legacy styles for backwards compatibility */

@@ -225,57 +225,57 @@
          TRUST STRIP - Credibilidad y Confianza
     ========================================================================== -->
     <div class="mb-10 -mx-4 sm:-mx-6 px-4 sm:px-6">
-      <div class="bg-gradient-to-r from-[#FDFBF9] via-white to-[#FDFBF9] border border-gray-100 rounded-2xl py-5 px-4 sm:px-8">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-4 lg:gap-8">
+      <div class="bg-gradient-to-r from-[#FDFBF9] via-white to-[#FDFBF9] border border-gray-100 rounded-2xl py-8 px-4 sm:px-8">
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
           <!-- Envíos rápidos -->
-          <div class="flex items-center gap-3 group">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#E8F5E9] to-[#C8E6C9] flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
-              <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="flex flex-col items-center text-center gap-3 group">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#E8F5E9] to-[#C8E6C9] flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all duration-300 shadow-md">
+              <svg class="w-7 h-7 sm:w-9 sm:h-9 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
               </svg>
             </div>
             <div>
-              <p class="text-sm font-semibold text-gray-800">Envíos rápidos</p>
-              <p class="text-xs text-gray-500">24-48 horas</p>
+              <p class="text-sm sm:text-base font-semibold text-gray-800">Envíos rápidos</p>
+              <p class="text-xs sm:text-sm text-gray-500 mt-0.5">24-48 horas</p>
             </div>
           </div>
           
           <!-- Calidad profesional -->
-          <div class="flex items-center gap-3 group">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FFF8E1] to-[#FFECB3] flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
-              <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="flex flex-col items-center text-center gap-3 group">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#FFF8E1] to-[#FFECB3] flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all duration-300 shadow-md">
+              <svg class="w-7 h-7 sm:w-9 sm:h-9 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
               </svg>
             </div>
             <div>
-              <p class="text-sm font-semibold text-gray-800">Calidad profesional</p>
-              <p class="text-xs text-gray-500">100% cabello humano</p>
+              <p class="text-sm sm:text-base font-semibold text-gray-800">Calidad profesional</p>
+              <p class="text-xs sm:text-sm text-gray-500 mt-0.5">100% cabello humano</p>
             </div>
           </div>
           
           <!-- Compra segura -->
-          <div class="flex items-center gap-3 group">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#E3F2FD] to-[#BBDEFB] flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
-              <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="flex flex-col items-center text-center gap-3 group">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#E3F2FD] to-[#BBDEFB] flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all duration-300 shadow-md">
+              <svg class="w-7 h-7 sm:w-9 sm:h-9 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
               </svg>
             </div>
             <div>
-              <p class="text-sm font-semibold text-gray-800">Compra segura</p>
-              <p class="text-xs text-gray-500">Pago protegido</p>
+              <p class="text-sm sm:text-base font-semibold text-gray-800">Compra segura</p>
+              <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Pago protegido</p>
             </div>
           </div>
           
           <!-- Atención personalizada -->
-          <div class="flex items-center gap-3 group">
-            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-[#FCE4EC] to-[#F8BBD9] flex items-center justify-center flex-shrink-0 group-hover:scale-105 transition-transform duration-300">
-              <svg class="w-5 h-5 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <div class="flex flex-col items-center text-center gap-3 group">
+            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#FCE4EC] to-[#F8BBD9] flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all duration-300 shadow-md">
+              <svg class="w-7 h-7 sm:w-9 sm:h-9 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
               </svg>
             </div>
             <div>
-              <p class="text-sm font-semibold text-gray-800">Atención VIP</p>
-              <p class="text-xs text-gray-500">Asesoría experta</p>
+              <p class="text-sm sm:text-base font-semibold text-gray-800">Atención VIP</p>
+              <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Asesoría experta</p>
             </div>
           </div>
         </div>
@@ -441,17 +441,22 @@
     <div class="mb-14">
       <div class="flex items-center justify-between mb-6">
         <div>
-          <h2 class="font-luxury text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Tus habituales</h2>
-          <p class="text-gray-500 text-sm mt-1 font-light tracking-wide">Restock rápido de tus favoritos</p>
+          <h2 class="font-luxury text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+            {{ hasOrderHistory ? 'Inspirado en tu actividad' : 'Comienza a explorar' }}
+          </h2>
+          <p class="text-gray-500 text-sm mt-1 font-light tracking-wide">
+            {{ hasOrderHistory ? 'Basado en lo que viste y tus favoritos' : 'Productos destacados para ti' }}
+          </p>
         </div>
         <router-link 
-          to="/portal/pedidos"
+          v-if="hasOrderHistory"
+          to="/portal/favoritos"
           class="text-gray-500 hover:text-gray-700 text-sm font-medium flex items-center gap-1 transition-colors"
         >
-          Ver historial
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
           </svg>
+          Mis favoritos
         </router-link>
       </div>
       
@@ -466,14 +471,15 @@
       </div>
       
       <div v-else class="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
-        <div 
+        <router-link 
           v-for="(product, index) in frequentProducts" 
           :key="product.id"
+          :to="`/portal/producto/${product.id}`"
           :style="{ 
             animationDelay: getAnimationDelay(index),
             opacity: hasAnimated ? 1 : 0
           }"
-          class="flex-shrink-0 w-[150px] sm:w-[170px] bg-white rounded-2xl overflow-hidden shadow-soft hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out group animate-fade-in-up"
+          class="flex-shrink-0 w-[150px] sm:w-[170px] bg-white rounded-2xl overflow-hidden shadow-soft hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out group animate-fade-in-up cursor-pointer"
         >
           <!-- Imagen del producto -->
           <div class="relative aspect-[4/5] bg-gray-50 overflow-hidden">
@@ -484,8 +490,28 @@
               @error="handleProductImageError($event, product)"
               loading="lazy"
             />
-            <!-- Badge de cantidad - más pequeño y sutil -->
-            <div class="absolute top-2 right-2 bg-gray-900/60 text-white text-[10px] px-1.5 py-0.5 rounded font-medium backdrop-blur-sm">
+            <!-- Badge según tipo: visto, favorito, o cantidad comprada -->
+            <div 
+              v-if="product.badge === 'visto'" 
+              class="absolute top-2 right-2 bg-blue-500/80 text-white text-[9px] px-1.5 py-0.5 rounded font-medium backdrop-blur-sm flex items-center gap-0.5"
+            >
+              <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+              </svg>
+              {{ product.veces_visto || 1 }}
+            </div>
+            <div 
+              v-else-if="product.badge === 'favorito'" 
+              class="absolute top-2 right-2 bg-pink-500/80 text-white text-[9px] px-1.5 py-0.5 rounded font-medium backdrop-blur-sm"
+            >
+              <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+              </svg>
+            </div>
+            <div 
+              v-else-if="product.lastQty" 
+              class="absolute top-2 right-2 bg-gray-900/60 text-white text-[10px] px-1.5 py-0.5 rounded font-medium backdrop-blur-sm"
+            >
               ×{{ product.lastQty }}
             </div>
           </div>
@@ -502,7 +528,7 @@
             <!-- Botón agregar - con animación y accesibilidad -->
             <!-- Botón agregar minimalista -->
             <button 
-              @click="quickAddToCart(product)"
+              @click.prevent="quickAddToCart(product)"
               class="w-full py-2 bg-[#1A1A1A] hover:bg-[#C9A962] text-white text-xs font-semibold rounded-lg flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg"
               :aria-label="`Agregar ${product.name} al carrito`"
             >
@@ -512,7 +538,7 @@
               AGREGAR
             </button>
           </div>
-        </div>
+        </router-link>
         
         <!-- Card "Ver más" -->
         <router-link 
@@ -731,6 +757,8 @@ import { ref, computed, onMounted, onUnmounted } from 'vue'
 import { B2BToast, useToast } from './ui'
 import B2BSkeleton from './ui/B2BSkeleton.vue'
 import { obtenerProductos, obtenerProductosDestacados } from '@/services/mayoristas'
+import { ordenesService } from '@/services/ordenes'
+import { vistosService, favoritosService } from '@/services/productos'
 
 export default {
   name: 'B2BDashboard',
@@ -758,6 +786,11 @@ export default {
     // Productos (se cargan desde API)
     const frequentProducts = ref([])
     const featuredProducts = ref([])
+    
+    // Computed para verificar si tiene historial de compras
+    const hasOrderHistory = computed(() => {
+      return frequentProducts.value.length > 0 && frequentProducts.value[0]?.lastQty
+    })
 
     // =========================================================================
     // SLIDER AUTO-PLAY
@@ -829,16 +862,80 @@ export default {
       try {
         isLoading.value = true
         
-        // Cargar productos destacados
+        // Cargar productos destacados (para Novedades)
         const destacados = await obtenerProductosDestacados()
         featuredProducts.value = (Array.isArray(destacados) ? destacados : [])
           .slice(0, 10)
           .map(normalizarProducto)
         
-        // Cargar productos frecuentes (últimos productos)
-        const productos = await obtenerProductos({ limit: 5 })
-        frequentProducts.value = (Array.isArray(productos) ? productos : [])
-          .map(normalizarProducto)
+        // =====================================================================
+        // ALGORITMO "TUS HABITUALES" - Inspirado en MercadoLibre
+        // Prioridad: 1) Vistos recientemente  2) Favoritos  3) Productos destacados
+        // =====================================================================
+        const userEmail = user.value?.email
+        let productosHabituales = []
+        const productosUnicos = new Set() // Para evitar duplicados
+        
+        if (userEmail) {
+          // 1. Cargar productos vistos recientemente
+          try {
+            const vistos = await vistosService.listar(userEmail, 10)
+            if (vistos && vistos.length > 0) {
+              vistos.forEach(v => {
+                if (!productosUnicos.has(v.producto_id)) {
+                  productosUnicos.add(v.producto_id)
+                  productosHabituales.push({
+                    id: v.producto_id,
+                    name: v.nombre,
+                    category: v.categoria || 'Sin categoría',
+                    price: v.precio_mayorista || v.precio || 0,
+                    originalPrice: v.precio || 0,
+                    stock: v.stock || 0,
+                    image: v.imagen_principal || 'https://placehold.co/400x400',
+                    badge: 'visto', // Badge para identificar origen
+                    veces_visto: v.veces_visto
+                  })
+                }
+              })
+            }
+          } catch (err) {
+            console.warn('No se pudo obtener productos vistos:', err)
+          }
+          
+          // 2. Agregar productos favoritos (sin duplicar)
+          try {
+            const favoritos = await favoritosService.listar()
+            if (favoritos && favoritos.length > 0) {
+              favoritos.forEach(f => {
+                if (!productosUnicos.has(f.producto_id)) {
+                  productosUnicos.add(f.producto_id)
+                  productosHabituales.push({
+                    id: f.producto_id,
+                    name: f.nombre,
+                    category: 'Favorito',
+                    price: f.precio_monto || 0,
+                    originalPrice: f.precio_monto || 0,
+                    stock: 100, // Los favoritos no tienen stock en el DTO
+                    image: f.imagen_principal || 'https://placehold.co/400x400',
+                    badge: 'favorito' // Badge para identificar origen
+                  })
+                }
+              })
+            }
+          } catch (err) {
+            console.warn('No se pudo obtener favoritos:', err)
+          }
+        }
+        
+        // Si hay productos vistos/favoritos, usarlos
+        if (productosHabituales.length > 0) {
+          frequentProducts.value = productosHabituales.slice(0, 8)
+        } else {
+          // Si no hay historial, mostrar productos destacados como sugerencia
+          const productos = await obtenerProductos({ limit: 5 })
+          frequentProducts.value = (Array.isArray(productos) ? productos : [])
+            .map(normalizarProducto)
+        }
         
         // Activar animaciones después de cargar
         setTimeout(() => {
@@ -887,6 +984,7 @@ export default {
       currentSlide,
       isLoading,
       hasAnimated,
+      hasOrderHistory,
       frequentProducts,
       featuredProducts,
       nextSlide,

@@ -7,6 +7,7 @@ from typing import List, Optional
 from datetime import datetime
 from uuid import UUID
 from asgiref.sync import sync_to_async
+from django.db import close_old_connections
 
 from infrastructure.auth.models import Usuario
 from .dependencies import get_current_admin_user
@@ -69,6 +70,8 @@ def obtener_productos_b2b(limit: int = 20, offset: int = 0):
     Obtiene productos reales de la base de datos para mayoristas.
     Endpoint público para B2B.
     """
+    # Cerrar conexiones viejas para evitar 'connection is closed'
+    close_old_connections()
     try:
         from infrastructure.persistence.django.models import ProductoModel
         
@@ -104,6 +107,8 @@ def obtener_productos_destacados_b2b(limit: int = 10):
     Obtiene productos destacados reales de la base de datos para mayoristas.
     Ordena por total de ventas (bestsellers).
     """
+    # Cerrar conexiones viejas para evitar 'connection is closed'
+    close_old_connections()
     try:
         from infrastructure.persistence.django.models import ProductoModel
         

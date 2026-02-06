@@ -482,98 +482,80 @@
          TRUST BAR - Premium Editorial Ribbon
          ======================================== -->
     <section class="trust-ribbon-premium relative overflow-hidden">
-      <!-- Fondo degradado suave -->
-      <div class="absolute inset-0 bg-gradient-to-r from-[#FAF7F5] via-[#FDF9F7] to-[#FAF7F5]"></div>
-      <!-- Línea decorativa superior -->
-      <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4B9A9] to-transparent opacity-40"></div>
-      <!-- Línea decorativa inferior -->
-      <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4B9A9] to-transparent opacity-40"></div>
       
       <div class="relative max-w-6xl mx-auto px-4">
-        <div class="flex flex-wrap lg:flex-nowrap items-stretch justify-center">
+        <div class="flex flex-wrap lg:flex-nowrap items-stretch justify-center gap-8">
           
           <!-- Item 1: Envíos VIP -->
-          <div class="trust-item-premium group w-1/2 lg:w-1/4 py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative">
-            <!-- Hover background effect -->
-            <div class="absolute inset-0 bg-white/0 group-hover:bg-white/60 transition-all duration-500"></div>
+          <div class="trust-item-premium group py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative">
             
             <div class="relative z-10 flex flex-col items-center">
               <!-- Icon container with subtle ring -->
-              <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-full border border-[#E8DED8] flex items-center justify-center mb-4 group-hover:border-[#D81B60]/30 group-hover:bg-[#D81B60]/5 transition-all duration-300">
-                <svg class="w-5 h-5 lg:w-6 lg:h-6 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+              <div class="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-lg flex items-center justify-center mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                <svg class="w-7 h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
                 </svg>
               </div>
               <!-- Title -->
-              <h4 class="text-[10px] sm:text-[11px] font-semibold tracking-[0.25em] uppercase text-[#1a1a1a] mb-1">
+              <h4 class="text-xs sm:text-sm font-semibold tracking-[0.15em] uppercase text-[#1a1a1a] mb-1">
                 Envíos VIP
               </h4>
               <!-- Subtitle -->
-              <p class="text-[10px] sm:text-[11px] text-[#8B7355] font-light">
+              <p class="text-xs sm:text-sm text-[#8B7355] font-light">
                 Gratis en compras +$2,999
               </p>
             </div>
-            
-            <!-- Vertical Divider -->
-            <div class="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-px h-16 bg-gradient-to-b from-transparent via-[#D4B9A9]/50 to-transparent"></div>
           </div>
 
           <!-- Item 2: Calidad Remy -->
-          <div class="trust-item-premium group w-1/2 lg:w-1/4 py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative">
-            <div class="absolute inset-0 bg-white/0 group-hover:bg-white/60 transition-all duration-500"></div>
+          <div class="trust-item-premium group py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative">
             
             <div class="relative z-10 flex flex-col items-center">
-              <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-full border border-[#E8DED8] flex items-center justify-center mb-4 group-hover:border-[#D81B60]/30 group-hover:bg-[#D81B60]/5 transition-all duration-300">
-                <svg class="w-5 h-5 lg:w-6 lg:h-6 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+              <div class="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-lg flex items-center justify-center mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                <svg class="w-7 h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
                 </svg>
               </div>
-              <h4 class="text-[10px] sm:text-[11px] font-semibold tracking-[0.25em] uppercase text-[#1a1a1a] mb-1">
+              <h4 class="text-xs sm:text-sm font-semibold tracking-[0.15em] uppercase text-[#1a1a1a] mb-1">
                 Calidad Remy
               </h4>
-              <p class="text-[10px] sm:text-[11px] text-[#8B7355] font-light">
+              <p class="text-xs sm:text-sm text-[#8B7355] font-light">
                 100% Cabello Humano
               </p>
             </div>
-            
-            <div class="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-px h-16 bg-gradient-to-b from-transparent via-[#D4B9A9]/50 to-transparent"></div>
           </div>
 
           <!-- Item 3: Compra Segura -->
-          <div class="trust-item-premium group w-1/2 lg:w-1/4 py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative border-t lg:border-t-0 border-[#E8DED8]/50">
-            <div class="absolute inset-0 bg-white/0 group-hover:bg-white/60 transition-all duration-500"></div>
+          <div class="trust-item-premium group py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative">
             
             <div class="relative z-10 flex flex-col items-center">
-              <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-full border border-[#E8DED8] flex items-center justify-center mb-4 group-hover:border-[#D81B60]/30 group-hover:bg-[#D81B60]/5 transition-all duration-300">
-                <svg class="w-5 h-5 lg:w-6 lg:h-6 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+              <div class="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-lg flex items-center justify-center mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                <svg class="w-7 h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                 </svg>
               </div>
-              <h4 class="text-[10px] sm:text-[11px] font-semibold tracking-[0.25em] uppercase text-[#1a1a1a] mb-1">
+              <h4 class="text-xs sm:text-sm font-semibold tracking-[0.15em] uppercase text-[#1a1a1a] mb-1">
                 Pago Seguro
               </h4>
-              <p class="text-[10px] sm:text-[11px] text-[#8B7355] font-light">
+              <p class="text-xs sm:text-sm text-[#8B7355] font-light">
                 Encriptación SSL 256-bit
               </p>
             </div>
-            
-            <div class="hidden lg:block absolute right-0 top-1/2 -translate-y-1/2 w-px h-16 bg-gradient-to-b from-transparent via-[#D4B9A9]/50 to-transparent"></div>
           </div>
 
           <!-- Item 4: Asesoría Experta -->
-          <div class="trust-item-premium group w-1/2 lg:w-1/4 py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative border-t lg:border-t-0 border-[#E8DED8]/50">
-            <div class="absolute inset-0 bg-white/0 group-hover:bg-white/60 transition-all duration-500"></div>
+          <div class="trust-item-premium group py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative">
             
             <div class="relative z-10 flex flex-col items-center">
-              <div class="w-12 h-12 lg:w-14 lg:h-14 rounded-full border border-[#E8DED8] flex items-center justify-center mb-4 group-hover:border-[#D81B60]/30 group-hover:bg-[#D81B60]/5 transition-all duration-300">
-                <svg class="w-5 h-5 lg:w-6 lg:h-6 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+              <div class="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-lg flex items-center justify-center mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                <svg class="w-7 h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
                 </svg>
               </div>
-              <h4 class="text-[10px] sm:text-[11px] font-semibold tracking-[0.25em] uppercase text-[#1a1a1a] mb-1">
+              <h4 class="text-xs sm:text-sm font-semibold tracking-[0.15em] uppercase text-[#1a1a1a] mb-1">
                 Asesoría VIP
               </h4>
-              <p class="text-[10px] sm:text-[11px] text-[#8B7355] font-light">
+              <p class="text-xs sm:text-sm text-[#8B7355] font-light">
                 Atención Personalizada
               </p>
             </div>
