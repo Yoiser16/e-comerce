@@ -167,8 +167,8 @@ router.beforeEach((to, from, next) => {
   // =========================================================================
   if (to.path.startsWith('/portal')) {
     console.log('⚠️ Intento de acceso a /portal en contexto B2C - Redirigiendo a B2B login')
-    // Redirigir a login B2B con parámetro app=b2b
-    window.location.href = `/login?app=b2b&redirect=${encodeURIComponent(to.fullPath)}`
+    // Redirigir a login B2B en /portal
+    window.location.href = `/portal/login?redirect=${encodeURIComponent(to.fullPath)}`
     return
   }
   

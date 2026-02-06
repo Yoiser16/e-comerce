@@ -121,7 +121,7 @@
           </div>
           
           <router-link 
-            to="/login"
+            to="/portal/login"
             class="inline-flex items-center gap-2 text-[#C9A962] hover:text-[#B8944F] transition-colors"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -502,7 +502,7 @@
           <div class="mt-8 pt-6 border-t border-gray-100 text-center">
             <p class="text-text-medium text-sm">
               ¿Ya tienes cuenta? 
-              <router-link to="/login" class="text-[#C9A962] hover:underline font-medium">
+              <router-link to="/portal/login" class="text-[#C9A962] hover:underline font-medium">
                 Inicia sesión
               </router-link>
             </p>
@@ -667,7 +667,7 @@ export default {
       closeStatusModal()
       
       if (action === 'login') {
-        router.push('/login')
+        router.push('/portal/login')
       } else if (action === 'support') {
         // Abrir WhatsApp de soporte
         window.open('https://wa.me/573001234567?text=Hola, necesito ayuda con mi cuenta mayorista', '_blank')

@@ -272,7 +272,7 @@
             Únete a nuestra red de distribuidores y accede a beneficios exclusivos
           </p>
           <router-link 
-            to="/registro"
+            to="/portal/registro"
             class="inline-flex items-center justify-center w-full py-3.5 px-6
                    border-2 border-[#C9A962] text-[#C9A962] font-medium rounded-lg
                    hover:bg-[#C9A962] hover:text-white transition-all duration-200 group"

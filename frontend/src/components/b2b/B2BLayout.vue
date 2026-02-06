@@ -343,7 +343,7 @@ export default {
       localStorage.removeItem('b2b_refresh_token')
       localStorage.removeItem('b2b_user')
       localStorage.removeItem('b2b_cart')
-      router.push('/login')
+      router.push('/portal/login')
     }
 
     function handleClickOutside(event) {

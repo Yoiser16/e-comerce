@@ -27,10 +27,18 @@ const routes = [
   {
     path: '/',
     name: 'B2BHome',
-    redirect: '/login'  // B2B siempre inicia en login
+    redirect: '/portal/login'  // B2B siempre inicia en login
   },
   {
     path: '/login',
+    redirect: '/portal/login'
+  },
+  {
+    path: '/registro',
+    redirect: '/portal/registro'
+  },
+  {
+    path: '/portal/login',
     name: 'B2BLogin',
     component: B2BLogin,
     meta: { 
@@ -39,7 +47,7 @@ const routes = [
     }
   },
   {
-    path: '/registro',
+    path: '/portal/registro',
     name: 'B2BRegistro',
     component: B2BRegistro,
     meta: { 
@@ -100,7 +108,7 @@ const routes = [
   // =========================================================================
   {
     path: '/:pathMatch(.*)*',
-    redirect: '/login'
+    redirect: '/portal/login'
   }
 ]
 

@@ -19,7 +19,13 @@ if (import.meta.env.DEV) {
  * Bootstrap de la aplicación según el contexto detectado
  */
 async function bootstrap() {
-  const context = getAppContext()
+  let context = getAppContext()
+  const currentPath = window.location?.pathname || '/'
+
+  // Si la ruta es /portal, forzar contexto B2B
+  if (currentPath.startsWith('/portal')) {
+    context = APP_CONTEXT.B2B
+  }
   
   let App, router
 
