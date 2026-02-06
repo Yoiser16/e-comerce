@@ -325,7 +325,7 @@ export default {
 
     function proceedToCheckout() {
       if (!canCheckout.value) return
-      router.push('/portal/checkout')
+      router.push('/portal/checkout/confirmar')
     }
 
     // Watch para persistir cambios
