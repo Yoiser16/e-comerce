@@ -368,16 +368,18 @@
 </template>
 
 <script>
-import { ref, computed, reactive, onMounted } from 'vue'
-import { B2BProductCard, B2BEmptyState } from './ui'
+import { ref, computed, reactive, onMounted, watch } from 'vue'
+import { B2BProductCard, B2BEmptyState, useToast } from './ui'
 import { obtenerProductos } from '@/services/mayoristas'
-import { useToast } from './ui'
+import { useRouter, useRoute } from 'vue-router'
 
 export default {
   name: 'B2BCatalogo',
   components: { B2BProductCard, B2BEmptyState },
   setup() {
     const toast = useToast()
+    const route = useRoute()
+    const router = useRouter()
     
     // State
     const searchQuery = ref('')
@@ -396,7 +398,9 @@ export default {
       priceMin: null,
       priceMax: null,
       inStock: false,
-      fastShipping: false
+      fastShipping: false,
+      isNew: false,
+      isOnSale: false
     })
 
     const openSections = reactive({
@@ -408,7 +412,9 @@ export default {
 
     // Datos de ejemplo
     const categories = ref([
+      { value: 'pelucas', label: 'Pelucas', count: 45 },
       { value: 'extensiones', label: 'Extensiones', count: 142 },
+      { value: 'sistemas-capilares', label: 'Sistemas Capilares', count: 32 },
       { value: 'tratamientos', label: 'Tratamientos', count: 89 },
       { value: 'herramientas', label: 'Herramientas', count: 67 },
       { value: 'coloracion', label: 'Coloración', count: 54 },
@@ -440,19 +446,28 @@ export default {
     // NORMALIZAR DATOS DE PRODUCTOS
     // =========================================================================
     function normalizarProducto(producto) {
+      const retail = parseFloat(producto.precio_retail || producto.retailPrice || 0)
+      const wholesale = parseFloat(producto.precio_mayorista || producto.wholesalePrice || 0)
+      
+      // Debug log para los primeros 3 productos
+      if (Math.random() < 0.1) {
+        console.log(`🔍 Prod: ${producto.nombre || producto.name} | R: ${retail} | W: ${wholesale} | OnSale: ${wholesale < retail}`)
+      }
+
       return {
         id: producto.id || producto.producto_id,
         name: producto.nombre || producto.name,
         category: producto.categoria || producto.category,
         sku: producto.sku || '',
         image: producto.imagen || producto.image || 'https://placehold.co/400x400',
-        retailPrice: producto.precio_retail || producto.retailPrice || 0,
-        wholesalePrice: producto.precio_mayorista || producto.wholesalePrice || 0,
+        retailPrice: retail,
+        wholesalePrice: wholesale,
         stock: producto.stock || 0,
         minOrder: producto.cantidad_minima || producto.minOrder || 1,
         inStock: (producto.stock || 0) > 0,
         isNew: producto.is_new || producto.isNew || false,
-        isBestSeller: producto.is_bestseller || producto.isBestSeller || false
+        isBestSeller: producto.is_bestseller || producto.isBestSeller || false,
+        isOnSale: wholesale < retail && wholesale > 0 // Asegurar que tenga precio válido
       }
     }
 
@@ -462,7 +477,9 @@ export default {
     async function cargarProductos() {
       try {
         isLoadingProducts.value = true
-        const data = await obtenerProductos()
+        // Pedimos más productos para asegurar que el filtrado cliente funcione bien
+        // Idealmente esto debería ser paginación servidor, pero para este fix rápido:
+        const data = await obtenerProductos({ limite: 1000 })
         products.value = (Array.isArray(data) ? data : []).map(normalizarProducto)
       } catch (error) {
         console.error('Error al cargar productos:', error)
@@ -507,6 +524,16 @@ export default {
       // Filtro stock
       if (filters.inStock) {
         result = result.filter(p => p.inStock && p.stock > 0)
+      }
+
+      // Filtro Nuevos
+      if (filters.isNew) {
+        result = result.filter(p => p.isNew)
+      }
+
+      // Filtro Ofertas
+      if (filters.isOnSale) {
+        result = result.filter(p => p.isOnSale)
       }
 
       // Ordenar
@@ -582,6 +609,8 @@ export default {
       filters.priceMax = null
       filters.inStock = false
       filters.fastShipping = false
+      filters.isNew = false
+      filters.isOnSale = false
       searchQuery.value = ''
     }
 
@@ -602,8 +631,40 @@ export default {
     // =========================================================================
     // LIFECYCLE
     // =========================================================================
+    // =========================================================================
+    // URL SYNC
+    // =========================================================================
+    function syncFiltersFromUrl() {
+      const q = route.query
+      
+      // Limpiar filtros primero
+      clearAllFilters()
+      
+      if (q.categoria) {
+        filters.categories = [q.categoria]
+      }
+      
+      if (q.nuevo === 'true') {
+        filters.isNew = true
+      }
+      
+      if (q.oferta === 'true') {
+        filters.isOnSale = true
+      }
+
+      if (q.q) {
+        searchQuery.value = q.q
+      }
+    }
+
+    // Watchers para sincronizar URL
+    watch(() => route.query, () => {
+      syncFiltersFromUrl()
+    })
+
     onMounted(() => {
       cargarProductos()
+      syncFiltersFromUrl()
     })
 
     return {

@@ -1,11 +1,50 @@
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import tailwindcss from '@tailwindcss/vite'
+import { VitePWA } from 'vite-plugin-pwa'
 import { fileURLToPath, URL } from 'node:url'
 
 // https://vite.dev/config/
 export default defineConfig({
-  plugins: [vue(), tailwindcss()],
+  plugins: [
+    vue(),
+    tailwindcss(),
+    VitePWA({
+      registerType: 'autoUpdate',
+      devOptions: {
+        enabled: true
+      },
+      includeAssets: ['favicon.ico', 'logo-kharis.png', 'apple-touch-icon.png'],
+      manifest: {
+        name: 'Kharis Distribuidora - Portal Mayorista',
+        short_name: 'Kharis Pro',
+        description: 'Plataforma exclusiva para mayoristas de belleza profesional',
+        theme_color: '#1A1318',
+        background_color: '#1A1318',
+        display: 'standalone',
+        orientation: 'portrait',
+        start_url: '/?app=b2b',
+        icons: [
+          {
+            src: 'logo-kharis.png',
+            sizes: '192x192',
+            type: 'image/png'
+          },
+          {
+            src: 'logo-kharis.png',
+            sizes: '512x512',
+            type: 'image/png'
+          },
+          {
+            src: 'logo-kharis.png',
+            sizes: '512x512',
+            type: 'image/png',
+            purpose: 'any maskable'
+          }
+        ]
+      }
+    })
+  ],
   resolve: {
     alias: {
       '@': fileURLToPath(new URL('./src', import.meta.url))
