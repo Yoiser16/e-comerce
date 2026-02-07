@@ -333,16 +333,6 @@ export default {
 
     onMounted(() => {
       loadCart()
-      
-      // Si el carrito está vacío, agregar items de ejemplo para demo
-      if (cartItems.value.length === 0) {
-        cartItems.value = [
-          { id: 1, name: 'Extensión Tape-in Premium 60cm Rubio #613', category: 'Extensiones', sku: 'EXT-001', image: '/placeholder.png', retailPrice: 290000, wholesalePrice: 245000, stock: 28, minOrder: 2, quantity: 4 },
-          { id: 2, name: 'Shampoo Profesional Sin Sulfatos 1L', category: 'Tratamientos', sku: 'SHP-002', image: '/placeholder.png', retailPrice: 85000, wholesalePrice: 68000, stock: 45, minOrder: 6, quantity: 12 },
-          { id: 4, name: 'Kit Balayage Profesional 6 Tonos', category: 'Coloración', sku: 'BAL-004', image: '/placeholder.png', retailPrice: 245000, wholesalePrice: 189000, stock: 8, minOrder: 1, quantity: 2 }
-        ]
-        saveCart()
-      }
     })
 
     return {

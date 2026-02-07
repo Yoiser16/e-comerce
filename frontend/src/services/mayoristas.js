@@ -39,7 +39,7 @@ function handleAuthError(error) {
 
 /**
  * Obtiene el catálogo completo de productos
- * @param {Object} filters - Filtros opcionales (categoria, precio_min, precio_max, etc.)
+ * @param {Object} filters - Filtros opcionales (categoria, precio_min, precio_max, buscar, limit, etc.)
  * @returns {Promise<Array>}
  */
 export async function obtenerProductos(filters = {}) {
@@ -49,6 +49,10 @@ export async function obtenerProductos(filters = {}) {
     if (filters.categoria) params.append('categoria', filters.categoria)
     if (filters.activo !== undefined) params.append('activo', filters.activo)
     if (filters.limite) params.append('limite', filters.limite)
+    if (filters.limit) params.append('limite', filters.limit)
+    if (filters.buscar) params.append('buscar', filters.buscar)
+    if (filters.oferta) params.append('oferta', 'true')
+    if (filters.nuevo) params.append('nuevo', 'true')
     
     const queryString = params.toString()
       const url = `${API_BASE}/b2b/productos${queryString ? '?' + queryString : ''}`
@@ -98,13 +102,13 @@ export async function obtenerProductosDestacados() {
 }
 
 /**
- * Obtiene detalle de un producto específico
+ * Obtiene detalle de un producto específico con precios mayoristas
  * @param {string} productoId - ID del producto
  * @returns {Promise<Object>}
  */
 export async function obtenerProducto(productoId) {
   try {
-    const response = await fetch(`${API_BASE}/productos/${productoId}`, {
+    const response = await fetch(`${API_BASE}/b2b/productos/${productoId}`, {
       method: 'GET',
       headers: getAuthHeaders()
     })

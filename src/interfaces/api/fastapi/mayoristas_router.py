@@ -65,21 +65,49 @@ class ProductoB2B(BaseModel):
 
 
 @router.get("/b2b/productos", response_model=List[ProductoB2B])
-def obtener_productos_b2b(limit: int = 20, offset: int = 0):
+def obtener_productos_b2b(
+    limit: int = 20, 
+    offset: int = 0,
+    buscar: Optional[str] = None,
+    categoria: Optional[str] = None,
+    limite: Optional[int] = None
+):
     """
     Obtiene productos reales de la base de datos para mayoristas.
-    Endpoint público para B2B.
+    Endpoint público para B2B con soporte de búsqueda y filtros.
     """
     # Cerrar conexiones viejas para evitar 'connection is closed'
     close_old_connections()
     try:
         from infrastructure.persistence.django.models import ProductoModel
+        from django.db.models import Q
+        
+        # Si se proporciona limite, usarlo en vez de limit
+        if limite:
+            limit = limite
         
         # Consultar productos activos de la BD
-        productos = ProductoModel.objects.filter(
+        queryset = ProductoModel.objects.filter(
             activo=True,
             stock_actual__gt=0
-        ).order_by('-total_vendidos', '-fecha_creacion')[offset:offset+limit]
+        )
+        
+        # Filtro de búsqueda por nombre, código o descripción
+        if buscar:
+            queryset = queryset.filter(
+                Q(nombre__icontains=buscar) |
+                Q(codigo__icontains=buscar) |
+                Q(descripcion__icontains=buscar)
+            )
+        
+        # Filtro por categoría
+        if categoria:
+            queryset = queryset.filter(
+                Q(categoria__nombre__iexact=categoria) |
+                Q(categoria__slug__iexact=categoria)
+            )
+        
+        productos = queryset.order_by('-total_vendidos', '-fecha_creacion')[offset:offset+limit]
         
         result = []
         for p in productos:
@@ -136,6 +164,99 @@ def obtener_productos_destacados_b2b(limit: int = 10):
     except Exception as e:
         print(f"❌ Error al obtener productos destacados B2B: {e}")
         raise HTTPException(status_code=500, detail=f"Error al cargar productos: {str(e)}")
+
+
+class ProductoDetalleB2B(BaseModel):
+    """Schema extendido para detalle de producto B2B"""
+    id: str
+    nombre: str
+    descripcion: Optional[str] = None
+    categoria: Optional[dict] = None
+    categoria_nombre: Optional[str] = None
+    codigo: Optional[str] = None
+    sku: Optional[str] = None
+    imagen_principal: Optional[str] = None
+    imagenes: Optional[List[str]] = None
+    precio: float  # Precio retail
+    precio_mayorista: float  # Precio con descuento mayorista
+    monto_precio: float  # alias para precio mayorista
+    precio_original: Optional[float] = None
+    stock: int
+    stock_actual: int
+    cantidad_minima: int = 1
+    metodo: Optional[str] = None
+    color: Optional[str] = None
+    largo: Optional[str] = None
+    tipo: Optional[str] = None
+    origen: Optional[str] = None
+    calidad: Optional[str] = None
+    activo: bool = True
+
+
+@router.get("/b2b/productos/{producto_id}", response_model=ProductoDetalleB2B)
+def obtener_producto_b2b(producto_id: str):
+    """
+    Obtiene detalle de un producto específico con precios mayoristas.
+    """
+    close_old_connections()
+    try:
+        from infrastructure.persistence.django.models import ProductoModel
+        from uuid import UUID
+        
+        try:
+            uid = UUID(producto_id)
+        except ValueError:
+            raise HTTPException(status_code=400, detail="ID de producto inválido")
+        
+        try:
+            p = ProductoModel.objects.select_related('categoria').get(id=uid)
+        except ProductoModel.DoesNotExist:
+            raise HTTPException(status_code=404, detail="Producto no encontrado")
+        
+        precio_retail = float(p.monto_precio_original or p.monto_precio or 0)
+        precio_mayorista = float(p.monto_precio or 0) * 0.85  # 15% descuento mayorista
+        
+        # Parsear imágenes adicionales
+        imagenes = []
+        if p.imagen_principal:
+            imagenes.append(p.imagen_principal)
+        if p.imagenes and isinstance(p.imagenes, list):
+            imagenes.extend([img for img in p.imagenes if img and img != p.imagen_principal])
+        
+        return ProductoDetalleB2B(
+            id=str(p.id),
+            nombre=p.nombre,
+            descripcion=p.descripcion,
+            categoria={
+                'id': str(p.categoria.id) if p.categoria else None,
+                'nombre': p.categoria.nombre if p.categoria else None,
+                'slug': p.categoria.slug if p.categoria else None
+            } if p.categoria else None,
+            categoria_nombre=p.categoria.nombre if p.categoria else None,
+            codigo=p.codigo,
+            sku=p.codigo,
+            imagen_principal=p.imagen_principal,
+            imagenes=imagenes,
+            precio=precio_retail,
+            precio_mayorista=precio_mayorista,
+            monto_precio=precio_mayorista,
+            precio_original=precio_retail,
+            stock=p.stock_actual - p.stock_reservado,
+            stock_actual=p.stock_actual,
+            cantidad_minima=10 if p.metodo == 'bundle' else 1,
+            metodo=p.metodo,
+            color=p.color,
+            largo=p.largo,
+            tipo=p.tipo,
+            origen=p.origen,
+            calidad=p.calidad,
+            activo=p.activo
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error al obtener producto B2B: {e}")
+        raise HTTPException(status_code=500, detail=f"Error al cargar producto: {str(e)}")
 
 
 @router.get("/mayoristas", response_model=List[MayoristaResponse])

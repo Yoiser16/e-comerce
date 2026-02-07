@@ -1,5 +1,7 @@
 <template>
   <div class="min-h-screen bg-[#FAFAFA]">
+    <!-- Toast notifications -->
+    <B2BToast />
     
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center min-h-[70vh]">
@@ -709,12 +711,18 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { productosService, favoritosService, vistosService } from '@/services/productos'
+import { obtenerProducto as obtenerProductoB2B, obtenerProductos as obtenerProductosB2B } from '@/services/mayoristas'
+import { B2BToast, useToast } from './ui'
 
 export default {
   name: 'B2BProductoDetalle',
+  components: {
+    B2BToast
+  },
   setup() {
     const route = useRoute()
     const router = useRouter()
+    const toast = useToast()
     
     // ===== CONSTANTES LOTES =====
     const LOTE_MINIMO = 10
@@ -910,8 +918,8 @@ export default {
         
         localStorage.setItem('b2b_cart', JSON.stringify(cart))
         
-        // Feedback visual
-        alert(`${producto.value.nombre} agregado al carrito (${cantidad.value} unidades)`)
+        // Feedback visual con toast
+        toast.success(`${producto.value.nombre} agregado al carrito (${cantidad.value} unidades)`, 3000)
         
       } catch (err) {
         console.error('Error al agregar al carrito:', err)
@@ -925,8 +933,8 @@ export default {
         loading.value = true
         error.value = null
         
-        // Cargar producto
-        const data = await productosService.getProducto(id)
+        // Cargar producto con precios mayoristas desde endpoint B2B
+        const data = await obtenerProductoB2B(id)
         producto.value = data
         
         // Registrar vista
@@ -958,12 +966,13 @@ export default {
           }
         }
         
-        // Cargar productos relacionados (misma categoría)
-        if (producto.value.categoria?.id) {
+        // Cargar productos relacionados (misma categoría) con precios B2B
+        if (producto.value.categoria?.nombre || producto.value.categoria_nombre) {
           try {
-            const relacionados = await productosService.getProductos({
-              categoria: producto.value.categoria.id,
-              limit: 5
+            const catNombre = producto.value.categoria?.nombre || producto.value.categoria_nombre
+            const relacionados = await obtenerProductosB2B({
+              categoria: catNombre,
+              limit: 6
             })
             productosRelacionados.value = relacionados.filter(p => p.id !== id).slice(0, 5)
           } catch (err) {

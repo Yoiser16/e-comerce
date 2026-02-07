@@ -8,16 +8,20 @@
         <!-- Top utility bar -->
         <div class="hidden lg:flex items-center justify-between px-4 sm:px-6 lg:px-8 py-1.5 border-b border-white/5 text-[11px]">
           <div class="flex items-center gap-4 text-white/50">
-            <a href="#" class="flex items-center gap-1.5 hover:text-white/80 transition-colors">
+            <router-link 
+              to="/portal/cuenta?tab=addresses" 
+              class="flex items-center gap-1.5 hover:text-white/80 transition-colors group"
+            >
               <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
               </svg>
-              <span>Ingresa tu ubicación para ver tiempos de entrega</span>
-            </a>
+              <span v-if="defaultAddress">Enviar a <span class="text-white/80 font-medium group-hover:text-white">{{ defaultAddress.ciudad }}</span> - {{ truncateAddress(defaultAddress.direccion) }}</span>
+              <span v-else>Agregar dirección de envío</span>
+            </router-link>
           </div>
           <div class="flex items-center gap-4 text-white/50">
-            <a href="#" class="hover:text-[#C9A962] transition-colors">Centro de ayuda</a>
+            <router-link to="/portal/ayuda" class="hover:text-[#C9A962] transition-colors">Ayuda / PQR</router-link>
             <span class="text-white/20">|</span>
             <a href="https://wa.me/573001234567" target="_blank" class="flex items-center gap-1.5 hover:text-emerald-400 transition-colors">
               <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
@@ -43,32 +47,64 @@
               </div>
             </router-link>
 
-            <!-- Desktop Navigation - Beauty Categories -->
+            <!-- Desktop Navigation - Categories Dropdown style MercadoLibre -->
             <nav class="hidden lg:flex items-center">
-              <!-- Main Categories with hover effect -->
+              <!-- Categories Dropdown -->
+              <div class="relative" ref="categoriesMenuRef" @mouseenter="showCategoriesMenu = true" @mouseleave="showCategoriesMenu = false">
+                <button 
+                  class="relative px-3 py-2 text-[13px] font-medium text-white/70 hover:text-white transition-all duration-200 flex items-center gap-1.5"
+                >
+                  Categorías
+                  <svg class="w-3.5 h-3.5 transition-transform" :class="{ 'rotate-180': showCategoriesMenu }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <!-- Categories Dropdown Menu -->
+                <transition name="dropdown">
+                  <div 
+                    v-if="showCategoriesMenu" 
+                    class="absolute left-0 top-full mt-1 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50"
+                  >
+                    <div class="py-2">
+                      <router-link 
+                        v-for="cat in categorias" 
+                        :key="cat.id" 
+                        :to="`/portal/catalogo?categoria=${cat.slug}`"
+                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
+                        @click="showCategoriesMenu = false"
+                      >
+                        <span class="w-2 h-2 rounded-full bg-[#C9A962]"></span>
+                        {{ cat.nombre }}
+                      </router-link>
+                      <div class="border-t border-gray-100 mt-2 pt-2">
+                        <router-link 
+                          to="/portal/catalogo"
+                          class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#C9A962] font-medium hover:bg-gray-50 transition-colors"
+                          @click="showCategoriesMenu = false"
+                        >
+                          Ver todo el catálogo
+                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                        </router-link>
+                      </div>
+                    </div>
+                  </div>
+                </transition>
+              </div>
+              
               <router-link 
-                to="/portal/catalogo?categoria=pelucas"
-                class="relative px-3 py-2 text-[13px] font-medium text-white/70 hover:text-white transition-all duration-200 group"
+                to="/portal/catalogo?oferta=true"
+                class="relative px-3 py-2 text-[13px] font-medium text-rose-400 hover:text-rose-300 transition-all duration-200"
               >
-                PELUCAS
-                <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#C9A962] rounded-full group-hover:w-6 transition-all duration-300"></span>
-              </router-link>
-              <router-link 
-                to="/portal/catalogo?categoria=extensiones"
-                class="relative px-3 py-2 text-[13px] font-medium text-white/70 hover:text-white transition-all duration-200 group"
-              >
-                EXTENSIONES
-                <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#C9A962] rounded-full group-hover:w-6 transition-all duration-300"></span>
-              </router-link>
-              <router-link 
-                to="/portal/catalogo?categoria=sistemas-capilares"
-                class="relative px-3 py-2 text-[13px] font-medium text-white/70 hover:text-white transition-all duration-200 group"
-              >
-                SISTEMAS
-                <span class="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-[#C9A962] rounded-full group-hover:w-6 transition-all duration-300"></span>
+                OFERTAS
               </router-link>
               
-              <span class="w-px h-5 bg-white/10 mx-2"></span>
+              <router-link 
+                to="/portal/cupones"
+                class="relative px-3 py-2 text-[13px] font-medium text-amber-400 hover:text-amber-300 transition-all duration-200 flex items-center gap-1.5"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 14.25l6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0c1.1.128 1.907 1.077 1.907 2.185zM9.75 9h.008v.008H9.75V9zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm4.125 4.5h.008v.008h-.008V13.5zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
+                CUPONES
+              </router-link>
               
               <router-link 
                 to="/portal/catalogo?nuevo=true"
@@ -76,12 +112,6 @@
               >
                 NUEVOS
                 <span class="w-1.5 h-1.5 bg-[#E8B4B8] rounded-full animate-pulse"></span>
-              </router-link>
-              <router-link 
-                to="/portal/catalogo?oferta=true"
-                class="relative px-3 py-2 text-[13px] font-medium text-rose-400 hover:text-rose-300 transition-all duration-200"
-              >
-                OFERTAS
               </router-link>
             </nav>
           </div>
@@ -283,11 +313,79 @@
           <div class="absolute inset-0 bg-black/60" @click="showSearchModal = false"></div>
           <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
             <div class="flex items-center gap-4 p-4 border-b border-gray-100">
-              <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-              <input v-model="searchQuery" ref="searchInput" type="text" placeholder="Buscar productos, SKU..." class="flex-1 text-lg outline-none placeholder:text-gray-400" @keydown.esc="showSearchModal = false" />
+              <svg v-if="!searchLoading" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              <svg v-else class="w-5 h-5 text-[#C9A962] animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
+              <input 
+                v-model="searchQuery" 
+                ref="searchInput" 
+                type="text" 
+                placeholder="Buscar productos, SKU..." 
+                class="flex-1 text-lg outline-none placeholder:text-gray-400" 
+                @keydown.esc="showSearchModal = false"
+                @keydown.enter="goToSearchResults"
+              />
               <button @click="showSearchModal = false" class="p-2 hover:bg-gray-100 rounded-lg"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
             </div>
-            <div class="p-4 max-h-96 overflow-y-auto"><p class="text-sm text-gray-500 text-center py-8">Escribe para buscar productos...</p></div>
+            <div class="max-h-[60vh] overflow-y-auto">
+              <!-- Loading State -->
+              <div v-if="searchLoading" class="p-6 text-center">
+                <p class="text-sm text-gray-500">Buscando productos...</p>
+              </div>
+              <!-- Results -->
+              <div v-else-if="searchResults.length > 0" class="divide-y divide-gray-100">
+                <router-link 
+                  v-for="product in searchResults" 
+                  :key="product.id" 
+                  :to="`/portal/producto/${product.id}`"
+                  class="flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors"
+                  @click="showSearchModal = false"
+                >
+                  <img 
+                    :src="product.imagen_principal || '/placeholder.png'" 
+                    :alt="product.nombre"
+                    class="w-14 h-14 object-cover rounded-lg bg-gray-100"
+                  />
+                  <div class="flex-1 min-w-0">
+                    <h4 class="font-medium text-gray-900 truncate">{{ product.nombre }}</h4>
+                    <p class="text-sm text-gray-500">{{ product.categoria_nombre }} · SKU: {{ product.sku || 'N/A' }}</p>
+                    <div class="flex items-center gap-2 mt-1">
+                      <span class="text-[#C9A962] font-bold">${{ formatPrice(product.precio_mayorista || product.precio) }}</span>
+                      <span v-if="product.precio > (product.precio_mayorista || product.precio)" class="text-xs text-gray-400 line-through">${{ formatPrice(product.precio) }}</span>
+                      <span v-if="product.stock <= 5 && product.stock > 0" class="text-xs px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded">Últimas {{ product.stock }} uds</span>
+                      <span v-else-if="product.stock <= 0" class="text-xs px-1.5 py-0.5 bg-red-100 text-red-700 rounded">Agotado</span>
+                    </div>
+                  </div>
+                  <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+                </router-link>
+                <!-- Ver todos los resultados -->
+                <button 
+                  @click="goToSearchResults"
+                  class="w-full p-4 text-center text-[#C9A962] font-medium hover:bg-gray-50 transition-colors"
+                >
+                  Ver todos los resultados para "{{ searchQuery }}"
+                </button>
+              </div>
+              <!-- No results -->
+              <div v-else-if="searchQuery.length >= 2" class="p-6 text-center">
+                <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
+                <p class="text-gray-500">No se encontraron productos</p>
+                <p class="text-sm text-gray-400 mt-1">Intenta con otros términos de búsqueda</p>
+              </div>
+              <!-- Empty State -->
+              <div v-else class="p-6">
+                <p class="text-sm text-gray-500 text-center mb-4">Busca productos por nombre, SKU o categoría</p>
+                <div class="flex flex-wrap gap-2 justify-center">
+                  <button 
+                    v-for="term in ['Pelucas', 'Extensiones', 'Sistemas', 'Cabello natural']" 
+                    :key="term"
+                    @click="searchQuery = term"
+                    class="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full transition-colors"
+                  >
+                    {{ term }}
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </transition>
@@ -299,6 +397,9 @@
 import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { getCrossContextUrl, APP_CONTEXT } from '../../utils/subdomain'
+import apiClient from '../../services/api'
+import { categoriasService } from '../../services/categorias'
+import { obtenerProductos } from '../../services/mayoristas'
 
 export default {
   name: 'B2BLayout',
@@ -306,13 +407,20 @@ export default {
     const router = useRouter()
     const route = useRoute()
     const userMenuRef = ref(null)
+    const categoriesMenuRef = ref(null)
     const searchInput = ref(null)
     const showUserMenu = ref(false)
     const showMobileMenu = ref(false)
     const showSearchModal = ref(false)
+    const showCategoriesMenu = ref(false)
     const searchQuery = ref('')
+    const searchResults = ref([])
+    const searchLoading = ref(false)
+    let searchTimeout = null
     const accountBalance = ref(0)
     const cartTotal = ref(0)
+    const defaultAddress = ref(null)
+    const categorias = ref([])
 
     const navItems = [
       { to: '/portal', label: 'Dashboard' },
@@ -372,13 +480,80 @@ export default {
       if ((event.metaKey || event.ctrlKey) && event.key === 'k') { event.preventDefault(); showSearchModal.value = true }
     }
 
-    watch(showSearchModal, async (val) => { if (val) { await nextTick(); searchInput.value?.focus() } })
+    function truncateAddress(address) {
+      if (!address) return ''
+      return address.length > 30 ? address.substring(0, 30) + '...' : address
+    }
+
+    async function loadDefaultAddress() {
+      try {
+        const response = await apiClient.get('/b2b/me/direcciones')
+        if (response.data && response.data.length > 0) {
+          defaultAddress.value = response.data.find(a => a.is_default) || response.data[0]
+        }
+      } catch (error) {
+        console.error('Error loading address:', error)
+      }
+    }
+
+    async function loadCategorias() {
+      try {
+        const data = await categoriasService.listar({ soloActivas: true })
+        categorias.value = data || []
+      } catch (error) {
+        console.error('Error loading categories:', error)
+      }
+    }
+
+    async function searchProducts(query) {
+      if (!query || query.length < 2) {
+        searchResults.value = []
+        return
+      }
+      
+      searchLoading.value = true
+      try {
+        const data = await obtenerProductos({ buscar: query, limit: 8 })
+        searchResults.value = data || []
+      } catch (error) {
+        console.error('Error searching products:', error)
+        searchResults.value = []
+      } finally {
+        searchLoading.value = false
+      }
+    }
+
+    function goToSearchResults() {
+      if (searchQuery.value.trim()) {
+        showSearchModal.value = false
+        router.push({ path: '/portal/catalogo', query: { buscar: searchQuery.value.trim() } })
+      }
+    }
+
+    // Watch search query with debounce
+    watch(searchQuery, (newVal) => {
+      if (searchTimeout) clearTimeout(searchTimeout)
+      searchTimeout = setTimeout(() => searchProducts(newVal), 300)
+    })
+
+    watch(showSearchModal, async (val) => { 
+      if (val) { 
+        await nextTick()
+        searchInput.value?.focus()
+      } else {
+        // Clear search when closing
+        searchQuery.value = ''
+        searchResults.value = []
+      }
+    })
 
     onMounted(() => {
       document.addEventListener('click', handleClickOutside)
       document.addEventListener('keydown', handleKeyboard)
       window.addEventListener('favoritos-updated', updateFavoritosCount)
       updateFavoritosCount() // Initial load
+      loadDefaultAddress() // Load user's default address
+      loadCategorias() // Load categories for dropdown
     })
 
     onUnmounted(() => {
@@ -387,7 +562,7 @@ export default {
       window.removeEventListener('favoritos-updated', updateFavoritosCount)
     })
 
-    return { userMenuRef, searchInput, showUserMenu, showMobileMenu, showSearchModal, searchQuery, navItems, user, userInitials, cartCount, favoritosCount, cartTotal, accountBalance, retailUrl, isActiveRoute, formatPrice, handleLogout }
+    return { userMenuRef, categoriesMenuRef, searchInput, showUserMenu, showMobileMenu, showSearchModal, showCategoriesMenu, searchQuery, searchResults, searchLoading, navItems, user, userInitials, cartCount, favoritosCount, cartTotal, accountBalance, retailUrl, defaultAddress, categorias, isActiveRoute, formatPrice, truncateAddress, handleLogout, goToSearchResults }
   }
 }
 </script>
