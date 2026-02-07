@@ -10,7 +10,7 @@ from asgiref.sync import sync_to_async
 from django.db import close_old_connections
 
 from infrastructure.auth.models import Usuario
-from .dependencies import get_current_admin_user, get_current_user_email
+from .dependencies import get_current_admin_user, get_current_user_email, get_optional_mayorista_user
 
 router = APIRouter(
     prefix="/api/v1",
@@ -70,11 +70,13 @@ def obtener_productos_b2b(
     offset: int = 0,
     buscar: Optional[str] = None,
     categoria: Optional[str] = None,
-    limite: Optional[int] = None
+    limite: Optional[int] = None,
+    mayorista: Optional[Usuario] = Depends(get_optional_mayorista_user)
 ):
     """
     Obtiene productos reales de la base de datos para mayoristas.
     Endpoint público para B2B con soporte de búsqueda y filtros.
+    Si el usuario está autenticado, aplica su descuento personalizado.
     """
     # Cerrar conexiones viejas para evitar 'connection is closed'
     close_old_connections()
@@ -118,7 +120,7 @@ def obtener_productos_b2b(
                 codigo=p.codigo,
                 imagen=p.imagen_principal,
                 precio_retail=float(p.monto_precio_original or p.monto_precio),
-                precio_mayorista=float(p.monto_precio) * 0.85,  # 15% descuento mayorista
+                precio_mayorista=float(p.monto_precio) * (1.0 - (float(mayorista.descuento_mayorista) / 100.0) if mayorista and mayorista.descuento_mayorista > 0 else 0.85),  # Descuento dinámico o 15% default
                 stock=p.stock_actual - p.stock_reservado,
                 cantidad_minima=5 if p.metodo == 'bundle' else 1
             ))
@@ -130,7 +132,10 @@ def obtener_productos_b2b(
 
 
 @router.get("/b2b/productos/destacados", response_model=List[ProductoB2B])
-def obtener_productos_destacados_b2b(limit: int = 10):
+def obtener_productos_destacados_b2b(
+    limit: int = 10,
+    mayorista: Optional[Usuario] = Depends(get_optional_mayorista_user)
+):
     """
     Obtiene productos destacados reales de la base de datos para mayoristas.
     Ordena por total de ventas (bestsellers).
@@ -155,7 +160,7 @@ def obtener_productos_destacados_b2b(limit: int = 10):
                 codigo=p.codigo,
                 imagen=p.imagen_principal,
                 precio_retail=float(p.monto_precio_original or p.monto_precio),
-                precio_mayorista=float(p.monto_precio) * 0.85,  # 15% descuento mayorista
+                precio_mayorista=float(p.monto_precio) * (1.0 - (float(mayorista.descuento_mayorista) / 100.0) if mayorista and mayorista.descuento_mayorista > 0 else 0.85),  # Descuento dinámico o 15% default
                 stock=p.stock_actual - p.stock_reservado,
                 cantidad_minima=5 if p.metodo == 'bundle' else 1
             ))
@@ -194,7 +199,10 @@ class ProductoDetalleB2B(BaseModel):
 
 
 @router.get("/b2b/productos/{producto_id}", response_model=ProductoDetalleB2B)
-def obtener_producto_b2b(producto_id: str):
+def obtener_producto_b2b(
+    producto_id: str,
+    mayorista: Optional[Usuario] = Depends(get_optional_mayorista_user)
+):
     """
     Obtiene detalle de un producto específico con precios mayoristas.
     """
@@ -214,7 +222,13 @@ def obtener_producto_b2b(producto_id: str):
             raise HTTPException(status_code=404, detail="Producto no encontrado")
         
         precio_retail = float(p.monto_precio_original or p.monto_precio or 0)
-        precio_mayorista = float(p.monto_precio or 0) * 0.85  # 15% descuento mayorista
+        
+        # Calcular descuento dinámico
+        factor_descuento = 0.85  # Default 15% off (factor 0.85)
+        if mayorista and mayorista.descuento_mayorista > 0:
+            factor_descuento = 1.0 - (float(mayorista.descuento_mayorista) / 100.0)
+            
+        precio_mayorista = float(p.monto_precio or 0) * factor_descuento
         
         # Parsear imágenes adicionales
         imagenes = []
@@ -307,6 +321,7 @@ async def aprobar_mayorista(
     Aprueba una solicitud de mayorista.
     """
     from django.utils import timezone
+    from infrastructure.notifications.email_service import send_b2b_status_notification
     
     try:
         mayorista = await sync_to_async(Usuario.objects.get)(id=mayorista_id, tipo='MAYORISTA')
@@ -319,6 +334,13 @@ async def aprobar_mayorista(
             mayorista.save()
         
         await sync_to_async(do_approve)()
+        
+        # Enviar notificación por correo
+        send_b2b_status_notification(
+            email=mayorista.email,
+            nombre=mayorista.nombre,
+            estado="APROBADO"
+        )
         
         return {"message": f"Mayorista {mayorista.nombre} aprobado correctamente"}
     except Usuario.DoesNotExist:
@@ -338,6 +360,7 @@ async def rechazar_mayorista(
     Rechaza una solicitud de mayorista con un motivo opcional.
     """
     from django.utils import timezone
+    from infrastructure.notifications.email_service import send_b2b_status_notification
     
     try:
         mayorista = await sync_to_async(Usuario.objects.get)(id=mayorista_id, tipo='MAYORISTA')
@@ -350,6 +373,14 @@ async def rechazar_mayorista(
             mayorista.save()
         
         await sync_to_async(do_reject)()
+        
+        # Enviar notificación por correo
+        send_b2b_status_notification(
+            email=mayorista.email,
+            nombre=mayorista.nombre,
+            estado="RECHAZADO",
+            notas=request.notas
+        )
         
         return {"message": f"Mayorista {mayorista.nombre} rechazado"}
     except Usuario.DoesNotExist:
@@ -368,6 +399,7 @@ async def suspender_mayorista(
     Suspende una cuenta de mayorista activa.
     """
     from django.utils import timezone
+    from infrastructure.notifications.email_service import send_b2b_status_notification
     
     try:
         mayorista = await sync_to_async(Usuario.objects.get)(id=mayorista_id, tipo='MAYORISTA')
@@ -379,6 +411,14 @@ async def suspender_mayorista(
             mayorista.save()
         
         await sync_to_async(do_suspend)()
+        
+        # Enviar notificación por correo
+        send_b2b_status_notification(
+            email=mayorista.email,
+            nombre=mayorista.nombre,
+            estado="SUSPENDIDO",
+            notas=f"Suspendido por admin: {admin.get('user_id', 'admin')}"
+        )
         
         return {"message": f"Mayorista {mayorista.nombre} suspendido"}
     except Usuario.DoesNotExist:

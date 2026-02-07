@@ -214,3 +214,97 @@ async def get_perfil(user_id: str):
         if 'DoesNotExist' in str(type(e)):
             raise HTTPException(status_code=404, detail="Usuario no encontrado")
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ENDPOINTS: Recuperación de Contraseña
+# ═══════════════════════════════════════════════════════════════════════════
+
+class ForgotPasswordRequest(BaseModel):
+    email: EmailStr
+
+class ResetPasswordRequest(BaseModel):
+    email: EmailStr
+    codigo: str
+    new_password: str
+
+@router.post("/forgot-password")
+async def forgot_password(request: ForgotPasswordRequest):
+    """
+    Solicita un código de recuperación de contraseña.
+    Envía un email con el código al usuario si existe.
+    """
+    from infrastructure.auth.models import Usuario
+    from infrastructure.notifications.email_service import send_password_reset_code
+    from django.utils import timezone
+    import random
+    from datetime import timedelta
+    
+    try:
+        user = await sync_to_async(Usuario.objects.get)(email=request.email)
+        
+        # Generar código de 6 dígitos
+        code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        
+        def save_code():
+            user.reset_code = code
+            user.reset_code_expires = timezone.now() + timedelta(minutes=15)
+            user.save()
+            
+        await sync_to_async(save_code)()
+        
+        # Enviar email (en segundo plano / sin bloquear si es posible, pero aquí es awaitable)
+        # Nota: send_password_reset_code ya maneja excepciones internamente y loguea errores
+        send_password_reset_code(
+            email=user.email,
+            nombre=user.nombre,
+            codigo=code
+        )
+        
+        return {"message": "Si el correo existe, se ha enviado un código de recuperación"}
+        
+    except Usuario.DoesNotExist:
+        # Por seguridad, no indicamos si el correo no existe, 
+        # pero simulamos éxito para evitar enumeración de usuarios.
+        return {"message": "Si el correo existe, se ha enviado un código de recuperación"}
+    except Exception as e:
+        print(f"❌ Error en forgot-password: {e}")
+        raise HTTPException(status_code=500, detail="Error al procesar la solicitud")
+
+
+@router.post("/reset-password")
+async def reset_password(request: ResetPasswordRequest):
+    """
+    Restablece la contraseña usando el código de verificación.
+    """
+    from infrastructure.auth.models import Usuario
+    from django.utils import timezone
+    
+    try:
+        user = await sync_to_async(Usuario.objects.get)(email=request.email)
+        
+        # Validar código
+        if not user.reset_code or user.reset_code != request.codigo:
+            raise HTTPException(status_code=400, detail="Código inválido o expirado")
+            
+        # Validar expiración
+        if not user.reset_code_expires or user.reset_code_expires < timezone.now():
+            raise HTTPException(status_code=400, detail="El código ha expirado")
+            
+        def do_reset():
+            user.set_password(request.new_password)
+            user.reset_code = None
+            user.reset_code_expires = None
+            user.save()
+            
+        await sync_to_async(do_reset)()
+        
+        return {"message": "Contraseña actualizada correctamente. Ya puedes iniciar sesión."}
+        
+    except Usuario.DoesNotExist:
+        raise HTTPException(status_code=400, detail="Solicitud inválida")
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error en reset-password: {e}")
+        raise HTTPException(status_code=500, detail="Error al restablecer contraseña")

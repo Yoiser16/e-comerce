@@ -159,6 +159,12 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     )
     
     # =========================================================================
+    # CAMPOS DE RECUPERACIÓN DE CONTRASEÑA
+    # =========================================================================
+    reset_code = models.CharField(max_length=6, blank=True, null=True, help_text="Código de 6 dígitos para recuperación")
+    reset_code_expires = models.DateTimeField(null=True, blank=True, help_text="Expiración del código de recuperación")
+    
+    # =========================================================================
     # CAMPOS DE DIRECCIÓN PARA MAYORISTAS (auto-relleno en compras)
     # =========================================================================
     direccion = models.CharField(max_length=255, blank=True, default='')

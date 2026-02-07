@@ -1,16 +1,23 @@
 <template>
-  <div class="min-h-screen flex flex-col lg:flex-row">
+  <div class="h-screen flex flex-col lg:flex-row overflow-hidden">
     <!-- =========================================================================
          LADO IZQUIERDO - Hero Image con Branding
          En móvil: aparece arriba como banner compacto
          En desktop: mitad izquierda de la pantalla
     ========================================================================== -->
     <div class="relative lg:w-1/2 h-48 sm:h-64 lg:h-screen overflow-hidden">
-      <!-- Gradient de fondo (siempre presente como fallback) -->
-      <div class="absolute inset-0 bg-gradient-to-br from-[#1A1A1A] via-[#2D2D2D] to-[#1A1A1A]"></div>
+      <!-- Imagen de fondo -->
+      <img 
+        src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&h=1200&fit=crop&q=80" 
+        alt="Fondo salón de belleza" 
+        class="absolute inset-0 w-full h-full object-cover"
+      />
       
-      <!-- Patrón decorativo -->
-      <div class="absolute inset-0 opacity-5">
+      <!-- Gradient de fondo (overlay para asegurar legibilidad) -->
+      <div class="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-black/80"></div>
+      
+      <!-- Patrón decorativo (opcional, reducimos opacidad) -->
+      <div class="absolute inset-0 opacity-10 mix-blend-overlay">
         <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23C9A962\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
       </div>
       

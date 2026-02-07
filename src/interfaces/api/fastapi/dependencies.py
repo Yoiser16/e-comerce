@@ -9,7 +9,9 @@ from uuid import UUID
 from infrastructure.persistence.repositories.cliente_repository_impl import ClienteRepositoryImpl
 from domain.repositories.cliente_repository import ClienteRepository
 from domain.repositories.producto_repository import ProductoRepository
+from domain.repositories.producto_repository import ProductoRepository
 from domain.repositories.carrito_repository import CarritoRepository
+from infrastructure.auth.models import Usuario
 
 # Seguridad Bearer para JWT
 security = HTTPBearer(auto_error=False)
@@ -164,6 +166,30 @@ def get_current_user_admin(
 
 # Alias para compatibilidad
 get_current_admin_user = get_current_user_admin
+
+
+async def get_optional_mayorista_user(request: Request) -> Optional[Usuario]:
+    """
+    Intenta obtener el usuario mayorista actual desde el header X-User-Email.
+    Retorna None si no se encuentra o no es válido.
+    """
+    try:
+        email = request.headers.get('X-User-Email', '').strip()
+        if not email:
+            return None
+            
+        # Importación local para evitar ciclos si fuera necesario, 
+        # pero Usuario ya se importó arriba.
+        from infrastructure.auth.models import Usuario
+        from asgiref.sync import sync_to_async
+        
+        try:
+            user = await sync_to_async(Usuario.objects.get)(email=email, tipo='MAYORISTA')
+            return user
+        except Usuario.DoesNotExist:
+            return None
+    except Exception:
+        return None
 
 
 # --- Services / Otros ---

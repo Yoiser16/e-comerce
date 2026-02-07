@@ -171,6 +171,126 @@ def _build_body(
     return text, html
 
 
+def _build_b2b_status_body(nombre: str, estado: str, notas: str = "") -> tuple[str, str]:
+    """Genera el cuerpo del email para cambios de estado B2B."""
+    estado_titulo = {
+        "APROBADO": "¡Tu cuenta mayorista ha sido APROBADA!",
+        "RECHAZADO": "Actualización sobre tu solicitud mayorista",
+        "SUSPENDIDO": "Aviso importante sobre tu cuenta mayorista"
+    }.get(estado, "Actualización de estado")
+    
+    color_estado = {
+        "APROBADO": "#10B981",  # Emerald 500
+        "RECHAZADO": "#EF4444", # Red 500
+        "SUSPENDIDO": "#F59E0B" # Amber 500
+    }.get(estado, "#6B7280")
+
+    mensaje_principal = ""
+    accion_boton = ""
+    
+    if estado == "APROBADO":
+        mensaje_principal = (
+            f"Nos complace informarte que tu solicitud para ser Mayorista en Kharis Distribuidora ha sido <strong>APROBADA</strong>.<br><br>"
+            "Ya puedes acceder al portal B2B con tu correo y contraseña para disfrutar de precios exclusivos."
+        )
+        accion_boton = '<a href="http://pro.localhost:5173/portal/login" style="display: inline-block; background-color: #C9A962; color: #000; padding: 12px 24px; text-decoration: none; border-radius: 8px; font-weight: bold;">Ingresar al Portal</a>'
+    elif estado == "RECHAZADO":
+        mensaje_principal = (
+            "Hemos revisado tu solicitud para cuenta mayorista y lamentamos informarte que no ha sido aprobada en esta ocasión.<br><br>"
+            f"<strong>Motivo:</strong> {notas or 'No especificado'}<br><br>"
+            "Si crees que esto es un error o deseas rectificar información, por favor responde a este correo."
+        )
+    elif estado == "SUSPENDIDO":
+        mensaje_principal = (
+            "Tu cuenta de mayorista ha sido suspendida temporalmente.<br><br>"
+            f"<strong>Motivo:</strong> {notas or 'Incumplimiento de términos'}<br><br>"
+            "Por favor contáctanos para resolver esta situación."
+        )
+
+    text = f"Hola {nombre},\n\n{estado_titulo}\n\n{mensaje_principal.replace('<br>', '\n').replace('<strong>', '').replace('</strong>', '')}"
+    
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #F3F4F6;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                 <img src="https://i.ibb.co/wzr84d1c/kharis-logo-placeholder.png" alt="Kharis Distribuidora" style="width: 120px; height: auto;" />
+            </div>
+            
+            <div style="background: #ffffff; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <h2 style="color: {color_estado}; margin: 0; font-size: 24px;">{estado_titulo}</h2>
+                </div>
+                
+                <p style="color: #444; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
+                    Hola <strong>{nombre}</strong>,<br><br>
+                    {mensaje_principal}
+                </p>
+                
+                <div style="text-align: center; margin-top: 30px;">
+                    {accion_boton}
+                </div>
+            </div>
+            
+            <div style="text-align: center; margin-top: 40px; color: #9CA3AF; font-size: 13px;">
+                <p>© Kharis Distribuidora B2B</p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return text, html
+
+
+def _build_recovery_body(nombre: str, codigo: str) -> tuple[str, str]:
+    """Genera el cuerpo del email para recuperación de contraseña."""
+    text = (
+        f"Hola {nombre},\n\n"
+        f"Hemos recibido una solicitud para restablecer tu contraseña.\n"
+        f"Tu código de verificación es: {codigo}\n\n"
+        "Este código expira en 15 minutos.\n"
+        "Si no solicitaste este cambio, puedes ignorar este correo."
+    )
+    
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #F3F4F6;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                 <img src="https://i.ibb.co/wzr84d1c/kharis-logo-placeholder.png" alt="Kharis Distribuidora" style="width: 120px; height: auto;" />
+            </div>
+            
+            <div style="background: #ffffff; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                <h2 style="color: #111; margin: 0 0 20px; text-align: center;">Recuperación de Contraseña</h2>
+                
+                <p style="color: #444; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
+                    Hola <strong>{nombre}</strong>,<br>
+                    Usa el siguiente código para restablecer tu contraseña. Este código es válido por 15 minutos.
+                </p>
+                
+                <div style="background-color: #F3F4F6; border-radius: 8px; padding: 20px; text-align: center; margin: 30px 0;">
+                    <span style="font-size: 32px; font-weight: bold; letter-spacing: 5px; color: #111;">{codigo}</span>
+                </div>
+                
+                <p style="color: #666; font-size: 14px; text-align: center;">
+                    Si no solicitaste este cambio, por favor ignora este correo.
+                </p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return text, html
+
+
 def send_order_status_email(
     *,
     email: Optional[str],
@@ -182,33 +302,55 @@ def send_order_status_email(
     productos: Optional[List[Dict]] = None,
     thread_id: Optional[str] = None,
 ) -> Optional[str]:
-    """Envía un email al cliente sobre el estado de su orden.
-
-    Falla de forma silenciosa (loguea) si la configuración de email no está lista.
-    
-    Args:
-        email: Email del cliente
-        nombre: Nombre del cliente
-        codigo: Código de la orden
-        estado: Estado de la orden
-        total: Total de la orden
-        direccion: Dirección de entrega
-        productos: Lista de productos con 'nombre', 'cantidad', 'imagen'
-        thread_id: Message-ID del primer email (para threading)
-    
-    Returns:
-        Message-ID del email enviado (para threading) o None si falla
-    """
-    if not email:
-        return None
-
-    estado = estado.lower()
-
+    """Envía email de estado de orden."""
+    if not email: return None
     try:
         subject = _build_subject(codigo, estado)
-        text_body, html_body = _build_body(nombre, codigo, estado, total, direccion, productos)
+        text_body, html_body = _build_body(nombre, codigo, estado.lower(), total, direccion, productos)
+        return _send_email_base(email, subject, text_body, html_body, thread_id)
+    except Exception as exc:
+        _log_error(f"Fallo enviando email orden {codigo}", exc)
+        return None
 
-        # Generar Message-ID único
+
+def send_b2b_status_notification(
+    *,
+    email: str,
+    nombre: str,
+    estado: str,
+    notas: str = ""
+) -> Optional[str]:
+    """Envía notificación de cambio de estado B2B."""
+    if not email: return None
+    try:
+        subject = f"Actualización de tu cuenta Mayorista - Kharis"
+        text_body, html_body = _build_b2b_status_body(nombre, estado, notas)
+        return _send_email_base(email, subject, text_body, html_body)
+    except Exception as exc:
+        _log_error(f"Fallo enviando email B2B a {email}", exc)
+        return None
+
+
+def send_password_reset_code(
+    *,
+    email: str,
+    nombre: str,
+    codigo: str
+) -> Optional[str]:
+    """Envía código de recuperación de contraseña."""
+    if not email: return None
+    try:
+        subject = "Código de recuperación de contraseña - Kharis"
+        text_body, html_body = _build_recovery_body(nombre, codigo)
+        return _send_email_base(email, subject, text_body, html_body)
+    except Exception as exc:
+        _log_error(f"Fallo enviando código a {email}", exc)
+        return None
+
+
+def _send_email_base(to_email: str, subject: str, text_body: str, html_body: str, thread_id: Optional[str] = None) -> Optional[str]:
+    """Función base para envío de correos con threading."""
+    try:
         domain = getattr(settings, "EMAIL_HOST_USER", "kharis.local").split("@")[-1]
         msg_id = make_msgid(domain=domain)
 
@@ -216,26 +358,28 @@ def send_order_status_email(
             subject=subject,
             body=text_body,
             from_email=getattr(settings, "DEFAULT_FROM_EMAIL", None) or getattr(settings, "EMAIL_HOST_USER", ""),
-            to=[email],
+            to=[to_email],
         )
         msg.attach_alternative(html_body, "text/html")
         
-        # Threading: Si hay thread_id, encadenar como respuesta
         if thread_id:
             msg.extra_headers['In-Reply-To'] = thread_id
             msg.extra_headers['References'] = thread_id
         
-        # Asignar Message-ID
         msg.extra_headers['Message-ID'] = msg_id
-        
+
         msg.send(fail_silently=True)
         return msg_id
-        
-    except Exception as exc:  # noqa: BLE001
-        # No interrumpir el flujo de negocio por fallas de email
-        try:
-            if hasattr(settings, "LOGGER"):
-                settings.LOGGER.warning("Fallo enviando email de estado", extra={"codigo": codigo, "estado": estado, "error": str(exc)})
-        except Exception:
-            pass
-        return None
+    except Exception as exc:
+        _log_error(f"Error base enviando email a {to_email}", exc)
+        raise exc
+
+
+def _log_error(msg: str, exc: Exception):
+    try:
+        if hasattr(settings, "LOGGER"):
+            settings.LOGGER.warning(f"{msg}: {str(exc)}")
+        else:
+            print(f"⚠️ {msg}: {str(exc)}")
+    except:
+        pass

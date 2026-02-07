@@ -969,7 +969,6 @@
               </a>
               <a 
                 href="http://pro.localhost:5173/"
-                target="_blank"
                 class="inline-flex items-center justify-center gap-2 sm:gap-3 bg-white hover:bg-nude-50 border-2 border-nude-300 text-text-dark font-medium text-sm sm:text-base px-5 py-3 sm:px-7 sm:py-3.5 rounded-full transition-all hover:border-brand-400 touch-target"
               >
                 <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">

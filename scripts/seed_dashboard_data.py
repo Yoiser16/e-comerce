@@ -52,20 +52,33 @@ try:
         ("Reloj Inteligente", "Wearables", 250.00)
     ]
 
+    # Map de imágenes por categoría
+    imagenes_map = {
+        "Tecnología": "https://images.unsplash.com/photo-1496181133206-80ce9b88a853?w=500&q=80",
+        "Audio": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&q=80",
+        "Accesorios": "https://images.unsplash.com/photo-1527864550417-7fd91fc51a46?w=500&q=80",
+        "Muebles": "https://images.unsplash.com/photo-1592078615290-033ee584e267?w=500&q=80",
+        "Wearables": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80",
+        "Extensiones": "https://images.unsplash.com/photo-1562025176-791f4865ae93?w=500&q=80"
+    }
+
     productos_db = []
     print(" -> Verificando productos...")
     for nombre, cat_nombre, precio in productos_nombres:
         cat = categorias_map.get(cat_nombre)
+        img_url = imagenes_map.get(cat_nombre, "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=500&q=80")
+        
         prod, created = ProductoModel.objects.get_or_create(
             nombre=nombre,
             defaults={
                 'codigo': f"PROD-{random.randint(1000, 9999)}", # Importante: código único
-                'descripcion': f"Descripción premium para {nombre}",
+                'descripcion': f"Descripción premium para {nombre}. Alta calidad y durabilidad.",
                 'monto_precio': precio,
                 'stock_actual': random.randint(10, 50),
                 'stock_minimo': 5,
                 'categoria': cat,
-                'activo': True
+                'activo': True,
+                'imagen_principal': img_url
             }
         )
         if created:
