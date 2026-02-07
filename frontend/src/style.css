@@ -78,6 +78,16 @@ body {
   font-family: 'Playfair Display', Georgia, 'Times New Roman', serif;
 }
 
+/* Tipografía alternativa luxury (B2B detalle) */
+.font-luxury-alt {
+  font-family: 'Cormorant Garamond', Georgia, 'Times New Roman', serif;
+}
+
+/* Tipografía utilitaria premium (B2B detalle) */
+.font-utility {
+  font-family: 'Manrope', 'Inter', system-ui, -apple-system, sans-serif;
+}
+
 /* ========================================
    HEADER LUXURY - Transparent-to-Sticky Premium Effect
    ======================================== */

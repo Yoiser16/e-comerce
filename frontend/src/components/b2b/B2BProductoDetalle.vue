@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-[#FAFAFA]">
+  <div class="min-h-screen bg-[#FAFAFA] font-utility">
     <!-- Toast notifications -->
     <B2BToast />
     
@@ -22,7 +22,7 @@
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"/>
           </svg>
         </div>
-        <h3 class="text-xl font-luxury text-gray-900 mb-2">Producto no encontrado</h3>
+        <h3 class="text-xl font-luxury-alt text-gray-900 mb-2">Producto no encontrado</h3>
         <p class="text-gray-500 mb-6">{{ error }}</p>
         <router-link to="/portal/catalogo" class="inline-flex items-center gap-2 text-[#1A1A1A] font-medium hover:underline">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -165,9 +165,24 @@
                   REF: {{ producto.sku }}
                 </span>
               </div>
-              <h1 class="font-luxury text-2xl sm:text-3xl lg:text-4xl text-[#1A1A1A] leading-tight">
+              <h1 class="font-luxury-alt text-2xl sm:text-3xl lg:text-4xl text-[#1A1A1A] leading-tight">
                 {{ producto.nombre }}
               </h1>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-[#7A7A7A]">
+              <span class="px-3 py-1 rounded-full bg-[#FAF5F2] border border-[#C9A962]/30 text-[#8B7355]">
+                Stock {{ producto.stock_actual }} uds
+              </span>
+              <span class="px-3 py-1 rounded-full bg-white border border-gray-200 text-[#5A5A5A]">
+                Lote minimo {{ LOTE_MINIMO }}
+              </span>
+              <span class="px-3 py-1 rounded-full bg-white border border-gray-200 text-[#5A5A5A]">
+                Envio 24-48h
+              </span>
+              <span v-if="producto.marca" class="px-3 py-1 rounded-full bg-white border border-gray-200 text-[#5A5A5A]">
+                Marca {{ producto.marca }}
+              </span>
             </div>
             
             <!-- Características Rápidas - BULLETS QUE VENDEN -->
