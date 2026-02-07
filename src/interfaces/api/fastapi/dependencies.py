@@ -95,9 +95,6 @@ def get_current_user_id(
 ) -> UUID:
     """
     Extrae el user_id del token JWT.
-    
-    TODO: Implementar validación completa del JWT.
-    Por ahora retorna un UUID fijo para desarrollo.
     """
     if not credentials:
         raise HTTPException(
@@ -106,18 +103,44 @@ def get_current_user_id(
             headers={"WWW-Authenticate": "Bearer"},
         )
     
-    # TODO: Decodificar JWT y extraer user_id
-    # Por ahora, para desarrollo, extraemos el user_id del header X-User-ID
-    # En producción, esto debe venir del token JWT validado
     try:
-        # Placeholder - en producción usar jwt.decode()
-        from uuid import uuid4
-        # Retornar UUID fijo para testing
-        return UUID("00000000-0000-0000-0000-000000000001")
-    except Exception:
+        import jwt
+        from django.conf import settings
+        
+        # Decodificar el token JWT
+        token = credentials.credentials
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=["HS256"]
+        )
+        
+        # Extraer user_id del payload
+        user_id = payload.get("user_id")
+        if not user_id:
+            raise HTTPException(
+                status_code=status.HTTP_401_UNAUTHORIZED,
+                detail="Token no contiene user_id",
+                headers={"WWW-Authenticate": "Bearer"},
+            )
+        
+        return UUID(user_id)
+    except jwt.ExpiredSignatureError:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token inválido",
+            detail="Token expirado",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except jwt.InvalidTokenError as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Token inválido: {str(e)}",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Error de autenticación: {str(e)}",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
@@ -131,8 +154,20 @@ def get_optional_user_id(
         return None
     
     try:
-        from uuid import uuid4
-        return UUID("00000000-0000-0000-0000-000000000001")
+        import jwt
+        from django.conf import settings
+        
+        token = credentials.credentials
+        payload = jwt.decode(
+            token,
+            settings.SECRET_KEY,
+            algorithms=["HS256"]
+        )
+        
+        user_id = payload.get("user_id")
+        if user_id:
+            return UUID(user_id)
+        return None
     except Exception:
         return None
 

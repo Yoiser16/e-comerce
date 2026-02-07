@@ -503,7 +503,7 @@ class VerificarEmailRequest(BaseModel):
     email: str
 
 
-@router.post("/verificar-email")
+@router.post("/mayoristas/verificar-email")
 async def verificar_email(request: VerificarEmailRequest):
     """
     Verifica si un email ya está registrado y retorna el estado.
@@ -588,7 +588,7 @@ from django.core.files.base import ContentFile
 import os
 
 
-@router.post("/registro", status_code=201)
+@router.post("/mayoristas/registro", status_code=201)
 async def registrar_mayorista(
     email: str = Form(...),
     password: str = Form(...),
