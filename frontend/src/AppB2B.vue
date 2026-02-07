@@ -46,7 +46,7 @@
               </div>
             </div>
             <button 
-              @click="installPrompt = null" 
+              @click="dismissInstallPrompt" 
               class="text-white/40 hover:text-white transition-colors"
               aria-label="Cerrar"
             >
@@ -80,32 +80,64 @@
 <script>
 import { ref, onMounted, onUnmounted } from 'vue'
 
+const INSTALL_PROMPT_KEY = 'kharis_pwa_prompt_dismissed'
+const HOURS_24 = 24 * 60 * 60 * 1000 // 24 horas en ms
+
 export default {
   name: 'AppB2B',
   setup() {
     const showPreloader = ref(true)
     const installPrompt = ref(null)
+    const deferredPrompt = ref(null) // Guardar el evento original
+
+    // Verificar si el popup debe mostrarse (han pasado 24h desde la última vez)
+    function shouldShowInstallPrompt() {
+      const lastDismissed = localStorage.getItem(INSTALL_PROMPT_KEY)
+      if (!lastDismissed) return true
+      
+      const timeSinceDismissed = Date.now() - parseInt(lastDismissed, 10)
+      return timeSinceDismissed >= HOURS_24
+    }
+
+    // Guardar timestamp cuando se cierra el popup
+    function dismissInstallPrompt() {
+      localStorage.setItem(INSTALL_PROMPT_KEY, Date.now().toString())
+      installPrompt.value = null
+    }
 
     function handleInstallPrompt(e) {
       // Prevenir el banner nativo de Chrome
       e.preventDefault()
-      // Guardar el evento
-      installPrompt.value = e
-      console.log('📱 PWA Install Prompt capturado')
+      
+      // Solo mostrar si han pasado 24h desde la última vez que se cerró
+      if (shouldShowInstallPrompt()) {
+        deferredPrompt.value = e
+        installPrompt.value = e
+        console.log('📱 PWA Install Prompt capturado')
+      } else {
+        // Guardar el evento por si el usuario quiere instalar después
+        deferredPrompt.value = e
+        console.log('📱 PWA prompt suprimido (menos de 24h desde última interacción)')
+      }
     }
 
     async function installApp() {
-      if (!installPrompt.value) return
+      const prompt = deferredPrompt.value || installPrompt.value
+      if (!prompt) return
       
       // Mostrar prompt nativo
-      installPrompt.value.prompt()
+      prompt.prompt()
       
       // Esperar elección del usuario
-      const { outcome } = await installPrompt.value.userChoice
+      const { outcome } = await prompt.userChoice
       console.log(`📱 Usuario eligió: ${outcome}`)
       
-      // Limpiar prompt
+      // Guardar timestamp para no volver a mostrar por 24h
+      localStorage.setItem(INSTALL_PROMPT_KEY, Date.now().toString())
+      
+      // Limpiar prompts
       installPrompt.value = null
+      deferredPrompt.value = null
     }
 
     onMounted(() => {
@@ -125,7 +157,8 @@ export default {
     return {
       showPreloader,
       installPrompt,
-      installApp
+      installApp,
+      dismissInstallPrompt
     }
   }
 }

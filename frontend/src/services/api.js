@@ -28,13 +28,14 @@ export const getImageUrl = (url) => {
 // Interceptor para agregar el token JWT y email
 apiClient.interceptors.request.use(
   (config) => {
-    const token = localStorage.getItem('access_token')
+    // Buscar token en ambas ubicaciones (B2C y B2B)
+    const token = localStorage.getItem('access_token') || localStorage.getItem('b2b_access_token')
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
     
     // Agregar email del usuario en header X-User-Email si está disponible
-    const user = localStorage.getItem('user')
+    const user = localStorage.getItem('user') || localStorage.getItem('b2b_user')
     if (user) {
       try {
         const userData = JSON.parse(user)

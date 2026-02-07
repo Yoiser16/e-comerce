@@ -1,7 +1,7 @@
 """
 Router para administrar solicitudes de mayoristas (B2B)
 """
-from fastapi import APIRouter, HTTPException, Depends
+from fastapi import APIRouter, HTTPException, Depends, Request
 from pydantic import BaseModel
 from typing import List, Optional
 from datetime import datetime
@@ -10,7 +10,7 @@ from asgiref.sync import sync_to_async
 from django.db import close_old_connections
 
 from infrastructure.auth.models import Usuario
-from .dependencies import get_current_admin_user
+from .dependencies import get_current_admin_user, get_current_user_email
 
 router = APIRouter(
     prefix="/api/v1",
@@ -552,4 +552,522 @@ async def registrar_mayorista(
         )
     except Exception as e:
         print(f"❌ Error al registrar mayorista: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ENDPOINTS B2B - Gestión de Dirección del Mayorista
+# ═══════════════════════════════════════════════════════════════════════════
+
+class DireccionMayorista(BaseModel):
+    """Esquema para dirección de mayorista"""
+    direccion: str = ""
+    complemento: str = ""
+    departamento: str = ""
+    departamento_id: Optional[int] = None
+    municipio: str = ""
+    municipio_id: Optional[int] = None
+    barrio: str = ""
+    indicaciones_entrega: str = ""
+    tipo_domicilio: str = "Residencial"
+    latitud: Optional[float] = None
+    longitud: Optional[float] = None
+    telefono: str = ""
+    nombre_contacto: str = ""
+
+    class Config:
+        from_attributes = True
+
+
+class DireccionUpdateRequest(BaseModel):
+    """Request para actualizar dirección"""
+    direccion: str
+    complemento: Optional[str] = ""
+    departamento: str
+    departamento_id: Optional[int] = None
+    municipio: str
+    municipio_id: Optional[int] = None
+    barrio: Optional[str] = ""
+    indicaciones_entrega: Optional[str] = ""
+    tipo_domicilio: Optional[str] = "Residencial"
+    latitud: Optional[float] = None
+    longitud: Optional[float] = None
+    telefono: Optional[str] = None
+    nombre_contacto: Optional[str] = None
+
+
+@router.get("/b2b/me/direccion", response_model=DireccionMayorista)
+async def obtener_mi_direccion(request: Request):
+    """
+    Obtiene la dirección guardada del mayorista actual.
+    El email del usuario viene en el header X-User-Email.
+    """
+    close_old_connections()
+    
+    # Obtener email del header
+    email = request.headers.get('X-User-Email', '').strip()
+    if not email:
+        raise HTTPException(
+            status_code=401,
+            detail="No autenticado. Se requiere header X-User-Email"
+        )
+    
+    try:
+        # Buscar usuario mayorista
+        def get_user():
+            try:
+                return Usuario.objects.get(email=email, tipo='MAYORISTA')
+            except Usuario.DoesNotExist:
+                return None
+        
+        user = await sync_to_async(get_user)()
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        
+        return DireccionMayorista(
+            direccion=user.direccion or "",
+            complemento=user.complemento or "",
+            departamento=user.departamento or "",
+            departamento_id=user.departamento_id,
+            municipio=user.municipio or "",
+            municipio_id=user.municipio_id,
+            barrio=user.barrio or "",
+            indicaciones_entrega=user.indicaciones_entrega or "",
+            tipo_domicilio=user.tipo_domicilio or "Residencial",
+            latitud=float(user.latitud) if user.latitud else None,
+            longitud=float(user.longitud) if user.longitud else None,
+            telefono=user.telefono or "",
+            nombre_contacto=f"{user.nombre} {user.apellido}".strip()
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error al obtener dirección: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.put("/b2b/me/direccion", response_model=DireccionMayorista)
+async def actualizar_mi_direccion(request: Request, data: DireccionUpdateRequest):
+    """
+    Actualiza la dirección del mayorista actual.
+    El email del usuario viene en el header X-User-Email.
+    """
+    close_old_connections()
+    
+    # Obtener email del header
+    email = request.headers.get('X-User-Email', '').strip()
+    if not email:
+        raise HTTPException(
+            status_code=401,
+            detail="No autenticado. Se requiere header X-User-Email"
+        )
+    
+    try:
+        def update_user():
+            try:
+                user = Usuario.objects.get(email=email, tipo='MAYORISTA')
+                
+                # Actualizar campos de dirección
+                user.direccion = data.direccion
+                user.complemento = data.complemento or ""
+                user.departamento = data.departamento
+                user.departamento_id = data.departamento_id
+                user.municipio = data.municipio
+                user.municipio_id = data.municipio_id
+                user.barrio = data.barrio or ""
+                user.indicaciones_entrega = data.indicaciones_entrega or ""
+                user.tipo_domicilio = data.tipo_domicilio or "Residencial"
+                
+                # Actualizar coordenadas si se proporcionan
+                if data.latitud is not None:
+                    user.latitud = data.latitud
+                if data.longitud is not None:
+                    user.longitud = data.longitud
+                
+                # Actualizar teléfono si se proporciona
+                if data.telefono:
+                    user.telefono = data.telefono
+                
+                user.save()
+                return user
+                
+            except Usuario.DoesNotExist:
+                return None
+        
+        user = await sync_to_async(update_user)()
+        
+        if not user:
+            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        
+        print(f"✅ Dirección actualizada para mayorista: {email}")
+        
+        return DireccionMayorista(
+            direccion=user.direccion or "",
+            complemento=user.complemento or "",
+            departamento=user.departamento or "",
+            departamento_id=user.departamento_id,
+            municipio=user.municipio or "",
+            municipio_id=user.municipio_id,
+            barrio=user.barrio or "",
+            indicaciones_entrega=user.indicaciones_entrega or "",
+            tipo_domicilio=user.tipo_domicilio or "Residencial",
+            latitud=float(user.latitud) if user.latitud else None,
+            longitud=float(user.longitud) if user.longitud else None,
+            telefono=user.telefono or "",
+            nombre_contacto=data.nombre_contacto or f"{user.nombre} {user.apellido}".strip()
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error al actualizar dirección: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ENDPOINTS CRUD - DIRECCIONES MÚLTIPLES
+# ═══════════════════════════════════════════════════════════════════════════
+
+class DireccionResponse(BaseModel):
+    """Respuesta de dirección individual"""
+    id: int
+    etiqueta: str
+    direccion: str
+    complemento: Optional[str] = ""
+    departamento: str
+    departamento_id: Optional[int] = None
+    municipio: str
+    municipio_id: Optional[int] = None
+    barrio: Optional[str] = ""
+    indicaciones: Optional[str] = ""
+    tipo_domicilio: str = "Residencial"
+    nombre_contacto: Optional[str] = ""
+    telefono: str
+    latitud: Optional[float] = None
+    longitud: Optional[float] = None
+    is_default: bool = False
+    
+    class Config:
+        from_attributes = True
+
+
+class DireccionCreateRequest(BaseModel):
+    """Request para crear dirección"""
+    etiqueta: str = "Mi dirección"
+    direccion: str
+    complemento: Optional[str] = ""
+    departamento: str
+    departamento_id: Optional[int] = None
+    municipio: str
+    municipio_id: Optional[int] = None
+    barrio: Optional[str] = ""
+    indicaciones: Optional[str] = ""
+    tipo_domicilio: str = "Residencial"
+    nombre_contacto: Optional[str] = ""
+    telefono: str
+    latitud: Optional[float] = None
+    longitud: Optional[float] = None
+    is_default: bool = False
+
+
+@router.get("/b2b/me/direcciones", response_model=List[DireccionResponse])
+async def listar_mis_direcciones(
+    email: str = Depends(get_current_user_email)
+):
+    """
+    Lista todas las direcciones del mayorista autenticado.
+    Ordenadas por: principal primero, luego por fecha de creación.
+    """
+    from infrastructure.auth.models import DireccionMayorista as DireccionModel
+    
+    close_old_connections()
+    
+    try:
+        def get_direcciones():
+            try:
+                user = Usuario.objects.get(email=email, tipo='MAYORISTA')
+                return list(user.direcciones.filter(activa=True))
+            except Usuario.DoesNotExist:
+                return []
+        
+        direcciones = await sync_to_async(get_direcciones)()
+        
+        return [
+            DireccionResponse(
+                id=d.id,
+                etiqueta=d.etiqueta,
+                direccion=d.direccion,
+                complemento=d.complemento or "",
+                departamento=d.departamento,
+                departamento_id=d.departamento_id,
+                municipio=d.municipio,
+                municipio_id=d.municipio_id,
+                barrio=d.barrio or "",
+                indicaciones=d.indicaciones or "",
+                tipo_domicilio=d.tipo_domicilio or "Residencial",
+                nombre_contacto=d.nombre_contacto or "",
+                telefono=d.telefono or "",
+                latitud=float(d.latitud) if d.latitud else None,
+                longitud=float(d.longitud) if d.longitud else None,
+                is_default=d.is_default
+            )
+            for d in direcciones
+        ]
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error al listar direcciones: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/b2b/me/direcciones", response_model=DireccionResponse)
+async def crear_direccion(
+    data: DireccionCreateRequest,
+    email: str = Depends(get_current_user_email)
+):
+    """
+    Crea una nueva dirección para el mayorista autenticado.
+    Si is_default=True, se desmarca la anterior principal.
+    """
+    from infrastructure.auth.models import DireccionMayorista as DireccionModel
+    
+    close_old_connections()
+    
+    try:
+        def create_direccion():
+            try:
+                user = Usuario.objects.get(email=email, tipo='MAYORISTA')
+                
+                # Si es la primera dirección o se marca como default
+                count = user.direcciones.filter(activa=True).count()
+                make_default = data.is_default or count == 0
+                
+                direccion = DireccionModel.objects.create(
+                    usuario=user,
+                    etiqueta=data.etiqueta,
+                    direccion=data.direccion,
+                    complemento=data.complemento or "",
+                    departamento=data.departamento,
+                    departamento_id=data.departamento_id,
+                    municipio=data.municipio,
+                    municipio_id=data.municipio_id,
+                    barrio=data.barrio or "",
+                    indicaciones=data.indicaciones or "",
+                    tipo_domicilio=data.tipo_domicilio or "Residencial",
+                    nombre_contacto=data.nombre_contacto or "",
+                    telefono=data.telefono,
+                    latitud=data.latitud,
+                    longitud=data.longitud,
+                    is_default=make_default
+                )
+                return direccion
+                
+            except Usuario.DoesNotExist:
+                return None
+        
+        direccion = await sync_to_async(create_direccion)()
+        
+        if not direccion:
+            raise HTTPException(status_code=404, detail="Usuario no encontrado")
+        
+        print(f"✅ Dirección creada para {email}: {direccion.etiqueta}")
+        
+        return DireccionResponse(
+            id=direccion.id,
+            etiqueta=direccion.etiqueta,
+            direccion=direccion.direccion,
+            complemento=direccion.complemento or "",
+            departamento=direccion.departamento,
+            departamento_id=direccion.departamento_id,
+            municipio=direccion.municipio,
+            municipio_id=direccion.municipio_id,
+            barrio=direccion.barrio or "",
+            indicaciones=direccion.indicaciones or "",
+            tipo_domicilio=direccion.tipo_domicilio,
+            nombre_contacto=direccion.nombre_contacto or "",
+            telefono=direccion.telefono,
+            latitud=float(direccion.latitud) if direccion.latitud else None,
+            longitud=float(direccion.longitud) if direccion.longitud else None,
+            is_default=direccion.is_default
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error al crear dirección: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.put("/b2b/me/direcciones/{direccion_id}", response_model=DireccionResponse)
+async def actualizar_direccion(
+    direccion_id: int,
+    data: DireccionCreateRequest,
+    email: str = Depends(get_current_user_email)
+):
+    """
+    Actualiza una dirección existente del mayorista.
+    """
+    from infrastructure.auth.models import DireccionMayorista as DireccionModel
+    
+    close_old_connections()
+    
+    try:
+        def update_direccion():
+            try:
+                user = Usuario.objects.get(email=email, tipo='MAYORISTA')
+                direccion = DireccionModel.objects.get(id=direccion_id, usuario=user, activa=True)
+                
+                direccion.etiqueta = data.etiqueta
+                direccion.direccion = data.direccion
+                direccion.complemento = data.complemento or ""
+                direccion.departamento = data.departamento
+                direccion.departamento_id = data.departamento_id
+                direccion.municipio = data.municipio
+                direccion.municipio_id = data.municipio_id
+                direccion.barrio = data.barrio or ""
+                direccion.indicaciones = data.indicaciones or ""
+                direccion.tipo_domicilio = data.tipo_domicilio or "Residencial"
+                direccion.nombre_contacto = data.nombre_contacto or ""
+                direccion.telefono = data.telefono
+                direccion.latitud = data.latitud
+                direccion.longitud = data.longitud
+                direccion.is_default = data.is_default
+                direccion.save()
+                
+                return direccion
+                
+            except (Usuario.DoesNotExist, DireccionModel.DoesNotExist):
+                return None
+        
+        direccion = await sync_to_async(update_direccion)()
+        
+        if not direccion:
+            raise HTTPException(status_code=404, detail="Dirección no encontrada")
+        
+        print(f"✅ Dirección actualizada: {direccion.etiqueta}")
+        
+        return DireccionResponse(
+            id=direccion.id,
+            etiqueta=direccion.etiqueta,
+            direccion=direccion.direccion,
+            complemento=direccion.complemento or "",
+            departamento=direccion.departamento,
+            departamento_id=direccion.departamento_id,
+            municipio=direccion.municipio,
+            municipio_id=direccion.municipio_id,
+            barrio=direccion.barrio or "",
+            indicaciones=direccion.indicaciones or "",
+            tipo_domicilio=direccion.tipo_domicilio,
+            nombre_contacto=direccion.nombre_contacto or "",
+            telefono=direccion.telefono,
+            latitud=float(direccion.latitud) if direccion.latitud else None,
+            longitud=float(direccion.longitud) if direccion.longitud else None,
+            is_default=direccion.is_default
+        )
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error al actualizar dirección: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.delete("/b2b/me/direcciones/{direccion_id}")
+async def eliminar_direccion(
+    direccion_id: int,
+    email: str = Depends(get_current_user_email)
+):
+    """
+    Elimina (soft delete) una dirección del mayorista.
+    Si era la principal, la siguiente más reciente se vuelve principal.
+    """
+    from infrastructure.auth.models import DireccionMayorista as DireccionModel
+    
+    close_old_connections()
+    
+    try:
+        def delete_direccion():
+            try:
+                user = Usuario.objects.get(email=email, tipo='MAYORISTA')
+                direccion = DireccionModel.objects.get(id=direccion_id, usuario=user, activa=True)
+                
+                was_default = direccion.is_default
+                direccion.activa = False
+                direccion.is_default = False
+                direccion.save()
+                
+                # Si era la principal, marcar la siguiente como principal
+                if was_default:
+                    next_default = DireccionModel.objects.filter(
+                        usuario=user, activa=True
+                    ).order_by('-fecha_creacion').first()
+                    if next_default:
+                        next_default.is_default = True
+                        next_default.save()
+                
+                return True
+                
+            except (Usuario.DoesNotExist, DireccionModel.DoesNotExist):
+                return False
+        
+        deleted = await sync_to_async(delete_direccion)()
+        
+        if not deleted:
+            raise HTTPException(status_code=404, detail="Dirección no encontrada")
+        
+        print(f"✅ Dirección eliminada: {direccion_id}")
+        
+        return {"message": "Dirección eliminada correctamente"}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error al eliminar dirección: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.put("/b2b/me/direcciones/{direccion_id}/default")
+async def marcar_direccion_principal(
+    direccion_id: int,
+    email: str = Depends(get_current_user_email)
+):
+    """
+    Marca una dirección como la principal del usuario.
+    Desmarca la anterior principal automáticamente.
+    """
+    from infrastructure.auth.models import DireccionMayorista as DireccionModel
+    
+    close_old_connections()
+    
+    try:
+        def set_default():
+            try:
+                user = Usuario.objects.get(email=email, tipo='MAYORISTA')
+                direccion = DireccionModel.objects.get(id=direccion_id, usuario=user, activa=True)
+                
+                # El modelo ya maneja desmarcar las anteriores en save()
+                direccion.is_default = True
+                direccion.save()
+                
+                return direccion
+                
+            except (Usuario.DoesNotExist, DireccionModel.DoesNotExist):
+                return None
+        
+        direccion = await sync_to_async(set_default)()
+        
+        if not direccion:
+            raise HTTPException(status_code=404, detail="Dirección no encontrada")
+        
+        print(f"✅ Dirección marcada como principal: {direccion.etiqueta}")
+        
+        return {"message": "Dirección marcada como principal", "id": direccion_id}
+        
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error al marcar dirección como principal: {e}")
         raise HTTPException(status_code=500, detail=str(e))

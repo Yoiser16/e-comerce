@@ -52,58 +52,6 @@
           {{ stockLabel }}
         </span>
       </div>
-
-      <!-- Quick Add Overlay -->
-      <div 
-        class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent 
-               opacity-0 group-hover:opacity-100 transition-all duration-300
-               flex items-end justify-center pb-4"
-      >
-        <div class="flex items-center gap-2 transform translate-y-4 group-hover:translate-y-0 transition-transform duration-300">
-          <!-- Quantity Input -->
-          <div class="flex items-center bg-white rounded-lg overflow-hidden shadow-lg">
-            <button 
-              @click.stop="decrementQuantity"
-              class="w-8 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors"
-              :disabled="quantity <= product.minOrder"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4" />
-              </svg>
-            </button>
-            <input 
-              v-model.number="quantity"
-              type="number"
-              :min="product.minOrder"
-              :max="product.stock"
-              class="w-12 h-10 text-center text-sm font-semibold border-x border-gray-200 focus:outline-none"
-              @click.stop
-            />
-            <button 
-              @click.stop="incrementQuantity"
-              class="w-8 h-10 flex items-center justify-center hover:bg-gray-100 transition-colors"
-              :disabled="quantity >= product.stock"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
-            </button>
-          </div>
-          
-          <!-- Add Button -->
-          <button 
-            @click.stop="addToCart"
-            :disabled="!product.inStock"
-            class="h-10 px-4 bg-[#C9A962] hover:bg-[#B8984F] text-[#1A1A1A] font-bold text-sm rounded-lg shadow-lg 
-                   disabled:opacity-50 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
-          >
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-            </svg>
-            Agregar
-          </button>
-        </div>
-      </div>
     </router-link>
 
     <!-- Product Info -->

@@ -77,7 +77,7 @@ def listar_vistos_recientemente(
                     categoria=producto.categoria.nombre if producto.categoria else None,
                     imagen_principal=producto.imagen_principal,
                     precio=float(producto.monto_precio or 0),
-                    precio_mayorista=float(producto.precio_mayorista) if producto.precio_mayorista else None,
+                    precio_mayorista=None,  # Campo no existe en ProductoModel
                     stock=producto.stock_actual,
                     fecha_visto=visto.fecha_visto,
                     veces_visto=visto.veces_visto
@@ -99,13 +99,10 @@ def registrar_vista(datos: RegistrarVistaRequest):
     - usuario_id: UUID del usuario (opcional)
     - email: Email del usuario (requerido si no hay usuario_id)
     """
+    from uuid import uuid4
+    from hashlib import md5
+    
     try:
-        if not datos.usuario_id and not datos.email:
-            raise HTTPException(
-                status_code=status.HTTP_400_BAD_REQUEST,
-                detail="Debe proporcionar usuario_id o email"
-            )
-        
         # Verificar que el producto existe
         try:
             producto = ProductoModel.objects.get(id=datos.producto_id, activo=True)
@@ -115,18 +112,37 @@ def registrar_vista(datos: RegistrarVistaRequest):
                 detail="Producto no encontrado"
             )
         
-        # Buscar si ya existe un registro de vista
-        filtro = {'producto': producto}
-        if datos.email:
-            filtro['email'] = datos.email
-        elif datos.usuario_id:
-            filtro['usuario_id'] = datos.usuario_id
-            
-        visto_existente = ProductoVistoModel.objects.filter(**filtro).first()
+        # Generar usuario_id consistente basado en email si no viene
+        # Esto evita el constraint de unicidad al crear registros duplicados
+        if datos.usuario_id:
+            usuario_id = datos.usuario_id
+        elif datos.email:
+            # Crear UUID determinístico basado en el email
+            hash_email = md5(datos.email.lower().encode()).hexdigest()
+            usuario_id = UUID(hash_email)
+        else:
+            # Usuario anónimo - usar UUID aleatorio pero buscar por producto
+            usuario_id = uuid4()
+        
+        # Buscar si ya existe un registro de vista para este usuario y producto
+        visto_existente = ProductoVistoModel.objects.filter(
+            usuario_id=usuario_id,
+            producto=producto
+        ).first()
+        
+        # Si no existe por usuario_id pero sí por email, buscar por email
+        if not visto_existente and datos.email:
+            visto_existente = ProductoVistoModel.objects.filter(
+                email=datos.email,
+                producto=producto
+            ).first()
         
         if visto_existente:
             # Actualizar fecha e incrementar contador
             visto_existente.veces_visto += 1
+            # Asegurar que el usuario_id sea consistente
+            if visto_existente.usuario_id != usuario_id:
+                visto_existente.usuario_id = usuario_id
             visto_existente.save()
             return RegistrarVistaResponse(
                 message="Vista actualizada",
@@ -134,12 +150,26 @@ def registrar_vista(datos: RegistrarVistaRequest):
             )
         
         # Crear nuevo registro de vista
-        from uuid import uuid4
-        nuevo_visto = ProductoVistoModel.objects.create(
-            usuario_id=datos.usuario_id or uuid4(),  # Generar UUID si no hay
-            email=datos.email,
-            producto=producto
-        )
+        try:
+            nuevo_visto = ProductoVistoModel.objects.create(
+                usuario_id=usuario_id,
+                email=datos.email,
+                producto=producto
+            )
+        except Exception as create_error:
+            # Si falla por constraint, intentar obtener el existente
+            visto_existente = ProductoVistoModel.objects.filter(
+                usuario_id=usuario_id,
+                producto=producto
+            ).first()
+            if visto_existente:
+                visto_existente.veces_visto += 1
+                visto_existente.save()
+                return RegistrarVistaResponse(
+                    message="Vista actualizada",
+                    veces_visto=visto_existente.veces_visto
+                )
+            raise create_error
         
         return RegistrarVistaResponse(
             message="Vista registrada",
@@ -149,6 +179,9 @@ def registrar_vista(datos: RegistrarVistaRequest):
     except HTTPException:
         raise
     except Exception as e:
+        import traceback
+        print(f"❌ Error en registrar_vista: {e}")
+        print(traceback.format_exc())
         raise HTTPException(status_code=500, detail=str(e))
 
 

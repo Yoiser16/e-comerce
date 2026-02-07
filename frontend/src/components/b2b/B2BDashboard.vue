@@ -521,22 +521,9 @@
             <h3 class="font-medium text-gray-800 text-[13px] line-clamp-2 mb-1.5 leading-snug">
               {{ product.name }}
             </h3>
-            <p class="text-gray-900 font-semibold text-sm mb-2.5">
+            <p class="text-gray-900 font-semibold text-sm">
               ${{ product.price.toLocaleString() }}
             </p>
-            
-            <!-- Botón agregar - con animación y accesibilidad -->
-            <!-- Botón agregar minimalista -->
-            <button 
-              @click.prevent="quickAddToCart(product)"
-              class="w-full py-2 bg-[#1A1A1A] hover:bg-[#C9A962] text-white text-xs font-semibold rounded-lg flex items-center justify-center gap-2 transition-all duration-300 shadow-md hover:shadow-lg"
-              :aria-label="`Agregar ${product.name} al carrito`"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-              </svg>
-              AGREGAR
-            </button>
           </div>
         </router-link>
         
@@ -587,9 +574,10 @@
       </div>
       
       <div v-else-if="featuredProducts.length > 0" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-        <div 
+        <router-link 
           v-for="(product, index) in featuredProducts" 
           :key="product.id"
+          :to="`/portal/producto/${product.id}`"
           :style="{ 
             animationDelay: getAnimationDelay(index),
             opacity: hasAnimated ? 1 : 0
@@ -633,20 +621,6 @@
                 -{{ product.discount }}%
               </span>
             </div>
-            
-            <!-- Quick add overlay - con mejoras de accesibilidad -->
-            <div class="absolute inset-0 bg-gradient-to-t from-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-end justify-center pb-3">
-              <button 
-                @click="quickAddToCart(product)"
-                class="px-4 py-2 bg-white/95 text-gray-900 text-xs font-semibold rounded-lg shadow-lg transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 flex items-center gap-1.5 hover:bg-white focus:outline-none focus:ring-2 focus:ring-white focus:ring-offset-2 focus:ring-offset-gray-900 active:scale-95"
-                :aria-label="`Agregar ${product.name} al carrito rápidamente`"
-              >
-                <svg class="w-3.5 h-3.5 group-hover:rotate-90 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-                </svg>
-                Agregar
-              </button>
-            </div>
           </div>
           
           <!-- Info del producto -->
@@ -673,7 +647,7 @@
               </div>
             </div>
           </div>
-        </div>
+        </router-link>
       </div>
       
       <!-- Empty state si no hay productos -->

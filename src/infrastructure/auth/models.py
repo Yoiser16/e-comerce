@@ -159,6 +159,28 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
     )
     
     # =========================================================================
+    # CAMPOS DE DIRECCIÓN PARA MAYORISTAS (auto-relleno en compras)
+    # =========================================================================
+    direccion = models.CharField(max_length=255, blank=True, default='')
+    complemento = models.CharField(max_length=50, blank=True, default='', 
+                                   help_text='Apartamento, oficina, local, etc.')
+    departamento = models.CharField(max_length=100, blank=True, default='')
+    departamento_id = models.IntegerField(null=True, blank=True,
+                                          help_text='ID del departamento en API Colombia')
+    municipio = models.CharField(max_length=100, blank=True, default='')
+    municipio_id = models.IntegerField(null=True, blank=True,
+                                       help_text='ID del municipio en API Colombia')
+    barrio = models.CharField(max_length=100, blank=True, default='')
+    indicaciones_entrega = models.CharField(max_length=128, blank=True, default='',
+                                            help_text='Indicaciones adicionales para entrega')
+    tipo_domicilio = models.CharField(max_length=20, blank=True, default='Residencial',
+                                      choices=[('Residencial', 'Residencial'), 
+                                               ('Laboral', 'Laboral')])
+    # Coordenadas GPS (para geolocalización)
+    latitud = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    longitud = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    
+    # =========================================================================
     # CAMPOS COMUNES
     # =========================================================================
     is_active = models.BooleanField(default=True)
@@ -272,3 +294,83 @@ class Usuario(AbstractBaseUser, PermissionsMixin):
         self.notas_revision = motivo
         self.fecha_revision = timezone.now()
         self.save()
+
+
+# =============================================================================
+# MODELO DE DIRECCIONES MÚLTIPLES PARA MAYORISTAS
+# =============================================================================
+
+class DireccionMayorista(models.Model):
+    """
+    Permite a los mayoristas tener múltiples direcciones de envío.
+    Una puede ser marcada como principal (is_default).
+    """
+    id = models.AutoField(primary_key=True)
+    
+    usuario = models.ForeignKey(
+        Usuario,
+        on_delete=models.CASCADE,
+        related_name='direcciones'
+    )
+    
+    # Etiqueta para identificar la dirección (ej: "Casa", "Oficina", "Bodega")
+    etiqueta = models.CharField(max_length=50, default='Mi dirección')
+    
+    # Dirección completa
+    direccion = models.CharField(max_length=255)
+    complemento = models.CharField(max_length=100, blank=True, default='',
+                                   help_text='Apartamento, oficina, local, etc.')
+    
+    # Ubicación geográfica
+    departamento = models.CharField(max_length=100)
+    departamento_id = models.IntegerField(null=True, blank=True,
+                                          help_text='ID del departamento en API Colombia')
+    municipio = models.CharField(max_length=100)
+    municipio_id = models.IntegerField(null=True, blank=True,
+                                       help_text='ID del municipio en API Colombia')
+    barrio = models.CharField(max_length=100, blank=True, default='')
+    
+    # Indicaciones adicionales
+    indicaciones = models.CharField(max_length=200, blank=True, default='',
+                                    help_text='Indicaciones para el repartidor')
+    
+    # Tipo de domicilio
+    tipo_domicilio = models.CharField(
+        max_length=20, 
+        default='Residencial',
+        choices=[('Residencial', 'Residencial'), ('Laboral', 'Laboral')]
+    )
+    
+    # Datos de contacto específicos para esta dirección
+    nombre_contacto = models.CharField(max_length=100, blank=True, default='')
+    telefono = models.CharField(max_length=20)
+    
+    # Coordenadas GPS
+    latitud = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    longitud = models.DecimalField(max_digits=10, decimal_places=7, null=True, blank=True)
+    
+    # Flags
+    is_default = models.BooleanField(default=False, help_text='¿Es la dirección principal?')
+    activa = models.BooleanField(default=True)
+    
+    # Timestamps
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_actualizacion = models.DateTimeField(auto_now=True)
+    
+    class Meta:
+        db_table = 'auth_direcciones_mayorista'
+        verbose_name = 'Dirección de Mayorista'
+        verbose_name_plural = 'Direcciones de Mayoristas'
+        ordering = ['-is_default', '-fecha_creacion']
+    
+    def __str__(self):
+        return f"{self.etiqueta} - {self.direccion}, {self.municipio}"
+    
+    def save(self, *args, **kwargs):
+        # Si se marca como default, quitar default de las otras direcciones del usuario
+        if self.is_default:
+            DireccionMayorista.objects.filter(
+                usuario=self.usuario, 
+                is_default=True
+            ).exclude(pk=self.pk).update(is_default=False)
+        super().save(*args, **kwargs)

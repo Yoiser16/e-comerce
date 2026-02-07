@@ -39,7 +39,7 @@
             </div>
             <div class="flex justify-between items-center">
               <span class="text-sm text-gray-500">Total Pedidos</span>
-              <span class="text-sm font-bold text-gray-900">{{ user.totalOrders || 24 }}</span>
+              <span class="text-sm font-bold text-gray-900">{{ user.totalOrders || 0 }}</span>
             </div>
           </div>
 
@@ -170,7 +170,7 @@
             <div class="flex items-center justify-between mb-6">
               <h3 class="text-lg font-bold text-gray-900">Direcciones de Envío</h3>
               <button 
-                @click="showAddressModal = true"
+                @click="openAddressModal()"
                 class="px-4 py-2 bg-[#C9A962] hover:bg-[#B8984F] text-white text-sm font-medium rounded-lg transition-colors flex items-center gap-2"
               >
                 <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -180,32 +180,63 @@
               </button>
             </div>
 
-            <div v-if="addresses.length > 0" class="space-y-4">
+            <!-- Loading state -->
+            <div v-if="loadingAddresses" class="py-12 text-center">
+              <svg class="w-8 h-8 text-gray-400 mx-auto mb-2 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              <p class="text-sm text-gray-500">Cargando direcciones...</p>
+            </div>
+
+            <!-- Addresses list -->
+            <div v-else-if="addresses.length > 0" class="space-y-4">
               <div 
                 v-for="address in addresses" 
                 :key="address.id"
                 :class="[
-                  'p-4 rounded-xl border-2 transition-colors cursor-pointer',
-                  address.isDefault ? 'border-[#C9A962] bg-[#C9A962]/5' : 'border-gray-100 hover:border-gray-200'
+                  'p-4 rounded-xl border-2 transition-colors',
+                  address.is_default ? 'border-[#C9A962] bg-[#C9A962]/5' : 'border-gray-100 hover:border-gray-200'
                 ]"
               >
                 <div class="flex items-start justify-between gap-4">
                   <div class="flex-1">
                     <div class="flex items-center gap-2 mb-1">
-                      <h4 class="font-semibold text-gray-900">{{ address.label }}</h4>
-                      <span v-if="address.isDefault" class="text-xs px-2 py-0.5 bg-[#C9A962] text-white rounded-full">Principal</span>
+                      <h4 class="font-semibold text-gray-900">{{ address.etiqueta }}</h4>
+                      <span v-if="address.is_default" class="text-xs px-2 py-0.5 bg-[#C9A962] text-white rounded-full">Principal</span>
                     </div>
-                    <p class="text-gray-600 text-sm">{{ address.address }}</p>
-                    <p class="text-gray-500 text-sm">{{ address.city }}, {{ address.department }}</p>
-                    <p class="text-gray-400 text-xs mt-1">{{ address.phone }}</p>
+                    <p class="text-gray-600 text-sm">
+                      {{ address.direccion }}
+                      <span v-if="address.complemento"> - {{ address.complemento }}</span>
+                    </p>
+                    <p class="text-gray-500 text-sm">{{ address.municipio }}, {{ address.departamento }}</p>
+                    <p class="text-gray-400 text-xs mt-1">{{ address.telefono }}</p>
                   </div>
                   <div class="flex items-center gap-2">
-                    <button class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors">
+                    <button 
+                      v-if="!address.is_default"
+                      @click="setDefaultAddress(address.id)"
+                      class="p-2 text-gray-400 hover:text-[#C9A962] hover:bg-[#C9A962]/10 rounded-lg transition-colors"
+                      title="Marcar como principal"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11.049 2.927c.3-.921 1.603-.921 1.902 0l1.519 4.674a1 1 0 00.95.69h4.915c.969 0 1.371 1.24.588 1.81l-3.976 2.888a1 1 0 00-.363 1.118l1.518 4.674c.3.922-.755 1.688-1.538 1.118l-3.976-2.888a1 1 0 00-1.176 0l-3.976 2.888c-.783.57-1.838-.197-1.538-1.118l1.518-4.674a1 1 0 00-.363-1.118l-3.976-2.888c-.784-.57-.38-1.81.588-1.81h4.914a1 1 0 00.951-.69l1.519-4.674z" />
+                      </svg>
+                    </button>
+                    <button 
+                      @click="openAddressModal(address)"
+                      class="p-2 text-gray-400 hover:text-gray-600 hover:bg-gray-100 rounded-lg transition-colors"
+                      title="Editar"
+                    >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
                       </svg>
                     </button>
-                    <button class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors">
+                    <button 
+                      @click="deleteAddress(address.id)"
+                      class="p-2 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
+                      title="Eliminar"
+                    >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
@@ -215,6 +246,7 @@
               </div>
             </div>
 
+            <!-- Empty state -->
             <div v-else class="text-center py-12">
               <div class="w-16 h-16 mx-auto mb-4 bg-gray-100 rounded-2xl flex items-center justify-center">
                 <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,7 +256,7 @@
               <h4 class="font-semibold text-gray-900 mb-1">No hay direcciones guardadas</h4>
               <p class="text-sm text-gray-500 mb-4">Agrega una dirección para agilizar tus pedidos</p>
               <button 
-                @click="showAddressModal = true"
+                @click="openAddressModal()"
                 class="text-[#C9A962] hover:text-[#B8984F] font-medium text-sm"
               >
                 + Agregar primera dirección
@@ -271,34 +303,6 @@
               </button>
             </div>
           </div>
-
-          <div class="bg-white rounded-xl border border-gray-100 p-6">
-            <h3 class="text-lg font-bold text-gray-900 mb-4">Sesiones Activas</h3>
-            <div class="space-y-3">
-              <div class="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
-                <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 bg-emerald-100 rounded-lg flex items-center justify-center">
-                    <svg class="w-5 h-5 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                    </svg>
-                  </div>
-                  <div>
-                    <p class="font-medium text-gray-900 text-sm">Este dispositivo</p>
-                    <p class="text-xs text-gray-500">Chrome · Bogotá, Colombia</p>
-                  </div>
-                </div>
-                <span class="text-xs text-emerald-600 font-medium">Activo ahora</span>
-              </div>
-            </div>
-          </div>
-
-          <div class="bg-red-50 rounded-xl border border-red-100 p-6">
-            <h3 class="text-lg font-bold text-red-900 mb-2">Zona de Peligro</h3>
-            <p class="text-sm text-red-700 mb-4">Estas acciones no se pueden deshacer.</p>
-            <button class="px-4 py-2 border border-red-300 text-red-600 rounded-lg text-sm hover:bg-red-100 transition-colors">
-              Cerrar Todas las Sesiones
-            </button>
-          </div>
         </div>
 
         <!-- Tab: Notificaciones -->
@@ -325,17 +329,186 @@
         </div>
       </div>
     </div>
+
+    <!-- Modal: Agregar/Editar Dirección -->
+    <div v-if="showAddressModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <!-- Backdrop -->
+      <div class="absolute inset-0 bg-black/50" @click="closeAddressModal"></div>
+      
+      <!-- Modal -->
+      <div class="relative bg-white rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl">
+        <div class="p-6">
+          <div class="flex items-center justify-between mb-6">
+            <h3 class="text-xl font-bold text-gray-900">
+              {{ editingAddress ? 'Editar Dirección' : 'Nueva Dirección' }}
+            </h3>
+            <button @click="closeAddressModal" class="text-gray-400 hover:text-gray-600">
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"/>
+              </svg>
+            </button>
+          </div>
+
+          <div class="space-y-4">
+            <!-- Etiqueta -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Nombre de la dirección</label>
+              <input 
+                v-model="addressForm.etiqueta"
+                type="text"
+                placeholder="Ej: Casa, Oficina, Bodega..."
+                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#C9A962]/30 focus:border-[#C9A962] text-sm"
+              />
+            </div>
+
+            <!-- Dirección -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Dirección <span class="text-red-500">*</span>
+              </label>
+              <input 
+                v-model="addressForm.direccion"
+                type="text"
+                placeholder="Ej: Carrera 71d #1-14 Sur"
+                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#C9A962]/30 focus:border-[#C9A962] text-sm"
+              />
+            </div>
+
+            <!-- Complemento -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Complemento (opcional)</label>
+              <input 
+                v-model="addressForm.complemento"
+                type="text"
+                placeholder="Apto, oficina, local..."
+                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#C9A962]/30 focus:border-[#C9A962] text-sm"
+              />
+            </div>
+
+            <!-- Departamento y Municipio -->
+            <div class="grid grid-cols-2 gap-4">
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Departamento <span class="text-red-500">*</span>
+                </label>
+                <select 
+                  v-model="addressForm.departamento_id"
+                  @change="onDepartamentoChange"
+                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#C9A962]/30 focus:border-[#C9A962] text-sm"
+                >
+                  <option :value="null">Selecciona...</option>
+                  <option v-for="dep in departamentos" :key="dep.id" :value="dep.id">
+                    {{ dep.name }}
+                  </option>
+                </select>
+              </div>
+              <div>
+                <label class="block text-sm font-medium text-gray-700 mb-1">
+                  Ciudad <span class="text-red-500">*</span>
+                </label>
+                <select 
+                  v-model="addressForm.municipio_id"
+                  @change="onMunicipioChange"
+                  :disabled="!addressForm.departamento_id"
+                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#C9A962]/30 focus:border-[#C9A962] text-sm disabled:bg-gray-100"
+                >
+                  <option :value="null">{{ addressForm.departamento_id ? 'Selecciona...' : 'Primero selecciona depto' }}</option>
+                  <option v-for="mun in municipios" :key="mun.id" :value="mun.id">
+                    {{ mun.name }}
+                  </option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Barrio -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Barrio (opcional)</label>
+              <input 
+                v-model="addressForm.barrio"
+                type="text"
+                placeholder="Ej: Kennedy, Chapinero..."
+                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#C9A962]/30 focus:border-[#C9A962] text-sm"
+              />
+            </div>
+
+            <!-- Teléfono -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">
+                Teléfono de contacto <span class="text-red-500">*</span>
+              </label>
+              <input 
+                v-model="addressForm.telefono"
+                type="tel"
+                placeholder="Ej: 3001234567"
+                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#C9A962]/30 focus:border-[#C9A962] text-sm"
+              />
+            </div>
+
+            <!-- Indicaciones -->
+            <div>
+              <label class="block text-sm font-medium text-gray-700 mb-1">Indicaciones (opcional)</label>
+              <textarea 
+                v-model="addressForm.indicaciones"
+                rows="2"
+                placeholder="Indicaciones para el repartidor..."
+                class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#C9A962]/30 focus:border-[#C9A962] text-sm resize-none"
+              ></textarea>
+            </div>
+
+            <!-- Marcar como principal -->
+            <label class="flex items-center gap-3 cursor-pointer">
+              <input 
+                v-model="addressForm.is_default"
+                type="checkbox"
+                class="w-4 h-4 text-[#C9A962] focus:ring-[#C9A962] rounded"
+              />
+              <span class="text-sm text-gray-700">Marcar como dirección principal</span>
+            </label>
+          </div>
+
+          <!-- Buttons -->
+          <div class="flex gap-3 mt-6">
+            <button 
+              @click="closeAddressModal"
+              class="flex-1 px-4 py-3 border border-gray-200 text-gray-700 rounded-lg font-medium hover:bg-gray-50 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button 
+              @click="saveAddress"
+              :disabled="savingAddress || !isAddressFormValid"
+              class="flex-1 px-4 py-3 bg-[#C9A962] hover:bg-[#B8984F] text-white rounded-lg font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              <svg v-if="savingAddress" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              {{ savingAddress ? 'Guardando...' : (editingAddress ? 'Actualizar' : 'Guardar') }}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
 <script>
 import { ref, computed, reactive, onMounted } from 'vue'
+import apiClient from '@/services/api'
+
+const COLOMBIA_API = {
+  departamentos: 'https://api-colombia.com/api/v1/Department',
+  ciudades: (id) => `https://api-colombia.com/api/v1/Department/${id}/cities`
+}
 
 export default {
   name: 'B2BCuenta',
   setup() {
     const activeTab = ref('profile')
     const showAddressModal = ref(false)
+    const editingAddress = ref(null)
+    const loadingAddresses = ref(false)
+    const savingAddress = ref(false)
 
     const tabs = [
       { id: 'profile', label: 'Perfil', icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>' },
@@ -345,7 +518,7 @@ export default {
     ]
 
     const user = computed(() => {
-      return JSON.parse(localStorage.getItem('b2b_user') || '{"nombre": "Usuario Demo", "email": "demo@empresa.com", "tier": "Gold", "descuento": 15, "credito": 500000, "totalOrders": 24}')
+      return JSON.parse(localStorage.getItem('b2b_user') || '{"nombre": "Usuario", "email": "usuario@example.com"}')
     })
 
     const userInitials = computed(() => {
@@ -369,10 +542,31 @@ export default {
       confirm: ''
     })
 
-    const addresses = ref([
-      { id: 1, label: 'Salón Principal', address: 'Calle 85 #15-24, Local 102', city: 'Bogotá', department: 'Cundinamarca', phone: '+57 300 123 4567', isDefault: true },
-      { id: 2, label: 'Bodega', address: 'Carrera 45 #67-89', city: 'Bogotá', department: 'Cundinamarca', phone: '+57 300 765 4321', isDefault: false },
-    ])
+    // Direcciones
+    const addresses = ref([])
+    const departamentos = ref([])
+    const municipios = ref([])
+
+    const addressForm = reactive({
+      etiqueta: 'Mi dirección',
+      direccion: '',
+      complemento: '',
+      departamento: '',
+      departamento_id: null,
+      municipio: '',
+      municipio_id: null,
+      barrio: '',
+      indicaciones: '',
+      telefono: '',
+      is_default: false
+    })
+
+    const isAddressFormValid = computed(() => {
+      return addressForm.direccion && 
+             addressForm.departamento_id && 
+             addressForm.municipio_id && 
+             addressForm.telefono
+    })
 
     const notificationPrefs = ref([
       { id: 'orders', label: 'Actualizaciones de Pedidos', description: 'Recibe notificaciones sobre el estado de tus pedidos', enabled: true },
@@ -420,15 +614,178 @@ export default {
       passwordForm.confirm = ''
     }
 
-    onMounted(() => {
+    // API de Colombia
+    async function loadDepartamentos() {
+      try {
+        const response = await fetch(COLOMBIA_API.departamentos)
+        const data = await response.json()
+        departamentos.value = data.sort((a, b) => a.name.localeCompare(b.name))
+      } catch (error) {
+        console.error('Error cargando departamentos:', error)
+      }
+    }
+
+    async function loadMunicipios(departamentoId) {
+      if (!departamentoId) return
+      municipios.value = []
+      try {
+        const response = await fetch(COLOMBIA_API.ciudades(departamentoId))
+        const data = await response.json()
+        municipios.value = data.sort((a, b) => a.name.localeCompare(b.name))
+      } catch (error) {
+        console.error('Error cargando municipios:', error)
+      }
+    }
+
+    function onDepartamentoChange() {
+      const dep = departamentos.value.find(d => d.id === addressForm.departamento_id)
+      if (dep) {
+        addressForm.departamento = dep.name
+        addressForm.municipio_id = null
+        addressForm.municipio = ''
+        loadMunicipios(dep.id)
+      }
+    }
+
+    function onMunicipioChange() {
+      const mun = municipios.value.find(m => m.id === addressForm.municipio_id)
+      if (mun) {
+        addressForm.municipio = mun.name
+      }
+    }
+
+    // CRUD Direcciones
+    async function loadAddresses() {
+      loadingAddresses.value = true
+      try {
+        const response = await apiClient.get('/b2b/me/direcciones')
+        addresses.value = response.data || []
+      } catch (error) {
+        console.error('Error cargando direcciones:', error)
+        addresses.value = []
+      } finally {
+        loadingAddresses.value = false
+      }
+    }
+
+    function openAddressModal(address = null) {
+      editingAddress.value = address
+      
+      if (address) {
+        // Editar existente
+        addressForm.etiqueta = address.etiqueta
+        addressForm.direccion = address.direccion
+        addressForm.complemento = address.complemento || ''
+        addressForm.departamento = address.departamento
+        addressForm.departamento_id = address.departamento_id
+        addressForm.municipio = address.municipio
+        addressForm.municipio_id = address.municipio_id
+        addressForm.barrio = address.barrio || ''
+        addressForm.indicaciones = address.indicaciones || ''
+        addressForm.telefono = address.telefono
+        addressForm.is_default = address.is_default
+        
+        // Cargar municipios si tiene departamento
+        if (address.departamento_id) {
+          loadMunicipios(address.departamento_id)
+        }
+      } else {
+        // Nueva dirección
+        addressForm.etiqueta = 'Mi dirección'
+        addressForm.direccion = ''
+        addressForm.complemento = ''
+        addressForm.departamento = ''
+        addressForm.departamento_id = null
+        addressForm.municipio = ''
+        addressForm.municipio_id = null
+        addressForm.barrio = ''
+        addressForm.indicaciones = ''
+        addressForm.telefono = user.value.telefono || ''
+        addressForm.is_default = addresses.value.length === 0
+      }
+      
+      showAddressModal.value = true
+    }
+
+    function closeAddressModal() {
+      showAddressModal.value = false
+      editingAddress.value = null
+    }
+
+    async function saveAddress() {
+      if (!isAddressFormValid.value) return
+      
+      savingAddress.value = true
+      
+      try {
+        const data = {
+          etiqueta: addressForm.etiqueta,
+          direccion: addressForm.direccion,
+          complemento: addressForm.complemento,
+          departamento: addressForm.departamento,
+          departamento_id: addressForm.departamento_id,
+          municipio: addressForm.municipio,
+          municipio_id: addressForm.municipio_id,
+          barrio: addressForm.barrio,
+          indicaciones: addressForm.indicaciones,
+          telefono: addressForm.telefono,
+          is_default: addressForm.is_default
+        }
+        
+        if (editingAddress.value) {
+          // Actualizar
+          await apiClient.put(`/b2b/me/direcciones/${editingAddress.value.id}`, data)
+        } else {
+          // Crear
+          await apiClient.post('/b2b/me/direcciones', data)
+        }
+        
+        await loadAddresses()
+        closeAddressModal()
+        
+      } catch (error) {
+        console.error('Error guardando dirección:', error)
+        alert('Error al guardar la dirección. Por favor intenta nuevamente.')
+      } finally {
+        savingAddress.value = false
+      }
+    }
+
+    async function deleteAddress(id) {
+      if (!confirm('¿Estás seguro de eliminar esta dirección?')) return
+      
+      try {
+        await apiClient.delete(`/b2b/me/direcciones/${id}`)
+        await loadAddresses()
+      } catch (error) {
+        console.error('Error eliminando dirección:', error)
+        alert('Error al eliminar la dirección')
+      }
+    }
+
+    async function setDefaultAddress(id) {
+      try {
+        await apiClient.put(`/b2b/me/direcciones/${id}/default`)
+        await loadAddresses()
+      } catch (error) {
+        console.error('Error al marcar dirección como principal:', error)
+      }
+    }
+
+    onMounted(async () => {
       loadForm()
+      await loadDepartamentos()
+      await loadAddresses()
     })
 
     return {
       activeTab, tabs, user, userInitials,
       editForm, passwordForm, addresses, notificationPrefs,
-      showAddressModal,
-      formatPrice, resetForm, saveProfile, changePassword
+      showAddressModal, editingAddress, loadingAddresses, savingAddress,
+      departamentos, municipios, addressForm, isAddressFormValid,
+      formatPrice, resetForm, saveProfile, changePassword,
+      openAddressModal, closeAddressModal, saveAddress, deleteAddress, setDefaultAddress,
+      onDepartamentoChange, onMunicipioChange
     }
   }
 }

@@ -62,10 +62,16 @@ class ProductoRepositoryImpl(ProductoRepository):
             destacado=model.destacado
         )
 
-        # Incluir imágenes adicionales (excluye principal)
+        # Incluir TODAS las imágenes adicionales del modelo ImagenProductoModel
         try:
-            imagenes_qs = model.imagenes.all()
-            producto.imagenes = [img.url for img in imagenes_qs if not img.es_principal]
+            imagenes_qs = model.imagenes.all().order_by('orden')
+            # Obtener todas las URLs de imágenes adicionales
+            imagenes_adicionales = [img.url for img in imagenes_qs if img.url]
+            # Si hay imágenes en el modelo, usarlas
+            if imagenes_adicionales:
+                producto.imagenes = imagenes_adicionales
+            else:
+                producto.imagenes = []
         except Exception:
             producto.imagenes = []
 

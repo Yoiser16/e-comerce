@@ -56,7 +56,7 @@ def get_orden_repository():
 # --- Autenticación ---
 
 def get_current_user_email(
-    request: Request = Depends(),
+    request: Request,
     credentials: Optional[HTTPAuthorizationCredentials] = Depends(security)
 ) -> str:
     """
