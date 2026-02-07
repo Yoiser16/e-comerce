@@ -175,6 +175,9 @@ class ProductoModel(models.Model):
         default=0,
         help_text='Stock temporalmente reservado por ordenes pendientes'
     )
+
+    # Campo requerido para ventas mayoristas
+    cantidad_minima_mayorista = models.IntegerField(default=1, help_text='Cantidad mínima para venta mayorista')
     
     # Atributos específicos de cabello
     color = models.CharField(max_length=50, choices=COLOR_CHOICES, null=True, blank=True, db_index=True)

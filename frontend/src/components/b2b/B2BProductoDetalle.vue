@@ -93,11 +93,23 @@
                 
                 <!-- Imagen Principal - SIN PADDING, LIBRE -->
                 <div class="aspect-[4/5] bg-gray-50">
-                  <img 
-                    :src="imagenActual" 
+                  <video
+                    v-if="isVideoUrl(imagenActual) && !hasMediaError(imagenActual)"
+                    :src="imagenActual"
+                    class="w-full h-full object-cover cursor-zoom-in"
+                    muted
+                    playsinline
+                    loop
+                    autoplay
+                    @error="handleVideoError(imagenActual)"
+                    @click="abrirZoom"
+                  ></video>
+                  <img
+                    v-else
+                    :src="getDisplayMedia(imagenActual)"
                     :alt="producto.nombre"
                     class="w-full h-full object-cover cursor-zoom-in"
-                    @error="handleImageError"
+                    @error="handleImageError(imagenActual, $event)"
                     @click="abrirZoom"
                   />
                 </div>
@@ -112,7 +124,22 @@
                   class="flex-shrink-0 w-16 h-20 rounded-lg overflow-hidden border-2 transition-all"
                   :class="imagenActualIndex === idx ? 'border-[#1A1A1A] shadow-md' : 'border-transparent hover:border-gray-300'"
                 >
-                  <img :src="img" :alt="`Vista ${idx + 1}`" class="w-full h-full object-cover"/>
+                  <video
+                    v-if="isVideoUrl(img) && !hasMediaError(img)"
+                    :src="img"
+                    class="w-full h-full object-cover"
+                    muted
+                    playsinline
+                    preload="metadata"
+                    @error="handleVideoError(img)"
+                  ></video>
+                  <img
+                    v-else
+                    :src="getDisplayMedia(img)"
+                    :alt="`Vista ${idx + 1}`"
+                    class="w-full h-full object-cover"
+                    @error="handleImageError(img, $event)"
+                  />
                 </button>
               </div>
               
@@ -708,11 +735,12 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, reactive, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { productosService, favoritosService, vistosService } from '@/services/productos'
 import { obtenerProducto as obtenerProductoB2B, obtenerProductos as obtenerProductosB2B } from '@/services/mayoristas'
 import { B2BToast, useToast } from './ui'
+import { getImageUrl } from '@/services/api'
 
 export default {
   name: 'B2BProductoDetalle',
@@ -737,6 +765,7 @@ export default {
     const esFavorito = ref(false)
     const agregando = ref(false)
     const productosRelacionados = ref([])
+    const mediaErrors = reactive({})
     
     // User
     const user = computed(() => {
@@ -744,11 +773,32 @@ export default {
     })
     
     // Computed
+    function normalizeMediaUrl(raw) {
+      if (typeof raw !== 'string') return null
+      const cleaned = raw.trim()
+      if (!cleaned) return null
+      const isFilenameOnly = !cleaned.includes('/') && !cleaned.includes('\\')
+      const isStaticRelative = cleaned.startsWith('static/') || cleaned.startsWith('uploads/')
+      let resolved = cleaned
+      if (isFilenameOnly) {
+        resolved = `/static/uploads/productos/${cleaned}`
+      } else if (isStaticRelative) {
+        resolved = `/${cleaned}`
+      }
+      return getImageUrl(resolved)
+    }
+
     const imagenes = computed(() => {
       const imgs = []
-      if (producto.value.imagen_principal) imgs.push(producto.value.imagen_principal)
+      const principal = normalizeMediaUrl(
+        producto.value.imagen_principal || producto.value.imagen_url || producto.value.imagen
+      )
+      if (principal) imgs.push(principal)
       if (producto.value.imagenes && Array.isArray(producto.value.imagenes)) {
-        imgs.push(...producto.value.imagenes.filter(i => i !== producto.value.imagen_principal))
+        const adicionales = producto.value.imagenes
+          .map((img) => normalizeMediaUrl(img))
+          .filter((img) => !!img && img !== principal)
+        imgs.push(...adicionales)
       }
       return imgs.length > 0 ? imgs : ['/placeholder.png']
     })
@@ -816,8 +866,35 @@ export default {
       return Number(value || 0).toLocaleString('es-CO')
     }
     
-    function handleImageError(e) {
-      e.target.src = '/placeholder.png'
+    function getPlaceholderImage() {
+      return '/placeholder.png'
+    }
+
+    function isVideoUrl(url) {
+      const value = (url || '').toLowerCase()
+      return value.includes('.mp4') || value.includes('.webm') || value.includes('.ogg')
+    }
+
+    function hasMediaError(url) {
+      return !!mediaErrors[url]
+    }
+
+    function getDisplayMedia(url) {
+      if (!url || hasMediaError(url)) return getPlaceholderImage()
+      return url
+    }
+
+    function handleImageError(url, event) {
+      if (url) {
+        mediaErrors[url] = true
+      }
+      event.target.src = getPlaceholderImage()
+    }
+
+    function handleVideoError(url) {
+      if (url) {
+        mediaErrors[url] = true
+      }
     }
     
     function abrirZoom() {
@@ -1031,6 +1108,10 @@ export default {
       // Methods
       formatPrice,
       handleImageError,
+      handleVideoError,
+      getDisplayMedia,
+      isVideoUrl,
+      hasMediaError,
       abrirZoom,
       seleccionarLote,
       incrementarLote,

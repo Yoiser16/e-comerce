@@ -371,6 +371,7 @@
 import { ref, computed, reactive, onMounted, watch } from 'vue'
 import { B2BProductCard, B2BEmptyState, useToast } from './ui'
 import { obtenerProductos } from '@/services/mayoristas'
+import { getImageUrl } from '@/services/api'
 import { useRouter, useRoute } from 'vue-router'
 
 export default {
@@ -454,12 +455,33 @@ export default {
         console.log(`🔍 Prod: ${producto.nombre || producto.name} | R: ${retail} | W: ${wholesale} | OnSale: ${wholesale < retail}`)
       }
 
+      // Normalización de imagen: prioriza imagen_principal, imagen, imagen_url
+      let image = producto.imagen_principal || producto.imagen || producto.imagen_url || producto.image
+      if (typeof image === 'string') {
+        const cleaned = image.trim()
+        if (cleaned) {
+          const isFilenameOnly = !cleaned.includes('/') && !cleaned.includes('\\')
+          const isStaticRelative = cleaned.startsWith('static/') || cleaned.startsWith('uploads/')
+          if (isFilenameOnly) {
+            image = `/static/uploads/productos/${cleaned}`
+          } else if (isStaticRelative) {
+            image = `/${cleaned}`
+          } else {
+            image = cleaned
+          }
+          image = getImageUrl(image)
+        } else {
+          image = null
+        }
+      } else {
+        image = null
+      }
       return {
         id: producto.id || producto.producto_id,
         name: producto.nombre || producto.name,
         category: producto.categoria || producto.category,
         sku: producto.sku || '',
-        image: producto.imagen || producto.image || 'https://placehold.co/400x400',
+        image,
         retailPrice: retail,
         wholesalePrice: wholesale,
         stock: producto.stock || 0,
