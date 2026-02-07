@@ -104,7 +104,7 @@ async def login(request: LoginRequest):
         raise
     except Exception as e:
         import traceback
-        print(f"❌ Error en login: {str(e)}")
+        print(f"Error en login: {str(e)}")
         traceback.print_exc()
         raise HTTPException(status_code=500, detail="Error al procesar la solicitud")
 

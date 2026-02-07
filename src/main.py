@@ -30,9 +30,9 @@ def main():
     """
     Función principal de ejecución.
     """
-    print("🚀 Sistema Empresarial - Clean Architecture")
-    print(f"🌍 Ambiente: {config.ambiente}")
-    print("📡 Iniciando servidor REST...")
+    print("Sistema Empresarial - Clean Architecture")
+    print(f"Ambiente: {config.ambiente}")
+    print("Iniciando servidor REST...")
     
     uvicorn.run(
         "main:app",
