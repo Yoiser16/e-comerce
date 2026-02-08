@@ -1,6 +1,8 @@
 <template>
+  <!-- GRID VIEW -->
   <div 
-    class="group bg-white rounded-xl border border-gray-100 overflow-hidden transition-all duration-300 hover:shadow-xl hover:-translate-y-1"
+    v-if="viewMode !== 'list'"
+    class="bg-white rounded-xl border border-gray-100 overflow-hidden shadow-sm"
     :class="{ 'opacity-60': !product.inStock }"
   >
     <!-- Image Section -->
@@ -11,7 +13,7 @@
       <video
         v-if="isVideo && !imageError"
         :src="videoSrc"
-        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+        class="w-full h-full object-cover"
         muted
         playsinline
         loop
@@ -22,7 +24,7 @@
         v-else
         :src="imageSrc"
         :alt="product.name"
-        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+        class="w-full h-full object-cover"
         @error="handleImageError"
       />
 
@@ -72,7 +74,7 @@
       
       <!-- Name -->
       <router-link :to="`/portal/producto/${product.id}`" class="block">
-        <h3 class="font-semibold text-gray-900 text-sm line-clamp-2 min-h-[2.5rem] mb-2 leading-snug hover:text-[#C9A962] transition-colors">
+        <h3 class="font-semibold text-gray-900 text-sm line-clamp-2 min-h-[2.5rem] mb-2 leading-snug">
           {{ product.name }}
         </h3>
       </router-link>
@@ -109,6 +111,93 @@
       </div>
     </div>
   </div>
+
+  <!-- LIST VIEW -->
+  <div 
+    v-else
+    class="bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm flex h-32 sm:h-36"
+    :class="{ 'opacity-60': !product.inStock }"
+  >
+    <!-- Image (compact, fixed size) -->
+    <router-link 
+      :to="`/portal/producto/${product.id}`"
+      class="relative w-32 sm:w-36 h-full flex-shrink-0 bg-gray-50 overflow-hidden cursor-pointer"
+    >
+      <video
+        v-if="isVideo && !imageError"
+        :src="videoSrc"
+        class="w-full h-full object-cover"
+        muted
+        playsinline
+        loop
+        autoplay
+        @error="handleImageError"
+      ></video>
+      <img
+        v-else
+        :src="imageSrc"
+        :alt="product.name"
+        class="w-full h-full object-cover"
+        @error="handleImageError"
+      />
+
+      <!-- Badges -->
+      <div class="absolute top-2 left-2 flex flex-col gap-1">
+        <span 
+          v-if="discountPercentage > 0"
+          class="px-2 py-0.5 bg-[#1A1A1A] text-white text-[10px] font-bold rounded-full"
+        >
+          -{{ discountPercentage }}%
+        </span>
+        <span 
+          v-if="product.isNew"
+          class="px-2 py-0.5 bg-emerald-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-full"
+        >
+          Nuevo
+        </span>
+      </div>
+    </router-link>
+
+    <!-- Info -->
+    <div class="flex-1 p-3 sm:p-4 flex flex-col justify-between min-w-0 overflow-hidden">
+      <div>
+        <div class="flex items-start justify-between gap-3">
+          <div class="min-w-0">
+            <p class="text-gray-400 text-[10px] sm:text-xs uppercase tracking-wider mb-0.5">{{ product.category }}</p>
+            <router-link :to="`/portal/producto/${product.id}`" class="block">
+              <h3 class="font-semibold text-gray-900 text-xs sm:text-sm line-clamp-1 sm:line-clamp-2 leading-snug">
+                {{ product.name }}
+              </h3>
+            </router-link>
+            <p v-if="product.sku" class="text-gray-400 text-[10px] mt-0.5">SKU: {{ product.sku }}</p>
+          </div>
+          <span 
+            class="px-2 py-1 text-[10px] font-semibold rounded-full flex-shrink-0"
+            :class="stockBadgeClass"
+          >
+            {{ stockLabel }}
+          </span>
+        </div>
+      </div>
+
+      <div class="flex items-end justify-between gap-2 sm:gap-4 mt-2">
+        <!-- Pricing -->
+        <div class="flex items-baseline gap-2 sm:gap-3">
+          <p class="text-[#C9A962] font-bold text-base sm:text-lg">
+            ${{ formatPrice(product.wholesalePrice) }}
+          </p>
+          <p v-if="product.retailPrice" class="text-gray-400 text-[10px] sm:text-xs line-through">
+            ${{ formatPrice(product.retailPrice) }}
+          </p>
+        </div>
+        <!-- Meta -->
+        <div class="hidden sm:flex items-center gap-4 text-xs text-gray-500 flex-shrink-0">
+          <span>Mín. {{ product.minOrder }} uds</span>
+          <span>{{ product.stock }} disp.</span>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script>
@@ -120,6 +209,10 @@ export default {
     product: {
       type: Object,
       required: true
+    },
+    viewMode: {
+      type: String,
+      default: 'grid'
     }
   },
   emits: ['add-to-cart'],

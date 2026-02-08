@@ -185,49 +185,40 @@
          CONTENIDO PRINCIPAL
     ========================================================================== -->
     <div class="flex-1 min-w-0">
-      <!-- Header con búsqueda y controles -->
-      <div class="bg-white rounded-xl border border-gray-100 p-4 mb-6">
-        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <!-- Título y resultados -->
+      <!-- Header limpio: resultados + controles -->
+      <div class="mb-5">
+        <!-- Título y conteo -->
+        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 mb-1">
           <div>
             <h1 class="text-xl sm:text-2xl font-bold text-gray-900">Catálogo Mayorista</h1>
-            <p class="text-sm text-gray-500 mt-1">
+            <p class="text-sm text-gray-500 mt-0.5">
               {{ filteredProducts.length }} productos encontrados
             </p>
           </div>
 
-          <!-- Controles -->
-          <div class="flex items-center gap-3 w-full sm:w-auto">
-            <!-- Búsqueda -->
-            <div class="relative flex-1 sm:w-64">
-              <input
-                v-model="searchQuery"
-                type="text"
-                placeholder="Buscar productos, SKU..."
-                class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-xl focus:ring-2 focus:ring-[#C9A962]/30 focus:border-[#C9A962] outline-none text-sm"
-              />
-              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </div>
+          <!-- Controles en línea -->
+          <div class="flex items-center gap-2 w-full sm:w-auto">
 
             <!-- Ordenar -->
-            <select 
-              v-model="sortBy"
-              class="px-4 py-2.5 border border-gray-200 rounded-xl text-sm bg-white focus:ring-2 focus:ring-[#C9A962]/30 focus:border-[#C9A962] cursor-pointer"
-            >
-              <option value="relevance">Más relevantes</option>
-              <option value="price-asc">Menor precio</option>
-              <option value="price-desc">Mayor precio</option>
-              <option value="name-asc">A-Z</option>
-              <option value="newest">Más nuevos</option>
-              <option value="bestseller">Más vendidos</option>
-            </select>
+            <div class="flex items-center gap-2 flex-1 sm:flex-none">
+              <span class="text-sm text-gray-500 hidden sm:inline whitespace-nowrap">Ordenar por</span>
+              <select 
+                v-model="sortBy"
+                class="px-3 py-2 border border-gray-200 rounded-lg text-sm bg-white focus:ring-1 focus:ring-[#C9A962]/30 focus:border-[#C9A962] cursor-pointer"
+              >
+                <option value="relevance">Más relevantes</option>
+                <option value="price-asc">Menor precio</option>
+                <option value="price-desc">Mayor precio</option>
+                <option value="name-asc">A-Z</option>
+                <option value="newest">Más nuevos</option>
+                <option value="bestseller">Más vendidos</option>
+              </select>
+            </div>
 
             <!-- Filtros móvil -->
             <button 
               @click="showMobileFilters = true"
-              class="lg:hidden flex items-center gap-2 px-4 py-2.5 border border-gray-200 rounded-xl hover:bg-gray-50"
+              class="lg:hidden flex items-center gap-2 px-3 py-2 border border-gray-200 rounded-lg hover:bg-gray-50"
             >
               <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
@@ -236,28 +227,6 @@
                 {{ activeFilterCount }}
               </span>
             </button>
-
-            <!-- Vista Grid/List -->
-            <div class="hidden sm:flex items-center border border-gray-200 rounded-xl overflow-hidden">
-              <button 
-                @click="viewMode = 'grid'"
-                class="p-2.5 transition-colors"
-                :class="viewMode === 'grid' ? 'bg-[#C9A962] text-white' : 'bg-white text-gray-600 hover:bg-gray-50'"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zM14 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zM14 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
-                </svg>
-              </button>
-              <button 
-                @click="viewMode = 'list'"
-                class="p-2.5 transition-colors"
-                :class="viewMode === 'list' ? 'bg-[#C9A962] text-white' : 'bg-white text-gray-600 hover:bg-gray-50'"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
-                </svg>
-              </button>
-            </div>
           </div>
         </div>
       </div>
@@ -265,8 +234,7 @@
       <!-- Grid de Productos -->
       <div 
         v-if="filteredProducts.length > 0"
-        class="grid gap-4"
-        :class="viewMode === 'grid' ? 'grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'"
+        class="grid gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
       >
         <B2BProductCard 
           v-for="product in filteredProducts" 

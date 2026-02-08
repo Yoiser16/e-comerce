@@ -36,8 +36,8 @@
             </svg>
             <div class="flex flex-col leading-none">
               <span class="text-[11px] text-white/50 leading-tight">Enviar a</span>
-              <span v-if="defaultAddress" class="text-[14px] font-bold text-white leading-tight">{{ defaultAddress.ciudad }}</span>
-              <span v-else class="text-[14px] font-bold text-white leading-tight">Tu dirección</span>
+              <span v-if="defaultAddress && (defaultAddress.municipio || defaultAddress.ciudad)" class="text-[14px] font-bold text-white leading-tight">{{ defaultAddress.municipio || defaultAddress.ciudad }}</span>
+              <span v-else class="text-[14px] font-bold text-white leading-tight">Colombia</span>
             </div>
           </router-link>
 

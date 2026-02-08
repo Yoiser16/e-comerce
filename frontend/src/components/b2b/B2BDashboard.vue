@@ -5,7 +5,7 @@
     <B2BToast />
     
     <!-- =========================================================================
-         HERO SECTION - Estilo Mercado Libre (Full-Width + Slider Horizontal)
+         HERO SECTION - Carrusel con Efecto Overlay
     ========================================================================== -->
     <section class="relative overflow-hidden">
       
@@ -19,12 +19,18 @@
         >
           
           <!-- ==================== SLIDE 1: Esmeralda ==================== -->
-          <div class="w-full flex-shrink-0 bg-[#0d2d27] relative">
+          <div class="w-full flex-shrink-0 bg-[#0b2820] relative">
+            <!-- Elementos decorativos -->
+            <div class="absolute inset-0 overflow-hidden">
+              <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-[#0d3d30]/50 rounded-full translate-x-1/3 -translate-y-1/3"></div>
+              <div class="absolute bottom-0 left-0 w-80 h-80 bg-[#C9A962]/5 rounded-full -translate-x-1/2 translate-y-1/2"></div>
+            </div>
+            
             <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-              <div class="grid lg:grid-cols-2 gap-6 lg:gap-4 min-h-[420px] sm:min-h-[480px] lg:min-h-[520px] items-center py-12 lg:py-16">
+              <div class="grid lg:grid-cols-2 gap-6 lg:gap-4 min-h-[380px] sm:min-h-[420px] lg:min-h-[460px] items-start py-6 sm:py-8 lg:py-10">
                 
                 <!-- Texto -->
-                <div class="relative z-10 order-2 lg:order-1">
+                <div class="relative z-10 order-2 lg:order-1 pt-4 sm:pt-6">
                   <div class="inline-flex items-center gap-2 mb-4">
                     <span class="w-8 h-px bg-gradient-to-r from-[#C9A962] to-transparent"></span>
                     <span class="text-[#C9A962] text-[10px] font-semibold tracking-[0.2em] uppercase">Portal Mayorista</span>
@@ -46,7 +52,7 @@
                   <div class="flex flex-wrap items-center gap-3 mb-6">
                     <router-link 
                       to="/portal/catalogo"
-                      class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#C9A962] to-[#D4B574] text-[#0d2d27] text-sm font-bold rounded-full shadow-lg hover:scale-[1.02] transition-all"
+                      class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#C9A962] to-[#D4B574] text-[#0b2820] text-sm font-bold rounded-full shadow-lg hover:scale-[1.02] transition-all"
                     >
                       Explorar Catálogo
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -62,42 +68,33 @@
                     </router-link>
                   </div>
                   
-                  <!-- Stats compactos -->
-                  <div class="flex items-center gap-6 pt-5 border-t border-white/10">
-                    <div>
-                      <p class="text-2xl font-bold text-white">500<span class="text-[#C9A962]">+</span></p>
-                      <p class="text-[10px] text-white/40 uppercase tracking-wide">Productos</p>
-                    </div>
-                    <div class="w-px h-10 bg-white/10"></div>
-                    <div>
-                      <p class="text-2xl font-bold text-white">24<span class="text-[#C9A962]">h</span></p>
-                      <p class="text-[10px] text-white/40 uppercase tracking-wide">Envío Express</p>
-                    </div>
-                    <div class="w-px h-10 bg-white/10"></div>
-                    <div>
-                      <p class="text-2xl font-bold text-[#C9A962]">30%</p>
-                      <p class="text-[10px] text-white/40 uppercase tracking-wide">Margen</p>
-                    </div>
-                  </div>
                 </div>
                 
-                <!-- Imagen -->
-                <div class="relative order-1 lg:order-2 flex items-center justify-center lg:justify-end h-[220px] sm:h-[280px] lg:h-[380px]">
+                <!-- Imagen con gradient mask -->
+                <div class="relative order-1 lg:order-2 flex items-center justify-center lg:justify-end h-[200px] sm:h-[260px] lg:h-[360px]">
+                  <!-- Gradient masks para fundir la imagen -->
+                  <div class="absolute inset-0 z-10 pointer-events-none" style="background: linear-gradient(90deg, #0b2820 0%, transparent 20%, transparent 80%, #0b2820 100%);"></div>
+                  <div class="absolute inset-0 z-10 pointer-events-none" style="background: linear-gradient(180deg, #0b2820 0%, transparent 15%, transparent 85%, #0b2820 100%);"></div>
+                  
                   <img 
                     src="/images/card%20panel/5.png" 
                     alt="Productos Premium" 
-                    class="h-full w-auto object-contain"
+                    class="h-full w-auto object-contain relative z-0"
                     style="filter: drop-shadow(0 20px 40px rgba(0,0,0,0.4));"
                   />
                   
                   <!-- Badge OFF -->
-                  <div class="absolute top-2 right-2 lg:top-4 lg:right-8 bg-[#C9A962] rounded-xl px-4 py-2 shadow-xl rotate-3">
-                    <p class="text-[#0d2d27] text-[9px] font-bold uppercase">Hasta</p>
-                    <p class="text-[#0d2d27] text-xl font-black -mt-1">30% OFF</p>
+                  <div class="absolute top-2 right-2 lg:top-4 lg:right-8 z-20 bg-[#C9A962] rounded-xl px-4 py-2 shadow-xl rotate-3">
+                    <p class="text-[#0b2820] text-[9px] font-bold uppercase">Hasta</p>
+                    <p class="text-[#0b2820] text-xl font-black -mt-1">30% OFF</p>
                   </div>
                 </div>
               </div>
             </div>
+            
+            <!-- Gradiente inferior para fundido suave (verde oscuro) -->
+            <div class="absolute bottom-0 left-0 right-0 h-32 sm:h-40 lg:h-48 z-10 pointer-events-none" style="background: linear-gradient(to bottom, transparent 0%, rgba(11,40,32,0.6) 40%, #FAFAFA 100%);"></div>
+            <div class="h-12 sm:h-14 lg:h-16"></div>
           </div>
           
           <!-- ==================== SLIDE 2: Champagne ==================== -->
@@ -111,10 +108,10 @@
             </div>
             
             <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 relative z-10">
-              <div class="grid lg:grid-cols-2 gap-6 lg:gap-4 min-h-[420px] sm:min-h-[480px] lg:min-h-[520px] items-center py-12 lg:py-16">
+              <div class="grid lg:grid-cols-2 gap-6 lg:gap-4 min-h-[380px] sm:min-h-[420px] lg:min-h-[460px] items-start py-6 sm:py-8 lg:py-10">
                 
                 <!-- Texto -->
-                <div class="relative z-10 order-2 lg:order-1">
+                <div class="relative z-10 order-2 lg:order-1 pt-4 sm:pt-6">
                   <div class="inline-flex items-center gap-2 mb-4">
                     <span class="w-8 h-px bg-gradient-to-r from-[#8B7355] to-transparent"></span>
                     <span class="text-[#8B7355] text-[10px] font-semibold tracking-[0.2em] uppercase">Calidad Certificada</span>
@@ -153,27 +150,10 @@
                     </a>
                   </div>
                   
-                  <!-- Stats compactos -->
-                  <div class="flex items-center gap-6 pt-5 border-t border-[#8B7355]/20">
-                    <div>
-                      <p class="text-2xl font-bold text-[#2C1810]">500<span class="text-[#C9A962]">+</span></p>
-                      <p class="text-[10px] text-[#8B7355]/60 uppercase tracking-wide">Productos</p>
-                    </div>
-                    <div class="w-px h-10 bg-[#8B7355]/20"></div>
-                    <div>
-                      <p class="text-2xl font-bold text-[#2C1810]">24<span class="text-[#C9A962]">h</span></p>
-                      <p class="text-[10px] text-[#8B7355]/60 uppercase tracking-wide">Envío Express</p>
-                    </div>
-                    <div class="w-px h-10 bg-[#8B7355]/20"></div>
-                    <div>
-                      <p class="text-2xl font-bold text-[#C9A962]">30%</p>
-                      <p class="text-[10px] text-[#8B7355]/60 uppercase tracking-wide">Margen</p>
-                    </div>
-                  </div>
                 </div>
                 
                 <!-- Imagen -->
-                <div class="relative order-1 lg:order-2 flex items-center justify-center lg:justify-end h-[220px] sm:h-[280px] lg:h-[380px]">
+                <div class="relative order-1 lg:order-2 flex items-center justify-center lg:justify-end h-[200px] sm:h-[260px] lg:h-[360px]">
                   <img 
                     src="/images/card%20panel/6.png" 
                     alt="Extensiones Remy" 
@@ -189,6 +169,10 @@
                 </div>
               </div>
             </div>
+            
+            <!-- Gradiente inferior para fundido suave -->
+            <div class="absolute bottom-0 left-0 right-0 h-24 sm:h-32 lg:h-40 z-10 pointer-events-none" style="background: linear-gradient(to bottom, transparent 0%, #FAFAFA 100%);"></div>
+            <div class="h-12 sm:h-14 lg:h-16"></div>
           </div>
           
           <!-- ==================== SLIDE 3: Promoción Estilo ML ==================== -->
@@ -206,7 +190,7 @@
             </div>
             
             <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 relative z-10">
-              <div class="flex flex-col items-center justify-center min-h-[420px] sm:min-h-[480px] lg:min-h-[520px] py-12 lg:py-16 text-center">
+              <div class="flex flex-col items-center justify-start min-h-[380px] sm:min-h-[420px] lg:min-h-[460px] py-6 sm:py-8 lg:py-10 text-center">
                 
                 <!-- Badge superior -->
                 <div class="inline-flex items-center gap-2 bg-[#E91E63] text-white px-4 py-2 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider mb-6 shadow-lg">
@@ -230,29 +214,22 @@
                 </div>
                 
                 <!-- Descripción -->
-                <p class="text-[#1A1A1A]/80 text-base sm:text-lg mb-8 max-w-lg">
+                <p class="text-[#1A1A1A]/80 text-base sm:text-lg max-w-lg">
                   Extensiones, pelucas y sistemas capilares con <strong>descuentos exclusivos</strong> para mayoristas
                 </p>
                 
-                <!-- CTA Button -->
-                <router-link 
-                  to="/portal/catalogo?oferta=true"
-                  class="inline-flex items-center gap-3 px-10 py-4 bg-[#1A1A1A] text-white text-base sm:text-lg font-bold rounded-full shadow-2xl hover:scale-105 hover:shadow-3xl transition-all duration-300"
-                >
-                  Ver todas las ofertas
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-                  </svg>
-                </router-link>
-                
                 <!-- Footer info -->
-                <p class="text-[#1A1A1A]/50 text-xs mt-4">*Aplican términos y condiciones. Válido hasta agotar existencias.</p>
+                <p class="text-[#1A1A1A]/50 text-xs mt-3">*Aplican términos y condiciones. Válido hasta agotar existencias.</p>
               </div>
             </div>
+            
+            <!-- Gradiente inferior para fundido suave -->
+            <div class="absolute bottom-0 left-0 right-0 h-24 sm:h-32 lg:h-40 z-10 pointer-events-none" style="background: linear-gradient(to bottom, transparent 0%, #FAFAFA 100%);"></div>
+            <div class="h-12 sm:h-14 lg:h-16"></div>
           </div>
         </div>
         
-        <!-- Flechas de navegación (estilo ML refinado) -->
+        <!-- Flechas de navegación -->
         <button 
           @click="prevScene"
           class="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-16 sm:w-12 sm:h-20 bg-white/95 hover:bg-white shadow-[2px_0_10px_rgba(0,0,0,0.1)] flex items-center justify-center transition-all rounded-r-xl group"
@@ -270,8 +247,8 @@
           </svg>
         </button>
         
-        <!-- Indicadores de slide (pill style) -->
-        <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+        <!-- Indicadores de slide -->
+        <div class="absolute bottom-16 sm:bottom-18 lg:bottom-20 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
           <button 
             v-for="(scene, index) in totalScenes" 
             :key="index"
@@ -287,175 +264,119 @@
     </section>
 
     <!-- =========================================================================
-         BENEFITS BAR - Cards con imágenes premium personalizadas
+         TARJETAS DE CATEGORÍAS - Overlay sobre el carrusel
     ========================================================================== -->
-    <section class="py-4 sm:py-5">
-      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-12">
+    <section class="relative z-20 -mt-16 sm:-mt-20 lg:-mt-24 pb-6">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <!-- Contenedor único estilo Mercado Libre -->
-        <div class="bg-white rounded-xl overflow-hidden" style="box-shadow: 0 2px 10px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.03);">
-          <div class="grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100">
-            
-            <!-- Benefit 1: Envío gratis -->
-            <div class="flex flex-col items-center text-center p-3 sm:p-4 border-b lg:border-b-0 border-gray-100">
-              <div class="w-full aspect-[4/3] rounded-xl overflow-hidden mb-2.5">
-                <img 
-                  src="/images/card%20panel/1.png" 
-                  alt="Envío gratis" 
-                  class="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-              <p class="font-semibold text-gray-900 text-[12px] sm:text-[14px] leading-tight mb-0.5">Envío gratis</p>
-              <p class="text-gray-400 text-[10px] sm:text-[11px] leading-snug">En compras desde $150.000</p>
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">
+          
+          <!-- Card 1: Pelucas Naturales -->
+          <router-link 
+            to="/portal/catalogo?categoria=pelucas"
+            class="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100"
+          >
+            <div class="aspect-square overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?q=80&w=600&auto=format&fit=crop" 
+                alt="Pelucas naturales"
+                class="w-full h-full object-cover"
+              />
             </div>
-            
-            <!-- Benefit 2: 100% Humano -->
-            <div class="flex flex-col items-center text-center p-3 sm:p-4 border-b lg:border-b-0 border-gray-100">
-              <div class="w-full aspect-[4/3] rounded-xl overflow-hidden mb-2.5">
-                <img 
-                  src="/images/card%20panel/2.png" 
-                  alt="Calidad Premium" 
-                  class="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-              <p class="font-semibold text-gray-900 text-[12px] sm:text-[14px] leading-tight mb-0.5">100% Humano</p>
-              <p class="text-gray-400 text-[10px] sm:text-[11px] leading-snug">Cabello Remy certificado</p>
+            <div class="p-4 sm:p-5">
+              <h3 class="font-bold text-gray-900 text-base sm:text-lg mb-1">Pelucas Naturales</h3>
+              <p class="text-gray-500 text-sm mb-3">100% cabello humano</p>
+              <span class="text-[#2874A6] text-sm font-medium ">Ver más</span>
             </div>
-            
-            <!-- Benefit 3: Pago Seguro -->
-            <div class="flex flex-col items-center text-center p-3 sm:p-4">
-              <div class="w-full aspect-[4/3] rounded-xl overflow-hidden mb-2.5">
-                <img 
-                  src="/images/card%20panel/3.png" 
-                  alt="Pago Seguro" 
-                  class="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-              <p class="font-semibold text-gray-900 text-[12px] sm:text-[14px] leading-tight mb-0.5">Pago seguro</p>
-              <p class="text-gray-400 text-[10px] sm:text-[11px] leading-snug">Transacciones protegidas</p>
+          </router-link>
+          
+          <!-- Card 2: Extensiones Premium -->
+          <router-link 
+            to="/portal/catalogo?categoria=extensiones"
+            class="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100"
+          >
+            <div class="aspect-square overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=600&auto=format&fit=crop" 
+                alt="Extensiones premium"
+                class="w-full h-full object-cover"
+              />
             </div>
-            
-            <!-- Benefit 4: Soporte VIP -->
-            <div class="flex flex-col items-center text-center p-3 sm:p-4">
-              <div class="w-full aspect-[4/3] rounded-xl overflow-hidden mb-2.5">
-                <img 
-                  src="/images/card%20panel/4.png" 
-                  alt="Asesoría VIP" 
-                  class="w-full h-full object-cover"
-                  loading="lazy"
-                />
-              </div>
-              <p class="font-semibold text-gray-900 text-[12px] sm:text-[14px] leading-tight mb-0.5">Soporte VIP</p>
-              <p class="text-gray-400 text-[10px] sm:text-[11px] leading-snug">Asesor personal 24/7</p>
+            <div class="p-4 sm:p-5">
+              <h3 class="font-bold text-gray-900 text-base sm:text-lg mb-1">Extensiones Premium</h3>
+              <p class="text-gray-500 text-sm mb-3">Clip-in, tape & más</p>
+              <span class="text-[#2874A6] text-sm font-medium ">Ver más</span>
             </div>
-            
-          </div>
+          </router-link>
+          
+          <!-- Card 3: Sistemas Capilares -->
+          <router-link 
+            to="/portal/catalogo?categoria=sistemas-capilares"
+            class="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100"
+          >
+            <div class="aspect-square overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=600&auto=format&fit=crop" 
+                alt="Sistemas capilares"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div class="p-4 sm:p-5">
+              <h3 class="font-bold text-gray-900 text-base sm:text-lg mb-1">Sistemas Capilares</h3>
+              <p class="text-gray-500 text-sm mb-3">Soluciones profesionales</p>
+              <span class="text-[#2874A6] text-sm font-medium ">Ver más</span>
+            </div>
+          </router-link>
+          
+          <!-- Card 4: Accesorios -->
+          <router-link 
+            to="/portal/catalogo?categoria=accesorios"
+            class="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100"
+          >
+            <div class="aspect-square overflow-hidden">
+              <img 
+                src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=600&auto=format&fit=crop" 
+                alt="Accesorios"
+                class="w-full h-full object-cover"
+              />
+            </div>
+            <div class="p-4 sm:p-5">
+              <h3 class="font-bold text-gray-900 text-base sm:text-lg mb-1">Accesorios</h3>
+              <p class="text-gray-500 text-sm mb-3">Cuidado & estilizado</p>
+              <span class="text-[#2874A6] text-sm font-medium ">Ver más</span>
+            </div>
+          </router-link>
+          
+          <!-- Card 5: Ofertas -->
+          <router-link 
+            to="/portal/catalogo?oferta=true"
+            class="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100 col-span-2 lg:col-span-1"
+          >
+            <div class="aspect-square overflow-hidden relative">
+              <img 
+                :src="ofertaCardImage" 
+                alt="Ofertas especiales"
+                class="w-full h-full object-cover"
+              />
+              <div class="absolute top-3 right-3 bg-[#CC0C39] text-white text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-md shadow">
+                Hasta 50% dto.
+              </div>
+            </div>
+            <div class="p-4 sm:p-5">
+              <h3 class="font-bold text-gray-900 text-base sm:text-lg mb-1">Ofertas Especiales</h3>
+              <p class="text-gray-500 text-sm mb-3">Descuentos exclusivos</p>
+              <span class="text-[#2874A6] text-sm font-medium ">Ver ofertas</span>
+            </div>
+          </router-link>
+          
         </div>
       </div>
     </section>
 
     <!-- =========================================================================
-         CONTENEDOR MAESTRO - Resto del contenido (max-w-7xl)
+         CONTENEDOR MAESTRO - Resto del contenido
     ========================================================================== -->
     <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-6 sm:py-8 lg:py-10">
-    
-        <!-- =====================================================================
-             SECCIÓN 1: CATEGORÍAS - Estilo Amazon/ML
-        ====================================================================== -->
-        <section class="mb-12 sm:mb-16">
-          <!-- Header sección -->
-          <div class="flex items-center justify-between mb-5 sm:mb-6">
-            <h2 class="font-bold text-xl sm:text-2xl text-gray-900">
-              Categorías
-            </h2>
-            <router-link 
-              to="/portal/catalogo"
-              class="text-[#007185] hover:text-[#C7511F] hover:underline text-sm font-medium transition-colors"
-            >
-              Ver todas
-            </router-link>
-          </div>
-        
-          <!-- Grid de Categorías - Estilo Amazon cards -->
-          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-          
-            <!-- Categoría 1: Pelucas Naturales -->
-            <router-link 
-              to="/portal/catalogo?categoria=pelucas"
-              class="bg-white rounded-lg p-4 sm:p-5 hover:shadow-md transition-shadow duration-200 border border-gray-100"
-            >
-              <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-3">
-                Pelucas Naturales
-              </h3>
-              <div class="w-full aspect-square rounded-md overflow-hidden mb-3">
-                <img 
-                  src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?q=80&w=800&auto=format&fit=crop" 
-                  alt="Pelucas naturales"
-                  class="w-full h-full object-cover"
-                />
-              </div>
-              <span class="text-[#007185] text-sm font-medium">Ver productos</span>
-            </router-link>
-          
-            <!-- Categoría 2: Extensiones Premium -->
-            <router-link 
-              to="/portal/catalogo?categoria=extensiones"
-              class="bg-white rounded-lg p-4 sm:p-5 hover:shadow-md transition-shadow duration-200 border border-gray-100"
-            >
-              <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-3">
-                Extensiones Premium
-              </h3>
-              <div class="w-full aspect-square rounded-md overflow-hidden mb-3">
-                <img 
-                  src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=800&auto=format&fit=crop" 
-                  alt="Extensiones premium"
-                  class="w-full h-full object-cover"
-                />
-              </div>
-              <span class="text-[#007185] text-sm font-medium">Ver productos</span>
-            </router-link>
-          
-            <!-- Categoría 3: Sistemas Capilares -->
-            <router-link 
-              to="/portal/catalogo?categoria=sistemas-capilares"
-              class="bg-white rounded-lg p-4 sm:p-5 hover:shadow-md transition-shadow duration-200 border border-gray-100"
-            >
-              <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-3">
-                Sistemas Capilares
-              </h3>
-              <div class="w-full aspect-square rounded-md overflow-hidden mb-3">
-                <img 
-                  src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=600&auto=format&fit=crop" 
-                  alt="Sistemas capilares"
-                  class="w-full h-full object-cover"
-                />
-              </div>
-              <span class="text-[#007185] text-sm font-medium">Ver productos</span>
-            </router-link>
-          
-            <!-- Categoría 4: Accesorios -->
-            <router-link 
-              to="/portal/catalogo?categoria=accesorios"
-              class="bg-white rounded-lg p-4 sm:p-5 hover:shadow-md transition-shadow duration-200 border border-gray-100"
-            >
-              <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-3">
-                Accesorios
-              </h3>
-              <div class="w-full aspect-square rounded-md overflow-hidden mb-3">
-                <img 
-                  src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=800&auto=format&fit=crop" 
-                  alt="Accesorios"
-                  class="w-full h-full object-cover"
-                />
-              </div>
-              <span class="text-[#007185] text-sm font-medium">Ver productos</span>
-            </router-link>
-          
-        </div>
-      </section>
 
       <!-- =====================================================================
            SECCIÓN 2: COMIENZA A EXPLORAR (Catálogo B2B)
@@ -557,6 +478,81 @@
             </svg>
           </router-link>
         </div>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           BENEFITS BAR - Cards con imágenes premium
+      ====================================================================== -->
+      <section class="mb-12 sm:mb-16">
+        <div class="bg-white rounded-2xl shadow-sm border border-gray-200/60 overflow-hidden">
+          
+          <!-- Header estilo ML: fondo gris, título + botón -->
+          <div class="px-5 sm:px-6 lg:px-8 py-4 sm:py-5 bg-[#F5F5F5] border-b border-gray-200/60 flex items-center justify-between gap-4">
+            <h2 class="text-base sm:text-lg font-extrabold text-gray-900 tracking-tight uppercase">Los mejores beneficios para tu negocio</h2>
+            <router-link 
+              to="/portal/catalogo"
+              class="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 sm:px-5 sm:py-2.5 bg-[#C9A962] hover:bg-[#B8944F] text-white text-xs sm:text-sm font-bold rounded-md transition-colors duration-200"
+            >
+              Ver productos
+            </router-link>
+          </div>
+          
+          <div class="grid grid-cols-2 lg:grid-cols-4">
+            
+            <!-- Benefit 1: Envío gratis -->
+            <div class="relative p-5 sm:p-6 lg:p-8 flex flex-col items-center text-center border-b lg:border-b-0 border-r border-gray-100">
+              <div class="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-2xl overflow-hidden mb-4 shadow-sm">
+                <img 
+                  src="/images/card%20panel/1.png" 
+                  alt="Envío gratis" 
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <p class="font-semibold text-gray-900 text-sm sm:text-base leading-snug mb-1">Envíos gratis en productos desde $150.000</p>
+            </div>
+            
+            <!-- Benefit 2: 100% Humano -->
+            <div class="relative p-5 sm:p-6 lg:p-8 flex flex-col items-center text-center border-b lg:border-b-0 lg:border-r border-gray-100">
+              <div class="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-2xl overflow-hidden mb-4 shadow-sm">
+                <img 
+                  src="/images/card%20panel/2.png" 
+                  alt="Calidad Premium" 
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <p class="font-semibold text-gray-900 text-sm sm:text-base leading-snug mb-1">Cabello 100% humano Remy certificado</p>
+            </div>
+            
+            <!-- Benefit 3: Pago Seguro -->
+            <div class="relative p-5 sm:p-6 lg:p-8 flex flex-col items-center text-center border-r border-gray-100">
+              <div class="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-2xl overflow-hidden mb-4 shadow-sm">
+                <img 
+                  src="/images/card%20panel/3.png" 
+                  alt="Pago Seguro" 
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <p class="font-semibold text-gray-900 text-sm sm:text-base leading-snug mb-1">Pago seguro con encriptación SSL</p>
+            </div>
+            
+            <!-- Benefit 4: Soporte VIP -->
+            <div class="relative p-5 sm:p-6 lg:p-8 flex flex-col items-center text-center">
+              <div class="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-2xl overflow-hidden mb-4 shadow-sm">
+                <img 
+                  src="/images/card%20panel/4.png" 
+                  alt="Asesoría VIP" 
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                />
+              </div>
+              <p class="font-semibold text-gray-900 text-sm sm:text-base leading-snug mb-1">Asesor personal disponible 24/7</p>
+            </div>
+            
+          </div>
         </div>
       </section>
 
@@ -799,6 +795,10 @@ export default {
     const cartCount = ref(0)
     const currentSlide = ref(0)
     const currentScene = ref(0)  // Sistema de escenarios: 0 = Esmeralda, 1 = Champagne, 2 = Promoción
+    
+    // Imagen aleatoria para card de ofertas (rota en cada refresh)
+    const ofertaImages = ['/images/off.png', '/images/retail.png']
+    const ofertaCardImage = ref(ofertaImages[Math.floor(Math.random() * ofertaImages.length)])
     const totalScenes = 3  // Total de slides del Hero
     const isLoading = ref(true)
     const hasAnimated = ref(false)
@@ -1110,7 +1110,7 @@ export default {
         }, 100)
         
       } catch (error) {
-        console.error('❌ [cargarProductos] Error:', error)
+        console.error('âŒ [cargarProductos] Error:', error)
         toast.error('Error al cargar productos. Intenta recargar la página.', 5000)
       } finally {
         isLoading.value = false
@@ -1179,7 +1179,8 @@ export default {
       getDisplayImage,
       hasMediaError,
       quickAddToCart,
-      getAnimationDelay
+      getAnimationDelay,
+      ofertaCardImage
     }
   }
 }
