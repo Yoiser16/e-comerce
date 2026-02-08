@@ -82,7 +82,20 @@
                     class="w-14 h-14 rounded-md overflow-hidden border-2 transition-all flex-shrink-0"
                     :class="imagenActualIndex === idx ? 'border-[#007185] shadow-sm' : 'border-gray-200 hover:border-[#007185]'"
                   >
-                    <img :src="img" :alt="`Vista ${idx + 1}`" class="w-full h-full object-cover"/>
+                    <video
+                      v-if="isVideoUrl(img) && !hasMediaError(img)"
+                      :src="img"
+                      class="w-full h-full object-cover"
+                      muted playsinline preload="metadata"
+                      @error="handleVideoError(img)"
+                    ></video>
+                    <img
+                      v-else
+                      :src="getDisplayMedia(img)"
+                      :alt="`Vista ${idx + 1}`"
+                      class="w-full h-full object-cover"
+                      @error="handleImageError(img, $event)"
+                    />
                   </button>
                 </div>
                 
@@ -114,11 +127,20 @@
                   
                   <!-- Imagen Principal -->
                   <div class="aspect-[4/5] bg-gray-50 rounded-lg overflow-hidden border border-gray-100">
+                    <video
+                      v-if="isVideoUrl(imagenActual) && !hasMediaError(imagenActual)"
+                      :src="imagenActual"
+                      class="w-full h-full object-cover cursor-zoom-in"
+                      muted playsinline loop autoplay
+                      @error="handleVideoError(imagenActual)"
+                      @click="abrirZoom"
+                    ></video>
                     <img 
-                      :src="imagenActual" 
+                      v-else
+                      :src="getDisplayMedia(imagenActual)" 
                       :alt="producto.nombre"
                       class="w-full h-full object-cover cursor-zoom-in"
-                      @error="handleImageError"
+                      @error="handleImageError(imagenActual, $event)"
                       @click="abrirZoom"
                     />
                   </div>
@@ -757,32 +779,33 @@ export default {
 
     const imagenes = computed(() => {
       const imgs = []
-      if (producto.value.imagen_principal && !isVideo(producto.value.imagen_principal)) {
-        imgs.push(producto.value.imagen_principal)
-      }
+      const principal = normalizeMediaUrl(
+        producto.value.imagen_principal || producto.value.imagen_url || producto.value.imagen
+      )
+      if (principal && !isVideoUrl(principal)) imgs.push(principal)
       if (producto.value.imagenes && Array.isArray(producto.value.imagenes)) {
-        imgs.push(...producto.value.imagenes.filter(i => i !== producto.value.imagen_principal && !isVideo(i)))
+        const adicionales = producto.value.imagenes
+          .map(img => normalizeMediaUrl(img))
+          .filter(img => !!img && img !== principal && !isVideoUrl(img))
+        imgs.push(...adicionales)
       }
       return imgs.length > 0 ? imgs : ['/placeholder.png']
     })
     
     const imagenActual = computed(() => imagenes.value[imagenActualIndex.value] || '/placeholder.png')
 
-    // Video helpers
-    const videoExtensions = ['.mp4', '.webm', '.ogg', '.mov']
-    function isVideo(url) {
-      if (!url) return false
-      const lower = url.toLowerCase()
-      return videoExtensions.some(ext => lower.includes(ext))
-    }
-
+    // Video section
     const videosProducto = computed(() => {
       const allMedia = []
-      if (producto.value.imagen_principal) allMedia.push(producto.value.imagen_principal)
+      const principal = normalizeMediaUrl(producto.value.imagen_principal)
+      if (principal) allMedia.push(principal)
       if (producto.value.imagenes && Array.isArray(producto.value.imagenes)) {
-        allMedia.push(...producto.value.imagenes)
+        producto.value.imagenes.forEach(img => {
+          const normalized = normalizeMediaUrl(img)
+          if (normalized) allMedia.push(normalized)
+        })
       }
-      return [...new Set(allMedia)].filter(url => isVideo(url))
+      return [...new Set(allMedia)].filter(url => isVideoUrl(url))
     })
 
     const videoActualIndex = ref(0)
@@ -1103,7 +1126,6 @@ export default {
       videosProducto,
       videoActualIndex,
       videoActual,
-      isVideo,
       // Computed precios
       precioMayorista,
       precioRetail,
