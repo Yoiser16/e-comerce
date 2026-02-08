@@ -1,7 +1,7 @@
 import axios from 'axios'
 
 // URL base del backend
-export const API_BASE_URL = 'http://localhost:8000'
+export const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace('/api/v1', '')
 
 const apiClient = axios.create({
   baseURL: `${API_BASE_URL}/api/v1`,
@@ -17,12 +17,11 @@ const apiClient = axios.create({
  */
 export const getImageUrl = (url) => {
   if (!url) return null
-  // Si ya es una URL absoluta (http/https), devolverla tal cual
-  if (url.startsWith('http://') || url.startsWith('https://')) {
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
     return url
   }
-  // Si es relativa, construir URL absoluta con el backend
-  return `${API_BASE_URL}${url}`
+  const normalized = url.startsWith('/') ? url : `/${url}`
+  return `${API_BASE_URL}${normalized}`
 }
 
 // Interceptor para agregar el token JWT y email

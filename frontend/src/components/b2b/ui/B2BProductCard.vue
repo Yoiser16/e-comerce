@@ -8,8 +8,19 @@
       :to="`/portal/producto/${product.id}`"
       class="block relative aspect-square bg-gray-50 overflow-hidden cursor-pointer"
     >
-      <img 
-        :src="product.image || placeholderImage"
+      <video
+        v-if="isVideo && !imageError"
+        :src="videoSrc"
+        class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+        muted
+        playsinline
+        loop
+        autoplay
+        @error="handleImageError"
+      ></video>
+      <img
+        v-else
+        :src="imageSrc"
         :alt="product.name"
         class="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
         @error="handleImageError"
@@ -117,9 +128,25 @@ export default {
     const imageError = ref(false)
 
     const placeholderImage = computed(() => {
-      const initials = props.product.name.substring(0, 3).toUpperCase()
+      const initials = props.product.name?.substring(0, 3).toUpperCase() || 'IMG'
       return `https://placehold.co/400x400/f5f5f5/1a1a1a?text=${encodeURIComponent(initials)}`
     })
+
+    // Si la imagen es válida, úsala; si no, usa el placeholder
+    const imageSrc = computed(() => {
+      // Si hay error de carga o la imagen es null/undefined/vacía, usar placeholder
+      if (imageError.value || !props.product.image || props.product.image === null || props.product.image === undefined || props.product.image === '') {
+        return placeholderImage.value
+      }
+      return props.product.image
+    })
+
+    const isVideo = computed(() => {
+      const src = (props.product.image || '').toLowerCase()
+      return src.includes('.mp4') || src.includes('.webm') || src.includes('.ogg')
+    })
+
+    const videoSrc = computed(() => props.product.image || '')
 
     const discountPercentage = computed(() => {
       if (!props.product.retailPrice || !props.product.wholesalePrice) return 0
@@ -156,6 +183,7 @@ export default {
     }
 
     function handleImageError(event) {
+      imageError.value = true
       event.target.src = placeholderImage.value
     }
 
@@ -181,6 +209,9 @@ export default {
     return {
       quantity,
       placeholderImage,
+      imageSrc,
+      isVideo,
+      videoSrc,
       discountPercentage,
       savingsAmount,
       stockBadgeClass,

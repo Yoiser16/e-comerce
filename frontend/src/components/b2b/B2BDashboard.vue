@@ -788,10 +788,11 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted } from 'vue'
+import { ref, computed, reactive, onMounted, onUnmounted } from 'vue'
 import { B2BToast, useToast } from './ui'
 import B2BSkeleton from './ui/B2BSkeleton.vue'
 import { obtenerProductos, obtenerProductosDestacados } from '@/services/mayoristas'
+import { getImageUrl } from '@/services/api'
 import { ordenesService } from '@/services/ordenes'
 import { vistosService, favoritosService } from '@/services/productos'
 
@@ -875,6 +876,8 @@ export default {
       currentSlide.value = (currentSlide.value - 1 + 3) % 3
     }
 
+    const mediaErrors = reactive({})
+
     // =========================================================================
     // SISTEMA DE ESCENARIOS (Hero Section)
     // =========================================================================
@@ -921,9 +924,36 @@ export default {
     // =========================================================================
     // HANDLERS
     // =========================================================================
+    function getPlaceholderImage(product) {
+      const initials = product?.name?.substring(0, 2).toUpperCase() || 'PR'
+      return `https://placehold.co/400x500/f5f5f5/999999?text=${encodeURIComponent(initials)}`
+    }
+
+    function hasMediaError(product) {
+      return !!mediaErrors[product?.id]
+    }
+
+    function getDisplayImage(product) {
+      if (hasMediaError(product)) return getPlaceholderImage(product)
+      return product?.image || getPlaceholderImage(product)
+    }
+
+    function isVideoUrl(url) {
+      const value = (url || '').toLowerCase()
+      return value.includes('.mp4') || value.includes('.webm') || value.includes('.ogg')
+    }
+
     function handleProductImageError(event, product) {
-      // Placeholder con iniciales del producto
-      event.target.src = `https://placehold.co/400x500/f5f5f5/999999?text=${encodeURIComponent(product.name.substring(0, 2).toUpperCase())}`
+      if (product?.id) {
+        mediaErrors[product.id] = true
+      }
+      event.target.src = getPlaceholderImage(product)
+    }
+
+    function handleVideoError(product) {
+      if (product?.id) {
+        mediaErrors[product.id] = true
+      }
     }
 
     function quickAddToCart(product) {
@@ -950,7 +980,25 @@ export default {
     // =========================================================================
     // NORMALIZAR DATOS DE PRODUCTOS
     // =========================================================================
+    function normalizeMediaUrl(raw) {
+      if (typeof raw !== 'string') return null
+      const cleaned = raw.trim()
+      if (!cleaned) return null
+      const isFilenameOnly = !cleaned.includes('/') && !cleaned.includes('\\')
+      const isStaticRelative = cleaned.startsWith('static/') || cleaned.startsWith('uploads/')
+      let resolved = cleaned
+      if (isFilenameOnly) {
+        resolved = `/static/uploads/productos/${cleaned}`
+      } else if (isStaticRelative) {
+        resolved = `/${cleaned}`
+      }
+      return getImageUrl(resolved)
+    }
+
     function normalizarProducto(producto) {
+      const image = normalizeMediaUrl(
+        producto.imagen_principal || producto.imagen || producto.imagen_url || producto.image
+      )
       return {
         id: producto.id || producto.producto_id,
         name: producto.nombre || producto.name,
@@ -958,7 +1006,7 @@ export default {
         price: producto.precio_mayorista || producto.wholesalePrice || producto.price || 0,
         originalPrice: producto.precio_retail || producto.retailPrice || producto.originalPrice || 0,
         stock: producto.stock || 0,
-        image: producto.imagen || producto.image || 'https://placehold.co/400x400',
+        image,
         badge: producto.stock < 5 ? 'low' : null,
         discount: null
       }
@@ -1000,7 +1048,7 @@ export default {
                     price: v.precio_mayorista || v.precio || 0,
                     originalPrice: v.precio || 0,
                     stock: v.stock || 0,
-                    image: v.imagen_principal || 'https://placehold.co/400x400',
+                    image: normalizeMediaUrl(v.imagen_principal || v.imagen || v.imagen_url),
                     badge: 'visto', // Badge para identificar origen
                     veces_visto: v.veces_visto
                   })
@@ -1025,7 +1073,7 @@ export default {
                     price: f.precio_monto || 0,
                     originalPrice: f.precio_monto || 0,
                     stock: 100, // Los favoritos no tienen stock en el DTO
-                    image: f.imagen_principal || 'https://placehold.co/400x400',
+                    image: normalizeMediaUrl(f.imagen_principal || f.imagen || f.imagen_url),
                     badge: 'favorito' // Badge para identificar origen
                   })
                 }
@@ -1132,6 +1180,10 @@ export default {
       nextScene,
       prevScene,
       handleProductImageError,
+      handleVideoError,
+      isVideoUrl,
+      getDisplayImage,
+      hasMediaError,
       quickAddToCart,
       getAnimationDelay
     }

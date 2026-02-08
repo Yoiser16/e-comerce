@@ -138,7 +138,6 @@
                           placeholder="50"
                         >
                       </div>
-                      
                       <div>
                         <label class="block text-sm font-medium text-text-dark mb-2">Stock Mínimo</label>
                         <input 
@@ -146,6 +145,17 @@
                           type="number"
                           class="w-full px-4 py-3 bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white transition-all text-sm"
                           placeholder="5"
+                        >
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-text-dark mb-2">Cantidad mínima mayorista <span class="text-red-500">*</span></label>
+                        <input 
+                          v-model.number="form.cantidad_minima_mayorista"
+                          type="number"
+                          min="1"
+                          required
+                          class="w-full px-4 py-3 bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white transition-all text-sm"
+                          placeholder="1"
                         >
                       </div>
                     </div>
@@ -497,6 +507,7 @@ const galleryUploading = ref(false)
 const galleryFileInput = ref(null)
 
 const form = ref({
+    cantidad_minima_mayorista: 1,
   codigo: '',
   nombre: '',
   descripcion: '',
@@ -537,6 +548,7 @@ const resetForm = () => {
     precio_moneda: 'COP',
     stock_actual: 0,
     stock_minimo: 0,
+    cantidad_minima_mayorista: 1,
     metodo: '',
     color: '',
     largo: '',
@@ -707,6 +719,7 @@ const loadProduct = async () => {
       precio_moneda: producto.precio?.moneda || producto.precio_moneda || 'COP',
       stock_actual: producto.stock?.actual || producto.stock_actual || 0,
       stock_minimo: producto.stock?.minimo || producto.stock_minimo || 0,
+      cantidad_minima_mayorista: producto.cantidad_minima_mayorista || 1,
       metodo: atributos.metodo || '',
       color: atributos.color || '',
       largo: atributos.largo || '',
@@ -802,7 +815,8 @@ const submitForm = async () => {
       calidad: enabledAttrs.value.calidad ? form.value.calidad : null,
       imagen_principal: imagenUrl || null,
       imagenes: galleryUrls.value,
-      destacado: form.value.destacado
+      destacado: form.value.destacado,
+      cantidad_minima_mayorista: form.value.cantidad_minima_mayorista ?? 1
     }
     
     if (isEditing.value) {

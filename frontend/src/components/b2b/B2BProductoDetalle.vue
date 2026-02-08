@@ -134,7 +134,22 @@
                   class="flex-shrink-0 w-14 h-14 rounded-md overflow-hidden border-2 transition-all"
                   :class="imagenActualIndex === idx ? 'border-[#007185]' : 'border-gray-200'"
                 >
-                  <img :src="img" :alt="`Vista ${idx + 1}`" class="w-full h-full object-cover"/>
+                  <video
+                    v-if="isVideoUrl(img) && !hasMediaError(img)"
+                    :src="img"
+                    class="w-full h-full object-cover"
+                    muted
+                    playsinline
+                    preload="metadata"
+                    @error="handleVideoError(img)"
+                  ></video>
+                  <img
+                    v-else
+                    :src="getDisplayMedia(img)"
+                    :alt="`Vista ${idx + 1}`"
+                    class="w-full h-full object-cover"
+                    @error="handleImageError(img, $event)"
+                  />
                 </button>
               </div>
               
@@ -173,6 +188,21 @@
               <h1 class="text-xl sm:text-2xl lg:text-[26px] font-normal text-[#0F1111] leading-tight">
                 {{ producto.nombre }}
               </h1>
+            </div>
+
+            <div class="flex flex-wrap items-center gap-2 text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-[#7A7A7A]">
+              <span class="px-3 py-1 rounded-full bg-[#FAF5F2] border border-[#C9A962]/30 text-[#8B7355]">
+                Stock {{ producto.stock_actual }} uds
+              </span>
+              <span class="px-3 py-1 rounded-full bg-white border border-gray-200 text-[#5A5A5A]">
+                Lote minimo {{ LOTE_MINIMO }}
+              </span>
+              <span class="px-3 py-1 rounded-full bg-white border border-gray-200 text-[#5A5A5A]">
+                Envio 24-48h
+              </span>
+              <span v-if="producto.marca" class="px-3 py-1 rounded-full bg-white border border-gray-200 text-[#5A5A5A]">
+                Marca {{ producto.marca }}
+              </span>
             </div>
             
             <!-- Separador -->
@@ -672,11 +702,12 @@
 </template>
 
 <script>
-import { ref, computed, onMounted, watch } from 'vue'
+import { ref, computed, reactive, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { productosService, favoritosService, vistosService } from '@/services/productos'
 import { obtenerProducto as obtenerProductoB2B, obtenerProductos as obtenerProductosB2B } from '@/services/mayoristas'
 import { B2BToast, useToast } from './ui'
+import { getImageUrl } from '@/services/api'
 
 export default {
   name: 'B2BProductoDetalle',
@@ -701,6 +732,7 @@ export default {
     const esFavorito = ref(false)
     const agregando = ref(false)
     const productosRelacionados = ref([])
+    const mediaErrors = reactive({})
     
     // User
     const user = computed(() => {
@@ -708,6 +740,21 @@ export default {
     })
     
     // Computed
+    function normalizeMediaUrl(raw) {
+      if (typeof raw !== 'string') return null
+      const cleaned = raw.trim()
+      if (!cleaned) return null
+      const isFilenameOnly = !cleaned.includes('/') && !cleaned.includes('\\')
+      const isStaticRelative = cleaned.startsWith('static/') || cleaned.startsWith('uploads/')
+      let resolved = cleaned
+      if (isFilenameOnly) {
+        resolved = `/static/uploads/productos/${cleaned}`
+      } else if (isStaticRelative) {
+        resolved = `/${cleaned}`
+      }
+      return getImageUrl(resolved)
+    }
+
     const imagenes = computed(() => {
       const imgs = []
       if (producto.value.imagen_principal && !isVideo(producto.value.imagen_principal)) {
@@ -808,8 +855,35 @@ export default {
       return Number(value || 0).toLocaleString('es-CO')
     }
     
-    function handleImageError(e) {
-      e.target.src = '/placeholder.png'
+    function getPlaceholderImage() {
+      return '/placeholder.png'
+    }
+
+    function isVideoUrl(url) {
+      const value = (url || '').toLowerCase()
+      return value.includes('.mp4') || value.includes('.webm') || value.includes('.ogg')
+    }
+
+    function hasMediaError(url) {
+      return !!mediaErrors[url]
+    }
+
+    function getDisplayMedia(url) {
+      if (!url || hasMediaError(url)) return getPlaceholderImage()
+      return url
+    }
+
+    function handleImageError(url, event) {
+      if (url) {
+        mediaErrors[url] = true
+      }
+      event.target.src = getPlaceholderImage()
+    }
+
+    function handleVideoError(url) {
+      if (url) {
+        mediaErrors[url] = true
+      }
     }
     
     function abrirZoom() {
@@ -1044,6 +1118,10 @@ export default {
       // Methods
       formatPrice,
       handleImageError,
+      handleVideoError,
+      getDisplayMedia,
+      isVideoUrl,
+      hasMediaError,
       abrirZoom,
       seleccionarLote,
       incrementarLote,
