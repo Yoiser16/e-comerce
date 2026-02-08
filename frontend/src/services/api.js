@@ -29,6 +29,7 @@ apiClient.interceptors.request.use(
   (config) => {
     // Buscar token en ambas ubicaciones (B2C y B2B)
     const token = localStorage.getItem('access_token') || localStorage.getItem('b2b_access_token')
+    
     if (token) {
       config.headers.Authorization = `Bearer ${token}`
     }
@@ -42,7 +43,7 @@ apiClient.interceptors.request.use(
           config.headers['X-User-Email'] = userData.email
         }
       } catch (e) {
-        console.warn('Error parsing user data:', e)
+        // Error silencioso
       }
     }
     
@@ -63,35 +64,55 @@ apiClient.interceptors.response.use(
 
     // Solo intentar refresh si es 401, no es un retry, y hay refresh token
     if (error.response?.status === 401 && !originalRequest._retry && !isRefreshing) {
-      const refreshToken = localStorage.getItem('refresh_token')
+      // IMPORTANTE: El endpoint /favoritos/ no soporta autenticación B2B
+      // No intentar refresh ni limpiar tokens en este caso
+      if (originalRequest.url?.includes('/favoritos')) {
+        return Promise.reject(error)
+      }
       
-      // Si no hay refresh token, simplemente rechazar (no redirigir)
+      // Buscar refresh token en ambas ubicaciones (B2C y B2B)
+      const refreshToken = localStorage.getItem('refresh_token') || localStorage.getItem('b2b_refresh_token')
+      const isB2B = !!localStorage.getItem('b2b_refresh_token')
+      
+      // Si no hay refresh token, limpiar todo y rechazar
       if (!refreshToken) {
         localStorage.removeItem('access_token')
+        localStorage.removeItem('refresh_token')
+        localStorage.removeItem('b2b_access_token')
+        localStorage.removeItem('b2b_refresh_token')
         return Promise.reject(error)
       }
 
       originalRequest._retry = true
       isRefreshing = true
-
+      
       try {
         const response = await axios.post('http://localhost:8000/api/v1/auth/refresh', {
           refresh: refreshToken
         })
 
         const { access } = response.data
-        localStorage.setItem('access_token', access)
+        
+        // Guardar token en la ubicación correcta según el tipo
+        if (isB2B) {
+          localStorage.setItem('b2b_access_token', access)
+        } else {
+          localStorage.setItem('access_token', access)
+        }
+        
         isRefreshing = false
 
         originalRequest.headers.Authorization = `Bearer ${access}`
         return apiClient(originalRequest)
       } catch (refreshError) {
         isRefreshing = false
+        
+        // Limpiar TODOS los tokens (B2C y B2B)
         localStorage.removeItem('access_token')
         localStorage.removeItem('refresh_token')
-        // NO redirigir automáticamente - esto causaba el loop infinito
-        // Solo limpiar tokens y rechazar el error
-        console.warn('Sesión expirada. Token refresh falló.')
+        localStorage.removeItem('b2b_access_token')
+        localStorage.removeItem('b2b_refresh_token')
+        
         return Promise.reject(refreshError)
       }
     }

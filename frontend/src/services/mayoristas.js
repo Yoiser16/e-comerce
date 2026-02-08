@@ -7,8 +7,6 @@
 const BACKEND_URL = 'http://localhost:8000'
 const API_BASE = `${BACKEND_URL}/api/v1`
 
-console.log('🔌 API Service - Backend URL:', API_BASE)
-
 /**
  * Obtiene los headers con el token de autenticación B2B
  */
@@ -24,7 +22,6 @@ function getAuthHeaders() {
  * Maneja errores de autenticación y respuestas
  */
 function handleAuthError(error) {
-  console.error('❌ Error de respuesta:', error)
   if (error.status === 401) {
     // Token expirado o inválido - limpiar sesión
     localStorage.removeItem('b2b_access_token')
@@ -55,22 +52,18 @@ export async function obtenerProductos(filters = {}) {
     if (filters.nuevo) params.append('nuevo', 'true')
     
     const queryString = params.toString()
-      const url = `${API_BASE}/b2b/productos${queryString ? '?' + queryString : ''}`
+    const url = `${API_BASE}/b2b/productos${queryString ? '?' + queryString : ''}`
     
-    console.log('📡 GET:', url)
     const response = await fetch(url, {
       method: 'GET',
       headers: getAuthHeaders()
     })
-    
-    console.log('📦 Respuesta:', response.status, response.statusText)
     
     if (!response.ok) {
       handleAuthError({ status: response.status })
     }
     
     const data = await response.json()
-    console.log('✅ Productos cargados:', data.length)
     return data
   } catch (error) {
     console.error('Error al obtener productos:', error)

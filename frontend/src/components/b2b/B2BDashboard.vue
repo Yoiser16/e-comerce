@@ -101,8 +101,16 @@
           </div>
           
           <!-- ==================== SLIDE 2: Champagne ==================== -->
-          <div class="w-full flex-shrink-0 bg-[#f5f2e9] relative">
-            <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+          <div class="w-full flex-shrink-0 relative overflow-hidden" style="background: linear-gradient(135deg, #F5EBE0 0%, #E8D5C4 40%, #F2E6D9 70%, #DEC9B6 100%);">
+            
+            <!-- Elementos decorativos de fondo -->
+            <div class="absolute inset-0 overflow-hidden">
+              <div class="absolute -top-20 -right-20 w-[400px] h-[400px] bg-[#C9A962]/10 rounded-full"></div>
+              <div class="absolute bottom-0 left-0 w-80 h-80 bg-[#8B7355]/8 rounded-full -translate-x-1/3 translate-y-1/3"></div>
+              <div class="absolute top-1/3 left-1/4 w-40 h-40 bg-[#D4A85A]/6 rounded-full"></div>
+            </div>
+            
+            <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 relative z-10">
               <div class="grid lg:grid-cols-2 gap-6 lg:gap-4 min-h-[420px] sm:min-h-[480px] lg:min-h-[520px] items-center py-12 lg:py-16">
                 
                 <!-- Texto -->
@@ -113,14 +121,14 @@
                   </div>
                   
                   <h1 class="font-luxury leading-[1.1] mb-4">
-                    <span class="block text-[#4A4A4A] text-lg sm:text-xl lg:text-2xl font-light mb-1">Extensiones y Pelucas</span>
+                    <span class="block text-[#5C4A3A] text-lg sm:text-xl lg:text-2xl font-light mb-1">Extensiones y Pelucas</span>
                     <span class="block text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold">
-                      <span class="text-[#1A1A1A]">100% </span>
-                      <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#8B7355] via-[#A8896C] to-[#8B7355]">Remy</span>
+                      <span class="text-[#2C1810]">100% </span>
+                      <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#8B7355] via-[#C9A962] to-[#8B7355]">Remy</span>
                     </span>
                   </h1>
                   
-                  <p class="text-[#7A7A7A] text-sm sm:text-base leading-relaxed mb-6 max-w-md">
+                  <p class="text-[#6B5B4E] text-sm sm:text-base leading-relaxed mb-6 max-w-md">
                     Cabello humano de la más alta calidad. Precios exclusivos para distribuidores profesionales.
                   </p>
                   
@@ -128,7 +136,7 @@
                   <div class="flex flex-wrap items-center gap-3 mb-6">
                     <router-link 
                       to="/portal/catalogo"
-                      class="inline-flex items-center gap-2 px-6 py-3 bg-[#1A1A1A] text-white text-sm font-bold rounded-full shadow-lg hover:scale-[1.02] transition-all"
+                      class="inline-flex items-center gap-2 px-6 py-3 bg-[#2C1810] text-white text-sm font-bold rounded-full shadow-lg hover:bg-[#1A0F09] hover:scale-[1.02] transition-all"
                     >
                       Ver Colección
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
@@ -139,27 +147,27 @@
                     <a 
                       href="https://wa.me/573001234567"
                       target="_blank"
-                      class="inline-flex items-center gap-2 px-5 py-3 border border-[#1A1A1A]/20 text-[#1A1A1A] text-sm font-medium rounded-full hover:bg-[#1A1A1A]/5 transition-all"
+                      class="inline-flex items-center gap-2 px-5 py-3 border border-[#8B7355]/40 text-[#2C1810] text-sm font-medium rounded-full hover:bg-[#8B7355]/10 transition-all"
                     >
                       Contactar Asesor
                     </a>
                   </div>
                   
                   <!-- Stats compactos -->
-                  <div class="flex items-center gap-6 pt-5 border-t border-[#1A1A1A]/10">
+                  <div class="flex items-center gap-6 pt-5 border-t border-[#8B7355]/20">
                     <div>
-                      <p class="text-2xl font-bold text-[#1A1A1A]">500<span class="text-[#8B7355]">+</span></p>
-                      <p class="text-[10px] text-[#7A7A7A] uppercase tracking-wide">Productos</p>
+                      <p class="text-2xl font-bold text-[#2C1810]">500<span class="text-[#C9A962]">+</span></p>
+                      <p class="text-[10px] text-[#8B7355]/60 uppercase tracking-wide">Productos</p>
                     </div>
-                    <div class="w-px h-10 bg-[#1A1A1A]/10"></div>
+                    <div class="w-px h-10 bg-[#8B7355]/20"></div>
                     <div>
-                      <p class="text-2xl font-bold text-[#1A1A1A]">24<span class="text-[#8B7355]">h</span></p>
-                      <p class="text-[10px] text-[#7A7A7A] uppercase tracking-wide">Envío Express</p>
+                      <p class="text-2xl font-bold text-[#2C1810]">24<span class="text-[#C9A962]">h</span></p>
+                      <p class="text-[10px] text-[#8B7355]/60 uppercase tracking-wide">Envío Express</p>
                     </div>
-                    <div class="w-px h-10 bg-[#1A1A1A]/10"></div>
+                    <div class="w-px h-10 bg-[#8B7355]/20"></div>
                     <div>
-                      <p class="text-2xl font-bold text-[#8B7355]">30%</p>
-                      <p class="text-[10px] text-[#7A7A7A] uppercase tracking-wide">Margen</p>
+                      <p class="text-2xl font-bold text-[#C9A962]">30%</p>
+                      <p class="text-[10px] text-[#8B7355]/60 uppercase tracking-wide">Margen</p>
                     </div>
                   </div>
                 </div>
@@ -170,11 +178,11 @@
                     src="/images/card%20panel/6.png" 
                     alt="Extensiones Remy" 
                     class="h-full w-auto object-contain"
-                    style="filter: drop-shadow(0 20px 40px rgba(0,0,0,0.2));"
+                    style="filter: drop-shadow(0 20px 40px rgba(44,24,16,0.25));"
                   />
                   
                   <!-- Badge Calidad -->
-                  <div class="absolute top-2 right-2 lg:top-4 lg:right-8 bg-[#1A1A1A] rounded-xl px-4 py-2 shadow-xl rotate-3">
+                  <div class="absolute top-2 right-2 lg:top-4 lg:right-8 bg-[#2C1810] rounded-xl px-4 py-2 shadow-xl rotate-3">
                     <p class="text-[#C9A962] text-[9px] font-bold uppercase">Certificado</p>
                     <p class="text-white text-xl font-black -mt-1">100%</p>
                   </div>
@@ -281,92 +289,70 @@
     <!-- =========================================================================
          BENEFITS BAR - Cards con imágenes premium personalizadas
     ========================================================================== -->
-    <section class="py-5 sm:py-7">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
+    <section class="py-4 sm:py-5">
+      <div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-12">
         
-        <!-- Grid 2x2 en móvil, 4 cols en desktop -->
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
-          
-          <!-- Card 1: Envío gratis -->
-          <div>
-            <div class="bg-white rounded-2xl overflow-hidden" style="box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03);">
-              <div class="p-3 sm:p-4 pb-2 sm:pb-3">
-                <div class="w-full aspect-square rounded-2xl overflow-hidden">
-                  <img 
-                    src="/images/card%20panel/1.png" 
-                    alt="Envío gratis" 
-                    class="w-full h-full object-cover rounded-2xl"
-                    loading="lazy"
-                  />
-                </div>
+        <!-- Contenedor único estilo Mercado Libre -->
+        <div class="bg-white rounded-xl overflow-hidden" style="box-shadow: 0 2px 10px rgba(0,0,0,0.05), 0 0 0 1px rgba(0,0,0,0.03);">
+          <div class="grid grid-cols-2 lg:grid-cols-4 divide-x divide-gray-100">
+            
+            <!-- Benefit 1: Envío gratis -->
+            <div class="flex flex-col items-center text-center p-3 sm:p-4 border-b lg:border-b-0 border-gray-100">
+              <div class="w-full aspect-[4/3] rounded-xl overflow-hidden mb-2.5">
+                <img 
+                  src="/images/card%20panel/1.png" 
+                  alt="Envío gratis" 
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                />
               </div>
-              <div class="px-3 sm:px-4 pb-4 sm:pb-5 pt-1 text-center">
-                <p class="font-semibold text-gray-900 text-[13px] sm:text-[15px] leading-tight mb-0.5">Envío gratis</p>
-                <p class="text-gray-400 text-[11px] sm:text-xs leading-relaxed">En compras desde $150.000</p>
-              </div>
+              <p class="font-semibold text-gray-900 text-[12px] sm:text-[14px] leading-tight mb-0.5">Envío gratis</p>
+              <p class="text-gray-400 text-[10px] sm:text-[11px] leading-snug">En compras desde $150.000</p>
             </div>
-          </div>
-          
-          <!-- Card 2: 100% Humano -->
-          <div>
-            <div class="bg-white rounded-2xl overflow-hidden" style="box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03);">
-              <div class="p-3 sm:p-4 pb-2 sm:pb-3">
-                <div class="w-full aspect-square rounded-2xl overflow-hidden">
-                  <img 
-                    src="/images/card%20panel/2.png" 
-                    alt="Calidad Premium" 
-                    class="w-full h-full object-cover rounded-2xl"
-                    loading="lazy"
-                  />
-                </div>
+            
+            <!-- Benefit 2: 100% Humano -->
+            <div class="flex flex-col items-center text-center p-3 sm:p-4 border-b lg:border-b-0 border-gray-100">
+              <div class="w-full aspect-[4/3] rounded-xl overflow-hidden mb-2.5">
+                <img 
+                  src="/images/card%20panel/2.png" 
+                  alt="Calidad Premium" 
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                />
               </div>
-              <div class="px-3 sm:px-4 pb-4 sm:pb-5 pt-1 text-center">
-                <p class="font-semibold text-gray-900 text-[13px] sm:text-[15px] leading-tight mb-0.5">100% Humano</p>
-                <p class="text-gray-400 text-[11px] sm:text-xs leading-relaxed">Cabello Remy certificado</p>
-              </div>
+              <p class="font-semibold text-gray-900 text-[12px] sm:text-[14px] leading-tight mb-0.5">100% Humano</p>
+              <p class="text-gray-400 text-[10px] sm:text-[11px] leading-snug">Cabello Remy certificado</p>
             </div>
-          </div>
-          
-          <!-- Card 3: Pago Seguro -->
-          <div>
-            <div class="bg-white rounded-2xl overflow-hidden" style="box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03);">
-              <div class="p-3 sm:p-4 pb-2 sm:pb-3">
-                <div class="w-full aspect-square rounded-2xl overflow-hidden">
-                  <img 
-                    src="/images/card%20panel/3.png" 
-                    alt="Pago Seguro" 
-                    class="w-full h-full object-cover rounded-2xl"
-                    loading="lazy"
-                  />
-                </div>
+            
+            <!-- Benefit 3: Pago Seguro -->
+            <div class="flex flex-col items-center text-center p-3 sm:p-4">
+              <div class="w-full aspect-[4/3] rounded-xl overflow-hidden mb-2.5">
+                <img 
+                  src="/images/card%20panel/3.png" 
+                  alt="Pago Seguro" 
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                />
               </div>
-              <div class="px-3 sm:px-4 pb-4 sm:pb-5 pt-1 text-center">
-                <p class="font-semibold text-gray-900 text-[13px] sm:text-[15px] leading-tight mb-0.5">Pago seguro</p>
-                <p class="text-gray-400 text-[11px] sm:text-xs leading-relaxed">Transacciones protegidas</p>
-              </div>
+              <p class="font-semibold text-gray-900 text-[12px] sm:text-[14px] leading-tight mb-0.5">Pago seguro</p>
+              <p class="text-gray-400 text-[10px] sm:text-[11px] leading-snug">Transacciones protegidas</p>
             </div>
-          </div>
-          
-          <!-- Card 4: Soporte VIP -->
-          <div>
-            <div class="bg-white rounded-2xl overflow-hidden" style="box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03);">
-              <div class="p-3 sm:p-4 pb-2 sm:pb-3">
-                <div class="w-full aspect-square rounded-2xl overflow-hidden">
-                  <img 
-                    src="/images/card%20panel/4.png" 
-                    alt="Asesoría VIP" 
-                    class="w-full h-full object-cover rounded-2xl"
-                    loading="lazy"
-                  />
-                </div>
+            
+            <!-- Benefit 4: Soporte VIP -->
+            <div class="flex flex-col items-center text-center p-3 sm:p-4">
+              <div class="w-full aspect-[4/3] rounded-xl overflow-hidden mb-2.5">
+                <img 
+                  src="/images/card%20panel/4.png" 
+                  alt="Asesoría VIP" 
+                  class="w-full h-full object-cover"
+                  loading="lazy"
+                />
               </div>
-              <div class="px-3 sm:px-4 pb-4 sm:pb-5 pt-1 text-center">
-                <p class="font-semibold text-gray-900 text-[13px] sm:text-[15px] leading-tight mb-0.5">Soporte VIP</p>
-                <p class="text-gray-400 text-[11px] sm:text-xs leading-relaxed">Asesor personal 24/7</p>
-              </div>
+              <p class="font-semibold text-gray-900 text-[12px] sm:text-[14px] leading-tight mb-0.5">Soporte VIP</p>
+              <p class="text-gray-400 text-[10px] sm:text-[11px] leading-snug">Asesor personal 24/7</p>
             </div>
+            
           </div>
-          
         </div>
       </div>
     </section>
@@ -543,7 +529,7 @@
               
               <!-- Precio -->
               <p class="text-gray-900 font-bold text-base sm:text-lg">
-                ${{ product.price.toLocaleString() }}
+                ${{ (product?.price || 0).toLocaleString() }}
               </p>
               
               <!-- Envío / Stock -->
@@ -619,15 +605,15 @@
               {{ featuredProducts[0].name }}
             </p>
             
-            <p v-if="featuredProducts[0].originalPrice && featuredProducts[0].originalPrice > featuredProducts[0].price" class="text-gray-400 text-sm line-through">
-              ${{ featuredProducts[0].originalPrice.toLocaleString() }}
+            <p v-if="featuredProducts[0]?.originalPrice && featuredProducts[0].originalPrice > featuredProducts[0].price" class="text-gray-400 text-sm line-through">
+              ${{ (featuredProducts[0]?.originalPrice || 0).toLocaleString() }}
             </p>
             
             <div class="flex items-baseline gap-2.5 mb-1">
               <span class="text-[28px] font-light text-gray-900">
-                ${{ featuredProducts[0].price.toLocaleString() }}
+                ${{ (featuredProducts[0]?.price || 0).toLocaleString() }}
               </span>
-              <span v-if="featuredProducts[0].discount" class="text-emerald-600 text-sm font-semibold">
+              <span v-if="featuredProducts[0]?.discount" class="text-emerald-600 text-sm font-semibold">
                 {{ featuredProducts[0].discount }}% OFF
               </span>
             </div>
@@ -691,16 +677,16 @@
                   </p>
                   
                   <!-- Precio anterior -->
-                  <p v-if="product.originalPrice && product.originalPrice > product.price" class="text-gray-400 text-xs line-through">
-                    ${{ product.originalPrice.toLocaleString() }}
+                  <p v-if="product?.originalPrice && product.originalPrice > product.price" class="text-gray-400 text-xs line-through">
+                    ${{ (product?.originalPrice || 0).toLocaleString() }}
                   </p>
                   
                   <!-- Precio + descuento -->
                   <div class="flex items-baseline gap-1.5 flex-wrap">
                     <span class="text-[22px] font-light text-gray-900">
-                      ${{ product.price.toLocaleString() }}
+                      ${{ (product?.price || 0).toLocaleString() }}
                     </span>
-                    <span v-if="product.discount" class="text-emerald-600 text-xs font-semibold">
+                    <span v-if="product?.discount" class="text-emerald-600 text-xs font-semibold">
                       {{ product.discount }}% OFF
                     </span>
                   </div>
@@ -788,7 +774,7 @@
 </template>
 
 <script>
-import { ref, computed, reactive, onMounted, onUnmounted } from 'vue'
+import { ref, computed, reactive, onBeforeMount, onMounted, onUnmounted } from 'vue'
 import { B2BToast, useToast } from './ui'
 import B2BSkeleton from './ui/B2BSkeleton.vue'
 import { obtenerProductos, obtenerProductosDestacados } from '@/services/mayoristas'
@@ -1056,14 +1042,18 @@ export default {
               })
             }
           } catch (err) {
-            console.warn('No se pudo obtener productos vistos:', err)
+            // Silenciar errores de productos vistos
           }
           
           // 2. Agregar productos favoritos (sin duplicar)
-          try {
-            const favoritos = await favoritosService.listar()
-            if (favoritos && favoritos.length > 0) {
-              favoritos.forEach(f => {
+          const hasToken = localStorage.getItem('b2b_access_token') || localStorage.getItem('access_token')
+          
+          if (hasToken) {
+            try {
+              const favoritos = await favoritosService.listar()
+              
+              if (favoritos && favoritos.length > 0) {
+                favoritos.forEach(f => {
                 if (!productosUnicos.has(f.producto_id)) {
                   productosUnicos.add(f.producto_id)
                   productosHabituales.push({
@@ -1080,7 +1070,8 @@ export default {
               })
             }
           } catch (err) {
-            console.warn('No se pudo obtener favoritos:', err)
+            // Silenciar error - endpoint no soporta B2B
+          }
           }
         }
         
@@ -1102,7 +1093,6 @@ export default {
             const combinados = [...productosHabituales, ...productosExtra]
             frequentProducts.value = combinados.slice(0, MAX_PRODUCTOS)
           } catch (err) {
-            console.warn('No se pudo completar productos:', err)
             // Si falla, al menos mostrar lo que tenemos
             if (productosHabituales.length > 0) {
               frequentProducts.value = productosHabituales
@@ -1120,7 +1110,7 @@ export default {
         }, 100)
         
       } catch (error) {
-        console.error('Error al cargar productos:', error)
+        console.error('❌ [cargarProductos] Error:', error)
         toast.error('Error al cargar productos. Intenta recargar la página.', 5000)
       } finally {
         isLoading.value = false
@@ -1130,9 +1120,13 @@ export default {
     // =========================================================================
     // LIFECYCLE
     // =========================================================================
+    onBeforeMount(() => {
+      // Preparando componente
+    })
+
     onMounted(() => {
       startSlideshow()
-      startSceneShow()  // Iniciar sistema de escenarios
+      startSceneShow()
       cargarProductos()
       
       // Cargar contador del carrito desde localStorage

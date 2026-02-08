@@ -12,7 +12,11 @@ export default defineConfig({
     VitePWA({
       registerType: 'autoUpdate',
       devOptions: {
-        enabled: true
+        enabled: false
+      },
+      workbox: {
+        navigateFallback: 'index.html',
+        navigateFallbackAllowlist: [/^\/(?!api)/]
       },
       includeAssets: ['favicon.ico', 'logo-kharis.png', 'apple-touch-icon.png'],
       manifest: {

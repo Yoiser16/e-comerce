@@ -14,6 +14,16 @@
   </head>
   <body class="antialiased">
     <div id="app"></div>
+    <script>
+      // Limpiar service workers viejos de PWA dev mode
+      if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.getRegistrations().then(registrations => {
+          registrations.forEach(r => {
+            r.unregister().then(() => console.log('🧹 SW desregistrado:', r.scope))
+          })
+        })
+      }
+    </script>
     <script type="module" src="/src/main.js"></script>
   </body>
 </html>

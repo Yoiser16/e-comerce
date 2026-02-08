@@ -208,6 +208,7 @@ export default {
 
     return {
       quantity,
+      imageError,
       placeholderImage,
       imageSrc,
       isVideo,

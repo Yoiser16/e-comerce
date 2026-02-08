@@ -10,9 +10,9 @@ import { createApp } from 'vue'
 import './style.css'
 import { getAppContext, debugSubdomain, APP_CONTEXT } from './utils/subdomain'
 
-// Debug en desarrollo
+// Importar utilidades de debug (solo en desarrollo)
 if (import.meta.env.DEV) {
-  debugSubdomain()
+  import('./utils/debugAuth.js')
 }
 
 /**
@@ -34,8 +34,6 @@ async function bootstrap() {
     // B2B - Portal Mayoristas (pro.dominio.com)
     // =========================================================================
     case APP_CONTEXT.B2B:
-      console.log('🏭 Iniciando aplicación B2B (Mayoristas)')
-      
       // Importar dinámicamente App y Router B2B
       const b2bModule = await import('./AppB2B.vue')
       const b2bRouter = await import('./router/b2b.js')

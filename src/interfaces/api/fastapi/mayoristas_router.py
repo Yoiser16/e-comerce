@@ -48,6 +48,10 @@ class DescuentoRequest(BaseModel):
     descuento: float
 
 
+class CambiarPasswordRequest(BaseModel):
+    new_password: str
+
+
 # ═══════════════════════════════════════════════════════════════════════════
 # ENDPOINTS B2B - Productos para Mayoristas
 # ═══════════════════════════════════════════════════════════════════════════
@@ -329,6 +333,7 @@ async def aprobar_mayorista(
         # Actualizar campos directamente (admin es dict, no Usuario)
         def do_approve():
             mayorista.estado_mayorista = 'APROBADO'
+            mayorista.is_active = True
             mayorista.fecha_revision = timezone.now()
             mayorista.notas_revision = f"Aprobado por {admin.get('user_id', 'admin')}"
             mayorista.save()
@@ -456,6 +461,38 @@ async def actualizar_descuento(
         raise
     except Exception as e:
         print(f"❌ Error al actualizar descuento: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.post("/mayoristas/{mayorista_id}/cambiar-password")
+async def cambiar_password_mayorista(
+    mayorista_id: UUID,
+    request: CambiarPasswordRequest,
+    admin = Depends(get_current_admin_user)
+):
+    """
+    Cambia la contraseña de un mayorista (solo admin).
+    """
+    try:
+        if len(request.new_password) < 8:
+            raise HTTPException(status_code=400, detail="La contraseña debe tener al menos 8 caracteres")
+        
+        mayorista = await sync_to_async(Usuario.objects.get)(id=mayorista_id, tipo='MAYORISTA')
+        
+        def do_change():
+            mayorista.set_password(request.new_password)
+            mayorista.save()
+        
+        await sync_to_async(do_change)()
+        
+        print(f"🔑 Admin cambió contraseña del mayorista: {mayorista.email}")
+        return {"message": f"Contraseña actualizada para {mayorista.email}"}
+    except Usuario.DoesNotExist:
+        raise HTTPException(status_code=404, detail="Mayorista no encontrado")
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error al cambiar contraseña: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 

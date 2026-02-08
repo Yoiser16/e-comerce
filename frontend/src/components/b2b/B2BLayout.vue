@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex flex-col bg-[#EBEBEB]">
+  <div class="min-h-screen flex flex-col bg-[#f5f5f5]">
     
     <!-- =========================================================================
          CONTENIDO PRINCIPAL
@@ -8,14 +8,23 @@
       <!-- New B2B Header Component -->
       <B2BHeader />
 
-      <!-- Spacer for fixed header (accent line + utility bar + main header) -->
-      <div class="h-[57px] lg:h-[107px]"></div>
+      <!-- Spacer for fixed header (main header + nav bar) -->
+      <div class="h-[56px] lg:h-[106px]"></div>
 
       <!-- Main Content (no gap) -->
       <main class="flex-1 -mt-px">
-        <router-view v-slot="{ Component }">
-          <transition name="fade" mode="out-in">
-            <component :is="Component" />
+        <router-view v-slot="{ Component, route: slotRoute }">
+          <transition 
+            name="fade" 
+            mode="out-in"
+            @before-enter="() => onBeforeEnter(slotRoute)"
+            @after-enter="() => onAfterEnter(slotRoute)"
+            @before-leave="() => onBeforeLeave(slotRoute)"
+            @after-leave="() => onAfterLeave(slotRoute)"
+          >
+            <div v-if="Component" :key="slotRoute.fullPath">
+              <component :is="Component" />
+            </div>
           </transition>
         </router-view>
       </main>
@@ -133,7 +142,7 @@
 </template>
 
 <script>
-import { computed } from 'vue'
+import { computed, onErrorCaptured } from 'vue'
 import { getCrossContextUrl, APP_CONTEXT } from '../../utils/subdomain'
 import B2BHeader from './B2BHeader.vue'
 
@@ -145,7 +154,27 @@ export default {
   setup() {
     const retailUrl = computed(() => getCrossContextUrl(APP_CONTEXT.B2C))
 
-    return { retailUrl }
+    // Capturar errores en componentes hijos
+    onErrorCaptured((err, instance, info) => {
+      console.error('❌ [B2BLayout] Error capturado en componente hijo:', err)
+      console.error('   Componente:', instance?.$options?.name || 'Unknown')
+      console.error('   Info:', info)
+      return false // Propagar el error
+    })
+
+    // Hooks de transición (sin logs)
+    function onBeforeEnter(slotRoute) {}
+    function onAfterEnter(slotRoute) {}
+    function onBeforeLeave(slotRoute) {}
+    function onAfterLeave(slotRoute) {}
+
+    return { 
+      retailUrl,
+      onBeforeEnter,
+      onAfterEnter,
+      onBeforeLeave,
+      onAfterLeave
+    }
   }
 }
 </script>

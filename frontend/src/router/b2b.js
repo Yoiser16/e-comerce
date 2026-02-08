@@ -208,7 +208,6 @@ router.beforeEach((to, from, next) => {
 
     // Sin token → acceso denegado
     if (!b2bToken || !b2bUserStr) {
-      console.log(`🔐 Acceso denegado a ${to.path} - No autenticado - Redirigiendo a login`)
       next({ 
         name: 'B2BLogin',
         query: { 
@@ -221,7 +220,6 @@ router.beforeEach((to, from, next) => {
 
     // Token existe pero sin usuario válido → acceso denegado
     if (!b2bUser.id && !b2bUser.es_mayorista && b2bUser.tipo !== 'MAYORISTA') {
-      console.warn(`🔐 Acceso denegado a ${to.path} - Usuario inválido`)
       localStorage.removeItem('b2b_access_token')
       localStorage.removeItem('b2b_user')
       localStorage.removeItem('b2b_refresh_token')
@@ -238,7 +236,7 @@ router.beforeEach((to, from, next) => {
 
 // Interceptar errores de navegación
 router.onError((error) => {
-  console.error('B2B Router Error:', error)
+  console.error('❌ [B2B Router Error]:', error)
 })
 
 export default router

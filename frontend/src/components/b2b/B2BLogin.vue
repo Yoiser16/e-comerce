@@ -314,6 +314,323 @@
     </div>
 
     <!-- =========================================================================
+         MODAL RECUPERAR CONTRASEÑA (3 pasos: email → código → nueva contraseña)
+    ========================================================================== -->
+    <Teleport to="body">
+      <Transition name="modal">
+        <div 
+          v-if="showForgotPassword" 
+          class="fixed inset-0 z-50 flex items-center justify-center p-4"
+        >
+          <!-- Backdrop -->
+          <div 
+            class="absolute inset-0 bg-black/50"
+            @click="closeForgotPassword"
+          ></div>
+          
+          <!-- Modal Content -->
+          <div class="relative bg-white rounded-2xl shadow-2xl max-w-md w-full p-8 transform transition-all">
+            <!-- Botón cerrar -->
+            <button 
+              @click="closeForgotPassword"
+              class="absolute top-4 right-4 text-gray-400 hover:text-gray-600 transition-colors"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+
+            <!-- ===== PASO 1: Ingresar email ===== -->
+            <div v-if="forgotStep === 1">
+              <div class="w-16 h-16 mx-auto mb-5 rounded-full bg-[#C9A962]/10 flex items-center justify-center">
+                <svg class="w-8 h-8 text-[#C9A962]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <h3 class="text-xl font-luxury text-text-dark text-center mb-2">
+                Recuperar contraseña
+              </h3>
+              <p class="text-text-light text-sm text-center mb-6">
+                Ingresa tu correo electrónico y te enviaremos un código de verificación.
+              </p>
+
+              <form @submit.prevent="handleForgotSubmit">
+                <div class="mb-5">
+                  <label class="block text-sm font-medium text-text-dark mb-1.5">Correo electrónico</label>
+                  <div class="relative">
+                    <input
+                      v-model="forgotEmail"
+                      type="email"
+                      required
+                      placeholder="tu@empresa.com"
+                      :disabled="forgotLoading"
+                      class="w-full px-4 py-3.5 pl-11 bg-white border border-gray-200 rounded-lg
+                             focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]
+                             transition-all outline-none disabled:opacity-50"
+                    />
+                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                  </div>
+                </div>
+
+                <!-- Error -->
+                <div v-if="forgotError" class="mb-4 p-3 rounded-lg bg-red-50 border border-red-200">
+                  <p class="text-sm text-red-700">{{ forgotError }}</p>
+                </div>
+
+                <button
+                  type="submit"
+                  :disabled="forgotLoading || !forgotEmail.trim()"
+                  class="w-full py-3.5 bg-[#1A1A1A] hover:bg-black text-white font-medium rounded-lg
+                         transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                         flex items-center justify-center gap-2"
+                >
+                  <svg v-if="forgotLoading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>{{ forgotLoading ? 'Enviando...' : 'Enviar código' }}</span>
+                </button>
+              </form>
+
+              <button
+                @click="closeForgotPassword"
+                class="w-full mt-3 py-3 text-text-medium text-sm hover:text-text-dark transition-colors"
+              >
+                Volver al inicio de sesión
+              </button>
+            </div>
+
+            <!-- ===== PASO 2: Ingresar código de 6 dígitos ===== -->
+            <div v-else-if="forgotStep === 2">
+              <div class="w-16 h-16 mx-auto mb-5 rounded-full bg-[#C9A962]/10 flex items-center justify-center">
+                <svg class="w-8 h-8 text-[#C9A962]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                </svg>
+              </div>
+              <h3 class="text-xl font-luxury text-text-dark text-center mb-2">
+                Verificar código
+              </h3>
+              <p class="text-text-light text-sm text-center mb-1">
+                Hemos enviado un código de 6 dígitos a:
+              </p>
+              <p class="text-[#C9A962] text-sm text-center font-medium mb-6">
+                {{ forgotEmail }}
+              </p>
+
+              <!-- Inputs de código -->
+              <div class="flex justify-center gap-2 sm:gap-3 mb-5">
+                <input
+                  v-for="(_, idx) in 6"
+                  :key="idx"
+                  :ref="el => { if (el) codeInputs[idx] = el }"
+                  v-model="codeDigits[idx]"
+                  type="text"
+                  inputmode="numeric"
+                  maxlength="1"
+                  :disabled="forgotLoading"
+                  @input="handleCodeInput(idx, $event)"
+                  @keydown.backspace="handleCodeBackspace(idx, $event)"
+                  @paste="handleCodePaste($event)"
+                  class="w-11 h-14 sm:w-12 sm:h-16 text-center text-xl font-bold bg-white border-2
+                         rounded-lg outline-none transition-all disabled:opacity-50
+                         focus:border-[#C9A962] focus:ring-2 focus:ring-[#C9A962]/20"
+                  :class="codeDigits[idx] ? 'border-[#C9A962]' : 'border-gray-200'"
+                />
+              </div>
+
+              <!-- Timer y reenviar -->
+              <div class="text-center mb-5">
+                <p v-if="resendTimer > 0" class="text-text-light text-sm">
+                  Reenviar código en <span class="text-[#C9A962] font-medium">{{ resendTimer }}s</span>
+                </p>
+                <button
+                  v-else
+                  @click="handleResendCode"
+                  :disabled="forgotLoading"
+                  class="text-[#C9A962] text-sm font-medium hover:text-[#B8944F] transition-colors disabled:opacity-50"
+                >
+                  Reenviar código
+                </button>
+              </div>
+
+              <!-- Error -->
+              <div v-if="forgotError" class="mb-4 p-3 rounded-lg bg-red-50 border border-red-200">
+                <p class="text-sm text-red-700">{{ forgotError }}</p>
+              </div>
+
+              <button
+                @click="handleVerifyCode"
+                :disabled="forgotLoading || fullCode.length !== 6"
+                class="w-full py-3.5 bg-[#1A1A1A] hover:bg-black text-white font-medium rounded-lg
+                       transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                       flex items-center justify-center gap-2"
+              >
+                <svg v-if="forgotLoading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>{{ forgotLoading ? 'Verificando...' : 'Verificar código' }}</span>
+              </button>
+
+              <button
+                @click="forgotStep = 1"
+                class="w-full mt-3 py-3 text-text-medium text-sm hover:text-text-dark transition-colors"
+              >
+                ← Cambiar correo electrónico
+              </button>
+            </div>
+
+            <!-- ===== PASO 3: Nueva contraseña ===== -->
+            <div v-else-if="forgotStep === 3">
+              <div class="w-16 h-16 mx-auto mb-5 rounded-full bg-green-100 flex items-center justify-center">
+                <svg class="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                </svg>
+              </div>
+              <h3 class="text-xl font-luxury text-text-dark text-center mb-2">
+                Nueva contraseña
+              </h3>
+              <p class="text-text-light text-sm text-center mb-6">
+                Crea tu nueva contraseña. Debe tener al menos 8 caracteres.
+              </p>
+
+              <form @submit.prevent="handleResetPassword">
+                <!-- Nueva contraseña -->
+                <div class="mb-4">
+                  <label class="block text-sm font-medium text-text-dark mb-1.5">Nueva contraseña</label>
+                  <div class="relative">
+                    <input
+                      v-model="newPassword"
+                      :type="showNewPassword ? 'text' : 'password'"
+                      required
+                      minlength="8"
+                      placeholder="Mínimo 8 caracteres"
+                      :disabled="forgotLoading"
+                      class="w-full px-4 py-3.5 pl-11 pr-12 bg-white border border-gray-200 rounded-lg
+                             focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]
+                             transition-all outline-none disabled:opacity-50"
+                    />
+                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                    </svg>
+                    <button
+                      type="button"
+                      @click="showNewPassword = !showNewPassword"
+                      class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      <svg v-if="showNewPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                      </svg>
+                      <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+                  </div>
+                  <!-- Indicador de fortaleza -->
+                  <div class="mt-2 flex gap-1">
+                    <div 
+                      v-for="i in 4" :key="i"
+                      class="h-1 flex-1 rounded-full transition-all"
+                      :class="passwordStrength >= i ? passwordStrengthColor : 'bg-gray-200'"
+                    ></div>
+                  </div>
+                  <p class="text-xs mt-1" :class="passwordStrengthTextColor">
+                    {{ passwordStrengthText }}
+                  </p>
+                </div>
+
+                <!-- Confirmar contraseña -->
+                <div class="mb-5">
+                  <label class="block text-sm font-medium text-text-dark mb-1.5">Confirmar contraseña</label>
+                  <div class="relative">
+                    <input
+                      v-model="confirmPassword"
+                      :type="showConfirmPassword ? 'text' : 'password'"
+                      required
+                      placeholder="Repite tu contraseña"
+                      :disabled="forgotLoading"
+                      class="w-full px-4 py-3.5 pl-11 pr-12 bg-white border rounded-lg
+                             focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]
+                             transition-all outline-none disabled:opacity-50"
+                      :class="confirmPassword && confirmPassword !== newPassword 
+                        ? 'border-red-300' 
+                        : confirmPassword && confirmPassword === newPassword 
+                          ? 'border-green-400' 
+                          : 'border-gray-200'"
+                    />
+                    <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
+                    </svg>
+                    <button
+                      type="button"
+                      @click="showConfirmPassword = !showConfirmPassword"
+                      class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    >
+                      <svg v-if="showConfirmPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                      </svg>
+                      <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    </button>
+                  </div>
+                  <p v-if="confirmPassword && confirmPassword !== newPassword" class="text-sm text-red-500 mt-1">
+                    Las contraseñas no coinciden
+                  </p>
+                </div>
+
+                <!-- Error -->
+                <div v-if="forgotError" class="mb-4 p-3 rounded-lg bg-red-50 border border-red-200">
+                  <p class="text-sm text-red-700">{{ forgotError }}</p>
+                </div>
+
+                <button
+                  type="submit"
+                  :disabled="forgotLoading || !canResetPassword"
+                  class="w-full py-3.5 bg-[#1A1A1A] hover:bg-black text-white font-medium rounded-lg
+                         transition-all disabled:opacity-50 disabled:cursor-not-allowed
+                         flex items-center justify-center gap-2"
+                >
+                  <svg v-if="forgotLoading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>{{ forgotLoading ? 'Guardando...' : 'Restablecer contraseña' }}</span>
+                </button>
+              </form>
+            </div>
+
+            <!-- ===== PASO 4: Éxito ===== -->
+            <div v-else-if="forgotStep === 4" class="text-center">
+              <div class="w-20 h-20 mx-auto mb-5 rounded-full bg-green-100 flex items-center justify-center">
+                <svg class="w-10 h-10 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 class="text-xl font-luxury text-text-dark mb-3">
+                ¡Contraseña actualizada!
+              </h3>
+              <p class="text-text-medium text-sm mb-8 leading-relaxed">
+                Tu contraseña ha sido restablecida exitosamente. Ya puedes iniciar sesión con tu nueva contraseña.
+              </p>
+              <button
+                @click="closeForgotPassword"
+                class="w-full py-3.5 bg-[#1A1A1A] hover:bg-black text-white font-medium rounded-lg
+                       transition-all flex items-center justify-center gap-2"
+              >
+                <span>Iniciar sesión</span>
+              </button>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
+    <!-- =========================================================================
          MODAL DE ESTADO (Cuenta pendiente, rechazada, suspendida, etc.)
     ========================================================================== -->
     <Teleport to="body">
@@ -423,6 +740,21 @@ export default {
     const showPassword = ref(false)
     const showForgotPassword = ref(false)
     const imageError = ref(false)
+
+    // Forgot Password state
+    const forgotStep = ref(1) // 1=email, 2=code, 3=new password, 4=success
+    const forgotEmail = ref('')
+    const forgotLoading = ref(false)
+    const forgotError = ref('')
+    const codeDigits = ref(['', '', '', '', '', ''])
+    const codeInputs = ref([])
+    const resendTimer = ref(0)
+    let resendInterval = null
+    const newPassword = ref('')
+    const confirmPassword = ref('')
+    const showNewPassword = ref(false)
+    const showConfirmPassword = ref(false)
+    const verifiedCode = ref('')
     
     const fieldErrors = ref({
       email: '',
@@ -464,6 +796,231 @@ export default {
     
     function closeStatusModal() {
       statusModal.value.show = false
+    }
+
+    // =========================================================================
+    // FORGOT PASSWORD COMPUTED
+    // =========================================================================
+    const fullCode = computed(() => codeDigits.value.join(''))
+
+    const passwordStrength = computed(() => {
+      const pw = newPassword.value
+      if (!pw) return 0
+      let score = 0
+      if (pw.length >= 8) score++
+      if (/[a-z]/.test(pw) && /[A-Z]/.test(pw)) score++
+      if (/\d/.test(pw)) score++
+      if (/[^a-zA-Z0-9]/.test(pw)) score++
+      return score
+    })
+
+    const passwordStrengthColor = computed(() => {
+      const s = passwordStrength.value
+      if (s <= 1) return 'bg-red-400'
+      if (s === 2) return 'bg-amber-400'
+      if (s === 3) return 'bg-[#C9A962]'
+      return 'bg-green-500'
+    })
+
+    const passwordStrengthTextColor = computed(() => {
+      const s = passwordStrength.value
+      if (s <= 1) return 'text-red-500'
+      if (s === 2) return 'text-amber-500'
+      if (s === 3) return 'text-[#C9A962]'
+      return 'text-green-600'
+    })
+
+    const passwordStrengthText = computed(() => {
+      const s = passwordStrength.value
+      if (!newPassword.value) return ''
+      if (s <= 1) return 'Débil'
+      if (s === 2) return 'Regular'
+      if (s === 3) return 'Buena'
+      return 'Fuerte'
+    })
+
+    const canResetPassword = computed(() => {
+      return newPassword.value.length >= 8 
+        && confirmPassword.value === newPassword.value
+    })
+
+    // =========================================================================
+    // FORGOT PASSWORD METHODS
+    // =========================================================================
+    function closeForgotPassword() {
+      showForgotPassword.value = false
+      // Reset state after animation
+      setTimeout(() => {
+        forgotStep.value = 1
+        forgotEmail.value = ''
+        forgotError.value = ''
+        codeDigits.value = ['', '', '', '', '', '']
+        newPassword.value = ''
+        confirmPassword.value = ''
+        verifiedCode.value = ''
+        showNewPassword.value = false
+        showConfirmPassword.value = false
+        if (resendInterval) {
+          clearInterval(resendInterval)
+          resendInterval = null
+        }
+        resendTimer.value = 0
+      }, 300)
+    }
+
+    function startResendTimer() {
+      resendTimer.value = 60
+      if (resendInterval) clearInterval(resendInterval)
+      resendInterval = setInterval(() => {
+        resendTimer.value--
+        if (resendTimer.value <= 0) {
+          clearInterval(resendInterval)
+          resendInterval = null
+        }
+      }, 1000)
+    }
+
+    async function handleForgotSubmit() {
+      forgotError.value = ''
+      forgotLoading.value = true
+
+      try {
+        const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:8000'
+        const response = await fetch(`${API_BASE}/api/v1/auth/forgot-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: forgotEmail.value })
+        })
+
+        if (!response.ok) {
+          const data = await response.json()
+          throw new Error(data.detail || 'Error al enviar el código')
+        }
+
+        // Pasar al paso 2
+        forgotStep.value = 2
+        startResendTimer()
+
+        // Focus en el primer input del código
+        setTimeout(() => {
+          if (codeInputs.value[0]) codeInputs.value[0].focus()
+        }, 100)
+
+      } catch (err) {
+        forgotError.value = err.message || 'Error al conectar con el servidor'
+      } finally {
+        forgotLoading.value = false
+      }
+    }
+
+    async function handleResendCode() {
+      forgotError.value = ''
+      forgotLoading.value = true
+      try {
+        const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:8000'
+        await fetch(`${API_BASE}/api/v1/auth/forgot-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: forgotEmail.value })
+        })
+        startResendTimer()
+        codeDigits.value = ['', '', '', '', '', '']
+        if (codeInputs.value[0]) codeInputs.value[0].focus()
+      } catch (err) {
+        forgotError.value = 'Error al reenviar el código'
+      } finally {
+        forgotLoading.value = false
+      }
+    }
+
+    function handleCodeInput(idx, event) {
+      const value = event.target.value
+      // Solo permitir dígitos
+      if (!/^\d*$/.test(value)) {
+        codeDigits.value[idx] = ''
+        return
+      }
+      // Mover al siguiente input
+      if (value && idx < 5) {
+        setTimeout(() => {
+          if (codeInputs.value[idx + 1]) codeInputs.value[idx + 1].focus()
+        }, 10)
+      }
+    }
+
+    function handleCodeBackspace(idx, event) {
+      if (!codeDigits.value[idx] && idx > 0) {
+        codeDigits.value[idx - 1] = ''
+        setTimeout(() => {
+          if (codeInputs.value[idx - 1]) codeInputs.value[idx - 1].focus()
+        }, 10)
+      }
+    }
+
+    function handleCodePaste(event) {
+      event.preventDefault()
+      const pastedData = event.clipboardData.getData('text').replace(/\D/g, '').slice(0, 6)
+      if (pastedData) {
+        for (let i = 0; i < 6; i++) {
+          codeDigits.value[i] = pastedData[i] || ''
+        }
+        // Focus en el último dígito ingresado o el siguiente vacío
+        const lastIdx = Math.min(pastedData.length, 5)
+        setTimeout(() => {
+          if (codeInputs.value[lastIdx]) codeInputs.value[lastIdx].focus()
+        }, 10)
+      }
+    }
+
+    function handleVerifyCode() {
+      if (fullCode.value.length !== 6) return
+      forgotError.value = ''
+      // Guardamos el código verificado y pasamos al paso 3
+      verifiedCode.value = fullCode.value
+      forgotStep.value = 3
+    }
+
+    async function handleResetPassword() {
+      if (!canResetPassword.value) return
+      forgotError.value = ''
+      forgotLoading.value = true
+
+      try {
+        const API_BASE = import.meta.env.VITE_API_URL?.replace('/api/v1', '') || 'http://localhost:8000'
+        const response = await fetch(`${API_BASE}/api/v1/auth/reset-password`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            email: forgotEmail.value,
+            codigo: verifiedCode.value,
+            new_password: newPassword.value
+          })
+        })
+
+        const data = await response.json()
+
+        if (!response.ok) {
+          throw new Error(data.detail || 'Error al restablecer contraseña')
+        }
+
+        // Éxito - paso 4
+        forgotStep.value = 4
+
+      } catch (err) {
+        if (err.message.includes('expirado')) {
+          forgotError.value = 'El código ha expirado. Por favor solicita uno nuevo.'
+          // Volver al paso 2 para reenviar
+          setTimeout(() => {
+            forgotStep.value = 2
+            codeDigits.value = ['', '', '', '', '', '']
+            verifiedCode.value = ''
+          }, 2000)
+        } else {
+          forgotError.value = err.message || 'Error al conectar con el servidor'
+        }
+      } finally {
+        forgotLoading.value = false
+      }
     }
     
     function validateForm() {
@@ -577,9 +1134,18 @@ export default {
         }
 
         // Guardar tokens B2B (separados de B2C)
+        console.log('💾 Guardando tokens B2B...')
+        console.log('   Access token:', data.access?.substring(0, 30) + '...')
+        console.log('   Refresh token:', data.refresh?.substring(0, 30) + '...')
+        console.log('   User data:', data.user)
+        
         localStorage.setItem('b2b_access_token', data.access)
         localStorage.setItem('b2b_refresh_token', data.refresh)
         localStorage.setItem('b2b_user', JSON.stringify(data.user))
+        
+        // Verificar que se guardaron correctamente
+        const savedToken = localStorage.getItem('b2b_access_token')
+        console.log('✅ Token guardado y verificado:', savedToken ? 'Sí' : 'No')
         
         // Si eligió "recordarme", guardar preferencia
         if (form.value.remember) {
@@ -621,7 +1187,33 @@ export default {
       statusModal,
       handleLogin,
       handleImageError,
-      closeStatusModal
+      closeStatusModal,
+      // Forgot password
+      forgotStep,
+      forgotEmail,
+      forgotLoading,
+      forgotError,
+      codeDigits,
+      codeInputs,
+      resendTimer,
+      newPassword,
+      confirmPassword,
+      showNewPassword,
+      showConfirmPassword,
+      fullCode,
+      passwordStrength,
+      passwordStrengthColor,
+      passwordStrengthTextColor,
+      passwordStrengthText,
+      canResetPassword,
+      closeForgotPassword,
+      handleForgotSubmit,
+      handleResendCode,
+      handleCodeInput,
+      handleCodeBackspace,
+      handleCodePaste,
+      handleVerifyCode,
+      handleResetPassword
     }
   }
 }

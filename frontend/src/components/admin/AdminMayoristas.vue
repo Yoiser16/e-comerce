@@ -219,6 +219,18 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
                     </svg>
                   </button>
+
+                  <!-- Cambiar contraseña -->
+                  <button 
+                    @click="openPasswordModal(solicitud)"
+                    :disabled="actionLoading === solicitud.id"
+                    class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors disabled:opacity-50"
+                    title="Cambiar contraseña"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                    </svg>
+                  </button>
                 </div>
               </td>
             </tr>
@@ -390,6 +402,104 @@
       </div>
     </div>
 
+    <!-- Modal Cambiar Contraseña -->
+    <div 
+      v-if="showPasswordModal" 
+      class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50"
+      @click.self="showPasswordModal = false"
+    >
+      <div class="bg-white rounded-2xl shadow-xl w-full max-w-md">
+        <div class="p-6">
+          <div class="w-12 h-12 mx-auto mb-4 bg-purple-100 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-purple-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+            </svg>
+          </div>
+          
+          <h3 class="text-lg font-semibold text-text-dark text-center mb-1">Cambiar Contraseña</h3>
+          <p class="text-text-light text-center text-sm mb-6">
+            Establecer nueva contraseña para <strong>{{ passwordSolicitud?.nombre }} {{ passwordSolicitud?.apellido }}</strong>
+            <br/>
+            <span class="text-xs text-text-light">{{ passwordSolicitud?.email }}</span>
+          </p>
+
+          <form @submit.prevent="submitPasswordChange">
+            <div class="mb-4">
+              <label class="block text-sm font-medium text-text-dark mb-2">Nueva contraseña</label>
+              <div class="relative">
+                <input
+                  v-model="newAdminPassword"
+                  :type="showAdminNewPassword ? 'text' : 'password'"
+                  required
+                  minlength="8"
+                  placeholder="Mínimo 8 caracteres"
+                  class="w-full px-4 py-3 pr-12 border border-gray-200 rounded-lg focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none"
+                />
+                <button
+                  type="button"
+                  @click="showAdminNewPassword = !showAdminNewPassword"
+                  class="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  <svg v-if="showAdminNewPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
+                  </svg>
+                  <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="mb-6">
+              <label class="block text-sm font-medium text-text-dark mb-2">Confirmar contraseña</label>
+              <input
+                v-model="confirmAdminPassword"
+                :type="showAdminNewPassword ? 'text' : 'password'"
+                required
+                placeholder="Repite la contraseña"
+                class="w-full px-4 py-3 border rounded-lg focus:ring-2 focus:ring-purple-500/20 focus:border-purple-500 outline-none"
+                :class="confirmAdminPassword && confirmAdminPassword !== newAdminPassword 
+                  ? 'border-red-300' 
+                  : confirmAdminPassword && confirmAdminPassword === newAdminPassword 
+                    ? 'border-green-400' 
+                    : 'border-gray-200'"
+              />
+              <p v-if="confirmAdminPassword && confirmAdminPassword !== newAdminPassword" class="text-sm text-red-500 mt-1">
+                Las contraseñas no coinciden
+              </p>
+            </div>
+
+            <!-- Error -->
+            <div v-if="passwordError" class="mb-4 p-3 rounded-lg bg-red-50 border border-red-200">
+              <p class="text-sm text-red-700">{{ passwordError }}</p>
+            </div>
+
+            <div class="flex gap-3">
+              <button
+                type="button"
+                @click="showPasswordModal = false"
+                class="flex-1 px-4 py-3 border border-gray-300 text-text-dark font-medium rounded-lg hover:bg-gray-50 transition-colors"
+              >
+                Cancelar
+              </button>
+              <button
+                type="submit"
+                :disabled="actionLoading || !newAdminPassword || newAdminPassword.length < 8 || newAdminPassword !== confirmAdminPassword"
+                class="flex-1 px-4 py-3 bg-purple-600 text-white font-medium rounded-lg hover:bg-purple-700 transition-colors disabled:opacity-50 flex items-center justify-center gap-2"
+              >
+                <svg v-if="actionLoading" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                {{ actionLoading ? 'Guardando...' : 'Cambiar Contraseña' }}
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>
+    </div>
+
     <!-- Toast de notificación -->
     <transition name="slide-up">
       <div 
@@ -434,6 +544,13 @@ export default {
     const showRejectModal = ref(false)
     const rejectingSolicitud = ref(null)
     const rejectReason = ref('')
+
+    const showPasswordModal = ref(false)
+    const passwordSolicitud = ref(null)
+    const newAdminPassword = ref('')
+    const confirmAdminPassword = ref('')
+    const showAdminNewPassword = ref(false)
+    const passwordError = ref('')
     
     const toast = ref({ show: false, message: '', type: 'success' })
 
@@ -587,6 +704,44 @@ export default {
       showRejectModal.value = true
     }
 
+    function openPasswordModal(solicitud) {
+      passwordSolicitud.value = solicitud
+      newAdminPassword.value = ''
+      confirmAdminPassword.value = ''
+      showAdminNewPassword.value = false
+      passwordError.value = ''
+      showPasswordModal.value = true
+    }
+
+    async function submitPasswordChange() {
+      if (!passwordSolicitud.value) return
+      if (newAdminPassword.value !== confirmAdminPassword.value) {
+        passwordError.value = 'Las contraseñas no coinciden'
+        return
+      }
+      if (newAdminPassword.value.length < 8) {
+        passwordError.value = 'La contraseña debe tener al menos 8 caracteres'
+        return
+      }
+
+      actionLoading.value = passwordSolicitud.value.id
+      passwordError.value = ''
+      try {
+        await axios.post(
+          `${API_BASE}/api/v1/mayoristas/${passwordSolicitud.value.id}/cambiar-password`,
+          { new_password: newAdminPassword.value },
+          { headers: getAuthHeaders() }
+        )
+        showToast(`Contraseña cambiada para ${passwordSolicitud.value.nombre}`, 'success')
+        showPasswordModal.value = false
+      } catch (err) {
+        console.error('Error al cambiar contraseña:', err)
+        passwordError.value = err.response?.data?.detail || 'Error al cambiar la contraseña'
+      } finally {
+        actionLoading.value = null
+      }
+    }
+
     function openFullImage(url) {
       window.open(getImageUrl(url), '_blank')
     }
@@ -682,6 +837,14 @@ export default {
       suspender,
       openDocuments,
       openRejectModal,
+      openPasswordModal,
+      showPasswordModal,
+      passwordSolicitud,
+      newAdminPassword,
+      confirmAdminPassword,
+      showAdminNewPassword,
+      passwordError,
+      submitPasswordChange,
       openFullImage,
       getImageUrl,
       getInitials,
