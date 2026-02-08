@@ -291,6 +291,70 @@ def _build_recovery_body(nombre: str, codigo: str) -> tuple[str, str]:
     return text, html
 
 
+def _build_welcome_body(nombre: str) -> tuple[str, str]:
+    """Genera el cuerpo del email de bienvenida."""
+    text = (
+        f"Hola {nombre},\n\n"
+        "¡Bienvenido a Kharis Distribuidora!\n\n"
+        "Gracias por registrarte en nuestra tienda. Estamos encantados de tenerte con nosotros.\n\n"
+        "Ahora puedes explorar nuestro catálogo de extensiones de cabello humano de alta calidad "
+        "y realizar tus compras de forma rápida y segura.\n\n"
+        "¿Tienes alguna pregunta? No dudes en contactarnos.\n\n"
+        "Saludos,\nEquipo Kharis Distribuidora"
+    )
+    
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #F3F4F6;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+            <div style="text-align: center; margin-bottom: 30px;">
+                 <img src="https://i.ibb.co/wzr84d1c/kharis-logo-placeholder.png" alt="Kharis Distribuidora" style="width: 120px; height: auto;" />
+            </div>
+            
+            <div style="background: #ffffff; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
+                <h2 style="color: #D81B60; margin: 0 0 20px; text-align: center; font-family: 'Playfair Display', serif;">¡Bienvenido a Kharis!</h2>
+                
+                <p style="color: #444; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
+                    Hola <strong>{nombre}</strong>,
+                </p>
+                
+                <p style="color: #444; font-size: 16px; line-height: 1.6; margin-bottom: 25px;">
+                    Gracias por registrarte en <strong>Kharis Distribuidora</strong>. Estamos encantados de tenerte con nosotros.
+                </p>
+                
+                <div style="background: linear-gradient(135deg, #FAF5F2 0%, #F5EBE5 100%); border-radius: 12px; padding: 25px; margin: 30px 0;">
+                    <p style="color: #333; font-size: 15px; line-height: 1.6; margin: 0;">
+                        👑 Ahora puedes explorar nuestro <strong>catálogo premium</strong> de extensiones de cabello humano<br><br>
+                        🛒 Realiza compras de forma <strong>rápida y segura</strong><br><br>
+                        ✨ Accede a <strong>ofertas exclusivas</strong> para clientes registrados
+                    </p>
+                </div>
+                
+                <div style="text-align: center; margin: 30px 0;">
+                    <a href="http://localhost:5173" style="display: inline-block; background-color: #D81B60; color: #ffffff; text-decoration: none; padding: 14px 32px; border-radius: 8px; font-weight: 600; font-size: 16px;">
+                        Explorar Catálogo
+                    </a>
+                </div>
+                
+                <p style="color: #666; font-size: 14px; text-align: center; margin-top: 30px;">
+                    ¿Tienes alguna pregunta? Estamos aquí para ayudarte.
+                </p>
+                
+                <p style="color: #888; font-size: 13px; text-align: center; margin-top: 10px;">
+                    Saludos,<br><strong>Equipo Kharis Distribuidora</strong>
+                </p>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return text, html
+
+
 def send_order_status_email(
     *,
     email: Optional[str],
@@ -348,6 +412,22 @@ def send_password_reset_code(
         return None
 
 
+def send_welcome_email(
+    *,
+    email: str,
+    nombre: str
+) -> Optional[str]:
+    """Envía email de bienvenida a nuevos usuarios."""
+    if not email: return None
+    try:
+        subject = "¡Bienvenido a Kharis Distribuidora!"
+        text_body, html_body = _build_welcome_body(nombre)
+        return _send_email_base(email, subject, text_body, html_body)
+    except Exception as exc:
+        _log_error(f"Fallo enviando email de bienvenida a {email}", exc)
+        return None
+
+
 def _send_email_base(to_email: str, subject: str, text_body: str, html_body: str, thread_id: Optional[str] = None) -> Optional[str]:
     """Función base para envío de correos con threading."""
     try:
@@ -368,7 +448,7 @@ def _send_email_base(to_email: str, subject: str, text_body: str, html_body: str
         
         msg.extra_headers['Message-ID'] = msg_id
 
-        msg.send(fail_silently=True)
+        msg.send(fail_silently=False)
         return msg_id
     except Exception as exc:
         _log_error(f"Error base enviando email a {to_email}", exc)

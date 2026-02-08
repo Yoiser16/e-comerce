@@ -234,6 +234,9 @@ async def forgot_password(request: ForgotPasswordRequest):
     Solicita un código de recuperación de contraseña.
     Envía un email con el código al usuario si existe.
     """
+    import logging
+    logger = logging.getLogger("auth.forgot_password")
+    
     from infrastructure.auth.models import Usuario
     from infrastructure.notifications.email_service import send_password_reset_code
     from django.utils import timezone
@@ -249,26 +252,27 @@ async def forgot_password(request: ForgotPasswordRequest):
         def save_code():
             user.reset_code = code
             user.reset_code_expires = timezone.now() + timedelta(minutes=15)
-            user.save()
+            user.save(update_fields=['reset_code', 'reset_code_expires'])
             
         await sync_to_async(save_code)()
         
-        # Enviar email (en segundo plano / sin bloquear si es posible, pero aquí es awaitable)
-        # Nota: send_password_reset_code ya maneja excepciones internamente y loguea errores
-        send_password_reset_code(
-            email=user.email,
-            nombre=user.nombre,
-            codigo=code
-        )
+        # Enviar email — sync_to_async porque es I/O de red (SMTP)
+        def do_send_email():
+            send_password_reset_code(
+                email=user.email,
+                nombre=user.nombre,
+                codigo=code
+            )
         
-        return {"message": "Si el correo existe, se ha enviado un código de recuperación"}
+        await sync_to_async(do_send_email)()
+        logger.info(f"Código de recuperación enviado a {user.email}")
+        
+        return {"message": "Hemos enviado un código de recuperación a tu correo.", "sent": True}
         
     except Usuario.DoesNotExist:
-        # Por seguridad, no indicamos si el correo no existe, 
-        # pero simulamos éxito para evitar enumeración de usuarios.
-        return {"message": "Si el correo existe, se ha enviado un código de recuperación"}
+        return {"message": "No encontramos una cuenta con ese correo electrónico.", "sent": False}
     except Exception as e:
-        print(f"❌ Error en forgot-password: {e}")
+        logger.error(f"Error en forgot-password: {type(e).__name__}: {e}", exc_info=True)
         raise HTTPException(status_code=500, detail="Error al procesar la solicitud")
 
 
@@ -308,3 +312,86 @@ async def reset_password(request: ResetPasswordRequest):
     except Exception as e:
         print(f"❌ Error en reset-password: {e}")
         raise HTTPException(status_code=500, detail="Error al restablecer contraseña")
+
+
+class RegisterRequest(BaseModel):
+    nombre: str
+    email: EmailStr
+    password: str
+
+@router.post("/register", response_model=LoginResponse)
+async def register(request: RegisterRequest):
+    """
+    Registra un nuevo usuario (cliente).
+    Los nuevos usuarios se crean con rol LECTURA por defecto.
+    """
+    from infrastructure.auth.models import Usuario
+    from rest_framework_simplejwt.tokens import RefreshToken
+    
+    # Validaciones
+    if len(request.password) < 6:
+        raise HTTPException(
+            status_code=400, 
+            detail="La contraseña debe tener al menos 6 caracteres"
+        )
+    
+    # Verificar si el email ya existe
+    exists = await sync_to_async(Usuario.objects.filter(email=request.email.lower()).exists)()
+    if exists:
+        raise HTTPException(
+            status_code=400,
+            detail="El email ya está registrado"
+        )
+    
+    try:
+        # Crear usuario
+        def create_user():
+            user = Usuario.objects.create_user(
+                email=request.email.lower(),
+                password=request.password,
+                nombre=request.nombre,
+                rol='LECTURA'
+            )
+            return user
+        
+        user = await sync_to_async(create_user)()
+        
+        # Enviar email de bienvenida
+        def send_welcome():
+            from infrastructure.notifications.email_service import send_welcome_email
+            send_welcome_email(
+                email=user.email,
+                nombre=user.nombre
+            )
+        
+        # Enviar en background sin bloquear el registro
+        try:
+            await sync_to_async(send_welcome)()
+        except Exception as e:
+            # Log pero no fallar el registro si el email falla
+            import logging
+            logging.getLogger("auth.register").warning(f"Email de bienvenida no enviado: {e}")
+        
+        # Generar tokens
+        def create_tokens():
+            refresh = RefreshToken.for_user(user)
+            return {
+                'access': str(refresh.access_token),
+                'refresh': str(refresh),
+                'user': {
+                    'id': str(user.id),
+                    'email': user.email,
+                    'nombre': user.nombre,
+                    'rol': user.rol
+                }
+            }
+        
+        tokens = await sync_to_async(create_tokens)()
+        return tokens
+        
+    except Exception as e:
+        print(f"❌ Error en registro: {e}")
+        raise HTTPException(
+            status_code=500,
+            detail="No pudimos crear tu cuenta. Intenta de nuevo."
+        )

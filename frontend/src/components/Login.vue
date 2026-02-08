@@ -155,19 +155,127 @@
 
               <!-- Forgot Password (solo login) -->
               <p v-if="!isRegistering" class="text-center">
-                <a href="#" class="text-sm text-text-light hover:text-brand-600 transition-colors">
+                <button type="button" @click="showForgotPassword" class="text-sm text-text-light hover:text-brand-600 transition-colors">
                   ¿Olvidaste tu contraseña?
-                </a>
+                </button>
               </p>
 
             </form>
+          </transition>
+
+          <!-- ===== Flujo Recuperar Contraseña ===== -->
+          <transition
+            enter-active-class="transition duration-300 ease-out"
+            enter-from-class="opacity-0 -translate-y-2"
+            enter-to-class="opacity-100 translate-y-0"
+            leave-active-class="transition duration-200 ease-in"
+            leave-from-class="opacity-100 translate-y-0"
+            leave-to-class="opacity-0 -translate-y-2"
+          >
+            <div v-if="forgotStep > 0" class="mt-6 space-y-4">
+              
+              <!-- Paso 1: Ingresar email -->
+              <form v-if="forgotStep === 1" @submit.prevent="handleForgotPassword" class="space-y-4">
+                <p class="text-sm text-text-medium text-center">
+                  Ingresa tu email y te enviaremos un código de recuperación.
+                </p>
+                <input 
+                  type="email" 
+                  v-model="forgotForm.email"
+                  required
+                  placeholder="Tu correo electrónico"
+                  class="w-full px-4 py-4 bg-nude-50 border border-nude-200 rounded-xl text-text-dark placeholder-text-light focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
+                >
+                <div v-if="forgotError" class="text-red-500 text-sm text-center">{{ forgotError }}</div>
+                <div v-if="forgotSuccess" class="text-green-600 text-sm text-center">{{ forgotSuccess }}</div>
+                <button 
+                  type="submit"
+                  :disabled="forgotLoading"
+                  class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-4 px-6 rounded-xl transition-all disabled:opacity-70"
+                >
+                  <span v-if="!forgotLoading">Enviar código</span>
+                  <span v-else class="flex items-center justify-center gap-2">
+                    <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Enviando...
+                  </span>
+                </button>
+                <p class="text-center">
+                  <button type="button" @click="cancelForgotPassword" class="text-sm text-text-light hover:text-brand-600 transition-colors">
+                    ← Volver al inicio de sesión
+                  </button>
+                </p>
+              </form>
+
+              <!-- Paso 2: Ingresar código + nueva contraseña -->
+              <form v-if="forgotStep === 2" @submit.prevent="handleResetPassword" class="space-y-4">
+                <p class="text-sm text-text-medium text-center">
+                  Ingresa el código que enviamos a <strong>{{ forgotForm.email }}</strong>
+                </p>
+                <input 
+                  type="text" 
+                  v-model="forgotForm.codigo"
+                  required
+                  maxlength="6"
+                  placeholder="Código de 6 dígitos"
+                  class="w-full px-4 py-4 bg-nude-50 border border-nude-200 rounded-xl text-text-dark placeholder-text-light focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all text-center text-2xl tracking-[0.5em] font-mono"
+                >
+                <div class="relative">
+                  <input 
+                    :type="showNewPassword ? 'text' : 'password'" 
+                    v-model="forgotForm.newPassword"
+                    required
+                    placeholder="Nueva contraseña (mínimo 6 caracteres)"
+                    class="w-full px-4 py-4 pr-12 bg-nude-50 border border-nude-200 rounded-xl text-text-dark placeholder-text-light focus:outline-none focus:border-brand-500 focus:ring-2 focus:ring-brand-500/20 transition-all"
+                  >
+                  <button 
+                    type="button"
+                    @click="showNewPassword = !showNewPassword"
+                    class="absolute right-4 top-1/2 -translate-y-1/2 text-text-light hover:text-text-dark transition-colors"
+                    tabindex="-1"
+                  >
+                    <svg v-if="!showNewPassword" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 010-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 001.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.45 10.45 0 0112 4.5c4.756 0 8.773 3.162 10.065 7.498a10.523 10.523 0 01-4.293 5.774M6.228 6.228L3 3m3.228 3.228l3.65 3.65m7.894 7.894L21 21m-3.228-3.228l-3.65-3.65m0 0a3 3 0 10-4.243-4.243m4.242 4.242L9.88 9.88" />
+                    </svg>
+                  </button>
+                </div>
+                <div v-if="forgotError" class="text-red-500 text-sm text-center">{{ forgotError }}</div>
+                <div v-if="forgotSuccess" class="text-green-600 text-sm text-center">{{ forgotSuccess }}</div>
+                <button 
+                  type="submit"
+                  :disabled="forgotLoading"
+                  class="w-full bg-brand-600 hover:bg-brand-700 text-white font-semibold py-4 px-6 rounded-xl transition-all disabled:opacity-70"
+                >
+                  <span v-if="!forgotLoading">Restablecer contraseña</span>
+                  <span v-else class="flex items-center justify-center gap-2">
+                    <svg class="animate-spin w-5 h-5" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                    </svg>
+                    Restableciendo...
+                  </span>
+                </button>
+                <p class="text-center">
+                  <button type="button" @click="forgotStep = 1" class="text-sm text-text-light hover:text-brand-600 transition-colors">
+                    ← Reenviar código
+                  </button>
+                </p>
+              </form>
+
+            </div>
           </transition>
 
           <!-- Divider -->
           <div class="my-8 border-t border-nude-200"></div>
 
           <!-- Toggle Login/Register -->
-          <p class="text-center text-sm text-text-medium">
+          <p v-if="forgotStep === 0" class="text-center text-sm text-text-medium">
             <span v-if="!isRegistering">
               ¿No tienes cuenta? 
               <button @click="toggleMode" class="text-brand-600 hover:text-brand-700 font-semibold transition-colors">
@@ -212,6 +320,18 @@ export default {
     const showPassword = ref(false)
     const loading = ref(false)
     const error = ref(null)
+
+    // Forgot password state
+    const forgotStep = ref(0) // 0=oculto, 1=email, 2=código+nueva contraseña
+    const forgotLoading = ref(false)
+    const forgotError = ref('')
+    const forgotSuccess = ref('')
+    const showNewPassword = ref(false)
+    const forgotForm = reactive({
+      email: '',
+      codigo: '',
+      newPassword: ''
+    })
 
     const loadGoogleScript = () => new Promise((resolve, reject) => {
       if (window.google?.accounts?.id) {
@@ -425,8 +545,100 @@ export default {
       form.nombre = ''
       form.email = ''
       form.password = ''
+      forgotStep.value = 0
       if (!showEmailForm.value) {
         showEmailForm.value = true
+      }
+    }
+
+    const showForgotPassword = () => {
+      forgotStep.value = 1
+      forgotError.value = ''
+      forgotSuccess.value = ''
+      forgotForm.email = form.email || ''
+      forgotForm.codigo = ''
+      forgotForm.newPassword = ''
+      showEmailForm.value = false
+      error.value = ''
+    }
+
+    const cancelForgotPassword = () => {
+      forgotStep.value = 0
+      forgotError.value = ''
+      forgotSuccess.value = ''
+      showEmailForm.value = true
+    }
+
+    const handleForgotPassword = async () => {
+      forgotError.value = ''
+      forgotSuccess.value = ''
+      forgotLoading.value = true
+
+      try {
+        const res = await apiClient.post('/auth/forgot-password', {
+          email: forgotForm.email
+        })
+        if (res.data.sent) {
+          forgotSuccess.value = 'Hemos enviado un código de recuperación a tu correo.'
+          // Avanzar al paso 2 después de un breve delay
+          setTimeout(() => {
+            forgotStep.value = 2
+            forgotSuccess.value = ''
+          }, 1500)
+        } else {
+          forgotError.value = 'No encontramos una cuenta con ese correo. ¿Seguro que te registraste con este email?'
+        }
+      } catch (err) {
+        console.error('Error en forgot-password:', err)
+        if (err.response?.data?.detail) {
+          forgotError.value = err.response.data.detail
+        } else {
+          forgotError.value = 'Error al enviar el código. Intenta de nuevo.'
+        }
+      } finally {
+        forgotLoading.value = false
+      }
+    }
+
+    const handleResetPassword = async () => {
+      forgotError.value = ''
+      forgotSuccess.value = ''
+
+      if (forgotForm.newPassword.length < 6) {
+        forgotError.value = 'La contraseña debe tener al menos 6 caracteres.'
+        return
+      }
+      if (forgotForm.codigo.length !== 6) {
+        forgotError.value = 'Ingresa el código de 6 dígitos.'
+        return
+      }
+
+      forgotLoading.value = true
+
+      try {
+        await apiClient.post('/auth/reset-password', {
+          email: forgotForm.email,
+          codigo: forgotForm.codigo,
+          new_password: forgotForm.newPassword
+        })
+        forgotSuccess.value = '¡Contraseña actualizada! Ahora puedes iniciar sesión.'
+        // Volver al login después de un momento
+        setTimeout(() => {
+          forgotStep.value = 0
+          forgotSuccess.value = ''
+          showEmailForm.value = true
+          form.email = forgotForm.email
+          form.password = ''
+        }, 2000)
+      } catch (err) {
+        console.error('Error en reset-password:', err)
+        if (err.response?.data?.detail) {
+          forgotError.value = err.response.data.detail
+        } else {
+          forgotError.value = 'Error al restablecer contraseña. Verifica el código.'
+        }
+      } finally {
+        forgotLoading.value = false
       }
     }
 
@@ -447,7 +659,18 @@ export default {
       closeModal,
       handleLogin,
       handleRegister,
-      toggleMode
+      toggleMode,
+      // Forgot password
+      forgotStep,
+      forgotLoading,
+      forgotError,
+      forgotSuccess,
+      forgotForm,
+      showNewPassword,
+      showForgotPassword,
+      cancelForgotPassword,
+      handleForgotPassword,
+      handleResetPassword
     }
   }
 }

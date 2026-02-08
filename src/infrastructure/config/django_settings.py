@@ -559,15 +559,19 @@ if not os.environ.get('DJANGO_SETTINGS_SUPPRESS_INFO'):
 # ============================================================================
 # CORS CONFIGURATION
 # ============================================================================
-CORS_ALLOWED_ORIGINS = [
-    "http://localhost:3000",
-    "http://localhost:5173",
-    "http://127.0.0.1:3000",
-    "http://127.0.0.1:5173",
-    # B2B subdomain
-    "http://pro.localhost:5173",
-    "http://pro.localhost:3000",
-]
+# En desarrollo, permitir todos los orígenes locales
+if ENVIRONMENT == 'development':
+    CORS_ALLOW_ALL_ORIGINS = True
+else:
+    CORS_ALLOWED_ORIGINS = [
+        "http://localhost:3000",
+        "http://localhost:5173",
+        "http://127.0.0.1:3000",
+        "http://127.0.0.1:5173",
+        # B2B subdomain
+        "http://pro.localhost:5173",
+        "http://pro.localhost:3000",
+    ]
 
 CORS_ALLOW_CREDENTIALS = True
 CORS_ALLOW_HEADERS = [
@@ -580,6 +584,7 @@ CORS_ALLOW_HEADERS = [
     'user-agent',
     'x-csrftoken',
     'x-requested-with',
+    'x-user-email',
 ]
 CORS_ALLOW_METHODS = [
     'DELETE',
@@ -589,6 +594,9 @@ CORS_ALLOW_METHODS = [
     'POST',
     'PUT',
 ]
+
+# Exponer headers adicionales al frontend
+CORS_EXPOSE_HEADERS = ['Content-Type', 'X-CSRFToken']
 
 # ============================================================================
 # EMAIL CONFIGURATION
