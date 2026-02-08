@@ -1,728 +1,789 @@
 <template>
-  <div class="min-h-screen bg-[#F8F8F8]">
+  <div class="min-h-screen relative">
     
     <!-- Toast notifications -->
     <B2BToast />
     
     <!-- =========================================================================
-         HERO BANNER - Beauty Brand with Hair Focus
+         HERO SECTION - Estilo Mercado Libre (Full-Width + Slider Horizontal)
     ========================================================================== -->
-    <div class="relative group mb-8 -mx-4 sm:-mx-6 overflow-hidden rounded-b-3xl">
-      <!-- Slider Container -->
-      <div 
-        class="flex transition-transform duration-700 ease-[cubic-bezier(0.4,0,0.2,1)]"
-        :style="{ transform: `translateX(-${currentSlide * 100}%)` }"
-      >
-        <!-- Slide 1 - PELUCAS Y EXTENSIONES (Principal - Beauty Focus) -->
-        <div class="w-full flex-shrink-0 relative">
-          <div class="relative h-[280px] sm:h-[340px] lg:h-[400px] bg-gradient-to-br from-[#1A1318] via-[#1F1A1E] to-[#18181B] overflow-hidden">
-            <!-- Decorative Hair Texture Background -->
-            <div class="absolute inset-0">
-              <!-- Soft flowing curves simulating hair -->
-              <svg class="absolute right-0 top-0 h-full w-2/3 opacity-10" viewBox="0 0 400 500" fill="none">
-                <path d="M200 0 Q350 100 300 250 T250 500" stroke="url(#hairGradient1)" stroke-width="1" fill="none"/>
-                <path d="M250 0 Q400 150 320 300 T280 500" stroke="url(#hairGradient1)" stroke-width="0.5" fill="none"/>
-                <path d="M300 0 Q450 120 350 280 T310 500" stroke="url(#hairGradient1)" stroke-width="0.5" fill="none"/>
-                <path d="M150 0 Q300 80 280 200 T220 500" stroke="url(#hairGradient1)" stroke-width="1" fill="none"/>
-                <defs>
-                  <linearGradient id="hairGradient1" x1="0%" y1="0%" x2="0%" y2="100%">
-                    <stop offset="0%" stop-color="#C9A962" stop-opacity="0.8"/>
-                    <stop offset="50%" stop-color="#E8D5B0" stop-opacity="0.4"/>
-                    <stop offset="100%" stop-color="#C9A962" stop-opacity="0.2"/>
-                  </linearGradient>
-                </defs>
-              </svg>
-              <!-- Silk/shine effect overlay -->
-              <div class="absolute top-1/4 right-1/4 w-96 h-96 bg-gradient-to-br from-[#C9A962]/8 via-[#E8D5B0]/5 to-transparent rounded-full blur-3xl"></div>
-              <div class="absolute bottom-0 right-0 w-80 h-80 bg-gradient-to-tl from-rose-500/5 via-transparent to-transparent rounded-full blur-3xl"></div>
-            </div>
-            
-            <!-- Imagen de fondo - Pelo/Beauty -->
-            <img 
-              src="/img2.jpg" 
-              alt="Pelucas y Extensiones Premium" 
-              class="absolute inset-0 w-full h-full object-cover object-center opacity-40"
-            />
-            <!-- Overlay con gradiente elegante -->
-            <div class="absolute inset-0 bg-gradient-to-r from-[#1A1318]/98 via-[#1A1318]/85 to-[#1A1318]/40"></div>
-            <div class="absolute inset-0 bg-gradient-to-t from-[#1A1318]/60 via-transparent to-transparent"></div>
-            
-            <!-- Contenido Principal -->
-            <div class="relative h-full flex flex-col justify-center px-6 sm:px-10 lg:px-16 max-w-2xl">
-              <!-- Label elegante -->
-              <span class="inline-flex items-center gap-3 text-[#E8B4B8] text-[10px] sm:text-[11px] font-medium tracking-[0.25em] uppercase mb-4 sm:mb-5">
-                <span class="w-8 h-px bg-gradient-to-r from-[#E8B4B8] to-transparent"></span>
-                Belleza profesional
-              </span>
-              
-              <!-- Headline Principal -->
-              <h2 class="font-luxury text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold text-white leading-[1.1] mb-4 sm:mb-6 tracking-tight">
-                Pelucas y extensiones<br class="hidden sm:block"/>
-                <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#C9A962] via-[#E8D5B0] to-[#C9A962]">
-                  que elevan tu belleza
-                </span>
-              </h2>
-              
-              <!-- Subtítulo con beneficios -->
-              <p class="text-white/60 text-sm sm:text-base mb-6 sm:mb-8 max-w-md leading-relaxed">
-                Calidad premium · Venta mayorista · Envíos rápidos a todo el país
-              </p>
-              
-              <!-- CTAs -->
-              <div class="flex flex-wrap items-center gap-3">
-                <router-link 
-                  to="/portal/catalogo?categoria=pelucas"
-                  class="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-[#C9A962] hover:bg-[#D4AF6A] text-[#18181B] text-sm font-semibold rounded-full transition-all duration-300 group hover:shadow-lg hover:shadow-[#C9A962]/25"
-                >
-                  Ver pelucas
-                  <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </router-link>
-                <router-link 
-                  to="/portal/catalogo?categoria=extensiones"
-                  class="inline-flex items-center gap-2 px-5 sm:px-6 py-2.5 sm:py-3 bg-white/10 hover:bg-white/15 text-white text-sm font-medium rounded-full border border-white/20 hover:border-white/30 transition-all duration-300 group"
-                >
-                  Explorar extensiones
-                  <svg class="w-4 h-4 opacity-60 group-hover:opacity-100 group-hover:translate-x-0.5 transition-all duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </router-link>
+    <section class="relative overflow-hidden">
+      
+      <!-- ===== SLIDER CONTAINER ===== -->
+      <div class="relative w-full overflow-hidden">
+        
+        <!-- Slides (transición horizontal) -->
+        <div 
+          class="flex transition-transform duration-700 ease-out"
+          :style="{ transform: `translateX(-${currentScene * 100}%)` }"
+        >
+          
+          <!-- ==================== SLIDE 1: Esmeralda ==================== -->
+          <div class="w-full flex-shrink-0 bg-[#0d2d27] relative">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+              <div class="grid lg:grid-cols-2 gap-6 lg:gap-4 min-h-[420px] sm:min-h-[480px] lg:min-h-[520px] items-center py-12 lg:py-16">
+                
+                <!-- Texto -->
+                <div class="relative z-10 order-2 lg:order-1">
+                  <div class="inline-flex items-center gap-2 mb-4">
+                    <span class="w-8 h-px bg-gradient-to-r from-[#C9A962] to-transparent"></span>
+                    <span class="text-[#C9A962] text-[10px] font-semibold tracking-[0.2em] uppercase">Portal Mayorista</span>
+                  </div>
+                  
+                  <h1 class="font-luxury leading-[1.1] mb-4">
+                    <span class="block text-white/80 text-lg sm:text-xl lg:text-2xl font-light mb-1">Impulsa tu Negocio con</span>
+                    <span class="block text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold">
+                      <span class="text-white">Cabello </span>
+                      <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#C9A962] via-[#E8D5A3] to-[#C9A962]">Premium</span>
+                    </span>
+                  </h1>
+                  
+                  <p class="text-white/60 text-sm sm:text-base leading-relaxed mb-6 max-w-md">
+                    Extensiones 100% Remy, pelucas de lujo y sistemas capilares con los mejores márgenes.
+                  </p>
+                  
+                  <!-- CTAs -->
+                  <div class="flex flex-wrap items-center gap-3 mb-6">
+                    <router-link 
+                      to="/portal/catalogo"
+                      class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-[#C9A962] to-[#D4B574] text-[#0d2d27] text-sm font-bold rounded-full shadow-lg hover:scale-[1.02] transition-all"
+                    >
+                      Explorar Catálogo
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                      </svg>
+                    </router-link>
+                    
+                    <router-link 
+                      to="/portal/catalogo?nuevo=true"
+                      class="inline-flex items-center gap-2 px-5 py-3 border border-white/25 text-white text-sm font-medium rounded-full hover:bg-white/10 transition-all"
+                    >
+                      Ver Novedades
+                    </router-link>
+                  </div>
+                  
+                  <!-- Stats compactos -->
+                  <div class="flex items-center gap-6 pt-5 border-t border-white/10">
+                    <div>
+                      <p class="text-2xl font-bold text-white">500<span class="text-[#C9A962]">+</span></p>
+                      <p class="text-[10px] text-white/40 uppercase tracking-wide">Productos</p>
+                    </div>
+                    <div class="w-px h-10 bg-white/10"></div>
+                    <div>
+                      <p class="text-2xl font-bold text-white">24<span class="text-[#C9A962]">h</span></p>
+                      <p class="text-[10px] text-white/40 uppercase tracking-wide">Envío Express</p>
+                    </div>
+                    <div class="w-px h-10 bg-white/10"></div>
+                    <div>
+                      <p class="text-2xl font-bold text-[#C9A962]">30%</p>
+                      <p class="text-[10px] text-white/40 uppercase tracking-wide">Margen</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Imagen -->
+                <div class="relative order-1 lg:order-2 flex items-center justify-center lg:justify-end h-[220px] sm:h-[280px] lg:h-[380px]">
+                  <img 
+                    src="/images/card%20panel/5.png" 
+                    alt="Productos Premium" 
+                    class="h-full w-auto object-contain"
+                    style="filter: drop-shadow(0 20px 40px rgba(0,0,0,0.4));"
+                  />
+                  
+                  <!-- Badge OFF -->
+                  <div class="absolute top-2 right-2 lg:top-4 lg:right-8 bg-[#C9A962] rounded-xl px-4 py-2 shadow-xl rotate-3">
+                    <p class="text-[#0d2d27] text-[9px] font-bold uppercase">Hasta</p>
+                    <p class="text-[#0d2d27] text-xl font-black -mt-1">30% OFF</p>
+                  </div>
+                </div>
               </div>
-            </div>
-            
-            <!-- Decorative Element Right Side - Hair silhouette -->
-            <div class="absolute right-0 bottom-0 w-1/3 h-full hidden lg:flex items-end justify-end opacity-20 pointer-events-none">
-              <svg viewBox="0 0 200 400" class="h-full w-auto" fill="none">
-                <path d="M100 400 Q120 300 90 200 Q60 100 100 0" stroke="#C9A962" stroke-width="0.5" fill="none"/>
-                <path d="M120 400 Q140 280 110 180 Q80 80 120 0" stroke="#E8D5B0" stroke-width="0.5" fill="none"/>
-                <path d="M80 400 Q100 320 70 220 Q40 120 80 0" stroke="#C9A962" stroke-width="0.3" fill="none"/>
-              </svg>
             </div>
           </div>
-        </div>
-        
-        <!-- Slide 2 - Ofertas -->
-        <div class="w-full flex-shrink-0 relative">
-            <!-- Slide 2 - Ofertas -->
-            <div class="relative h-[280px] sm:h-[340px] lg:h-[400px] bg-[#1A1318] overflow-hidden group/slide">
-            <!-- Imagen de fondo High-End -->
-            <img 
-              src="https://images.unsplash.com/photo-1562322140-8baeececf3df?q=80&w=1920&auto=format&fit=crop" 
-              alt="Model hair extensions" 
-              class="absolute inset-0 w-full h-full object-cover object-center opacity-60 group-hover/slide:scale-105 transition-transform duration-1000 ease-in-out"
-            />
-            
-            <!-- Gradient Overlay Cinematic -->
-            <div class="absolute inset-0 bg-gradient-to-r from-[#1A1318] via-[#1A1318]/70 to-transparent"></div>
-            
-            <div class="relative h-full flex flex-col justify-center px-6 sm:px-10 lg:px-16 max-w-xl">
-              <!-- Badge Animado -->
-              <div class="animate-fade-in-up" style="animation-delay: 100ms">
-                <span class="inline-flex items-center gap-3 text-[#E8B4B8]/90 text-[11px] font-bold tracking-[0.2em] uppercase mb-4">
-                  <span class="w-8 h-px bg-[#E8B4B8]"></span>
-                  Limited Time Offer
-                </span>
+          
+          <!-- ==================== SLIDE 2: Champagne ==================== -->
+          <div class="w-full flex-shrink-0 bg-[#f5f2e9] relative">
+            <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
+              <div class="grid lg:grid-cols-2 gap-6 lg:gap-4 min-h-[420px] sm:min-h-[480px] lg:min-h-[520px] items-center py-12 lg:py-16">
+                
+                <!-- Texto -->
+                <div class="relative z-10 order-2 lg:order-1">
+                  <div class="inline-flex items-center gap-2 mb-4">
+                    <span class="w-8 h-px bg-gradient-to-r from-[#8B7355] to-transparent"></span>
+                    <span class="text-[#8B7355] text-[10px] font-semibold tracking-[0.2em] uppercase">Calidad Certificada</span>
+                  </div>
+                  
+                  <h1 class="font-luxury leading-[1.1] mb-4">
+                    <span class="block text-[#4A4A4A] text-lg sm:text-xl lg:text-2xl font-light mb-1">Extensiones y Pelucas</span>
+                    <span class="block text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold">
+                      <span class="text-[#1A1A1A]">100% </span>
+                      <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#8B7355] via-[#A8896C] to-[#8B7355]">Remy</span>
+                    </span>
+                  </h1>
+                  
+                  <p class="text-[#7A7A7A] text-sm sm:text-base leading-relaxed mb-6 max-w-md">
+                    Cabello humano de la más alta calidad. Precios exclusivos para distribuidores profesionales.
+                  </p>
+                  
+                  <!-- CTAs -->
+                  <div class="flex flex-wrap items-center gap-3 mb-6">
+                    <router-link 
+                      to="/portal/catalogo"
+                      class="inline-flex items-center gap-2 px-6 py-3 bg-[#1A1A1A] text-white text-sm font-bold rounded-full shadow-lg hover:scale-[1.02] transition-all"
+                    >
+                      Ver Colección
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                      </svg>
+                    </router-link>
+                    
+                    <a 
+                      href="https://wa.me/573001234567"
+                      target="_blank"
+                      class="inline-flex items-center gap-2 px-5 py-3 border border-[#1A1A1A]/20 text-[#1A1A1A] text-sm font-medium rounded-full hover:bg-[#1A1A1A]/5 transition-all"
+                    >
+                      Contactar Asesor
+                    </a>
+                  </div>
+                  
+                  <!-- Stats compactos -->
+                  <div class="flex items-center gap-6 pt-5 border-t border-[#1A1A1A]/10">
+                    <div>
+                      <p class="text-2xl font-bold text-[#1A1A1A]">500<span class="text-[#8B7355]">+</span></p>
+                      <p class="text-[10px] text-[#7A7A7A] uppercase tracking-wide">Productos</p>
+                    </div>
+                    <div class="w-px h-10 bg-[#1A1A1A]/10"></div>
+                    <div>
+                      <p class="text-2xl font-bold text-[#1A1A1A]">24<span class="text-[#8B7355]">h</span></p>
+                      <p class="text-[10px] text-[#7A7A7A] uppercase tracking-wide">Envío Express</p>
+                    </div>
+                    <div class="w-px h-10 bg-[#1A1A1A]/10"></div>
+                    <div>
+                      <p class="text-2xl font-bold text-[#8B7355]">30%</p>
+                      <p class="text-[10px] text-[#7A7A7A] uppercase tracking-wide">Margen</p>
+                    </div>
+                  </div>
+                </div>
+                
+                <!-- Imagen -->
+                <div class="relative order-1 lg:order-2 flex items-center justify-center lg:justify-end h-[220px] sm:h-[280px] lg:h-[380px]">
+                  <img 
+                    src="/images/card%20panel/6.png" 
+                    alt="Extensiones Remy" 
+                    class="h-full w-auto object-contain"
+                    style="filter: drop-shadow(0 20px 40px rgba(0,0,0,0.2));"
+                  />
+                  
+                  <!-- Badge Calidad -->
+                  <div class="absolute top-2 right-2 lg:top-4 lg:right-8 bg-[#1A1A1A] rounded-xl px-4 py-2 shadow-xl rotate-3">
+                    <p class="text-[#C9A962] text-[9px] font-bold uppercase">Certificado</p>
+                    <p class="text-white text-xl font-black -mt-1">100%</p>
+                  </div>
+                </div>
               </div>
-              
-              <!-- Título con Font Luxury -->
-              <h2 class="animate-fade-in-up font-luxury text-3xl sm:text-5xl lg:text-6xl font-bold text-white leading-[1.05] mb-4 tracking-tight" style="animation-delay: 200ms">
-                Hasta <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#D81B60] to-[#FF4081]">30% OFF</span><br />
-                en Extensiones
-              </h2>
-              
-              <!-- Descripción -->
-              <p class="animate-fade-in-up text-white/70 text-sm sm:text-base mb-8 max-w-sm leading-relaxed font-light" style="animation-delay: 300ms">
-                Eleva tu inventario con nuestra colección exclusiva de cabello 100% Remy.
-              </p>
-              
-              <!-- Botón Premium -->
-              <div class="animate-fade-in-up" style="animation-delay: 400ms">
+            </div>
+          </div>
+          
+          <!-- ==================== SLIDE 3: Promoción Estilo ML ==================== -->
+          <div class="w-full flex-shrink-0 relative overflow-hidden" style="background: linear-gradient(135deg, #FFE600 0%, #FFB800 50%, #FF9500 100%);">
+            
+            <!-- Elementos decorativos de fondo -->
+            <div class="absolute inset-0 overflow-hidden">
+              <div class="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
+              <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-orange-500/20 rounded-full translate-x-1/3 translate-y-1/3"></div>
+              <div class="absolute top-1/2 left-1/4 w-32 h-32 bg-[#E91E63]/10 rounded-full"></div>
+              <!-- Patrón de puntos decorativo -->
+              <div class="absolute top-10 right-20 grid grid-cols-5 gap-2 opacity-20">
+                <div v-for="i in 15" :key="i" class="w-2 h-2 bg-white rounded-full"></div>
+              </div>
+            </div>
+            
+            <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 relative z-10">
+              <div class="flex flex-col items-center justify-center min-h-[420px] sm:min-h-[480px] lg:min-h-[520px] py-12 lg:py-16 text-center">
+                
+                <!-- Badge superior -->
+                <div class="inline-flex items-center gap-2 bg-[#E91E63] text-white px-4 py-2 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider mb-6 shadow-lg">
+                  <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
+                  Oferta por tiempo limitado
+                </div>
+                
+                <!-- Título principal -->
+                <h2 class="font-luxury text-[#1A1A1A] text-4xl sm:text-5xl lg:text-7xl font-black leading-none mb-4 drop-shadow-sm">
+                  LIQUIDACIÓN
+                </h2>
+                
+                <!-- Porcentaje destacado -->
+                <div class="flex items-center justify-center gap-3 sm:gap-4 mb-6">
+                  <span class="text-[#1A1A1A]/70 text-xl sm:text-2xl lg:text-3xl font-bold">HASTA</span>
+                  <div class="relative">
+                    <span class="text-[#1A1A1A] text-6xl sm:text-7xl lg:text-[120px] font-black leading-none">50</span>
+                    <span class="absolute -top-2 -right-8 sm:-right-12 text-[#1A1A1A] text-3xl sm:text-4xl lg:text-5xl font-black">%</span>
+                  </div>
+                  <span class="text-[#E91E63] text-4xl sm:text-5xl lg:text-6xl font-black drop-shadow-lg">OFF</span>
+                </div>
+                
+                <!-- Descripción -->
+                <p class="text-[#1A1A1A]/80 text-base sm:text-lg mb-8 max-w-lg">
+                  Extensiones, pelucas y sistemas capilares con <strong>descuentos exclusivos</strong> para mayoristas
+                </p>
+                
+                <!-- CTA Button -->
                 <router-link 
                   to="/portal/catalogo?oferta=true"
-                  class="inline-flex items-center gap-3 px-8 py-3 bg-white text-[#1A1318] text-sm font-bold uppercase tracking-widest rounded-sm hover:bg-[#C9A962] hover:text-white transition-all duration-300 shadow-[0_0_20px_rgba(255,255,255,0.2)] hover:shadow-[0_0_30px_rgba(201,169,98,0.4)]"
+                  class="inline-flex items-center gap-3 px-10 py-4 bg-[#1A1A1A] text-white text-base sm:text-lg font-bold rounded-full shadow-2xl hover:scale-105 hover:shadow-3xl transition-all duration-300"
                 >
-                  Comprar Ahora
-                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                  Ver todas las ofertas
+                  <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
                   </svg>
                 </router-link>
+                
+                <!-- Footer info -->
+                <p class="text-[#1A1A1A]/50 text-xs mt-4">*Aplican términos y condiciones. Válido hasta agotar existencias.</p>
               </div>
             </div>
           </div>
         </div>
         
-        <!-- Slide 3 - Envío Gratis -->
-        <div class="w-full flex-shrink-0 relative">
-          <div class="relative h-[280px] sm:h-[340px] lg:h-[400px] bg-gradient-to-br from-[#141D1A] via-[#182420] to-[#18181B] overflow-hidden">
-            <!-- Decoración sutil -->
-            <div class="absolute top-0 right-0 w-80 h-80 bg-gradient-to-bl from-emerald-500/15 to-transparent rounded-full blur-3xl"></div>
-            <div class="absolute bottom-0 left-0 w-64 h-64 bg-gradient-to-tr from-emerald-500/10 to-transparent rounded-full blur-2xl"></div>
-            <!-- Icono decorativo de envío -->
-            <div class="absolute right-10 lg:right-20 top-1/2 -translate-y-1/2 hidden md:block">
-              <svg class="w-32 lg:w-40 h-32 lg:h-40 text-emerald-500/10" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="0.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4" />
-              </svg>
-            </div>
-            
-            <div class="relative h-full flex flex-col justify-center px-6 sm:px-10 lg:px-16 max-w-xl">
-              <span class="inline-flex items-center gap-3 text-emerald-400/80 text-[11px] font-medium tracking-[0.2em] uppercase mb-4">
-                <span class="w-6 h-px bg-emerald-400/50"></span>
-                Beneficio exclusivo
-              </span>
-              <h2 class="font-luxury text-3xl sm:text-4xl lg:text-5xl font-bold text-white/95 leading-tight mb-3 tracking-tight">
-                Envío <span class="text-emerald-400">gratis</span><br class="hidden sm:block"/>
-                a todo el país
-              </h2>
-              <p class="text-white/50 text-sm mb-6 max-w-sm leading-relaxed">
-                En pedidos +$500.000. Entrega en 24-48 horas.
-              </p>
-              <router-link 
-                to="/portal/catalogo"
-                class="inline-flex items-center gap-2 px-5 py-2.5 bg-emerald-500/90 hover:bg-emerald-500 text-white text-sm font-semibold rounded-full transition-all duration-300 w-fit group hover:shadow-lg hover:shadow-emerald-500/20"
-              >
-                Explorar catálogo
-                <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                </svg>
-              </router-link>
-            </div>
-          </div>
-        </div>
-      </div>
-      
-      <!-- Indicadores minimalistas (líneas) -->
-      <div class="absolute bottom-5 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
+        <!-- Flechas de navegación (estilo ML refinado) -->
         <button 
-          v-for="(slide, index) in 3" 
-          :key="index"
-          @click="currentSlide = index"
-          class="h-0.5 rounded-full transition-all duration-500 ease-out"
-          :class="currentSlide === index ? 'bg-white w-8' : 'bg-white/25 w-4 hover:bg-white/40'"
-        ></button>
-      </div>
-      
-      <!-- Flechas de navegación más sutiles -->
-      <button 
-        @click="prevSlide"
-        class="absolute left-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/5 hover:bg-white/15 rounded-full flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-105"
-      >
-        <svg class="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 19l-7-7 7-7" />
-        </svg>
-      </button>
-      <button 
-        @click="nextSlide"
-        class="absolute right-3 top-1/2 -translate-y-1/2 w-9 h-9 bg-white/5 hover:bg-white/15 rounded-full flex items-center justify-center transition-all duration-300 opacity-0 group-hover:opacity-100 hover:scale-105"
-      >
-        <svg class="w-4 h-4 text-white/80" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5l7 7-7 7" />
-        </svg>
-      </button>
-    </div>
-
-    <!-- =========================================================================
-         TRUST STRIP - Credibilidad y Confianza
-    ========================================================================== -->
-    <div class="mb-10 -mx-4 sm:-mx-6 px-4 sm:px-6">
-      <div class="bg-gradient-to-r from-[#FDFBF9] via-white to-[#FDFBF9] border border-gray-100 rounded-2xl py-8 px-4 sm:px-8">
-        <div class="grid grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-8">
-          <!-- Envíos rápidos -->
-          <div class="flex flex-col items-center text-center gap-3 group">
-            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#E8F5E9] to-[#C8E6C9] flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all duration-300 shadow-md">
-              <svg class="w-7 h-7 sm:w-9 sm:h-9 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
-              </svg>
-            </div>
-            <div>
-              <p class="text-sm sm:text-base font-semibold text-gray-800">Envíos rápidos</p>
-              <p class="text-xs sm:text-sm text-gray-500 mt-0.5">24-48 horas</p>
-            </div>
-          </div>
-          
-          <!-- Calidad profesional -->
-          <div class="flex flex-col items-center text-center gap-3 group">
-            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#FFF8E1] to-[#FFECB3] flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all duration-300 shadow-md">
-              <svg class="w-7 h-7 sm:w-9 sm:h-9 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-              </svg>
-            </div>
-            <div>
-              <p class="text-sm sm:text-base font-semibold text-gray-800">Calidad profesional</p>
-              <p class="text-xs sm:text-sm text-gray-500 mt-0.5">100% cabello humano</p>
-            </div>
-          </div>
-          
-          <!-- Compra segura -->
-          <div class="flex flex-col items-center text-center gap-3 group">
-            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#E3F2FD] to-[#BBDEFB] flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all duration-300 shadow-md">
-              <svg class="w-7 h-7 sm:w-9 sm:h-9 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-              </svg>
-            </div>
-            <div>
-              <p class="text-sm sm:text-base font-semibold text-gray-800">Compra segura</p>
-              <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Pago protegido</p>
-            </div>
-          </div>
-          
-          <!-- Atención personalizada -->
-          <div class="flex flex-col items-center text-center gap-3 group">
-            <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-br from-[#FCE4EC] to-[#F8BBD9] flex items-center justify-center flex-shrink-0 group-hover:scale-110 transition-all duration-300 shadow-md">
-              <svg class="w-7 h-7 sm:w-9 sm:h-9 text-pink-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
-              </svg>
-            </div>
-            <div>
-              <p class="text-sm sm:text-base font-semibold text-gray-800">Atención VIP</p>
-              <p class="text-xs sm:text-sm text-gray-500 mt-0.5">Asesoría experta</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- =========================================================================
-         CATEGORÍAS RÁPIDAS - Visual Beauty Categories
-    ========================================================================== -->
-    <div class="mb-12">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h2 class="text-lg sm:text-xl font-semibold text-gray-800 tracking-tight">Categorías</h2>
-          <p class="text-gray-400 text-sm mt-0.5">Explora nuestro catálogo profesional</p>
+          @click="prevScene"
+          class="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-16 sm:w-12 sm:h-20 bg-white/95 hover:bg-white shadow-[2px_0_10px_rgba(0,0,0,0.1)] flex items-center justify-center transition-all rounded-r-xl group"
+        >
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 group-hover:text-gray-800 transition-colors" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+          </svg>
+        </button>
+        <button 
+          @click="nextScene"
+          class="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-16 sm:w-12 sm:h-20 bg-white/95 hover:bg-white shadow-[-2px_0_10px_rgba(0,0,0,0.1)] flex items-center justify-center transition-all rounded-l-xl group"
+        >
+          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 group-hover:text-gray-800 transition-colors" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+          </svg>
+        </button>
+        
+        <!-- Indicadores de slide (pill style) -->
+        <div class="absolute bottom-5 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+          <button 
+            v-for="(scene, index) in totalScenes" 
+            :key="index"
+            @click="goToScene(index)"
+            class="rounded-full transition-all duration-300"
+            :class="currentScene === index 
+              ? 'bg-white w-6 h-2.5 shadow-lg' 
+              : 'bg-white/40 w-2.5 h-2.5 hover:bg-white/60'"
+          ></button>
         </div>
       </div>
       
-      <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
-        <!-- Pelucas Naturales -->
-        <!-- Pelucas Naturales -->
-        <router-link 
-          to="/portal/catalogo?categoria=pelucas"
-          class="group relative overflow-hidden rounded-2xl aspect-[4/3] sm:aspect-[3/2] shadow-sm hover:shadow-xl transition-all duration-500"
-        >
-          <!-- Imagen de fondo -->
-          <img 
-            src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?q=80&w=800&auto=format&fit=crop" 
-            alt="Pelucas naturales"
-            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0"
-          />
-          <div class="absolute inset-0 bg-gradient-to-t from-[#1A1318]/95 via-[#1A1318]/50 to-transparent opacity-90 group-hover:opacity-80 transition-opacity duration-300"></div>
-          
-          <div class="relative h-full flex flex-col justify-end p-4 sm:p-6">
-            <div class="w-10 h-10 rounded-full bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-[#C9A962] group-hover:border-[#C9A962] transition-all duration-300 shadow-lg">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
-              </svg>
-            </div>
-            
-            <h3 class="text-white font-bold text-lg sm:text-xl mb-1 leading-tight tracking-tight">Pelucas naturales</h3>
-            <p class="text-[#E8D5B0] text-xs sm:text-sm font-medium tracking-wide">CABELLO 100% HUMANO</p>
-          </div>
-          
-           <!-- Arrow Icon -->
-          <div class="absolute top-4 right-4 opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-100">
-            <div class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
-              </svg>
-            </div>
-          </div>
-        </router-link>
+    </section>
+
+    <!-- =========================================================================
+         BENEFITS BAR - Cards con imágenes premium personalizadas
+    ========================================================================== -->
+    <section class="py-5 sm:py-7">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
         
-        <!-- Extensiones Premium -->
-        <!-- Extensiones Premium -->
-        <router-link 
-          to="/portal/catalogo?categoria=extensiones"
-          class="group relative overflow-hidden rounded-2xl aspect-[4/3] sm:aspect-[3/2] shadow-sm hover:shadow-xl transition-all duration-500"
-        >
-          <!-- Imagen de fondo -->
-          <img 
-            src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=800&auto=format&fit=crop" 
-            alt="Extensiones premium"
-            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0"
-          />
-          <div class="absolute inset-0 bg-gradient-to-t from-[#1A1318]/95 via-[#1A1318]/50 to-transparent opacity-90 group-hover:opacity-80 transition-opacity duration-300"></div>
+        <!-- Grid 2x2 en móvil, 4 cols en desktop -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-5">
           
-          <div class="relative h-full flex flex-col justify-end p-4 sm:p-6">
-            <div class="w-10 h-10 rounded-full bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-[#E8B4B8] group-hover:border-[#E8B4B8] transition-all duration-300 shadow-lg">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
-              </svg>
+          <!-- Card 1: Envío gratis -->
+          <div>
+            <div class="bg-white rounded-2xl overflow-hidden" style="box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03);">
+              <div class="p-3 sm:p-4 pb-2 sm:pb-3">
+                <div class="w-full aspect-square rounded-2xl overflow-hidden">
+                  <img 
+                    src="/images/card%20panel/1.png" 
+                    alt="Envío gratis" 
+                    class="w-full h-full object-cover rounded-2xl"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+              <div class="px-3 sm:px-4 pb-4 sm:pb-5 pt-1 text-center">
+                <p class="font-semibold text-gray-900 text-[13px] sm:text-[15px] leading-tight mb-0.5">Envío gratis</p>
+                <p class="text-gray-400 text-[11px] sm:text-xs leading-relaxed">En compras desde $150.000</p>
+              </div>
             </div>
-            
-            <h3 class="text-white font-bold text-lg sm:text-xl mb-1 leading-tight tracking-tight">Extensiones premium</h3>
-            <p class="text-[#E8B4B8] text-xs sm:text-sm font-medium tracking-wide">CLIP-IN, TAPE & MÁS</p>
           </div>
           
-           <!-- Arrow Icon -->
-          <div class="absolute top-4 right-4 opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-100">
-            <div class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
-              </svg>
+          <!-- Card 2: 100% Humano -->
+          <div>
+            <div class="bg-white rounded-2xl overflow-hidden" style="box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03);">
+              <div class="p-3 sm:p-4 pb-2 sm:pb-3">
+                <div class="w-full aspect-square rounded-2xl overflow-hidden">
+                  <img 
+                    src="/images/card%20panel/2.png" 
+                    alt="Calidad Premium" 
+                    class="w-full h-full object-cover rounded-2xl"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+              <div class="px-3 sm:px-4 pb-4 sm:pb-5 pt-1 text-center">
+                <p class="font-semibold text-gray-900 text-[13px] sm:text-[15px] leading-tight mb-0.5">100% Humano</p>
+                <p class="text-gray-400 text-[11px] sm:text-xs leading-relaxed">Cabello Remy certificado</p>
+              </div>
             </div>
-          </div>
-        </router-link>
-        
-        <!-- Sistemas Capilares -->
-        <!-- Sistemas Capilares -->
-        <router-link 
-          to="/portal/catalogo?categoria=sistemas-capilares"
-          class="group relative overflow-hidden rounded-2xl aspect-[4/3] sm:aspect-[3/2] shadow-sm hover:shadow-xl transition-all duration-500"
-        >
-          <!-- Imagen de fondo -->
-          <img 
-            src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=600&auto=format&fit=crop" 
-            alt="Sistemas capilares"
-            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0"
-          />
-          <div class="absolute inset-0 bg-gradient-to-t from-[#1A1318]/95 via-[#1A1318]/50 to-transparent opacity-90 group-hover:opacity-80 transition-opacity duration-300"></div>
-          
-          <div class="relative h-full flex flex-col justify-end p-4 sm:p-6">
-            <div class="w-10 h-10 rounded-full bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-emerald-500 group-hover:border-emerald-500 transition-all duration-300 shadow-lg">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" />
-              </svg>
-            </div>
-            
-            <h3 class="text-white font-bold text-lg sm:text-xl mb-1 leading-tight tracking-tight">Sistemas capilares</h3>
-            <p class="text-emerald-300 text-xs sm:text-sm font-medium tracking-wide">SOLUCIONES PROFESIONALES</p>
           </div>
           
-           <!-- Arrow Icon -->
-          <div class="absolute top-4 right-4 opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-100">
-            <div class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
-              </svg>
+          <!-- Card 3: Pago Seguro -->
+          <div>
+            <div class="bg-white rounded-2xl overflow-hidden" style="box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03);">
+              <div class="p-3 sm:p-4 pb-2 sm:pb-3">
+                <div class="w-full aspect-square rounded-2xl overflow-hidden">
+                  <img 
+                    src="/images/card%20panel/3.png" 
+                    alt="Pago Seguro" 
+                    class="w-full h-full object-cover rounded-2xl"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+              <div class="px-3 sm:px-4 pb-4 sm:pb-5 pt-1 text-center">
+                <p class="font-semibold text-gray-900 text-[13px] sm:text-[15px] leading-tight mb-0.5">Pago seguro</p>
+                <p class="text-gray-400 text-[11px] sm:text-xs leading-relaxed">Transacciones protegidas</p>
+              </div>
             </div>
-          </div>
-        </router-link>
-        
-        <!-- Nuevos Lanzamientos -->
-        <!-- Nuevos Lanzamientos -->
-        <router-link 
-          to="/portal/catalogo?nuevo=true"
-          class="group relative overflow-hidden rounded-2xl aspect-[4/3] sm:aspect-[3/2] shadow-sm hover:shadow-xl transition-all duration-500"
-        >
-          <!-- Imagen de fondo -->
-          <img 
-            src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=800&auto=format&fit=crop" 
-            alt="Nuevos lanzamientos"
-            class="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 grayscale-[30%] group-hover:grayscale-0"
-          />
-          <div class="absolute inset-0 bg-gradient-to-t from-[#1A1318]/95 via-[#1A1318]/50 to-transparent opacity-90 group-hover:opacity-80 transition-opacity duration-300"></div>
-          
-          <div class="relative h-full flex flex-col justify-end p-4 sm:p-6">
-            <div class="w-10 h-10 rounded-full bg-white/10 border border-white/20 backdrop-blur-md flex items-center justify-center mb-3 group-hover:scale-110 group-hover:bg-purple-500 group-hover:border-purple-500 transition-all duration-300 shadow-lg">
-              <svg class="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
-              </svg>
-            </div>
-            
-            <div class="flex items-center gap-2 mb-1">
-              <h3 class="text-white font-bold text-lg sm:text-xl leading-tight tracking-tight">Nuevos</h3>
-              <span class="px-2 py-0.5 bg-purple-500 text-white text-[10px] font-bold rounded-full animate-pulse shadow-lg shadow-purple-500/40">NEW</span>
-            </div>
-            <p class="text-purple-300 text-xs sm:text-sm font-medium tracking-wide">ÚLTIMOS LANZAMIENTOS</p>
           </div>
           
-           <!-- Arrow Icon -->
-          <div class="absolute top-4 right-4 opacity-0 -translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500 delay-100">
-            <div class="w-8 h-8 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center">
-              <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.5 19.5l15-15m0 0H8.25m11.25 0v11.25" />
-              </svg>
+          <!-- Card 4: Soporte VIP -->
+          <div>
+            <div class="bg-white rounded-2xl overflow-hidden" style="box-shadow: 0 2px 8px rgba(0,0,0,0.04), 0 0 0 1px rgba(0,0,0,0.03);">
+              <div class="p-3 sm:p-4 pb-2 sm:pb-3">
+                <div class="w-full aspect-square rounded-2xl overflow-hidden">
+                  <img 
+                    src="/images/card%20panel/4.png" 
+                    alt="Asesoría VIP" 
+                    class="w-full h-full object-cover rounded-2xl"
+                    loading="lazy"
+                  />
+                </div>
+              </div>
+              <div class="px-3 sm:px-4 pb-4 sm:pb-5 pt-1 text-center">
+                <p class="font-semibold text-gray-900 text-[13px] sm:text-[15px] leading-tight mb-0.5">Soporte VIP</p>
+                <p class="text-gray-400 text-[11px] sm:text-xs leading-relaxed">Asesor personal 24/7</p>
+              </div>
             </div>
           </div>
-        </router-link>
+          
+        </div>
       </div>
-    </div>
-    <div class="mb-14">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h2 class="font-luxury text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">
+    </section>
+
+    <!-- =========================================================================
+         CONTENEDOR MAESTRO - Resto del contenido (max-w-7xl)
+    ========================================================================== -->
+    <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 py-6 sm:py-8 lg:py-10">
+    
+        <!-- =====================================================================
+             SECCIÓN 1: CATEGORÍAS - Estilo Amazon/ML
+        ====================================================================== -->
+        <section class="mb-12 sm:mb-16">
+          <!-- Header sección -->
+          <div class="flex items-center justify-between mb-5 sm:mb-6">
+            <h2 class="font-bold text-xl sm:text-2xl text-gray-900">
+              Categorías
+            </h2>
+            <router-link 
+              to="/portal/catalogo"
+              class="text-[#007185] hover:text-[#C7511F] hover:underline text-sm font-medium transition-colors"
+            >
+              Ver todas
+            </router-link>
+          </div>
+        
+          <!-- Grid de Categorías - Estilo Amazon cards -->
+          <div class="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+          
+            <!-- Categoría 1: Pelucas Naturales -->
+            <router-link 
+              to="/portal/catalogo?categoria=pelucas"
+              class="bg-white rounded-lg p-4 sm:p-5 hover:shadow-md transition-shadow duration-200 border border-gray-100"
+            >
+              <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-3">
+                Pelucas Naturales
+              </h3>
+              <div class="w-full aspect-square rounded-md overflow-hidden mb-3">
+                <img 
+                  src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?q=80&w=800&auto=format&fit=crop" 
+                  alt="Pelucas naturales"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <span class="text-[#007185] text-sm font-medium">Ver productos</span>
+            </router-link>
+          
+            <!-- Categoría 2: Extensiones Premium -->
+            <router-link 
+              to="/portal/catalogo?categoria=extensiones"
+              class="bg-white rounded-lg p-4 sm:p-5 hover:shadow-md transition-shadow duration-200 border border-gray-100"
+            >
+              <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-3">
+                Extensiones Premium
+              </h3>
+              <div class="w-full aspect-square rounded-md overflow-hidden mb-3">
+                <img 
+                  src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=800&auto=format&fit=crop" 
+                  alt="Extensiones premium"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <span class="text-[#007185] text-sm font-medium">Ver productos</span>
+            </router-link>
+          
+            <!-- Categoría 3: Sistemas Capilares -->
+            <router-link 
+              to="/portal/catalogo?categoria=sistemas-capilares"
+              class="bg-white rounded-lg p-4 sm:p-5 hover:shadow-md transition-shadow duration-200 border border-gray-100"
+            >
+              <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-3">
+                Sistemas Capilares
+              </h3>
+              <div class="w-full aspect-square rounded-md overflow-hidden mb-3">
+                <img 
+                  src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=600&auto=format&fit=crop" 
+                  alt="Sistemas capilares"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <span class="text-[#007185] text-sm font-medium">Ver productos</span>
+            </router-link>
+          
+            <!-- Categoría 4: Accesorios -->
+            <router-link 
+              to="/portal/catalogo?categoria=accesorios"
+              class="bg-white rounded-lg p-4 sm:p-5 hover:shadow-md transition-shadow duration-200 border border-gray-100"
+            >
+              <h3 class="font-bold text-base sm:text-lg text-gray-900 mb-3">
+                Accesorios
+              </h3>
+              <div class="w-full aspect-square rounded-md overflow-hidden mb-3">
+                <img 
+                  src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=800&auto=format&fit=crop" 
+                  alt="Accesorios"
+                  class="w-full h-full object-cover"
+                />
+              </div>
+              <span class="text-[#007185] text-sm font-medium">Ver productos</span>
+            </router-link>
+          
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           SECCIÓN 2: COMIENZA A EXPLORAR (Catálogo B2B)
+      ====================================================================== -->
+      <section class="mb-12 sm:mb-16">
+        <div class="bg-white rounded-lg p-4 sm:p-5">
+        <!-- Header sección - Mismo estilo que Categorías -->
+        <div class="flex items-center justify-between mb-5 sm:mb-6">
+          <h2 class="font-bold text-xl sm:text-2xl text-gray-900">
             {{ hasOrderHistory ? 'Inspirado en tu actividad' : 'Comienza a explorar' }}
           </h2>
-          <p class="text-gray-500 text-sm mt-1 font-light tracking-wide">
-            {{ hasOrderHistory ? 'Basado en lo que viste y tus favoritos' : 'Productos destacados para ti' }}
-          </p>
+          <router-link 
+            to="/portal/catalogo"
+            class="text-[#007185] hover:text-[#C7511F] hover:underline text-sm font-medium transition-colors"
+          >
+            Ver todo
+          </router-link>
         </div>
-        <router-link 
-          v-if="hasOrderHistory"
-          to="/portal/favoritos"
-          class="text-gray-500 hover:text-gray-700 text-sm font-medium flex items-center gap-1 transition-colors"
-        >
-          <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-          </svg>
-          Mis favoritos
-        </router-link>
-      </div>
-      
-      <!-- Scroll horizontal de productos habituales -->
-      <div v-if="isLoading" class="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
-        <B2BSkeleton 
-          v-for="n in 5" 
-          :key="`skeleton-${n}`"
-          variant="rounded" 
-          class="flex-shrink-0 w-[150px] sm:w-[168px] h-[280px]" 
-        />
-      </div>
-      
-      <div v-else class="flex gap-3 overflow-x-auto pb-4 -mx-4 px-4 scrollbar-hide">
-        <router-link 
-          v-for="(product, index) in frequentProducts" 
-          :key="product.id"
-          :to="`/portal/producto/${product.id}`"
-          :style="{ 
-            animationDelay: getAnimationDelay(index),
-            opacity: hasAnimated ? 1 : 0
-          }"
-          class="flex-shrink-0 w-[150px] sm:w-[170px] bg-white rounded-2xl overflow-hidden shadow-soft hover:shadow-lg hover:-translate-y-1 transition-all duration-300 ease-out group animate-fade-in-up cursor-pointer"
-        >
-          <!-- Imagen del producto -->
-          <div class="relative aspect-[4/5] bg-gray-50 overflow-hidden">
-            <img 
-              :src="product.image" 
-              :alt="product.name"
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-              @error="handleProductImageError($event, product)"
-              loading="lazy"
-            />
-            <!-- Badge según tipo: visto, favorito, o cantidad comprada -->
-            <div 
-              v-if="product.badge === 'visto'" 
-              class="absolute top-2 right-2 bg-blue-500/80 text-white text-[9px] px-1.5 py-0.5 rounded font-medium backdrop-blur-sm flex items-center gap-0.5"
-            >
-              <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
-              </svg>
-              {{ product.veces_visto || 1 }}
-            </div>
-            <div 
-              v-else-if="product.badge === 'favorito'" 
-              class="absolute top-2 right-2 bg-pink-500/80 text-white text-[9px] px-1.5 py-0.5 rounded font-medium backdrop-blur-sm"
-            >
-              <svg class="w-2.5 h-2.5" fill="currentColor" viewBox="0 0 24 24">
-                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
-              </svg>
-            </div>
-            <div 
-              v-else-if="product.lastQty" 
-              class="absolute top-2 right-2 bg-gray-900/60 text-white text-[10px] px-1.5 py-0.5 rounded font-medium backdrop-blur-sm"
-            >
-              ×{{ product.lastQty }}
-            </div>
-          </div>
-          
-          <!-- Info del producto -->
-          <div class="p-3">
-            <h3 class="font-medium text-gray-800 text-[13px] line-clamp-2 mb-1.5 leading-snug">
-              {{ product.name }}
-            </h3>
-            <p class="text-gray-900 font-semibold text-sm">
-              ${{ product.price.toLocaleString() }}
-            </p>
-          </div>
-        </router-link>
         
-        <!-- Card "Ver más" -->
-        <router-link 
-          to="/portal/catalogo"
-          class="flex-shrink-0 w-[150px] sm:w-[168px] bg-gray-50/50 rounded-xl border border-dashed border-gray-200 flex flex-col items-center justify-center aspect-[4/5] hover:border-gray-300 hover:bg-gray-50 transition-all duration-300 group"
-        >
-          <div class="w-10 h-10 bg-white rounded-lg flex items-center justify-center mb-2 shadow-sm group-hover:scale-105 transition-transform duration-300">
-            <svg class="w-5 h-5 text-gray-400 group-hover:text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </div>
-          <span class="text-gray-500 font-medium text-xs">Ver catálogo</span>
-          <span class="text-gray-400 text-[10px]">+500 productos</span>
-        </router-link>
-      </div>
-    </div>
-
-    <!-- =========================================================================
-         SECCIÓN DESCUBRIMIENTO - Novedades
-    ========================================================================== -->
-    <div class="mb-14">
-      <div class="flex items-center justify-between mb-6">
-        <div>
-          <h2 class="font-luxury text-2xl sm:text-3xl font-bold text-gray-900 tracking-tight">Novedades</h2>
-          <p class="text-gray-500 text-sm mt-1 font-light tracking-wide">Los productos más recientes del inventario</p>
+        <!-- Grid de productos -->
+        <div v-if="isLoading" class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+          <B2BSkeleton 
+            v-for="n in 10" 
+            :key="`skeleton-${n}`"
+            variant="rounded" 
+            class="aspect-[3/4] h-full" 
+          />
         </div>
-        <router-link 
-          to="/portal/catalogo?orden=nuevo"
-          class="text-gray-500 hover:text-gray-700 text-sm font-medium flex items-center gap-1 transition-colors"
-        >
-          Ver todas
-          <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
-          </svg>
-        </router-link>
-      </div>
-      
-      <!-- Grid de productos destacados -->
-      <div v-if="isLoading" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-        <B2BSkeleton 
-          v-for="n in 10" 
-          :key="`skeleton-featured-${n}`"
-          variant="rounded" 
-          class="aspect-[4/5] h-[320px]" 
-        />
-      </div>
-      
-      <div v-else-if="featuredProducts.length > 0" class="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3">
-        <router-link 
-          v-for="(product, index) in featuredProducts" 
-          :key="product.id"
-          :to="`/portal/producto/${product.id}`"
-          :style="{ 
-            animationDelay: getAnimationDelay(index),
-            opacity: hasAnimated ? 1 : 0
-          }"
-          class="group bg-white rounded-2xl overflow-hidden shadow-soft hover:shadow-xl hover:-translate-y-1 transition-all duration-500 ease-out animate-fade-in-up"
-        >
-          <!-- Imagen grande -->
-          <div class="relative aspect-[4/5] bg-gray-50 overflow-hidden">
-            <img 
-              :src="product.image" 
-              :alt="product.name"
-              class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 ease-out"
-              @error="handleProductImageError($event, product)"
-              loading="lazy"
-            />
-            
-            <!-- Badges más sutiles -->
-            <div class="absolute top-2 left-2 flex flex-col gap-1.5">
-              <span 
-                v-if="product.badge === 'new'"
-                class="px-2 py-0.5 bg-emerald-500/90 text-white text-[10px] font-semibold rounded backdrop-blur-sm"
-              >
-                Nuevo
-              </span>
-              <span 
-                v-if="product.badge === 'low'"
-                class="px-2 py-0.5 bg-amber-500/90 text-white text-[10px] font-semibold rounded backdrop-blur-sm"
-              >
-                Últimas uds.
-              </span>
-              <span 
-                v-if="product.badge === 'hot'"
-                class="px-2 py-0.5 bg-rose-500/90 text-white text-[10px] font-semibold rounded backdrop-blur-sm"
-              >
-                Top ventas
-              </span>
-              <span 
-                v-if="product.discount"
-                class="px-2 py-0.5 bg-gray-900/80 text-white text-[10px] font-semibold rounded backdrop-blur-sm"
-              >
-                -{{ product.discount }}%
-              </span>
-            </div>
-          </div>
-          
-          <!-- Info del producto -->
-          <div class="p-3">
-            <p class="text-gray-400 text-[10px] uppercase tracking-wider mb-0.5">{{ product.category }}</p>
-            <h3 class="font-medium text-gray-800 text-[13px] line-clamp-2 mb-2 leading-snug min-h-[2.25rem]">
-              {{ product.name }}
-            </h3>
-            
-            <div class="flex items-end justify-between">
-              <div>
-                <p v-if="product.originalPrice" class="text-gray-400 text-[10px] line-through">
-                  ${{ product.originalPrice.toLocaleString() }}
-                </p>
-                <p class="text-gray-900 font-semibold text-sm">
-                  ${{ product.price.toLocaleString() }}
-                </p>
+        
+        <div v-else class="grid grid-cols-2 md:grid-cols-4 lg:grid-cols-5 gap-3 sm:gap-4">
+          <router-link 
+            v-for="(product, index) in frequentProducts" 
+            :key="product.id"
+            :to="`/portal/producto/${product.id}`"
+            :style="{ 
+              animationDelay: getAnimationDelay(index),
+              opacity: hasAnimated ? 1 : 0
+            }"
+            class="rounded-lg border border-gray-100 hover:shadow-md transition-shadow duration-200 overflow-hidden animate-fade-in-up"
+          >
+            <!-- Imagen -->
+            <div class="relative">
+              <div class="aspect-square overflow-hidden bg-gray-50">
+                <img 
+                  :src="product.image" 
+                  :alt="product.name"
+                  class="w-full h-full object-cover"
+                  @error="handleProductImageError($event, product)"
+                  loading="lazy"
+                />
               </div>
-              <div class="flex items-center gap-0.5 text-gray-400 text-[10px]">
-                <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+              
+              <!-- Botón de añadir rápido -->
+              <button 
+                @click.stop.prevent="quickAddToCart(product)"
+                class="absolute bottom-2 right-2 w-8 h-8 bg-white hover:bg-[#E91E63] hover:text-white text-gray-700 rounded-full flex items-center justify-center shadow-md border border-gray-200 opacity-0 group-hover:opacity-100 transition-all duration-200"
+                aria-label="Añadir rápido"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
                 </svg>
-                {{ product.stock }}
+              </button>
+            </div>
+            
+            <!-- Info del producto -->
+            <div class="p-3 sm:p-4">
+              <!-- Nombre del producto -->
+              <p class="text-gray-800 text-[13px] sm:text-sm line-clamp-2 leading-snug mb-2 min-h-[2.25rem]">
+                {{ product.name }}
+              </p>
+              
+              <!-- Precio -->
+              <p class="text-gray-900 font-bold text-base sm:text-lg">
+                ${{ product.price.toLocaleString() }}
+              </p>
+              
+              <!-- Envío / Stock -->
+              <div class="flex items-center gap-1.5 mt-1.5">
+                <span class="text-emerald-600 text-xs font-medium">Envío gratis</span>
+              </div>
+              
+              <div class="flex items-center gap-1 mt-1">
+                <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+                <span class="text-gray-400 text-[11px]">{{ product.stock || '150' }} Uds. disponibles</span>
               </div>
             </div>
-          </div>
-        </router-link>
-      </div>
-      
-      <!-- Empty state si no hay productos -->
-      <div v-else class="flex flex-col items-center justify-center py-16 px-4">
-        <div class="w-16 h-16 bg-gray-100 rounded-full flex items-center justify-center mb-4">
-          <svg class="w-8 h-8 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
-          </svg>
+          </router-link>
         </div>
-        <h3 class="text-lg font-semibold text-gray-800 mb-2">No hay productos disponibles</h3>
-        <p class="text-gray-500 text-sm mb-6 text-center max-w-sm">
-          Actualmente no hay productos en esta sección. Vuelve más tarde o explora el catálogo completo.
-        </p>
-        <router-link 
-          to="/portal/catalogo"
-          class="inline-flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
-        >
-          Ver catálogo completo
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-        </router-link>
-      </div>
-      
-      <!-- Botón ver más - con accesibilidad mejorada -->
-      <div v-if="featuredProducts.length > 0" class="text-center mt-10">
-        <router-link 
-          to="/portal/catalogo"
-          class="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-all duration-300 group hover:shadow-lg hover:shadow-gray-900/20 focus:outline-none focus:ring-2 focus:ring-gray-900 focus:ring-offset-2"
-          aria-label="Ver catálogo completo con todos los productos"
-        >
-          Explorar catálogo completo
-          <svg class="w-4 h-4 group-hover:translate-x-0.5 transition-transform duration-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-          </svg>
-        </router-link>
-      </div>
-    </div>
+        
+        <!-- Botón ver catálogo móvil -->
+        <div class="text-center mt-6 sm:hidden">
+          <router-link 
+            to="/portal/catalogo"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            Ver catálogo completo
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </router-link>
+        </div>
+        </div>
+      </section>
 
-    <!-- =========================================================================
-         BANNER CTA - Asesoría (sutil y corporativo)
-    ========================================================================== -->
-    <div class="relative bg-gradient-to-r from-[#18181B] to-[#1F1F23] rounded-xl p-5 sm:p-6 overflow-hidden">
-      <!-- Decoración sutil -->
-      <div class="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-[#C9A962]/10 to-transparent rounded-full blur-3xl"></div>
+      <!-- =====================================================================
+           SECCIÓN 3: OFERTAS - Layout Mercado Libre
+           Izq: Oferta del día (card grande)
+           Der: Carrusel horizontal de ofertas con flecha
+      ====================================================================== -->
+      <section class="mb-10 sm:mb-14">
+        
+        <!-- Skeleton loading -->
+        <div v-if="isLoading" class="grid grid-cols-1 lg:grid-cols-[minmax(300px,1fr)_2fr] gap-4">
+          <div class="bg-white rounded-md shadow-sm p-6">
+            <B2BSkeleton variant="rounded" class="aspect-square" />
+          </div>
+          <div class="bg-white rounded-md shadow-sm p-6">
+            <div class="flex gap-4 overflow-hidden">
+              <B2BSkeleton v-for="n in 4" :key="`sk-of-${n}`" variant="rounded" class="min-w-[160px] aspect-[3/4]" />
+            </div>
+          </div>
+        </div>
+        
+        <!-- Contenido real -->
+        <div v-else-if="featuredProducts.length > 0" class="grid grid-cols-1 lg:grid-cols-[minmax(300px,1fr)_2fr] gap-4">
+          
+          <!-- ============ OFERTA DEL DÍA (Izquierda) ============ -->
+          <router-link 
+            :to="`/portal/producto/${featuredProducts[0].id}`"
+            class="bg-white rounded-md shadow-sm p-5 sm:p-6 flex flex-col"
+          >
+            <h3 class="font-bold text-xl text-gray-900 mb-5">Oferta del día</h3>
+            
+            <!-- Imagen centrada -->
+            <div class="flex-1 flex items-center justify-center px-4 mb-5">
+              <img 
+                :src="featuredProducts[0].image" 
+                :alt="featuredProducts[0].name"
+                class="max-w-full max-h-[280px] object-contain"
+                @error="handleProductImageError($event, featuredProducts[0])"
+                loading="lazy"
+              />
+            </div>
+            
+            <!-- Info -->
+            <p class="text-gray-800 text-sm leading-snug mb-2 line-clamp-2">
+              {{ featuredProducts[0].name }}
+            </p>
+            
+            <p v-if="featuredProducts[0].originalPrice && featuredProducts[0].originalPrice > featuredProducts[0].price" class="text-gray-400 text-sm line-through">
+              ${{ featuredProducts[0].originalPrice.toLocaleString() }}
+            </p>
+            
+            <div class="flex items-baseline gap-2.5 mb-1">
+              <span class="text-[28px] font-light text-gray-900">
+                ${{ featuredProducts[0].price.toLocaleString() }}
+              </span>
+              <span v-if="featuredProducts[0].discount" class="text-emerald-600 text-sm font-semibold">
+                {{ featuredProducts[0].discount }}% OFF
+              </span>
+            </div>
+            
+            <span class="text-emerald-600 text-[13px] font-medium">Envío gratis</span>
+          </router-link>
+          
+          <!-- ============ OFERTAS CARRUSEL (Derecha) ============ -->
+          <div class="bg-white rounded-md shadow-sm p-5 sm:p-6 flex flex-col">
+            <!-- Header -->
+            <div class="flex items-baseline gap-3 mb-5">
+              <h3 class="font-bold text-xl text-gray-900">Ofertas</h3>
+              <router-link 
+                to="/portal/catalogo?orden=nuevo"
+                class="text-[#007185] hover:text-[#C7511F] hover:underline text-sm font-medium"
+              >
+                Mostrar todas las ofertas
+              </router-link>
+            </div>
+            
+            <!-- Carrusel -->
+            <div class="relative flex-1">
+              <!-- Flecha izquierda -->
+              <button 
+                v-show="canScrollOffersLeft"
+                @click="scrollOffers(-1)"
+                class="absolute left-0 top-1/3 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+              >
+                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
+                </svg>
+              </button>
+              
+              <!-- Contenedor scroll -->
+              <div 
+                ref="offersContainer"
+                @scroll="onOffersScroll"
+                class="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
+                style="-ms-overflow-style: none; scrollbar-width: none;"
+              >
+                <router-link 
+                  v-for="product in featuredProducts.slice(1)" 
+                  :key="product.id"
+                  :to="`/portal/producto/${product.id}`"
+                  class="flex-shrink-0 w-[140px] sm:w-[170px]"
+                >
+                  <!-- Imagen -->
+                  <div class="w-full aspect-[3/4] overflow-hidden rounded bg-gray-50 mb-2.5">
+                    <img 
+                      :src="product.image" 
+                      :alt="product.name"
+                      class="w-full h-full object-contain"
+                      @error="handleProductImageError($event, product)"
+                      loading="lazy"
+                    />
+                  </div>
+                  
+                  <!-- Nombre -->
+                  <p class="text-gray-800 text-[13px] line-clamp-2 leading-snug mb-2">
+                    {{ product.name }}
+                  </p>
+                  
+                  <!-- Precio anterior -->
+                  <p v-if="product.originalPrice && product.originalPrice > product.price" class="text-gray-400 text-xs line-through">
+                    ${{ product.originalPrice.toLocaleString() }}
+                  </p>
+                  
+                  <!-- Precio + descuento -->
+                  <div class="flex items-baseline gap-1.5 flex-wrap">
+                    <span class="text-[22px] font-light text-gray-900">
+                      ${{ product.price.toLocaleString() }}
+                    </span>
+                    <span v-if="product.discount" class="text-emerald-600 text-xs font-semibold">
+                      {{ product.discount }}% OFF
+                    </span>
+                  </div>
+                  
+                  <span class="text-emerald-600 text-[12px] font-medium mt-1 block">Envío gratis</span>
+                </router-link>
+              </div>
+              
+              <!-- Flecha derecha -->
+              <button 
+                v-show="canScrollOffersRight"
+                @click="scrollOffers(1)"
+                class="absolute right-0 top-1/3 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+              >
+                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                </svg>
+              </button>
+            </div>
+          </div>
+          
+        </div>
+        
+        <!-- Empty state -->
+        <div v-else class="bg-white rounded-md shadow-sm p-8 text-center">
+          <p class="text-gray-400 text-sm">No hay ofertas disponibles en este momento</p>
+        </div>
+        
+        <!-- Botón explorar -->
+        <div v-if="featuredProducts.length > 0" class="text-center mt-8">
+          <router-link 
+            to="/portal/catalogo"
+            class="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            Explorar catálogo completo
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
+          </router-link>
+        </div>
+      </section>
+
+      <!-- =====================================================================
+           BANNER CTA - Asesoría (dentro del contenedor maestro)
+      ====================================================================== -->
+      <section class="mb-8">
+        <div class="relative bg-gradient-to-r from-[#18181B] to-[#1F1F23] rounded-2xl p-6 sm:p-8 overflow-hidden">
+          <!-- Decoración sutil -->
+          <div class="absolute top-0 right-0 w-48 h-48 bg-gradient-to-bl from-[#C9A962]/10 to-transparent rounded-full blur-3xl"></div>
+          
+          <div class="relative flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+            <!-- Icono -->
+            <div class="shrink-0 w-14 h-14 bg-[#C9A962]/10 rounded-xl flex items-center justify-center">
+              <svg class="w-6 h-6 text-[#C9A962]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+              </svg>
+            </div>
+            
+            <div class="flex-1 text-center sm:text-left">
+              <h3 class="text-lg sm:text-xl font-semibold text-white mb-1">
+                ¿Necesitas asesoría personalizada?
+              </h3>
+              <p class="text-white/50 text-sm">
+                Nuestro equipo B2B está disponible para ayudarte con tu pedido
+              </p>
+            </div>
+            
+            <a 
+              href="https://wa.me/573001234567?text=Hola,%20soy%20mayorista%20y%20necesito%20asesoría"
+              target="_blank"
+              class="shrink-0 px-6 py-3 bg-white/10 hover:bg-white/20 text-white text-sm font-medium rounded-lg transition-all duration-300 flex items-center gap-2 border border-white/10"
+            >
+              <svg class="w-5 h-5 text-green-400" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+              </svg>
+              Contactar ahora
+            </a>
+          </div>
+        </div>
+      </section>
       
-      <div class="relative flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
-        <!-- Icono sin animación -->
-        <div class="shrink-0 w-12 h-12 bg-[#C9A962]/10 rounded-xl flex items-center justify-center">
-          <svg class="w-5 h-5 text-[#C9A962]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-          </svg>
-        </div>
-        
-        <div class="flex-1 text-center sm:text-left">
-          <h3 class="text-base sm:text-lg font-medium text-white/90 mb-0.5">
-            ¿Necesitas asesoría personalizada?
-          </h3>
-          <p class="text-white/40 text-sm">
-            Nuestro equipo B2B está disponible para ayudarte
-          </p>
-        </div>
-        
-        <a 
-          href="https://wa.me/573001234567?text=Hola,%20soy%20mayorista%20y%20necesito%20asesoría"
-          target="_blank"
-          class="shrink-0 px-5 py-2.5 bg-white/10 hover:bg-white/15 text-white text-sm font-medium rounded-lg transition-all duration-300 flex items-center gap-2 hover:shadow-lg"
-        >
-          <svg class="w-4 h-4 text-green-400" fill="currentColor" viewBox="0 0 24 24">
-            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
-          </svg>
-          Contactar
-        </a>
-      </div>
     </div>
+    <!-- FIN DEL CONTENEDOR MAESTRO -->
   </div>
 </template>
 
@@ -750,9 +811,12 @@ export default {
 
     const cartCount = ref(0)
     const currentSlide = ref(0)
+    const currentScene = ref(0)  // Sistema de escenarios: 0 = Esmeralda, 1 = Champagne, 2 = Promoción
+    const totalScenes = 3  // Total de slides del Hero
     const isLoading = ref(true)
     const hasAnimated = ref(false)
     let slideInterval = null
+    let sceneInterval = null  // Intervalo para cambio de escenas
     
     // Toast notifications
     const toast = useToast()
@@ -761,9 +825,37 @@ export default {
     const frequentProducts = ref([])
     const featuredProducts = ref([])
     
+    // Carrusel de ofertas
+    const offersScrollPos = ref(0)
+    const offersContainer = ref(null)
+    
     // Computed para verificar si tiene historial de compras
     const hasOrderHistory = computed(() => {
       return frequentProducts.value.length > 0 && frequentProducts.value[0]?.lastQty
+    })
+
+    // =========================================================================
+    // CARRUSEL OFERTAS
+    // =========================================================================
+    function scrollOffers(direction) {
+      const container = offersContainer.value
+      if (!container) return
+      const cardWidth = container.querySelector('a')?.offsetWidth || 200
+      const scrollAmount = cardWidth + 16 // card width + gap
+      container.scrollBy({ left: direction * scrollAmount, behavior: 'smooth' })
+    }
+    
+    function onOffersScroll() {
+      const container = offersContainer.value
+      if (!container) return
+      offersScrollPos.value = container.scrollLeft
+    }
+    
+    const canScrollOffersLeft = computed(() => offersScrollPos.value > 0)
+    const canScrollOffersRight = computed(() => {
+      const container = offersContainer.value
+      if (!container) return true
+      return offersScrollPos.value < container.scrollWidth - container.clientWidth - 2
     })
 
     // =========================================================================
@@ -781,6 +873,49 @@ export default {
 
     function prevSlide() {
       currentSlide.value = (currentSlide.value - 1 + 3) % 3
+    }
+
+    // =========================================================================
+    // SISTEMA DE ESCENARIOS (Hero Section)
+    // =========================================================================
+    function startSceneShow() {
+      sceneInterval = setInterval(() => {
+        currentScene.value = (currentScene.value + 1) % totalScenes
+      }, 6000) // Cambio cada 6 segundos
+    }
+
+    function goToScene(index) {
+      currentScene.value = index
+      // Reiniciar el intervalo para que no cambie inmediatamente
+      if (sceneInterval) {
+        clearInterval(sceneInterval)
+        startSceneShow()
+      }
+    }
+
+    function nextScene() {
+      currentScene.value = (currentScene.value + 1) % totalScenes
+      // Reiniciar el intervalo
+      if (sceneInterval) {
+        clearInterval(sceneInterval)
+        startSceneShow()
+      }
+    }
+
+    function prevScene() {
+      currentScene.value = (currentScene.value - 1 + totalScenes) % totalScenes
+      // Reiniciar el intervalo
+      if (sceneInterval) {
+        clearInterval(sceneInterval)
+        startSceneShow()
+      }
+    }
+
+    function stopSceneShow() {
+      if (sceneInterval) {
+        clearInterval(sceneInterval)
+        sceneInterval = null
+      }
     }
 
     // =========================================================================
@@ -901,14 +1036,34 @@ export default {
           }
         }
         
-        // Si hay productos vistos/favoritos, usarlos
-        if (productosHabituales.length > 0) {
-          frequentProducts.value = productosHabituales.slice(0, 8)
+        // Garantizar mínimo 5 productos siempre
+        const MIN_PRODUCTOS = 5
+        const MAX_PRODUCTOS = 10
+        
+        if (productosHabituales.length >= MIN_PRODUCTOS) {
+          // Tiene suficientes productos vistos/favoritos
+          frequentProducts.value = productosHabituales.slice(0, MAX_PRODUCTOS)
         } else {
-          // Si no hay historial, mostrar productos destacados como sugerencia
-          const productos = await obtenerProductos({ limit: 5 })
-          frequentProducts.value = (Array.isArray(productos) ? productos : [])
-            .map(normalizarProducto)
+          // Rellenar con productos destacados o generales hasta completar el mínimo
+          try {
+            const complemento = await obtenerProductos({ limit: MAX_PRODUCTOS })
+            const productosExtra = (Array.isArray(complemento) ? complemento : [])
+              .map(normalizarProducto)
+              .filter(p => !productosUnicos.has(p.id)) // Sin duplicar
+            
+            const combinados = [...productosHabituales, ...productosExtra]
+            frequentProducts.value = combinados.slice(0, MAX_PRODUCTOS)
+          } catch (err) {
+            console.warn('No se pudo completar productos:', err)
+            // Si falla, al menos mostrar lo que tenemos
+            if (productosHabituales.length > 0) {
+              frequentProducts.value = productosHabituales
+            } else {
+              const productos = await obtenerProductos({ limit: MIN_PRODUCTOS })
+              frequentProducts.value = (Array.isArray(productos) ? productos : [])
+                .map(normalizarProducto)
+            }
+          }
         }
         
         // Activar animaciones después de cargar
@@ -929,6 +1084,7 @@ export default {
     // =========================================================================
     onMounted(() => {
       startSlideshow()
+      startSceneShow()  // Iniciar sistema de escenarios
       cargarProductos()
       
       // Cargar contador del carrito desde localStorage
@@ -947,6 +1103,7 @@ export default {
       if (slideInterval) {
         clearInterval(slideInterval)
       }
+      stopSceneShow()  // Limpiar intervalo de escenarios
     })
 
     // =========================================================================
@@ -956,13 +1113,24 @@ export default {
       user,
       cartCount,
       currentSlide,
+      currentScene,
+      totalScenes,
       isLoading,
       hasAnimated,
       hasOrderHistory,
       frequentProducts,
       featuredProducts,
+      offersContainer,
+      offersScrollPos,
+      canScrollOffersLeft,
+      canScrollOffersRight,
+      scrollOffers,
+      onOffersScroll,
       nextSlide,
       prevSlide,
+      goToScene,
+      nextScene,
+      prevScene,
       handleProductImageError,
       quickAddToCart,
       getAnimationDelay
@@ -1040,8 +1208,28 @@ a:focus-visible {
   backdrop-filter: blur(4px);
 }
 
-/* Transición del slider más cinematográfica */
+/* Transición del slider horizontal (estilo Mercado Libre) */
 [style*="transform: translateX"] {
   transition: transform 700ms cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+/* Full-width para el Hero (cubre todo el viewport) */
+.hero-fullwidth {
+  width: 100vw;
+  position: relative;
+  left: 50%;
+  right: 50%;
+  margin-left: -50vw;
+  margin-right: -50vw;
+  /* Compensar padding del Layout y cubrir fondos arquitectónicos */
+  margin-top: -2rem;
+  padding-top: 2rem;
+  z-index: 1;
+}
+@media (min-width: 640px) {
+  .hero-fullwidth {
+    margin-top: -2.5rem;
+    padding-top: 2.5rem;
+  }
 }
 </style>

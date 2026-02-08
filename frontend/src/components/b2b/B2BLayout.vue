@@ -1,579 +1,156 @@
 <template>
-  <div class="min-h-screen bg-[#FAFAFA] flex flex-col">
+  <div class="min-h-screen flex flex-col bg-[#EBEBEB]">
+    
     <!-- =========================================================================
-         TOP NAVIGATION BAR - Beauty Brand B2B Header
+         CONTENIDO PRINCIPAL
     ========================================================================== -->
-    <header class="bg-[#0F0F0F] text-white sticky top-0 z-50">
-      <div class="max-w-[1600px] mx-auto">
-        <!-- Top utility bar -->
-        <div class="hidden lg:flex items-center justify-between px-4 sm:px-6 lg:px-8 py-1.5 border-b border-white/5 text-[11px]">
-          <div class="flex items-center gap-4 text-white/50">
-            <router-link 
-              to="/portal/cuenta?tab=addresses" 
-              class="flex items-center gap-1.5 hover:text-white/80 transition-colors group"
-            >
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z" />
-              </svg>
-              <span v-if="defaultAddress">Enviar a <span class="text-white/80 font-medium group-hover:text-white">{{ defaultAddress.ciudad }}</span> - {{ truncateAddress(defaultAddress.direccion) }}</span>
-              <span v-else>Agregar dirección de envío</span>
-            </router-link>
-          </div>
-          <div class="flex items-center gap-4 text-white/50">
-            <router-link to="/portal/ayuda" class="hover:text-[#C9A962] transition-colors">Ayuda / PQR</router-link>
-            <span class="text-white/20">|</span>
-            <a href="https://wa.me/573001234567" target="_blank" class="flex items-center gap-1.5 hover:text-emerald-400 transition-colors">
-              <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/></svg>
-              WhatsApp B2B
-            </a>
-          </div>
-        </div>
+    <div class="flex flex-col min-h-screen">
+      <!-- New B2B Header Component -->
+      <B2BHeader />
 
-        <div class="flex items-center justify-between h-14 px-4 sm:px-6 lg:px-8">
-          
-          <!-- Left: Logo + Nav -->
-          <div class="flex items-center gap-6 lg:gap-8">
-            <!-- Logo -->
-            <router-link to="/portal" class="flex items-center gap-3 group">
-              <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#C9A962] to-[#A8893D] p-0.5">
-                <div class="w-full h-full rounded-full bg-[#0F0F0F] flex items-center justify-center">
-                  <img src="/logo-kharis.png" alt="Kharis Pro" class="w-7 h-7 object-contain" />
-                </div>
-              </div>
-              <div class="hidden sm:block">
-                <span class="text-[#C9A962] font-luxury text-lg tracking-wider">KHARIS PRO</span>
-                <span class="block text-white/40 text-[10px] tracking-widest uppercase">Portal Mayoristas</span>
-              </div>
-            </router-link>
+      <!-- Spacer for fixed header (accent line + utility bar + main header) -->
+      <div class="h-[57px] lg:h-[107px]"></div>
 
-            <!-- Desktop Navigation - Categories Dropdown style MercadoLibre -->
-            <nav class="hidden lg:flex items-center">
-              <!-- Categories Dropdown -->
-              <div class="relative" ref="categoriesMenuRef" @mouseenter="showCategoriesMenu = true" @mouseleave="showCategoriesMenu = false">
-                <button 
-                  class="relative px-3 py-2 text-[13px] font-medium text-white/70 hover:text-white transition-all duration-200 flex items-center gap-1.5"
-                >
-                  Categorías
-                  <svg class="w-3.5 h-3.5 transition-transform" :class="{ 'rotate-180': showCategoriesMenu }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                  </svg>
-                </button>
-                <!-- Categories Dropdown Menu -->
-                <transition name="dropdown">
-                  <div 
-                    v-if="showCategoriesMenu" 
-                    class="absolute left-0 top-full mt-1 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50"
-                  >
-                    <div class="py-2">
-                      <router-link 
-                        v-for="cat in categorias" 
-                        :key="cat.id" 
-                        :to="`/portal/catalogo?categoria=${cat.slug}`"
-                        class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors"
-                        @click="showCategoriesMenu = false"
-                      >
-                        <span class="w-2 h-2 rounded-full bg-[#C9A962]"></span>
-                        {{ cat.nombre }}
-                      </router-link>
-                      <div class="border-t border-gray-100 mt-2 pt-2">
-                        <router-link 
-                          to="/portal/catalogo"
-                          class="flex items-center gap-3 px-4 py-2.5 text-sm text-[#C9A962] font-medium hover:bg-gray-50 transition-colors"
-                          @click="showCategoriesMenu = false"
-                        >
-                          Ver todo el catálogo
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                        </router-link>
-                      </div>
-                    </div>
-                  </div>
-                </transition>
-              </div>
-              
-              <router-link 
-                to="/portal/catalogo?oferta=true"
-                class="relative px-3 py-2 text-[13px] font-medium text-rose-400 hover:text-rose-300 transition-all duration-200"
-              >
-                OFERTAS
-              </router-link>
-              
-              <router-link 
-                to="/portal/cupones"
-                class="relative px-3 py-2 text-[13px] font-medium text-amber-400 hover:text-amber-300 transition-all duration-200 flex items-center gap-1.5"
-              >
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 14.25l6-6m4.5-3.493V21.75l-3.75-1.5-3.75 1.5-3.75-1.5-3.75 1.5V4.757c0-1.108.806-2.057 1.907-2.185a48.507 48.507 0 0111.186 0c1.1.128 1.907 1.077 1.907 2.185zM9.75 9h.008v.008H9.75V9zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0zm4.125 4.5h.008v.008h-.008V13.5zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" /></svg>
-                CUPONES
-              </router-link>
-              
-              <router-link 
-                to="/portal/catalogo?nuevo=true"
-                class="relative px-3 py-2 text-[13px] font-medium text-[#E8B4B8] hover:text-[#F0C4C8] transition-all duration-200 group flex items-center gap-1.5"
-              >
-                NUEVOS
-                <span class="w-1.5 h-1.5 bg-[#E8B4B8] rounded-full animate-pulse"></span>
-              </router-link>
-            </nav>
-          </div>
-
-          <!-- Right: Actions -->
-          <div class="flex items-center gap-2 sm:gap-4">
-            <!-- Search Button -->
-            <button 
-              @click="showSearchModal = true"
-              class="hidden sm:flex items-center gap-2 px-3 py-2 bg-white/5 hover:bg-white/10 rounded-lg transition-colors text-white/60 hover:text-white text-sm"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-              <span class="hidden md:inline">Buscar...</span>
-              <kbd class="hidden lg:inline ml-2 px-1.5 py-0.5 bg-white/10 rounded text-[10px] font-mono">⌘K</kbd>
-            </button>
-
-            <!-- Favorites -->
-            <router-link to="/portal/favoritos" class="relative p-2 text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
-              </svg>
-              <span v-if="favoritosCount > 0" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-pink-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center">
-                {{ favoritosCount > 99 ? '99+' : favoritosCount }}
-              </span>
-            </router-link>
-
-            <!-- Cart -->
-            <router-link to="/portal/carrito" class="relative p-2 text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z" />
-              </svg>
-              <span v-if="cartCount > 0" class="absolute -top-0.5 -right-0.5 min-w-[18px] h-[18px] px-1 bg-[#C9A962] text-[#0F0F0F] text-[10px] font-bold rounded-full flex items-center justify-center">
-                {{ cartCount > 99 ? '99+' : cartCount }}
-              </span>
-            </router-link>
-
-            <!-- User Menu -->
-            <div class="relative" ref="userMenuRef">
-              <button @click="showUserMenu = !showUserMenu" class="flex items-center gap-2 p-1.5 hover:bg-white/5 rounded-lg transition-colors">
-                <div class="w-8 h-8 rounded-lg bg-gradient-to-br from-[#C9A962] to-[#A8893D] flex items-center justify-center">
-                  <span class="text-[#0F0F0F] text-sm font-bold">{{ userInitials }}</span>
-                </div>
-                <div class="hidden md:block text-left">
-                  <p class="text-sm font-medium text-white truncate max-w-[120px]">{{ user.nombre }}</p>
-                  <p class="text-[10px] text-white/40">{{ user.nivel || 'Mayorista' }}</p>
-                </div>
-                <svg class="w-4 h-4 text-white/40 hidden sm:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
-                </svg>
-              </button>
-
-              <transition name="dropdown">
-                <div v-if="showUserMenu" class="absolute right-0 mt-2 w-64 bg-white rounded-xl shadow-2xl border border-gray-100 overflow-hidden z-50">
-                  <div class="px-4 py-4 bg-gradient-to-br from-gray-50 to-white border-b border-gray-100">
-                    <p class="font-semibold text-gray-900 truncate">{{ user.nombre }}</p>
-                    <p class="text-sm text-gray-500 truncate">{{ user.email }}</p>
-                    <div class="flex items-center gap-2 mt-2">
-                      <span class="inline-flex items-center gap-1 px-2 py-0.5 bg-[#C9A962]/10 text-[#C9A962] text-xs font-semibold rounded-full border border-[#C9A962]/20">
-                        <svg class="w-3 h-3" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                        {{ user.nivel || 'Mayorista' }}
-                      </span>
-                    </div>
-                  </div>
-                  <div class="py-2">
-                    <router-link to="/portal/cuenta" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors" @click="showUserMenu = false">
-                      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" /></svg>
-                      Mi Cuenta
-                    </router-link>
-                    <router-link to="/portal/pedidos" class="flex items-center gap-3 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors" @click="showUserMenu = false">
-                      <svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" /></svg>
-                      Historial de Pedidos
-                    </router-link>
-                  </div>
-                  <div class="border-t border-gray-100 py-2">
-                    <button @click="handleLogout" class="flex items-center gap-3 w-full px-4 py-2.5 text-sm text-red-600 hover:bg-red-50 transition-colors">
-                      <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" /></svg>
-                      Cerrar Sesión
-                    </button>
-                  </div>
-                </div>
-              </transition>
-            </div>
-
-            <!-- Mobile Menu Toggle -->
-            <button @click="showMobileMenu = !showMobileMenu" class="lg:hidden p-2 text-white/60 hover:text-white hover:bg-white/5 rounded-lg transition-colors">
-              <svg v-if="!showMobileMenu" class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" /></svg>
-              <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" /></svg>
-            </button>
-          </div>
-        </div>
-
-        <!-- Mobile Navigation - Beauty Categories -->
-        <transition name="slide">
-          <nav v-if="showMobileMenu" class="lg:hidden border-t border-white/5 pb-4">
-            <div class="px-4 pt-4 space-y-1">
-              <!-- Beauty Categories -->
-              <p class="px-4 py-2 text-[10px] text-white/30 uppercase tracking-widest font-medium">Categorías</p>
-              <router-link to="/portal/catalogo?categoria=pelucas" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" @click="showMobileMenu = false">
-                <svg class="w-5 h-5 text-[#C9A962]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" /></svg>
-                Pelucas
-              </router-link>
-              <router-link to="/portal/catalogo?categoria=extensiones" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" @click="showMobileMenu = false">
-                <svg class="w-5 h-5 text-[#E8B4B8]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" /></svg>
-                Extensiones
-              </router-link>
-              <router-link to="/portal/catalogo?categoria=sistemas-capilares" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" @click="showMobileMenu = false">
-                <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15.3M14.25 3.104c.251.023.501.05.75.082M19.8 15.3l-1.57.393A9.065 9.065 0 0112 15a9.065 9.065 0 00-6.23.693L5 14.5m14.8.8l1.402 1.402c1.232 1.232.65 3.318-1.067 3.611A48.309 48.309 0 0112 21c-2.773 0-5.491-.235-8.135-.687-1.718-.293-2.3-2.379-1.067-3.61L5 14.5" /></svg>
-                Sistemas Capilares
-              </router-link>
-              
-              <div class="border-t border-white/5 my-3"></div>
-              
-              <router-link to="/portal/catalogo?nuevo=true" class="flex items-center gap-3 px-4 py-3 text-[#E8B4B8] hover:text-[#F0C4C8] hover:bg-white/5 rounded-lg transition-colors" @click="showMobileMenu = false">
-                <span class="w-2 h-2 bg-[#E8B4B8] rounded-full animate-pulse"></span>
-                Nuevos Lanzamientos
-              </router-link>
-              <router-link to="/portal/catalogo?oferta=true" class="flex items-center gap-3 px-4 py-3 text-rose-400 hover:text-rose-300 hover:bg-white/5 rounded-lg transition-colors" @click="showMobileMenu = false">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 6h.008v.008H6V6z" /></svg>
-                Ofertas
-              </router-link>
-              
-              <div class="border-t border-white/5 my-3"></div>
-              <p class="px-4 py-2 text-[10px] text-white/30 uppercase tracking-widest font-medium">Mi cuenta</p>
-              
-              <router-link v-for="item in navItems" :key="item.to" :to="item.to" class="flex items-center gap-3 px-4 py-3 text-white/70 hover:text-white hover:bg-white/5 rounded-lg transition-colors" :class="{ 'text-white bg-white/5': isActiveRoute(item.to) }" @click="showMobileMenu = false">
-                {{ item.label }}
-              </router-link>
-            </div>
-          </nav>
-        </transition>
-      </div>
-    </header>
-
-    <!-- Welcome Bar - Más compacta y elegante -->
-    <div class="bg-[#18181B] border-b border-white/5">
-      <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-2">
-        <div class="flex items-center justify-between gap-3 text-xs sm:text-sm">
-          <div class="flex items-center gap-3 sm:gap-4">
-            <span class="text-white/50">Hola, <span class="text-white/80 font-medium">{{ user.nombre?.split(' ')[0] || 'Mayorista' }}</span></span>
-            <div class="hidden sm:flex items-center gap-1.5 text-[#C9A962]/80">
-              <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-              <span class="font-medium">{{ user.nivel || 'Gold' }}</span>
-              <span class="text-white/30">·</span>
-              <span class="text-emerald-400/80">{{ user.descuento || '15' }}% OFF</span>
-            </div>
-          </div>
-          <div class="flex items-center gap-3 sm:gap-5 text-white/50">
-            <div class="hidden sm:flex items-center gap-1.5">
-              <span>Saldo:</span>
-              <span class="text-emerald-400 font-medium">${{ formatPrice(accountBalance) }}</span>
-            </div>
-            <router-link to="/portal/carrito" class="flex items-center gap-1.5 text-white/70 hover:text-white transition-colors">
-              <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" /></svg>
-              <span class="font-medium">${{ formatPrice(cartTotal) }}</span>
-            </router-link>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Main Content -->
-    <main class="flex-1">
-      <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-10">
+      <!-- Main Content (no gap) -->
+      <main class="flex-1 -mt-px">
         <router-view v-slot="{ Component }">
           <transition name="fade" mode="out-in">
             <component :is="Component" />
           </transition>
         </router-view>
-      </div>
-    </main>
+      </main>
 
-    <!-- Footer - Más sutil -->
-    <footer class="bg-[#0F0F0F] text-white/40 py-6 mt-auto border-t border-white/5">
-      <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8">
-        <div class="flex flex-col sm:flex-row items-center justify-between gap-4 text-xs">
-          <div class="flex items-center gap-2">
-            <div class="w-6 h-6 rounded-full bg-gradient-to-br from-[#C9A962] to-[#A8893D] p-0.5">
-              <div class="w-full h-full rounded-full bg-[#0F0F0F] flex items-center justify-center">
-                <img src="/logo-kharis.png" alt="Kharis Pro" class="w-4 h-4 object-contain" />
-              </div>
-            </div>
-            <span>&copy; {{ new Date().getFullYear() }} Kharis Distribuidora</span>
-          </div>
-          <div class="flex items-center gap-4">
-            <a href="#" class="hover:text-[#C9A962] transition-colors">Términos</a>
-            <a href="#" class="hover:text-[#C9A962] transition-colors">Privacidad</a>
-            <a :href="retailUrl" class="hover:text-[#C9A962] transition-colors">Tienda Retail</a>
-          </div>
-        </div>
-      </div>
-    </footer>
+      <!-- Footer -->
+      <footer class="mt-auto">
 
-    <!-- Search Modal -->
-    <Teleport to="body">
-      <transition name="modal">
-        <div v-if="showSearchModal" class="fixed inset-0 z-[60] flex items-start justify-center pt-20 px-4">
-          <div class="absolute inset-0 bg-black/60" @click="showSearchModal = false"></div>
-          <div class="relative bg-white rounded-2xl shadow-2xl w-full max-w-2xl overflow-hidden">
-            <div class="flex items-center gap-4 p-4 border-b border-gray-100">
-              <svg v-if="!searchLoading" class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
-              <svg v-else class="w-5 h-5 text-[#C9A962] animate-spin" fill="none" viewBox="0 0 24 24"><circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle><path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path></svg>
-              <input 
-                v-model="searchQuery" 
-                ref="searchInput" 
-                type="text" 
-                placeholder="Buscar productos, SKU..." 
-                class="flex-1 text-lg outline-none placeholder:text-gray-400" 
-                @keydown.esc="showSearchModal = false"
-                @keydown.enter="goToSearchResults"
-              />
-              <button @click="showSearchModal = false" class="p-2 hover:bg-gray-100 rounded-lg"><svg class="w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg></button>
-            </div>
-            <div class="max-h-[60vh] overflow-y-auto">
-              <!-- Loading State -->
-              <div v-if="searchLoading" class="p-6 text-center">
-                <p class="text-sm text-gray-500">Buscando productos...</p>
-              </div>
-              <!-- Results -->
-              <div v-else-if="searchResults.length > 0" class="divide-y divide-gray-100">
-                <router-link 
-                  v-for="product in searchResults" 
-                  :key="product.id" 
-                  :to="`/portal/producto/${product.id}`"
-                  class="flex items-center gap-4 p-4 hover:bg-gray-50 transition-colors"
-                  @click="showSearchModal = false"
-                >
-                  <img 
-                    :src="product.imagen_principal || '/placeholder.png'" 
-                    :alt="product.nombre"
-                    class="w-14 h-14 object-cover rounded-lg bg-gray-100"
-                  />
-                  <div class="flex-1 min-w-0">
-                    <h4 class="font-medium text-gray-900 truncate">{{ product.nombre }}</h4>
-                    <p class="text-sm text-gray-500">{{ product.categoria_nombre }} · SKU: {{ product.sku || 'N/A' }}</p>
-                    <div class="flex items-center gap-2 mt-1">
-                      <span class="text-[#C9A962] font-bold">${{ formatPrice(product.precio_mayorista || product.precio) }}</span>
-                      <span v-if="product.precio > (product.precio_mayorista || product.precio)" class="text-xs text-gray-400 line-through">${{ formatPrice(product.precio) }}</span>
-                      <span v-if="product.stock <= 5 && product.stock > 0" class="text-xs px-1.5 py-0.5 bg-amber-100 text-amber-700 rounded">Últimas {{ product.stock }} uds</span>
-                      <span v-else-if="product.stock <= 0" class="text-xs px-1.5 py-0.5 bg-red-100 text-red-700 rounded">Agotado</span>
+        <!-- Banda superior oscura con logo y navegación -->
+        <div class="bg-[#1B1D21] text-white">
+          <div class="max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12 py-10 sm:py-12">
+            
+            <!-- Grid principal -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 lg:gap-12">
+              
+              <!-- Col 1: Marca -->
+              <div class="sm:col-span-2 lg:col-span-1">
+                <div class="flex items-center gap-3 mb-4">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#E91E63] to-[#AD1457] p-0.5">
+                    <div class="w-full h-full rounded-full bg-[#1B1D21] flex items-center justify-center">
+                      <img src="/logo-kharis.png" alt="Kharis" class="w-6 h-6 object-contain brightness-0 invert" />
                     </div>
                   </div>
-                  <svg class="w-5 h-5 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
-                </router-link>
-                <!-- Ver todos los resultados -->
-                <button 
-                  @click="goToSearchResults"
-                  class="w-full p-4 text-center text-[#C9A962] font-medium hover:bg-gray-50 transition-colors"
-                >
-                  Ver todos los resultados para "{{ searchQuery }}"
-                </button>
+                  <div>
+                    <p class="font-bold text-base tracking-wide">KHARIS</p>
+                    <p class="text-[10px] text-gray-400 tracking-[0.2em] uppercase -mt-0.5">Distribuidora</p>
+                  </div>
+                </div>
+                <p class="text-gray-400 text-sm leading-relaxed max-w-xs">
+                  Portal mayorista para profesionales del sector capilar. Calidad premium, precios competitivos.
+                </p>
               </div>
-              <!-- No results -->
-              <div v-else-if="searchQuery.length >= 2" class="p-6 text-center">
-                <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                <p class="text-gray-500">No se encontraron productos</p>
-                <p class="text-sm text-gray-400 mt-1">Intenta con otros términos de búsqueda</p>
+
+              <!-- Col 2: Portal -->
+              <div>
+                <h4 class="text-xs font-semibold tracking-[0.15em] uppercase text-gray-300 mb-4">Portal B2B</h4>
+                <ul class="space-y-2.5">
+                  <li><router-link to="/portal/catalogo" class="text-gray-400 hover:text-white text-sm transition-colors">Catálogo</router-link></li>
+                  <li><router-link to="/portal/pedidos" class="text-gray-400 hover:text-white text-sm transition-colors">Mis Pedidos</router-link></li>
+                  <li><router-link to="/portal/perfil" class="text-gray-400 hover:text-white text-sm transition-colors">Mi Cuenta</router-link></li>
+                  <li><a :href="retailUrl" class="text-gray-400 hover:text-white text-sm transition-colors">Tienda Retail</a></li>
+                </ul>
               </div>
-              <!-- Empty State -->
-              <div v-else class="p-6">
-                <p class="text-sm text-gray-500 text-center mb-4">Busca productos por nombre, SKU o categoría</p>
-                <div class="flex flex-wrap gap-2 justify-center">
-                  <button 
-                    v-for="term in ['Pelucas', 'Extensiones', 'Sistemas', 'Cabello natural']" 
-                    :key="term"
-                    @click="searchQuery = term"
-                    class="px-3 py-1.5 text-sm bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full transition-colors"
-                  >
-                    {{ term }}
-                  </button>
+
+              <!-- Col 3: Legal -->
+              <div>
+                <h4 class="text-xs font-semibold tracking-[0.15em] uppercase text-gray-300 mb-4">Legal</h4>
+                <ul class="space-y-2.5">
+                  <li><a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Términos y condiciones</a></li>
+                  <li><a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Política de privacidad</a></li>
+                  <li><a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Seguridad</a></li>
+                  <li><a href="#" class="text-gray-400 hover:text-white text-sm transition-colors">Política de devoluciones</a></li>
+                </ul>
+              </div>
+
+              <!-- Col 4: Contacto -->
+              <div>
+                <h4 class="text-xs font-semibold tracking-[0.15em] uppercase text-gray-300 mb-4">Contacto</h4>
+                <ul class="space-y-2.5">
+                  <li class="flex items-center gap-2 text-gray-400 text-sm">
+                    <svg class="w-4 h-4 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    ventas@kharis.com
+                  </li>
+                  <li>
+                    <a href="https://wa.me/573001234567" target="_blank" rel="noopener noreferrer" class="flex items-center gap-2 text-gray-400 hover:text-green-400 text-sm transition-colors">
+                      <svg class="w-4 h-4 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                      </svg>
+                      WhatsApp
+                    </a>
+                  </li>
+                </ul>
+
+                <!-- Redes sociales -->
+                <div class="flex items-center gap-3 mt-5">
+                  <a href="#" class="w-8 h-8 rounded-full bg-gray-700/50 hover:bg-[#E91E63] flex items-center justify-center transition-colors" aria-label="Instagram">
+                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                    </svg>
+                  </a>
+                  <a href="#" class="w-8 h-8 rounded-full bg-gray-700/50 hover:bg-[#E91E63] flex items-center justify-center transition-colors" aria-label="Facebook">
+                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                    </svg>
+                  </a>
+                  <a href="#" class="w-8 h-8 rounded-full bg-gray-700/50 hover:bg-[#E91E63] flex items-center justify-center transition-colors" aria-label="TikTok">
+                    <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+                      <path d="M12.525.02c1.31-.02 2.61-.01 3.91-.02.08 1.53.63 3.09 1.75 4.17 1.12 1.11 2.7 1.62 4.24 1.79v4.03c-1.44-.05-2.89-.35-4.2-.97-.57-.26-1.1-.59-1.62-.93-.01 2.92.01 5.84-.02 8.75-.08 1.4-.54 2.79-1.35 3.94-1.31 1.92-3.58 3.17-5.91 3.21-1.43.08-2.86-.31-4.08-1.03-2.02-1.19-3.44-3.37-3.65-5.71-.02-.5-.03-1-.01-1.49.18-1.9 1.12-3.72 2.58-4.96 1.66-1.44 3.98-2.13 6.15-1.72.02 1.48-.04 2.96-.04 4.44-.99-.32-2.15-.23-3.02.37-.63.41-1.11 1.04-1.36 1.75-.21.51-.15 1.07-.14 1.61.24 1.64 1.82 3.02 3.5 2.87 1.12-.01 2.19-.66 2.77-1.61.19-.33.4-.67.41-1.06.1-1.79.06-3.57.07-5.36.01-4.03-.01-8.05.02-12.07z"/>
+                    </svg>
+                  </a>
                 </div>
               </div>
             </div>
           </div>
         </div>
-      </transition>
-    </Teleport>
+
+        <!-- Barra inferior - Copyright & Créditos -->
+        <div class="bg-[#141518] py-4">
+          <div class="max-w-[1600px] mx-auto px-6 sm:px-8 lg:px-12">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-gray-500">
+              <span>Copyright &copy; {{ new Date().getFullYear() }} Kharis Distribuidora. Todos los derechos reservados.</span>
+              <div class="flex items-center gap-1.5">
+                <span>Desarrollado por</span>
+                <a href="https://105code.cloud" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white font-medium transition-colors">105 Code</a>
+                <span class="text-gray-600 mx-1">·</span>
+                <span class="text-gray-400 font-medium">Labeste</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </footer>
+    </div>
   </div>
 </template>
 
 <script>
-import { ref, computed, onMounted, onUnmounted, nextTick, watch } from 'vue'
-import { useRouter, useRoute } from 'vue-router'
+import { computed } from 'vue'
 import { getCrossContextUrl, APP_CONTEXT } from '../../utils/subdomain'
-import apiClient from '../../services/api'
-import { categoriasService } from '../../services/categorias'
-import { obtenerProductos } from '../../services/mayoristas'
+import B2BHeader from './B2BHeader.vue'
 
 export default {
   name: 'B2BLayout',
+  components: {
+    B2BHeader
+  },
   setup() {
-    const router = useRouter()
-    const route = useRoute()
-    const userMenuRef = ref(null)
-    const categoriesMenuRef = ref(null)
-    const searchInput = ref(null)
-    const showUserMenu = ref(false)
-    const showMobileMenu = ref(false)
-    const showSearchModal = ref(false)
-    const showCategoriesMenu = ref(false)
-    const searchQuery = ref('')
-    const searchResults = ref([])
-    const searchLoading = ref(false)
-    let searchTimeout = null
-    const accountBalance = ref(0)
-    const cartTotal = ref(0)
-    const defaultAddress = ref(null)
-    const categorias = ref([])
-
-    const navItems = [
-      { to: '/portal', label: 'Dashboard' },
-      { to: '/portal/catalogo', label: 'Catálogo' },
-      { to: '/portal/pedidos', label: 'Mis Pedidos' },
-    ]
-
-    const user = computed(() => {
-      const stored = localStorage.getItem('b2b_user')
-      if (stored) {
-        try { return JSON.parse(stored) } catch { return { nombre: 'Usuario', email: '', nivel: 'Mayorista' } }
-      }
-      return { nombre: 'Usuario', email: '', nivel: 'Mayorista' }
-    })
-
-    const userInitials = computed(() => {
-      const nombre = user.value.nombre || 'U'
-      return nombre.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
-    })
-
-    const cartCount = computed(() => {
-      const cart = localStorage.getItem('b2b_cart')
-      if (cart) { try { return JSON.parse(cart).items?.length || 0 } catch { return 0 } }
-      return 0
-    })
-
-    const favoritosCount = ref(0)
-    
-    function updateFavoritosCount() {
-      const fav = localStorage.getItem('b2b_favoritos')
-      if (fav) { try { favoritosCount.value = JSON.parse(fav).length || 0 } catch { favoritosCount.value = 0 } }
-      else { favoritosCount.value = 0 }
-    }
-
     const retailUrl = computed(() => getCrossContextUrl(APP_CONTEXT.B2C))
 
-    function isActiveRoute(path) {
-      if (path === '/portal') return route.path === '/portal'
-      return route.path.startsWith(path)
-    }
-
-    function formatPrice(value) { return value?.toLocaleString('es-CO') || '0' }
-
-    function handleLogout() {
-      localStorage.removeItem('b2b_access_token')
-      localStorage.removeItem('b2b_refresh_token')
-      localStorage.removeItem('b2b_user')
-      localStorage.removeItem('b2b_cart')
-      router.push('/portal/login')
-    }
-
-    function handleClickOutside(event) {
-      if (userMenuRef.value && !userMenuRef.value.contains(event.target)) showUserMenu.value = false
-    }
-
-    function handleKeyboard(event) {
-      if ((event.metaKey || event.ctrlKey) && event.key === 'k') { event.preventDefault(); showSearchModal.value = true }
-    }
-
-    function truncateAddress(address) {
-      if (!address) return ''
-      return address.length > 30 ? address.substring(0, 30) + '...' : address
-    }
-
-    async function loadDefaultAddress() {
-      try {
-        const response = await apiClient.get('/b2b/me/direcciones')
-        if (response.data && response.data.length > 0) {
-          defaultAddress.value = response.data.find(a => a.is_default) || response.data[0]
-        }
-      } catch (error) {
-        console.error('Error loading address:', error)
-      }
-    }
-
-    async function loadCategorias() {
-      try {
-        const data = await categoriasService.listar({ soloActivas: true })
-        categorias.value = data || []
-      } catch (error) {
-        console.error('Error loading categories:', error)
-      }
-    }
-
-    async function searchProducts(query) {
-      if (!query || query.length < 2) {
-        searchResults.value = []
-        return
-      }
-      
-      searchLoading.value = true
-      try {
-        const data = await obtenerProductos({ buscar: query, limit: 8 })
-        searchResults.value = data || []
-      } catch (error) {
-        console.error('Error searching products:', error)
-        searchResults.value = []
-      } finally {
-        searchLoading.value = false
-      }
-    }
-
-    function goToSearchResults() {
-      if (searchQuery.value.trim()) {
-        showSearchModal.value = false
-        router.push({ path: '/portal/catalogo', query: { buscar: searchQuery.value.trim() } })
-      }
-    }
-
-    // Watch search query with debounce
-    watch(searchQuery, (newVal) => {
-      if (searchTimeout) clearTimeout(searchTimeout)
-      searchTimeout = setTimeout(() => searchProducts(newVal), 300)
-    })
-
-    watch(showSearchModal, async (val) => { 
-      if (val) { 
-        await nextTick()
-        searchInput.value?.focus()
-      } else {
-        // Clear search when closing
-        searchQuery.value = ''
-        searchResults.value = []
-      }
-    })
-
-    onMounted(() => {
-      document.addEventListener('click', handleClickOutside)
-      document.addEventListener('keydown', handleKeyboard)
-      window.addEventListener('favoritos-updated', updateFavoritosCount)
-      updateFavoritosCount() // Initial load
-      loadDefaultAddress() // Load user's default address
-      loadCategorias() // Load categories for dropdown
-    })
-
-    onUnmounted(() => {
-      document.removeEventListener('click', handleClickOutside)
-      document.removeEventListener('keydown', handleKeyboard)
-      window.removeEventListener('favoritos-updated', updateFavoritosCount)
-    })
-
-    return { userMenuRef, categoriesMenuRef, searchInput, showUserMenu, showMobileMenu, showSearchModal, showCategoriesMenu, searchQuery, searchResults, searchLoading, navItems, user, userInitials, cartCount, favoritosCount, cartTotal, accountBalance, retailUrl, defaultAddress, categorias, isActiveRoute, formatPrice, truncateAddress, handleLogout, goToSearchResults }
+    return { retailUrl }
   }
 }
 </script>
 
 <style scoped>
-.dropdown-enter-active, .dropdown-leave-active { transition: all 0.2s ease; }
-.dropdown-enter-from, .dropdown-leave-to { opacity: 0; transform: translateY(-10px); }
-.slide-enter-active, .slide-leave-active { transition: all 0.3s ease; }
-.slide-enter-from, .slide-leave-to { opacity: 0; max-height: 0; }
 .fade-enter-active, .fade-leave-active { transition: opacity 0.2s ease; }
 .fade-enter-from, .fade-leave-to { opacity: 0; }
-.modal-enter-active, .modal-leave-active { transition: all 0.3s ease; }
-.modal-enter-from, .modal-leave-to { opacity: 0; }
 </style>
