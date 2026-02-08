@@ -612,9 +612,10 @@
             >
               <div class="aspect-square bg-gray-50 overflow-hidden">
                 <img 
-                  :src="prod.imagen_principal || '/placeholder.png'" 
+                  :src="getDisplayMedia(prod.imagen_principal)" 
                   :alt="prod.nombre"
                   class="w-full h-full object-cover"
+                  @error="handleImageError(prod.imagen_principal, $event)"
                 />
               </div>
               <div class="p-3">
@@ -633,12 +634,12 @@
              VIDEOS DEL PRODUCTO - Amazon style
         ======================================== -->
         <div v-if="videosProducto.length > 0" class="mt-4 bg-white rounded-lg p-4 sm:p-6">
-          <h2 class="font-bold text-lg sm:text-xl text-gray-900 mb-4">Videos del producto</h2>
+          <h2 class="font-bold text-base sm:text-lg text-gray-900 mb-4">Videos del producto</h2>
           
-          <div class="flex flex-col lg:flex-row gap-4">
-            <!-- Video player principal -->
-            <div class="flex-1">
-              <div class="relative bg-black rounded-lg overflow-hidden aspect-video">
+          <div class="flex flex-col lg:flex-row gap-0">
+            <!-- Video player principal (constrained) -->
+            <div class="lg:flex-1 lg:max-w-[680px]">
+              <div class="relative bg-black rounded-l-lg lg:rounded-r-none rounded-lg overflow-hidden" style="aspect-ratio: 16/9; max-height: 380px;">
                 <video 
                   :key="videoActual"
                   :src="videoActual" 
@@ -650,46 +651,41 @@
                   Tu navegador no soporta video.
                 </video>
               </div>
-              <!-- Info bajo el video -->
-              <div class="mt-3 flex items-center justify-between">
-                <p class="text-sm text-gray-500">{{ producto.nombre }}</p>
-                <span class="text-xs text-gray-400">Video {{ videoActualIndex + 1 }} de {{ videosProducto.length }}</span>
+              <div class="mt-2 px-1">
+                <p class="text-[13px] text-gray-500 truncate">{{ producto.nombre }}</p>
               </div>
             </div>
             
-            <!-- Lista de videos (sidebar derecho) -->
-            <div v-if="videosProducto.length > 1" class="lg:w-72 xl:w-80 flex-shrink-0">
-              <p class="text-sm font-semibold text-gray-800 mb-3 flex items-center gap-2">
-                <svg class="w-4 h-4 text-[#007185]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"/></svg>
-                Videos de este producto
-              </p>
-              <div class="flex lg:flex-col gap-3 overflow-x-auto lg:overflow-x-visible lg:max-h-[400px] lg:overflow-y-auto pb-2 lg:pb-0 scrollbar-hide">
+            <!-- Sidebar de videos (derecho, compacto como Amazon) -->
+            <div class="lg:w-56 xl:w-64 flex-shrink-0 lg:border-l border-gray-200">
+              <div class="px-3 pt-2 pb-1.5 border-b border-gray-200 hidden lg:block">
+                <p class="text-[13px] font-bold text-gray-900">Videos de este producto</p>
+              </div>
+              <div class="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible lg:max-h-[340px] lg:overflow-y-auto pt-3 lg:pt-0 scrollbar-hide">
                 <button 
                   v-for="(vid, idx) in videosProducto" 
                   :key="idx"
                   @click="videoActualIndex = idx"
-                  class="flex-shrink-0 flex items-start gap-3 rounded-lg p-2 transition-all duration-200 text-left"
+                  class="flex-shrink-0 flex items-start gap-2.5 px-3 py-2 transition-all duration-150 text-left border-l-2 lg:border-l-2"
                   :class="videoActualIndex === idx 
-                    ? 'bg-gray-100 ring-2 ring-[#007185]' 
-                    : 'hover:bg-gray-50'"
+                    ? 'border-[#E77600] bg-gray-50' 
+                    : 'border-transparent hover:bg-gray-50'"
                 >
-                  <div class="relative w-28 sm:w-32 flex-shrink-0 aspect-video bg-gray-900 rounded-md overflow-hidden">
+                  <div class="relative w-24 flex-shrink-0 aspect-video bg-gray-900 rounded overflow-hidden">
                     <video 
                       :src="vid" 
                       preload="metadata" 
                       muted 
                       class="w-full h-full object-cover"
                     ></video>
-                    <div class="absolute inset-0 flex items-center justify-center">
-                      <div class="w-8 h-8 rounded-full bg-black/60 flex items-center justify-center">
-                        <svg class="w-4 h-4 text-white ml-0.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                      </div>
+                    <div class="absolute inset-0 flex items-center justify-center bg-black/20">
+                      <svg class="w-5 h-5 text-white drop-shadow" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
                     </div>
-                    <span v-if="videoActualIndex === idx" class="absolute bottom-1 left-1 text-[10px] bg-[#007185] text-white px-1.5 py-0.5 rounded font-medium">Reproduciendo</span>
+                    <span v-if="videoActualIndex === idx" class="absolute bottom-0.5 left-0.5 text-[9px] bg-[#E77600] text-white px-1 py-0.5 rounded-sm font-medium leading-none">Reproduci...</span>
                   </div>
-                  <div class="hidden sm:block min-w-0 pt-0.5">
-                    <p class="text-[13px] font-medium text-gray-800 line-clamp-2">{{ producto.nombre }}</p>
-                    <p class="text-xs text-gray-500 mt-1">Video {{ idx + 1 }}</p>
+                  <div class="hidden lg:block min-w-0 pt-0.5">
+                    <p class="text-[12px] font-medium text-gray-800 line-clamp-2 leading-tight">{{ producto.nombre }}</p>
+                    <p class="text-[11px] text-gray-400 mt-0.5">Video {{ idx + 1 }}</p>
                   </div>
                 </button>
               </div>
@@ -1079,7 +1075,10 @@ export default {
               categoria: catNombre,
               limit: 6
             })
-            productosRelacionados.value = relacionados.filter(p => p.id !== id).slice(0, 5)
+            productosRelacionados.value = relacionados.filter(p => p.id !== id).slice(0, 5).map(p => ({
+              ...p,
+              imagen_principal: normalizeMediaUrl(p.imagen_principal || p.imagen_url || p.imagen) || '/placeholder.png'
+            }))
           } catch (err) {
             console.warn('Error cargando relacionados:', err)
           }
