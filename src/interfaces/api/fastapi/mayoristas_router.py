@@ -326,6 +326,7 @@ async def aprobar_mayorista(
     """
     from django.utils import timezone
     from infrastructure.notifications.email_service import send_b2b_status_notification
+    from infrastructure.notifications.inapp_notifications import create_b2b_notification
     
     try:
         mayorista = await sync_to_async(Usuario.objects.get)(id=mayorista_id, tipo='MAYORISTA')
@@ -346,6 +347,17 @@ async def aprobar_mayorista(
             nombre=mayorista.nombre,
             estado="APROBADO"
         )
+
+        try:
+            create_b2b_notification(
+                email=mayorista.email,
+                tipo='account_status',
+                titulo='Cuenta aprobada',
+                mensaje='Tu cuenta mayorista fue aprobada y ya esta activa.',
+                data={'estado': 'APROBADO'},
+            )
+        except Exception as e:
+            print(f"❌ Error creando notificacion de aprobacion: {e}")
         
         return {"message": f"Mayorista {mayorista.nombre} aprobado correctamente"}
     except Usuario.DoesNotExist:
@@ -366,6 +378,7 @@ async def rechazar_mayorista(
     """
     from django.utils import timezone
     from infrastructure.notifications.email_service import send_b2b_status_notification
+    from infrastructure.notifications.inapp_notifications import create_b2b_notification
     
     try:
         mayorista = await sync_to_async(Usuario.objects.get)(id=mayorista_id, tipo='MAYORISTA')
@@ -386,6 +399,17 @@ async def rechazar_mayorista(
             estado="RECHAZADO",
             notas=request.notas
         )
+
+        try:
+            create_b2b_notification(
+                email=mayorista.email,
+                tipo='account_status',
+                titulo='Cuenta rechazada',
+                mensaje='Tu solicitud de cuenta mayorista fue rechazada.',
+                data={'estado': 'RECHAZADO', 'motivo': request.notas or ''},
+            )
+        except Exception as e:
+            print(f"❌ Error creando notificacion de rechazo: {e}")
         
         return {"message": f"Mayorista {mayorista.nombre} rechazado"}
     except Usuario.DoesNotExist:
@@ -405,6 +429,7 @@ async def suspender_mayorista(
     """
     from django.utils import timezone
     from infrastructure.notifications.email_service import send_b2b_status_notification
+    from infrastructure.notifications.inapp_notifications import create_b2b_notification
     
     try:
         mayorista = await sync_to_async(Usuario.objects.get)(id=mayorista_id, tipo='MAYORISTA')
@@ -424,6 +449,17 @@ async def suspender_mayorista(
             estado="SUSPENDIDO",
             notas=f"Suspendido por admin: {admin.get('user_id', 'admin')}"
         )
+
+        try:
+            create_b2b_notification(
+                email=mayorista.email,
+                tipo='account_status',
+                titulo='Cuenta suspendida',
+                mensaje='Tu cuenta mayorista fue suspendida temporalmente.',
+                data={'estado': 'SUSPENDIDO'},
+            )
+        except Exception as e:
+            print(f"❌ Error creando notificacion de suspension: {e}")
         
         return {"message": f"Mayorista {mayorista.nombre} suspendido"}
     except Usuario.DoesNotExist:
@@ -476,6 +512,8 @@ async def cambiar_password_mayorista(
     try:
         if len(request.new_password) < 8:
             raise HTTPException(status_code=400, detail="La contraseña debe tener al menos 8 caracteres")
+
+        from infrastructure.notifications.inapp_notifications import create_b2b_notification
         
         mayorista = await sync_to_async(Usuario.objects.get)(id=mayorista_id, tipo='MAYORISTA')
         
@@ -484,6 +522,17 @@ async def cambiar_password_mayorista(
             mayorista.save()
         
         await sync_to_async(do_change)()
+
+        try:
+            create_b2b_notification(
+                email=mayorista.email,
+                tipo='password_changed',
+                titulo='Contrasena actualizada',
+                mensaje='Tu contrasena fue actualizada por el administrador.',
+                data={},
+            )
+        except Exception as e:
+            print(f"❌ Error creando notificacion de contrasena: {e}")
         
         print(f"🔑 Admin cambió contraseña del mayorista: {mayorista.email}")
         return {"message": f"Contraseña actualizada para {mayorista.email}"}

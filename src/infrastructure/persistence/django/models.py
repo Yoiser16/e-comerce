@@ -728,3 +728,41 @@ class ProductoVistoModel(models.Model):
     
     def __str__(self) -> str:
         return f"Visto: {self.producto.nombre} - Usuario {self.usuario_id} ({self.veces_visto}x)"
+
+
+class NotificacionModel(models.Model):
+    """
+    Modelo para notificaciones in-app (B2B).
+    """
+    TIPO_CHOICES = [
+        ('orden_estado', 'Estado de Orden'),
+        ('password_changed', 'Cambio de Contrasena'),
+        ('account_status', 'Estado de Cuenta'),
+        ('promo_stock', 'Promos y Stock'),
+        ('sistema', 'Sistema'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    usuario_id = models.UUIDField(db_index=True)
+    email = models.EmailField(db_index=True)
+    tipo = models.CharField(max_length=30, choices=TIPO_CHOICES, default='sistema', db_index=True)
+    titulo = models.CharField(max_length=200)
+    mensaje = models.TextField()
+    data = models.JSONField(default=dict, blank=True)
+    leida = models.BooleanField(default=False, db_index=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True, db_index=True)
+    fecha_leida = models.DateTimeField(null=True, blank=True)
+
+    class Meta:
+        db_table = 'notificaciones'
+        verbose_name = 'Notificacion'
+        verbose_name_plural = 'Notificaciones'
+        ordering = ['-fecha_creacion']
+        indexes = [
+            models.Index(fields=['usuario_id', '-fecha_creacion']),
+            models.Index(fields=['email', '-fecha_creacion']),
+            models.Index(fields=['leida', '-fecha_creacion']),
+        ]
+
+    def __str__(self) -> str:
+        return f"Notificacion {self.tipo} - {self.email}"

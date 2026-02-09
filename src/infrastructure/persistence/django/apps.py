@@ -9,3 +9,6 @@ class DjangoPersistenceConfig(AppConfig):
     name = 'infrastructure.persistence.django'
     label = 'ecommerce_persistence'
     verbose_name = 'E-Commerce Persistence'
+
+    def ready(self):
+        import infrastructure.persistence.django.signals  # noqa: F401

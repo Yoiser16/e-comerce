@@ -123,20 +123,69 @@
             </div>
 
             <!-- Notifications -->
-            <button 
-              class="relative p-2.5 text-white hover:text-[#C9A962] transition-colors"
-              @click="showNotifications = !showNotifications"
-            >
-              <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
-              </svg>
-              <span 
-                v-if="notificationsCount > 0" 
-                class="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center"
+            <div class="relative" ref="notificationsRef">
+              <button 
+                class="relative p-2.5 text-white hover:text-[#C9A962] transition-colors"
+                @click="toggleNotifications"
               >
-                {{ notificationsCount > 9 ? '9+' : notificationsCount }}
-              </span>
-            </button>
+                <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
+                </svg>
+                <span 
+                  v-if="notificationsCount > 0" 
+                  class="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center"
+                >
+                  {{ notificationsCount > 9 ? '9+' : notificationsCount }}
+                </span>
+              </button>
+
+              <transition name="dropdown">
+                <div
+                  v-if="showNotifications"
+                  class="absolute right-0 mt-1.5 w-[320px] bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50"
+                >
+                  <div class="px-4 py-3 border-b border-gray-100 flex items-center justify-between">
+                    <div class="text-sm font-bold text-gray-900">Notificaciones</div>
+                    <button
+                      v-if="notificationsCount > 0"
+                      class="text-[11px] text-[#8B6914] font-semibold hover:text-[#6f5310]"
+                      @click="markAllNotificationsRead"
+                    >
+                      Marcar todas
+                    </button>
+                  </div>
+
+                  <div v-if="notificationsLoading" class="p-4 text-center">
+                    <div class="w-5 h-5 border-2 border-slate-300 border-t-transparent rounded-full animate-spin mx-auto"></div>
+                  </div>
+
+                  <div v-else-if="notifications.length" class="max-h-[360px] overflow-y-auto divide-y divide-gray-100">
+                    <button
+                      v-for="notif in notifications"
+                      :key="notif.id"
+                      class="w-full text-left px-4 py-3 hover:bg-slate-50 transition-colors"
+                      @click="markNotificationRead(notif)"
+                    >
+                      <div class="flex items-start gap-2">
+                        <span
+                          class="mt-1.5 w-2 h-2 rounded-full"
+                          :class="notif.leida ? 'bg-gray-300' : 'bg-[#C9A962]'"
+                        ></span>
+                        <div class="flex-1">
+                          <p class="text-[13px] font-semibold text-gray-900 leading-snug">{{ notif.titulo }}</p>
+                          <p class="text-[12px] text-gray-600 leading-snug mt-0.5">{{ notif.mensaje }}</p>
+                          <p class="text-[11px] text-gray-400 mt-1">{{ formatNotificationDate(notif.fecha_creacion) }}</p>
+                        </div>
+                      </div>
+                    </button>
+                  </div>
+
+                  <div v-else class="p-4 text-center text-gray-500 text-sm">
+                    No tienes notificaciones por ahora.
+                  </div>
+                </div>
+              </transition>
+            </div>
 
             <!-- Cart -->
             <router-link 
@@ -588,6 +637,7 @@ import { useRouter, useRoute } from 'vue-router'
 import apiClient from '../../services/api'
 import { categoriasService } from '../../services/categorias'
 import { obtenerProductos } from '../../services/mayoristas'
+import { listarNotificaciones, marcarNotificacionLeida, marcarTodasLeidas } from '../../services/notificaciones'
 
 export default {
   name: 'B2BHeader',
@@ -599,6 +649,7 @@ export default {
     const headerRef = ref(null)
     const userMenuRef = ref(null)
     const categoriesMenuRef = ref(null)
+    const notificationsRef = ref(null)
     const mobileSearchInput = ref(null)
     
     // UI State
@@ -631,6 +682,8 @@ export default {
     const favoritosCount = ref(0)
     const notificationsCount = ref(0)
     const showNotifications = ref(false)
+    const notifications = ref([])
+    const notificationsLoading = ref(false)
 
     // Computed
     const user = computed(() => {
@@ -660,6 +713,55 @@ export default {
       if (event.key === 'b2b_cart') {
         updateCartCount()
       }
+    }
+
+    async function loadNotifications() {
+      if (notificationsLoading.value) return
+      notificationsLoading.value = true
+      try {
+        const data = await listarNotificaciones({ limit: 15, offset: 0, soloNoLeidas: false })
+        notifications.value = data.items || []
+        notificationsCount.value = data.unread_count || 0
+      } catch (error) {
+        console.error('Error loading notifications:', error)
+      } finally {
+        notificationsLoading.value = false
+      }
+    }
+
+    async function markNotificationRead(notif) {
+      if (!notif || notif.leida) return
+      try {
+        await marcarNotificacionLeida(notif.id)
+        notif.leida = true
+        notificationsCount.value = Math.max(0, notificationsCount.value - 1)
+      } catch (error) {
+        console.error('Error marking notification read:', error)
+      }
+    }
+
+    async function markAllNotificationsRead() {
+      if (notificationsCount.value === 0) return
+      try {
+        await marcarTodasLeidas()
+        notifications.value = notifications.value.map(n => ({ ...n, leida: true }))
+        notificationsCount.value = 0
+      } catch (error) {
+        console.error('Error marking all notifications read:', error)
+      }
+    }
+
+    async function toggleNotifications() {
+      showNotifications.value = !showNotifications.value
+      if (showNotifications.value) {
+        await loadNotifications()
+      }
+    }
+
+    function formatNotificationDate(dateStr) {
+      if (!dateStr) return ''
+      const date = new Date(dateStr)
+      return date.toLocaleString('es-CO', { day: '2-digit', month: 'short', hour: '2-digit', minute: '2-digit' })
     }
 
     // Smart Sticky Logic with scroll delta threshold
@@ -754,6 +856,9 @@ export default {
       if (userMenuRef.value && !userMenuRef.value.contains(event.target)) {
         showUserMenu.value = false
       }
+      if (notificationsRef.value && !notificationsRef.value.contains(event.target)) {
+        showNotifications.value = false
+      }
       if (!event.target.closest('.search-container')) {
         showSearchSuggestions.value = false
       }
@@ -821,6 +926,7 @@ export default {
       
       updateCartCount()
       updateFavoritosCount()
+      loadNotifications()
       loadDefaultAddress()
       loadCategorias()
     })
@@ -838,6 +944,7 @@ export default {
       headerRef,
       userMenuRef,
       categoriesMenuRef,
+      notificationsRef,
       mobileSearchInput,
       
       // UI State
@@ -864,10 +971,16 @@ export default {
       categorias,
       notificationsCount,
       showNotifications,
+      notifications,
+      notificationsLoading,
       
       // Methods
       formatPrice,
+      formatNotificationDate,
       handleLogout,
+      toggleNotifications,
+      markNotificationRead,
+      markAllNotificationsRead,
       handleSearch,
       handleMobileSearch
     }

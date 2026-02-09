@@ -430,6 +430,7 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
                 subtotal_monto=subtotal,
                 subtotal_moneda='COP'
             )
+
             
             # DESCONTAR STOCK AQUÍ (orden PENDIENTE)
             # El stock se devuelve solo si se CANCELA la orden
@@ -604,6 +605,7 @@ def _actualizar_estado_sync(orden_id: str, estado: str) -> dict:
         # Actualizar estado
         orden.estado = estado_nuevo
         orden.save()
+
 
         try:
             if orden.cliente:
