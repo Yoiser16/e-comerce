@@ -171,11 +171,16 @@ export default {
     const user = computed(() => {
       return JSON.parse(localStorage.getItem('b2b_user') || '{}')
     })
+
+    function getFavoritosKey() {
+      const keyPart = user.value?.email || user.value?.id || user.value?.usuario_id || 'anon'
+      return `b2b_favoritos_${keyPart}`
+    }
     
     // Helper para sincronizar localStorage
     function syncLocalFavoritos() {
       const ids = favoritos.value.map(f => f.producto?.id || f.producto_id).filter(Boolean)
-      localStorage.setItem('b2b_favoritos', JSON.stringify(ids))
+      localStorage.setItem(getFavoritosKey(), JSON.stringify(ids))
       window.dispatchEvent(new CustomEvent('favoritos-updated'))
     }
     
@@ -208,7 +213,7 @@ export default {
         
         // Para B2B, cargar directamente desde localStorage con precios mayoristas
         // Esto evita problemas de autenticación y es más rápido
-        const storedIds = JSON.parse(localStorage.getItem('b2b_favoritos') || '[]')
+        const storedIds = JSON.parse(localStorage.getItem(getFavoritosKey()) || '[]')
         
         if (storedIds.length === 0) {
           favoritos.value = []

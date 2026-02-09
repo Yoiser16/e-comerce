@@ -947,11 +947,16 @@ export default {
       decrementarLote()
     }
     
+    function getFavoritosKey() {
+      const keyPart = user.value?.email || user.value?.id || user.value?.usuario_id || 'anon'
+      return `b2b_favoritos_${keyPart}`
+    }
+
     // Helper para actualizar localStorage de favoritos
     function updateLocalFavoritos(productoId, agregar) {
       let favoritos = []
       try {
-        const stored = localStorage.getItem('b2b_favoritos')
+        const stored = localStorage.getItem(getFavoritosKey())
         if (stored) favoritos = JSON.parse(stored)
       } catch {}
       
@@ -962,7 +967,7 @@ export default {
       } else {
         favoritos = favoritos.filter(id => id !== productoId)
       }
-      localStorage.setItem('b2b_favoritos', JSON.stringify(favoritos))
+      localStorage.setItem(getFavoritosKey(), JSON.stringify(favoritos))
       // Dispatch event para que el header se actualice
       window.dispatchEvent(new CustomEvent('favoritos-updated'))
     }
@@ -1043,7 +1048,7 @@ export default {
         
         // Verificar si es favorito desde localStorage
         try {
-          const stored = localStorage.getItem('b2b_favoritos')
+          const stored = localStorage.getItem(getFavoritosKey())
           if (stored) {
             const favs = JSON.parse(stored)
             esFavorito.value = favs.includes(id)

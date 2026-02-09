@@ -751,8 +751,13 @@ export default {
       }
     }
 
+    function getFavoritosKey() {
+      const keyPart = user.value?.email || user.value?.id || user.value?.usuario_id || 'anon'
+      return `b2b_favoritos_${keyPart}`
+    }
+
     function updateFavoritosCount() {
-      const fav = localStorage.getItem('b2b_favoritos')
+      const fav = localStorage.getItem(getFavoritosKey())
       if (fav) { 
         try { favoritosCount.value = JSON.parse(fav).length || 0 } 
         catch { favoritosCount.value = 0 } 

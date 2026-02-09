@@ -825,6 +825,11 @@ export default {
       return JSON.parse(localStorage.getItem('b2b_user') || '{"nombre": "Mayorista"}')
     })
 
+    function getFavoritosKey() {
+      const keyPart = user.value?.email || user.value?.id || user.value?.usuario_id || 'anon'
+      return `b2b_favoritos_${keyPart}`
+    }
+
     const cartCount = ref(0)
     const currentSlide = ref(0)
     const currentScene = ref(0)  // Sistema de escenarios: 0 = Esmeralda, 1 = Champagne, 2 = Promoción
@@ -1080,7 +1085,7 @@ export default {
           
           // 2. Agregar productos favoritos desde localStorage (sin duplicar)
           try {
-            const storedFavoritos = localStorage.getItem('b2b_favoritos')
+            const storedFavoritos = localStorage.getItem(getFavoritosKey())
             if (storedFavoritos) {
               const favoritosIds = JSON.parse(storedFavoritos)
               
