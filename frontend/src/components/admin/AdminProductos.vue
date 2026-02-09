@@ -86,6 +86,57 @@
           </svg>
         </button>
       </div>
+
+      <!-- Bulk Actions -->
+      <div v-if="selectedCount > 0" class="mt-4 flex flex-col lg:flex-row lg:items-center gap-3 rounded-xl border border-[#C9A962]/30 bg-[#FAF5F2] px-4 py-3">
+        <div class="text-sm text-text-dark">
+          <span class="font-semibold">{{ selectedCount }}</span> seleccionados
+        </div>
+        <div class="flex flex-wrap gap-2">
+          <button
+            @click="openBulkConfirm('activar')"
+            class="px-3 py-2 text-xs font-semibold rounded-lg bg-emerald-600 text-white hover:bg-emerald-700 transition-colors"
+            :disabled="bulkLoading"
+          >
+            Activar
+          </button>
+          <button
+            @click="openBulkConfirm('inactivar')"
+            class="px-3 py-2 text-xs font-semibold rounded-lg bg-gray-800 text-white hover:bg-black transition-colors"
+            :disabled="bulkLoading"
+          >
+            Inactivar
+          </button>
+          <button
+            @click="openCategoryModal"
+            class="px-3 py-2 text-xs font-semibold rounded-lg border border-text-dark/20 text-text-dark hover:border-text-dark transition-colors"
+            :disabled="bulkLoading"
+          >
+            Editar categoria
+          </button>
+          <button
+            @click="openStockModal"
+            class="px-3 py-2 text-xs font-semibold rounded-lg border border-text-dark/20 text-text-dark hover:border-text-dark transition-colors"
+            :disabled="bulkLoading"
+          >
+            Ajustar stock
+          </button>
+          <button
+            @click="openBulkConfirm('eliminar')"
+            class="px-3 py-2 text-xs font-semibold rounded-lg bg-red-600 text-white hover:bg-red-700 transition-colors"
+            :disabled="bulkLoading"
+          >
+            Eliminar
+          </button>
+          <button
+            @click="clearSelection"
+            class="px-3 py-2 text-xs font-semibold rounded-lg text-text-medium hover:text-text-dark transition-colors"
+            :disabled="bulkLoading"
+          >
+            Limpiar
+          </button>
+        </div>
+      </div>
     </div>
 
     <!-- Error State -->
@@ -123,6 +174,15 @@
         <table class="w-full min-w-[700px]">
           <thead class="bg-[#FAFAFA] border-b border-text-dark/5">
             <tr>
+              <th class="px-4 py-3.5 text-left text-xs font-semibold text-text-medium uppercase tracking-wide w-10">
+                <input
+                  type="checkbox"
+                  class="w-4 h-4 rounded border-text-dark/20 text-[#D81B60] focus:ring-[#D81B60]/30"
+                  :checked="allDisplayedSelected"
+                  :indeterminate.prop="someDisplayedSelected"
+                  @change="toggleSelectAll"
+                />
+              </th>
               <th class="px-6 py-3.5 text-left text-xs font-semibold text-text-medium uppercase tracking-wide">Producto</th>
               <th class="px-6 py-3.5 text-right text-xs font-semibold text-text-medium uppercase tracking-wide">Precio</th>
               <th class="px-6 py-3.5 text-left text-xs font-semibold text-text-medium uppercase tracking-wide">Stock</th>
@@ -132,6 +192,14 @@
           </thead>
           <tbody class="divide-y divide-text-dark/5">
             <tr v-for="producto in displayedProducts" :key="producto.id" class="hover:bg-[#FAFAFA] transition-colors">
+              <td class="px-4 py-4">
+                <input
+                  type="checkbox"
+                  class="w-4 h-4 rounded border-text-dark/20 text-[#D81B60] focus:ring-[#D81B60]/30"
+                  :checked="isSelected(producto.id)"
+                  @change="toggleSelection(producto.id)"
+                />
+              </td>
               <!-- Product - COLUMNA PRINCIPAL CON JERARQUÍA VISUAL -->
               <td class="px-6 py-4">
                 <div class="flex items-center gap-4">
@@ -242,7 +310,7 @@
 
             <!-- Empty State -->
             <tr v-if="displayedProducts.length === 0 && !loading">
-              <td colspan="5" class="px-6 py-16 text-center">
+              <td colspan="6" class="px-6 py-16 text-center">
                 <div class="flex flex-col items-center">
                   <svg class="w-16 h-16 text-text-light mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
@@ -348,6 +416,137 @@
       </div>
     </div>
 
+    <!-- Bulk Confirmation Modal -->
+    <div v-if="bulkConfirm.open" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+        <div class="flex items-center gap-3">
+          <div class="w-12 h-12 bg-amber-100 rounded-full flex items-center justify-center">
+            <svg class="w-6 h-6 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+            </svg>
+          </div>
+          <div>
+            <h3 class="text-lg font-semibold text-gray-900">Confirmar accion</h3>
+            <p class="text-gray-500 text-sm">{{ bulkConfirm.message }}</p>
+          </div>
+        </div>
+        <div class="flex gap-3 justify-end">
+          <button
+            @click="closeBulkConfirm"
+            class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="applyBulkAction"
+            :disabled="bulkLoading"
+            class="px-4 py-2 text-white bg-gray-900 hover:bg-black rounded-lg font-medium transition-colors disabled:opacity-50"
+          >
+            {{ bulkLoading ? 'Aplicando...' : 'Confirmar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bulk Category Modal -->
+    <div v-if="bulkCategory.open" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Editar categoria</h3>
+          <p class="text-gray-500 text-sm">Aplica una categoria a {{ selectedCount }} productos.</p>
+        </div>
+        <div class="space-y-3">
+          <select
+            v-model="bulkCategory.value"
+            class="w-full px-3 py-2.5 text-sm bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white"
+          >
+            <option value="">Selecciona una categoria</option>
+            <option v-for="cat in categoryOptions" :key="cat" :value="cat">{{ cat }}</option>
+            <option value="__custom">Otra categoria...</option>
+          </select>
+          <input
+            v-if="bulkCategory.value === '__custom'"
+            v-model="bulkCategory.custom"
+            type="text"
+            placeholder="Nueva categoria"
+            class="w-full px-3 py-2.5 text-sm bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white"
+          />
+        </div>
+        <div class="flex gap-3 justify-end">
+          <button
+            @click="closeCategoryModal"
+            class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="confirmCategoryBulk"
+            :disabled="bulkLoading"
+            class="px-4 py-2 text-white bg-gray-900 hover:bg-black rounded-lg font-medium transition-colors disabled:opacity-50"
+          >
+            {{ bulkLoading ? 'Aplicando...' : 'Aplicar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bulk Stock Modal -->
+    <div v-if="bulkStock.open" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
+      <div class="bg-white rounded-2xl max-w-md w-full p-6 space-y-4">
+        <div>
+          <h3 class="text-lg font-semibold text-gray-900">Ajustar stock</h3>
+          <p class="text-gray-500 text-sm">Aplica un ajuste a {{ selectedCount }} productos.</p>
+        </div>
+        <div class="space-y-3">
+          <div class="flex gap-2">
+            <button
+              @click="bulkStock.mode = 'add'"
+              :class="bulkStock.mode === 'add' ? 'bg-[#D81B60] text-white' : 'bg-gray-100 text-gray-700'"
+              class="px-3 py-2 text-xs font-semibold rounded-lg transition-colors"
+            >
+              Sumar
+            </button>
+            <button
+              @click="bulkStock.mode = 'subtract'"
+              :class="bulkStock.mode === 'subtract' ? 'bg-[#D81B60] text-white' : 'bg-gray-100 text-gray-700'"
+              class="px-3 py-2 text-xs font-semibold rounded-lg transition-colors"
+            >
+              Restar
+            </button>
+            <button
+              @click="bulkStock.mode = 'set'"
+              :class="bulkStock.mode === 'set' ? 'bg-[#D81B60] text-white' : 'bg-gray-100 text-gray-700'"
+              class="px-3 py-2 text-xs font-semibold rounded-lg transition-colors"
+            >
+              Fijar
+            </button>
+          </div>
+          <input
+            v-model.number="bulkStock.value"
+            type="number"
+            min="0"
+            class="w-full px-3 py-2.5 text-sm bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white"
+            placeholder="Cantidad"
+          />
+        </div>
+        <div class="flex gap-3 justify-end">
+          <button
+            @click="closeStockModal"
+            class="px-4 py-2 text-gray-700 bg-gray-100 hover:bg-gray-200 rounded-lg font-medium transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="confirmStockBulk"
+            :disabled="bulkLoading"
+            class="px-4 py-2 text-white bg-gray-900 hover:bg-black rounded-lg font-medium transition-colors disabled:opacity-50"
+          >
+            {{ bulkLoading ? 'Aplicando...' : 'Aplicar' }}
+          </button>
+        </div>
+      </div>
+    </div>
+
     <!-- History Warning Modal (Elegant) -->
     <div v-if="showHistoryWarningModal" class="fixed inset-0 bg-black/60 backdrop-blur-sm flex items-center justify-center z-50 p-4">
       <div class="bg-gradient-to-br from-white to-gray-50 rounded-3xl max-w-lg w-full shadow-2xl transform transition-all">
@@ -445,7 +644,7 @@
 </template>
 
 <script>
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { productosService } from '../../services/productos'
 import { getImageUrl } from '../../services/api'
 import ProductoEditModal from './ProductoEditModal.vue'
@@ -472,6 +671,11 @@ export default {
     const activeTab = ref('activos')
     const showHistoryWarningModal = ref(false)
     const historyWarningData = ref(null)
+    const selectedIds = ref([])
+    const bulkLoading = ref(false)
+    const bulkConfirm = ref({ open: false, action: '', message: '' })
+    const bulkCategory = ref({ open: false, value: '', custom: '' })
+    const bulkStock = ref({ open: false, mode: 'add', value: 0 })
 
     const productosActivos = computed(() => {
       return productos.value.filter(p => p.activo)
@@ -516,6 +720,23 @@ export default {
 
     const displayedProducts = computed(() => {
       return filteredProducts.value
+    })
+
+    const selectedCount = computed(() => selectedIds.value.length)
+    const displayedIds = computed(() => displayedProducts.value.map(p => p.id))
+    const allDisplayedSelected = computed(() => {
+      return displayedIds.value.length > 0 && displayedIds.value.every(id => selectedIds.value.includes(id))
+    })
+    const someDisplayedSelected = computed(() => {
+      return displayedIds.value.some(id => selectedIds.value.includes(id)) && !allDisplayedSelected.value
+    })
+    const categoryOptions = computed(() => {
+      const set = new Set()
+      productos.value.forEach(p => {
+        const label = getCategoryLabel(p)
+        if (label) set.add(label)
+      })
+      return Array.from(set).sort((a, b) => a.localeCompare(b))
     })
 
     const formatNumber = (num) => {
@@ -703,6 +924,153 @@ export default {
       filterStock.value = ''
     }
 
+    const isSelected = (id) => selectedIds.value.includes(id)
+
+    const toggleSelection = (id) => {
+      if (selectedIds.value.includes(id)) {
+        selectedIds.value = selectedIds.value.filter(itemId => itemId !== id)
+      } else {
+        selectedIds.value = [...selectedIds.value, id]
+      }
+    }
+
+    const toggleSelectAll = () => {
+      if (allDisplayedSelected.value) {
+        selectedIds.value = selectedIds.value.filter(id => !displayedIds.value.includes(id))
+      } else {
+        const merged = new Set([...selectedIds.value, ...displayedIds.value])
+        selectedIds.value = Array.from(merged)
+      }
+    }
+
+    const clearSelection = () => {
+      selectedIds.value = []
+    }
+
+    const openBulkConfirm = (action) => {
+      if (selectedCount.value === 0) return
+      const actionLabel = {
+        activar: 'activar',
+        inactivar: 'inactivar',
+        eliminar: 'eliminar'
+      }[action]
+      bulkConfirm.value = {
+        open: true,
+        action,
+        message: `¿Deseas ${actionLabel} ${selectedCount.value} productos seleccionados?`
+      }
+    }
+
+    const closeBulkConfirm = () => {
+      bulkConfirm.value = { open: false, action: '', message: '' }
+    }
+
+    const openCategoryModal = () => {
+      if (selectedCount.value === 0) return
+      bulkCategory.value = { open: true, value: '', custom: '' }
+    }
+
+    const closeCategoryModal = () => {
+      bulkCategory.value.open = false
+    }
+
+    const openStockModal = () => {
+      if (selectedCount.value === 0) return
+      bulkStock.value = { open: true, mode: 'add', value: 0 }
+    }
+
+    const closeStockModal = () => {
+      bulkStock.value.open = false
+    }
+
+    const applyBulkAction = async () => {
+      if (!bulkConfirm.value.action) return
+      bulkLoading.value = true
+
+      try {
+        const productsMap = new Map(productos.value.map(p => [p.id, p]))
+        for (const id of selectedIds.value) {
+          const producto = productsMap.get(id)
+          if (!producto) continue
+
+          if (bulkConfirm.value.action === 'activar') {
+            await productosService.actualizar(id, { activo: true })
+          } else if (bulkConfirm.value.action === 'inactivar') {
+            await productosService.actualizar(id, { activo: false })
+          } else if (bulkConfirm.value.action === 'eliminar') {
+            if (producto.activo) {
+              await productosService.eliminar(id)
+            } else {
+              await productosService.eliminarPermanentemente(id)
+            }
+          }
+        }
+
+        await loadProducts()
+        clearSelection()
+        closeBulkConfirm()
+      } catch (err) {
+        console.error('Error en accion masiva:', err)
+        error.value = err.response?.data?.detail || err.message || 'Error al aplicar la accion masiva'
+      } finally {
+        bulkLoading.value = false
+      }
+    }
+
+    const confirmCategoryBulk = async () => {
+      const value = bulkCategory.value.value === '__custom' ? bulkCategory.value.custom.trim() : bulkCategory.value.value
+      if (!value) return
+
+      bulkLoading.value = true
+      try {
+        for (const id of selectedIds.value) {
+          await productosService.actualizar(id, { categoria: value })
+        }
+        await loadProducts()
+        clearSelection()
+        closeCategoryModal()
+      } catch (err) {
+        console.error('Error actualizando categoria:', err)
+        error.value = err.response?.data?.detail || err.message || 'Error al actualizar categoria'
+      } finally {
+        bulkLoading.value = false
+      }
+    }
+
+    const confirmStockBulk = async () => {
+      const delta = Number(bulkStock.value.value)
+      if (Number.isNaN(delta)) return
+
+      bulkLoading.value = true
+      try {
+        const productsMap = new Map(productos.value.map(p => [p.id, p]))
+        for (const id of selectedIds.value) {
+          const producto = productsMap.get(id)
+          if (!producto) continue
+
+          let nuevoStock = producto.stock_actual
+          if (bulkStock.value.mode === 'add') {
+            nuevoStock = producto.stock_actual + delta
+          } else if (bulkStock.value.mode === 'subtract') {
+            nuevoStock = Math.max(0, producto.stock_actual - delta)
+          } else if (bulkStock.value.mode === 'set') {
+            nuevoStock = Math.max(0, delta)
+          }
+
+          await productosService.actualizar(id, { stock_actual: nuevoStock })
+        }
+
+        await loadProducts()
+        clearSelection()
+        closeStockModal()
+      } catch (err) {
+        console.error('Error ajustando stock:', err)
+        error.value = err.response?.data?.detail || err.message || 'Error al ajustar stock'
+      } finally {
+        bulkLoading.value = false
+      }
+    }
+
     const loadProducts = async () => {
       loading.value = true
       error.value = null
@@ -723,6 +1091,11 @@ export default {
 
     onMounted(loadProducts)
 
+    watch(displayedProducts, (newList) => {
+      const visibleIds = new Set(newList.map(p => p.id))
+      selectedIds.value = selectedIds.value.filter(id => visibleIds.has(id))
+    })
+
     return {
       loading,
       productos,
@@ -741,6 +1114,14 @@ export default {
       activeTab,
       showHistoryWarningModal,
       historyWarningData,
+      selectedCount,
+      allDisplayedSelected,
+      someDisplayedSelected,
+      bulkLoading,
+      bulkConfirm,
+      bulkCategory,
+      bulkStock,
+      categoryOptions,
       productosActivos,
       productosInactivos,
       formatNumber,
@@ -754,6 +1135,19 @@ export default {
       confirmDelete,
       deleteProduct,
       clearFilters,
+      isSelected,
+      toggleSelection,
+      toggleSelectAll,
+      clearSelection,
+      openBulkConfirm,
+      closeBulkConfirm,
+      applyBulkAction,
+      openCategoryModal,
+      closeCategoryModal,
+      confirmCategoryBulk,
+      openStockModal,
+      closeStockModal,
+      confirmStockBulk,
       loadProducts,
       getImageUrl,
       isVideo,
