@@ -24,14 +24,19 @@
           <!-- Separator -->
           <div class="!my-3 border-t border-[#e8e8e8]"></div>
 
-          <!-- Router Links (Pedidos, Cupones) -->
+          <!-- Pedidos y Cupones como tabs internos -->
           <button 
             v-for="link in sidebarLinks"
-            :key="link.route"
-            @click="router.push(link.route)"
-            class="w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors text-[14px] rounded-md text-[#555] hover:bg-[#f5f5f5] hover:text-[#333] font-normal"
+            :key="link.id"
+            @click="activeTab = link.id"
+            :class="[
+              'w-full flex items-center gap-2.5 px-3 py-2 text-left transition-colors text-[14px] rounded-md',
+              activeTab === link.id
+                ? 'text-[#2563eb] font-semibold bg-[#eff4ff]' 
+                : 'text-[#555] hover:bg-[#f5f5f5] hover:text-[#333] font-normal'
+            ]"
           >
-            <span v-html="link.icon" class="w-[18px] h-[18px] text-[#999]"></span>
+            <span v-html="link.icon" :class="['w-[18px] h-[18px]', activeTab === link.id ? 'text-[#2563eb]' : 'text-[#999]']"></span>
             {{ link.label }}
           </button>
         </nav>
@@ -84,9 +89,14 @@
               </button>
               <button 
                 v-for="link in sidebarLinks"
-                :key="link.route"
-                @click="router.push(link.route)"
-                class="px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors bg-[#f0f0f0] text-[#555] hover:bg-[#e5e5e5]"
+                :key="link.id"
+                @click="activeTab = link.id"
+                :class="[
+                  'px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors',
+                  activeTab === link.id
+                    ? 'bg-[#2563eb] text-white' 
+                    : 'bg-[#f0f0f0] text-[#555] hover:bg-[#e5e5e5]'
+                ]"
               >
                 {{ link.label }}
               </button>
@@ -446,6 +456,286 @@
           </div>
         </div>
 
+        <!-- Tab: Mis Pedidos (Estilo Mercado Libre - Clean) -->
+        <div v-if="activeTab === 'pedidos'">
+          <!-- Header Simple -->
+          <div class="mb-6">
+            <h2 class="text-[22px] font-semibold text-[#333] mb-1">Compras</h2>
+            <p class="text-[14px] text-[#666]">Revisa el estado de tus pedidos y haz seguimiento de tus envíos</p>
+          </div>
+
+          <!-- Filtros estilo tabs simples + búsqueda -->
+          <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-6 pb-4 border-b border-[#e8e8e8]">
+            <div class="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0">
+              <button 
+                v-for="status in ordersStatuses" 
+                :key="status.value"
+                @click="selectedStatus = status.value"
+                :class="[
+                  'px-4 py-2 text-[14px] font-medium transition-all whitespace-nowrap rounded-full',
+                  selectedStatus === status.value 
+                    ? 'bg-[#2563eb] text-white' 
+                    : 'text-[#666] hover:bg-[#f5f5f5]'
+                ]"
+              >
+                {{ status.label }}
+              </button>
+            </div>
+            <div class="relative">
+              <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-[#999]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" /></svg>
+              <input 
+                v-model="searchQuery"
+                type="text"
+                placeholder="Buscar en compras"
+                class="w-full sm:w-48 h-[40px] pl-10 pr-4 text-[14px] border border-[#ddd] rounded-full focus:outline-none focus:border-[#2563eb] bg-white"
+              />
+            </div>
+          </div>
+
+          <!-- Loading Orders -->
+          <div v-if="isLoadingOrders" class="py-12 text-center">
+            <svg class="w-6 h-6 text-[#2563eb] mx-auto mb-2 animate-spin" fill="none" viewBox="0 0 24 24">
+              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+            </svg>
+            <p class="text-[13px] text-[#666]">Cargando pedidos...</p>
+          </div>
+
+          <!-- Orders List - Estilo Limpio tipo ML -->
+          <div v-else-if="filteredOrders.length > 0" class="space-y-3">
+            <div 
+              v-for="order in filteredOrders" 
+              :key="order.id"
+              @click="viewOrderDetail(order)"
+              class="bg-white rounded-lg border border-[#e5e5e5] p-4 hover:shadow-md transition-all cursor-pointer group"
+            >
+              <div class="flex items-start gap-4">
+                <!-- Product Images -->
+                <div class="flex-shrink-0 relative">
+                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-[#f5f5f5] overflow-hidden">
+                    <img 
+                      v-if="order.products?.[0]?.image" 
+                      :src="order.products[0].image" 
+                      :alt="order.products[0].name"
+                      class="w-full h-full object-cover"
+                    />
+                    <div v-else class="w-full h-full flex items-center justify-center">
+                      <svg class="w-8 h-8 text-[#ccc]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                    </div>
+                  </div>
+                  <span v-if="order.items > 1" class="absolute -bottom-1 -right-1 bg-white border border-[#e0e0e0] text-[10px] text-[#666] font-medium px-1.5 py-0.5 rounded-full shadow-sm">
+                    +{{ order.items - 1 }}
+                  </span>
+                </div>
+
+                <!-- Order Info -->
+                <div class="flex-1 min-w-0">
+                  <div class="flex items-start justify-between gap-3">
+                    <div class="min-w-0">
+                      <!-- Status Badge -->
+                      <div class="flex items-center gap-2 mb-1.5">
+                        <span :class="[
+                          'inline-flex items-center gap-1 text-[13px] font-medium',
+                          order.status === 'Entregado' ? 'text-emerald-600' : 
+                          order.status === 'En Camino' ? 'text-blue-600' : 
+                          order.status === 'Procesando' ? 'text-amber-600' : 'text-[#666]'
+                        ]">
+                          <span v-if="order.status === 'Entregado'" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                          <span v-else-if="order.status === 'En Camino'" class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                          <span v-else-if="order.status === 'Procesando'" class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                          <span v-else class="w-1.5 h-1.5 rounded-full bg-[#999]"></span>
+                          {{ order.status }}
+                        </span>
+                      </div>
+                      
+                      <!-- Product name or order summary -->
+                      <p class="text-[15px] text-[#333] font-medium mb-0.5 truncate">
+                        {{ order.products?.[0]?.name || `Pedido #${order.id}` }}
+                      </p>
+                      
+                      <!-- Order metadata -->
+                      <p class="text-[13px] text-[#999]">
+                        {{ order.date }} · {{ order.items }} {{ order.items === 1 ? 'producto' : 'productos' }}
+                      </p>
+                    </div>
+                    
+                    <!-- Price -->
+                    <div class="text-right flex-shrink-0">
+                      <p class="text-[16px] font-semibold text-[#333]">${{ formatPrice(order.total) }}</p>
+                      <p v-if="order.savings" class="text-[12px] text-emerald-600">-${{ formatPrice(order.savings) }}</p>
+                    </div>
+                  </div>
+                  
+                  <!-- Quick Actions (visible on hover) -->
+                  <div class="flex items-center gap-3 mt-3 pt-3 border-t border-[#f0f0f0] opacity-0 group-hover:opacity-100 transition-opacity">
+                    <button @click.stop="viewOrderDetail(order)" class="text-[13px] text-[#2563eb] hover:underline font-medium">
+                      Ver detalle
+                    </button>
+                    <button v-if="order.status === 'Entregado'" @click.stop="reorderItems(order)" class="text-[13px] text-[#2563eb] hover:underline font-medium">
+                      Volver a comprar
+                    </button>
+                    <button v-if="order.tracking" @click.stop="trackOrder(order)" class="text-[13px] text-[#2563eb] hover:underline font-medium">
+                      Seguir envío
+                    </button>
+                  </div>
+                </div>
+                
+                <!-- Arrow indicator -->
+                <svg class="w-5 h-5 text-[#ccc] flex-shrink-0 hidden sm:block group-hover:text-[#2563eb] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+              </div>
+            </div>
+          </div>
+
+          <!-- Empty State - Estilo Mercado Libre -->
+          <div v-else class="py-16 sm:py-24">
+            <div class="max-w-[400px] mx-auto text-center px-4">
+              <!-- Ilustración grande estilo ML -->
+              <div class="mb-8 relative">
+                <svg class="w-40 h-40 mx-auto text-[#e0e0e0]" viewBox="0 0 200 200" fill="none">
+                  <!-- Laptop base -->
+                  <rect x="30" y="140" width="140" height="8" rx="2" fill="#d5d5d5"/>
+                  <!-- Laptop screen -->
+                  <rect x="40" y="70" width="120" height="75" rx="4" fill="#f5f5f5" stroke="#d5d5d5" stroke-width="2"/>
+                  <!-- Screen content - search icon -->
+                  <circle cx="100" cy="105" r="18" stroke="#c0c0c0" stroke-width="3" fill="none"/>
+                  <text x="100" y="112" text-anchor="middle" fill="#c0c0c0" font-size="20">?</text>
+                  <line x1="113" y1="118" x2="125" y2="130" stroke="#c0c0c0" stroke-width="3" stroke-linecap="round"/>
+                  <!-- Cursor/pencil icon -->
+                  <g transform="translate(130, 60)">
+                    <rect x="0" y="0" width="30" height="30" rx="4" fill="#FFE082"/>
+                    <path d="M8 18 L15 6 L22 18" stroke="#F9A825" stroke-width="2" fill="none" stroke-linecap="round"/>
+                    <circle cx="15" cy="10" r="2" fill="#F9A825"/>
+                  </g>
+                </svg>
+              </div>
+              
+              <h3 class="text-[20px] sm:text-[22px] font-semibold text-[#333] mb-3">
+                {{ selectedStatus === 'all' ? '¡Haz tu primera compra!' : `No tienes compras "${getStatusLabel(selectedStatus)}"` }}
+              </h3>
+              <p class="text-[15px] text-[#666] leading-relaxed mb-6">
+                {{ selectedStatus === 'all' 
+                  ? 'Aquí podrás ver tus compras y hacer el seguimiento de tus envíos.' 
+                  : 'Prueba seleccionando otro filtro o explora nuestros productos.' 
+                }}
+              </p>
+              <router-link 
+                to="/portal/catalogo" 
+                class="inline-flex items-center gap-2 text-[15px] text-[#2563eb] hover:text-[#1d4ed8] font-medium transition-colors"
+              >
+                {{ selectedStatus === 'all' ? 'Ver ofertas del día' : 'Explorar catálogo' }}
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+              </router-link>
+            </div>
+          </div>
+        </div>
+
+        <!-- Tab: Cupones -->
+        <div v-if="activeTab === 'cupones'">
+          <!-- Canjear Cupón -->
+          <div class="bg-white rounded-md border border-[#e0e0e0] p-5 mb-5" style="box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);">
+            <div class="flex flex-col sm:flex-row items-start sm:items-center gap-4">
+              <div class="flex items-center gap-3 flex-1 min-w-0">
+                <div class="w-10 h-10 rounded-full bg-[#eff4ff] flex items-center justify-center flex-shrink-0">
+                  <svg class="w-5 h-5 text-[#2563eb]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+                </div>
+                <div>
+                  <h3 class="text-[15px] font-semibold text-[#333]">¿Tienes un código de cupón?</h3>
+                  <p class="text-[13px] text-[#666]">Ingresa tu código para aplicar el descuento</p>
+                </div>
+              </div>
+              <div class="flex items-center gap-2 w-full sm:w-auto">
+                <input v-model="cuponCode" type="text" placeholder="CÓDIGO" class="flex-1 sm:w-32 h-[36px] px-3 text-[13px] text-[#333] border border-[#ccc] rounded-md focus:outline-none focus:ring-1 focus:ring-[#2563eb] focus:border-[#2563eb] bg-white uppercase" @keydown.enter="aplicarCupon" />
+                <button @click="aplicarCupon" :disabled="!cuponCode || aplicandoCupon" class="h-[36px] px-4 text-[13px] font-semibold text-white bg-[#2563eb] hover:bg-[#1d4ed8] rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap">
+                  {{ aplicandoCupon ? 'Validando...' : 'Aplicar' }}
+                </button>
+              </div>
+            </div>
+            <transition name="fade">
+              <div v-if="cuponFeedback" :class="['mt-4 p-3 rounded-md text-[13px]', cuponFeedback.success ? 'bg-emerald-50 text-emerald-700 border border-emerald-200' : 'bg-red-50 text-red-700 border border-red-200']">
+                {{ cuponFeedback.message }}
+              </div>
+            </transition>
+          </div>
+
+          <!-- Mis Cupones Disponibles -->
+          <div class="bg-white rounded-md border border-[#e0e0e0] overflow-hidden mb-5" style="box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);">
+            <div class="px-5 py-4 border-b border-[#e8e8e8] flex items-center justify-between">
+              <h3 class="text-[15px] font-bold text-[#333]">Mis Cupones Disponibles</h3>
+              <span class="text-[13px] text-[#666]">{{ cuponesActivos.length }} activos</span>
+            </div>
+
+            <div v-if="loadingCupones" class="py-10 text-center">
+              <svg class="w-6 h-6 text-[#2563eb] mx-auto mb-2 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+              </svg>
+              <p class="text-[13px] text-[#666]">Cargando cupones...</p>
+            </div>
+
+            <div v-else-if="cuponesActivos.length === 0" class="py-10 text-center px-5">
+              <div class="w-12 h-12 mx-auto mb-3 bg-[#f5f5f5] rounded-full flex items-center justify-center">
+                <svg class="w-6 h-6 text-[#999]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>
+              </div>
+              <h4 class="text-[14px] font-semibold text-[#333] mb-1">No tienes cupones activos</h4>
+              <p class="text-[12px] text-[#666]">Los cupones se asignan según tu nivel de mayorista</p>
+            </div>
+
+            <div v-else class="p-4 grid grid-cols-1 md:grid-cols-2 gap-3">
+              <div v-for="cupon in cuponesActivos" :key="cupon.id" class="relative bg-white rounded-md border border-[#e0e0e0] overflow-hidden hover:border-[#2563eb]/40 transition-all">
+                <div class="flex">
+                  <div class="w-20 flex-shrink-0 bg-gradient-to-br from-[#2563eb] to-[#1d4ed8] text-white p-3 flex flex-col items-center justify-center relative">
+                    <span class="text-xl font-bold">{{ cupon.descuento }}%</span>
+                    <span class="text-[9px] uppercase tracking-wide opacity-80">Dcto</span>
+                    <div class="absolute right-0 top-0 bottom-0 flex flex-col justify-around">
+                      <div class="w-2 h-2 bg-white rounded-full -mr-1"></div>
+                      <div class="w-2 h-2 bg-white rounded-full -mr-1"></div>
+                      <div class="w-2 h-2 bg-white rounded-full -mr-1"></div>
+                    </div>
+                  </div>
+                  <div class="flex-1 p-3">
+                    <h4 class="text-[13px] font-semibold text-[#333] mb-0.5">{{ cupon.nombre }}</h4>
+                    <p class="text-[11px] text-[#666] mb-2">{{ cupon.descripcion }}</p>
+                    <div class="flex items-center gap-2 text-[10px] text-[#888] mb-2">
+                      <span v-if="cupon.compra_minima">Min ${{ formatPrice(cupon.compra_minima) }}</span>
+                      <span>Hasta {{ formatDate(cupon.fecha_expiracion) }}</span>
+                    </div>
+                    <div class="flex items-center justify-between">
+                      <code class="px-1.5 py-0.5 bg-[#f5f5f5] rounded text-[11px] font-mono text-[#333]">{{ cupon.codigo }}</code>
+                      <button @click="copiarCodigo(cupon.codigo)" class="text-[11px] text-[#2563eb] hover:text-[#1d4ed8] font-medium flex items-center gap-1">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+                        Copiar
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Beneficios por Nivel -->
+          <div class="bg-white rounded-md border border-[#e0e0e0] overflow-hidden" style="box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);">
+            <div class="px-5 py-4 border-b border-[#e8e8e8]">
+              <h3 class="text-[15px] font-bold text-[#333]">Beneficios por Nivel</h3>
+              <p class="text-[12px] text-[#666] mt-0.5">Mientras más compras, más beneficios obtienes</p>
+            </div>
+            <div>
+              <div v-for="(nivel, index) in niveles" :key="nivel.nombre" :class="['px-5 py-3.5 flex items-center gap-3', index > 0 ? 'border-t border-[#e8e8e8]' : '']">
+                <div :class="['w-10 h-10 rounded-full flex items-center justify-center', nivel.bgColor]">
+                  <svg class="w-5 h-5" :class="nivel.iconColor" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <h4 class="text-[13px] font-semibold text-[#333]">{{ nivel.nombre }}</h4>
+                  <p class="text-[11px] text-[#666]">{{ nivel.requisito }}</p>
+                </div>
+                <div class="text-right flex-shrink-0">
+                  <span class="text-lg font-bold" :class="nivel.iconColor">{{ nivel.descuento }}%</span>
+                  <p class="text-[10px] text-[#888]">descuento</p>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
     <!-- Modal: Agregar/Editar Dirección -->
     <div v-if="showAddressModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
       <!-- Backdrop -->
@@ -606,7 +896,47 @@
         </div>
       </div>
     </div>
-    <!-- end modal -->
+    <!-- end address modal -->
+
+    <!-- Modal: Detalle de Pedido -->
+    <div v-if="showDetailModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+      <div class="absolute inset-0 bg-black/50" @click="showDetailModal = false"></div>
+      <div class="relative bg-white rounded-lg w-full max-w-lg max-h-[90vh] overflow-hidden" style="box-shadow: 0 20px 60px rgba(0,0,0,0.15);">
+        <div class="px-5 py-4 border-b border-[#e8e8e8] flex items-center justify-between">
+          <div>
+            <h3 class="text-[15px] font-bold text-[#333]">Pedido #{{ selectedOrder?.id }}</h3>
+            <p class="text-[12px] text-[#888]">{{ selectedOrder?.date }}</p>
+          </div>
+          <button @click="showDetailModal = false" class="text-[#999] hover:text-[#333] p-1 rounded transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+        </div>
+        <div class="p-5 overflow-y-auto max-h-[55vh]">
+          <div class="space-y-3">
+            <div v-for="(item, idx) in selectedOrder?.products || []" :key="idx" class="flex gap-3 p-3 bg-[#fafafa] rounded-md">
+              <div class="w-12 h-12 rounded bg-[#f0f0f0] overflow-hidden flex-shrink-0">
+                <img :src="item.image || `https://placehold.co/80x80/f5f5f5/1a1a1a?text=${idx+1}`" class="w-full h-full object-cover" />
+              </div>
+              <div class="flex-1 min-w-0">
+                <h4 class="text-[13px] font-medium text-[#333]">{{ item.name }}</h4>
+                <p class="text-[11px] text-[#888]">Cantidad: {{ item.quantity }}</p>
+              </div>
+              <div class="text-right flex-shrink-0">
+                <p class="text-[13px] font-semibold text-[#333]">${{ formatPrice(item.price * item.quantity) }}</p>
+                <p class="text-[10px] text-[#999]">${{ formatPrice(item.price) }}/ud</p>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="p-5 border-t border-[#e8e8e8] bg-[#fafafa]">
+          <div class="flex justify-between items-center">
+            <span class="text-[14px] font-semibold text-[#555]">Total del Pedido</span>
+            <span class="text-xl font-bold text-[#333]">${{ formatPrice(selectedOrder?.total) }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- end detail modal -->
 
       </div><!-- end max-w-960 -->
     </div><!-- end flex-1 content -->
@@ -614,9 +944,10 @@
 </template>
 
 <script>
-import { ref, computed, reactive, onMounted } from 'vue'
-import { useRouter } from 'vue-router'
+import { ref, computed, reactive, onMounted, watch } from 'vue'
+import { useRouter, useRoute } from 'vue-router'
 import apiClient from '@/services/api'
+import { obtenerMisPedidos } from '@/services/mayoristas'
 
 const COLOMBIA_API = {
   departamentos: 'https://api-colombia.com/api/v1/Department',
@@ -628,6 +959,7 @@ export default {
   setup() {
     const activeTab = ref('profile')
     const router = useRouter()
+    const route = useRoute()
     const showAddressModal = ref(false)
     const editingAddress = ref(null)
     const loadingAddresses = ref(false)
@@ -643,9 +975,190 @@ export default {
     ]
 
     const sidebarLinks = [
-      { label: 'Mis Pedidos', route: '/portal/pedidos', icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>' },
-      { label: 'Cupones', route: '/portal/cupones', icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>' },
+      { id: 'pedidos', label: 'Mis Pedidos', icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01" /></svg>' },
+      { id: 'cupones', label: 'Cupones', icon: '<svg fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" /></svg>' },
     ]
+
+    // =======================================================================
+    // PEDIDOS STATE
+    // =======================================================================
+    const orders = ref([])
+    const isLoadingOrders = ref(true)
+    const selectedStatus = ref('all')
+    const searchQuery = ref('')
+    const showDetailModal = ref(false)
+    const selectedOrder = ref(null)
+
+    const ordersStats = computed(() => ({
+      delivered: orders.value.filter(o => o.status === 'Entregado').length,
+      shipping: orders.value.filter(o => o.status === 'En Camino').length,
+      processing: orders.value.filter(o => o.status === 'Procesando' || o.status === 'Pendiente').length,
+      totalSpent: orders.value.reduce((sum, o) => sum + o.total, 0)
+    }))
+
+    const ordersStatuses = computed(() => [
+      { value: 'all', label: 'Todos', count: orders.value.length },
+      { value: 'Pendiente', label: 'Pendientes', count: orders.value.filter(o => o.status === 'Pendiente').length },
+      { value: 'Procesando', label: 'Procesando', count: orders.value.filter(o => o.status === 'Procesando').length },
+      { value: 'En Camino', label: 'En Camino', count: orders.value.filter(o => o.status === 'En Camino').length },
+      { value: 'Entregado', label: 'Entregados', count: orders.value.filter(o => o.status === 'Entregado').length },
+    ])
+
+    const filteredOrders = computed(() => {
+      let result = orders.value
+      if (selectedStatus.value !== 'all') {
+        result = result.filter(o => o.status === selectedStatus.value)
+      }
+      if (searchQuery.value) {
+        const query = searchQuery.value.toLowerCase()
+        result = result.filter(o => o.id.toLowerCase().includes(query))
+      }
+      return result
+    })
+
+    function getStatusClass(status) {
+      const classes = {
+        'Entregado': 'bg-emerald-100 text-emerald-700',
+        'En Camino': 'bg-blue-100 text-blue-700',
+        'Procesando': 'bg-amber-100 text-amber-700',
+        'Pendiente': 'bg-gray-100 text-gray-600',
+        'Cancelado': 'bg-red-100 text-red-700',
+      }
+      return classes[status] || classes['Pendiente']
+    }
+
+    function getStatusLabel(value) {
+      const labels = {
+        'all': 'todas',
+        'Pendientes': 'pendientes',
+        'Procesando': 'procesando',
+        'En Camino': 'en camino',
+        'Entregados': 'entregados'
+      }
+      return labels[value] || value
+    }
+
+    function normalizarOrden(orden) {
+      return {
+        id: orden.id || orden.numero_orden,
+        date: orden.fecha || orden.date || new Date().toLocaleDateString('es-CO'),
+        total: orden.total || orden.monto_total || 0,
+        savings: orden.ahorro || orden.savings || 0,
+        items: (orden.items?.length || orden.cantidad_items || 0),
+        status: orden.estado || orden.status || 'Pendiente',
+        tracking: orden.numero_seguimiento || orden.tracking || null,
+        estimatedDelivery: orden.fecha_entrega_estimada || orden.estimatedDelivery,
+        invoice: orden.numero_factura || orden.invoice,
+        products: orden.items || []
+      }
+    }
+
+    async function cargarPedidos() {
+      try {
+        isLoadingOrders.value = true
+        const userStr = localStorage.getItem('b2b_user')
+        if (!userStr) return
+        const userData = JSON.parse(userStr)
+        const pedidos = await obtenerMisPedidos(userData.email)
+        orders.value = (Array.isArray(pedidos) ? pedidos : []).map(normalizarOrden)
+      } catch (error) {
+        console.error('Error al cargar pedidos:', error)
+      } finally {
+        isLoadingOrders.value = false
+      }
+    }
+
+    function formatCompact(value) {
+      if (value >= 1000000) return (value / 1000000).toFixed(1) + 'M'
+      if (value >= 1000) return (value / 1000).toFixed(0) + 'K'
+      return value?.toString() || '0'
+    }
+
+    function viewOrderDetail(order) {
+      selectedOrder.value = order
+      showDetailModal.value = true
+    }
+
+    function reorderItems(order) {
+      alert(`Agregando ${order.items} productos al carrito...`)
+    }
+
+    function trackOrder(order) {
+      alert(`Rastreando envío: ${order.tracking}`)
+    }
+
+    // =======================================================================
+    // CUPONES STATE  
+    // =======================================================================
+    const loadingCupones = ref(true)
+    const cuponCode = ref('')
+    const aplicandoCupon = ref(false)
+    const cuponFeedback = ref(null)
+    const cuponToast = ref('')
+    const cuponesActivos = ref([])
+
+    const niveles = [
+      { nombre: 'Bronce', requisito: 'Compras hasta $2.000.000', descuento: 10, bgColor: 'bg-amber-100', iconColor: 'text-amber-600' },
+      { nombre: 'Plata', requisito: 'Compras de $2.000.000 a $5.000.000', descuento: 15, bgColor: 'bg-gray-200', iconColor: 'text-gray-500' },
+      { nombre: 'Gold', requisito: 'Compras superiores a $5.000.000', descuento: 20, bgColor: 'bg-amber-50', iconColor: 'text-amber-500' },
+    ]
+
+    const cuponesMock = [
+      { id: 1, codigo: 'BIENVENIDO20', nombre: 'Cupón de Bienvenida', descripcion: 'Para tu primera compra como mayorista', descuento: 20, compra_minima: 500000, fecha_expiracion: '2026-03-30' },
+      { id: 2, codigo: 'FEBRERO10', nombre: 'Promo Febrero', descripcion: 'Descuento especial del mes', descuento: 10, compra_minima: 200000, fecha_expiracion: '2026-02-27' },
+    ]
+
+    function formatDate(dateStr) {
+      const date = new Date(dateStr)
+      return date.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })
+    }
+
+    async function cargarCupones() {
+      loadingCupones.value = true
+      try {
+        cuponesActivos.value = cuponesMock
+      } catch (error) {
+        console.error('Error cargando cupones:', error)
+      } finally {
+        loadingCupones.value = false
+      }
+    }
+
+    async function aplicarCupon() {
+      if (!cuponCode.value) return
+      aplicandoCupon.value = true
+      cuponFeedback.value = null
+      try {
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        const codigoUpper = cuponCode.value.toUpperCase()
+        const cuponExistente = cuponesMock.find(c => c.codigo === codigoUpper)
+        if (cuponExistente) {
+          if (cuponesActivos.value.find(c => c.codigo === codigoUpper)) {
+            cuponFeedback.value = { success: false, message: 'Este cupón ya está en tu lista de cupones activos' }
+          } else {
+            cuponesActivos.value.push(cuponExistente)
+            cuponFeedback.value = { success: true, message: `¡Cupón "${cuponExistente.nombre}" agregado exitosamente!` }
+            cuponCode.value = ''
+          }
+        } else {
+          cuponFeedback.value = { success: false, message: 'Código de cupón inválido o expirado' }
+        }
+      } catch (error) {
+        cuponFeedback.value = { success: false, message: 'Error al validar el cupón. Intenta de nuevo.' }
+      } finally {
+        aplicandoCupon.value = false
+      }
+    }
+
+    function copiarCodigo(codigo) {
+      navigator.clipboard.writeText(codigo)
+      cuponToast.value = 'Código copiado al portapapeles'
+      setTimeout(() => { cuponToast.value = '' }, 2000)
+    }
+
+    // =======================================================================
+    // ACCOUNT DATA
+    // =======================================================================
 
     const user = computed(() => {
       return JSON.parse(localStorage.getItem('b2b_user') || '{"nombre": "Usuario", "email": "usuario@example.com"}')
@@ -925,10 +1438,35 @@ export default {
     }
 
     onMounted(async () => {
+      // Leer tab desde query params
+      if (route.query.tab) {
+        activeTab.value = route.query.tab
+      }
+      
       loadForm()
       checkVerificationStatus()
       await loadDepartamentos()
       await loadAddresses()
+      
+      // Cargar datos según el tab activo
+      if (activeTab.value === 'pedidos') {
+        await cargarPedidos()
+      } else if (activeTab.value === 'cupones') {
+        await cargarCupones()
+      }
+    })
+
+    // Watch para cambios de tab y cargar datos
+    watch(activeTab, async (newTab) => {
+      // Actualizar URL sin recargar
+      const query = newTab === 'profile' ? {} : { tab: newTab }
+      router.replace({ query })
+      
+      if (newTab === 'pedidos' && orders.value.length === 0) {
+        await cargarPedidos()
+      } else if (newTab === 'cupones' && cuponesActivos.value.length === 0) {
+        await cargarCupones()
+      }
     })
 
     return {
@@ -940,7 +1478,14 @@ export default {
       formatPrice, resetForm, saveProfile, changePassword,
       openAddressModal, closeAddressModal, saveAddress, deleteAddress, setDefaultAddress,
       onDepartamentoChange, onMunicipioChange,
-      sendVerificationEmail, dismissVerification
+      sendVerificationEmail, dismissVerification,
+      // Pedidos
+      orders, isLoadingOrders, selectedStatus, searchQuery, showDetailModal, selectedOrder,
+      ordersStats, ordersStatuses, filteredOrders, getStatusClass, getStatusLabel, formatCompact,
+      viewOrderDetail, reorderItems, trackOrder,
+      // Cupones
+      loadingCupones, cuponCode, aplicandoCupon, cuponFeedback, cuponToast,
+      cuponesActivos, niveles, formatDate, aplicarCupon, copiarCodigo
     }
   }
 }

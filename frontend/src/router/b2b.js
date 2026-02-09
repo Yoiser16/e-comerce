@@ -108,8 +108,7 @@ const routes = [
       {
         path: 'pedidos',
         name: 'B2BPedidos',
-        component: B2BPedidos,
-        meta: { title: 'Mis Pedidos | Kharis Pro' }
+        redirect: '/portal/cuenta?tab=pedidos'
       },
       {
         path: 'favoritos',
@@ -132,8 +131,7 @@ const routes = [
       {
         path: 'cupones',
         name: 'B2BCupones',
-        component: B2BCupones,
-        meta: { title: 'Cupones y Descuentos | Kharis Pro' }
+        redirect: '/portal/cuenta?tab=cupones'
       }
     ]
   },

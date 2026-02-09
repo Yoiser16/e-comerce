@@ -11,7 +11,7 @@
     <!-- ROW 1: Main Header (Logo + Address + Search + Actions) -->
     <!-- ============================== -->
     <div class="bg-[#131A2B]">
-      <div class="max-w-7xl mx-auto px-4 sm:px-6">
+      <div class="w-full px-4 sm:px-6 lg:px-8">
         <div class="flex items-center h-[56px] lg:h-[68px] gap-3 lg:gap-5">
           
           <!-- Logo -->
@@ -122,21 +122,21 @@
               <span class="text-[15px] font-bold text-[#C9A962] leading-tight">${{ formatPrice(accountBalance) }}</span>
             </div>
 
-            <!-- Favorites -->
-            <router-link 
-              to="/portal/favoritos" 
+            <!-- Notifications -->
+            <button 
               class="relative p-2.5 text-white hover:text-[#C9A962] transition-colors"
+              @click="showNotifications = !showNotifications"
             >
               <svg class="w-[22px] h-[22px]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
               </svg>
               <span 
-                v-if="favoritosCount > 0" 
-                class="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 bg-[#C9A962] text-slate-900 text-[10px] font-bold rounded-full flex items-center justify-center"
+                v-if="notificationsCount > 0" 
+                class="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center"
               >
-                {{ favoritosCount > 99 ? '99+' : favoritosCount }}
+                {{ notificationsCount > 9 ? '9+' : notificationsCount }}
               </span>
-            </router-link>
+            </button>
 
             <!-- Cart -->
             <router-link 
@@ -276,7 +276,7 @@
     <!-- ROW 2: Navigation Bar (like Amazon's nav strip) -->
     <!-- ============================== -->
     <div class="hidden lg:block bg-[#1a2332] border-t border-white/[0.06]">
-      <div class="max-w-7xl mx-auto px-6">
+      <div class="w-full px-6 lg:px-8">
         <nav class="flex items-center gap-0.5 h-[38px] -ml-3">
           <!-- Categories Dropdown -->
           <div 
@@ -372,6 +372,22 @@
             class="px-3 py-1.5 text-[13px] font-semibold text-white/90 hover:text-white hover:bg-white/[0.08] rounded transition-colors"
           >
             Mis Pedidos
+          </router-link>
+
+          <router-link 
+            to="/portal/favoritos"
+            class="px-3 py-1.5 text-[13px] font-semibold text-white/90 hover:text-white hover:bg-white/[0.08] rounded transition-colors flex items-center gap-1.5"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>
+            </svg>
+            Mis Favoritos
+            <span 
+              v-if="favoritosCount > 0" 
+              class="text-[10px] px-1.5 py-0.5 bg-[#C9A962] text-[#131A2B] rounded-full font-bold"
+            >
+              {{ favoritosCount }}
+            </span>
           </router-link>
 
           <!-- Spacer to push help links right -->
@@ -612,6 +628,8 @@ export default {
     const defaultAddress = ref(null)
     const categorias = ref([])
     const favoritosCount = ref(0)
+    const notificationsCount = ref(0)
+    const showNotifications = ref(false)
 
     // Computed
     const user = computed(() => {
