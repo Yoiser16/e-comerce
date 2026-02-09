@@ -474,6 +474,21 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
             orden.email_thread_id = msg_id
             orden.save()
         print(f"✅ Email de confirmación enviado exitosamente - Message ID: {msg_id}")
+
+        # Si el pago fue con tarjeta (Wompi), enviar también el email de pedido confirmado
+        if data.metodo_pago == 'wompi':
+            print(f"📧 Enviando email de pedido confirmado a {cliente.email} - Orden: {orden.codigo}")
+            send_order_status_email(
+                email=cliente.email,
+                nombre=f"{cliente.nombre} {cliente.apellido}".strip(),
+                codigo=orden.codigo,
+                estado='confirmada',
+                total=float(orden.total_monto),
+                direccion=direccion_completa,
+                productos=productos_email,
+                thread_id=orden.email_thread_id or msg_id or None,
+            )
+            print("✅ Email de pedido confirmado enviado exitosamente")
     except Exception as e:
         # No bloquear la creación de la orden por fallos de email
         print(f"❌ Error enviando email de confirmación: {e}")
