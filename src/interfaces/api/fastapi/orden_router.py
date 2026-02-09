@@ -307,6 +307,7 @@ def _validar_stock_sync(items: List[LineaOrdenInput]) -> dict:
 def _crear_orden_sync(data: CrearOrdenInput) -> dict:
     """Crea una orden (sync) con validacion atomica de stock"""
     from django.db import transaction
+    from infrastructure.auth.models import Usuario
     
     with transaction.atomic():
         # 0. VALIDAR STOCK PRIMERO (con bloqueo pesimista)
@@ -325,11 +326,21 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
         # 1. Obtener o crear cliente
         cliente = ClienteModel.objects.filter(email=data.email).first()
     
+    tipo_doc = data.tipo_documento or None
+    numero_doc = data.numero_documento or None
+
+    if not numero_doc:
+        usuario = Usuario.objects.filter(email=data.email, tipo='MAYORISTA').first()
+        if usuario and usuario.numero_documento:
+            tipo_doc = usuario.tipo_documento or 'CC'
+            numero_doc = usuario.numero_documento
+
+    if not numero_doc:
+        numero_doc = f"AUTO-{uuid4().hex[:8].upper()}"
+    if not tipo_doc:
+        tipo_doc = 'CC'
+
     if not cliente:
-        # Validar número de documento
-        numero_doc = data.numero_documento if data.numero_documento else f"AUTO-{uuid4().hex[:8].upper()}"
-        tipo_doc = data.tipo_documento if data.tipo_documento else 'CC'
-        
         cliente = ClienteModel.objects.create(
             id=uuid4(),
             email=data.email,
@@ -352,14 +363,13 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
         if cliente.telefono != data.telefono:
             cliente.telefono = data.telefono
             actualizado = True
-        # Actualizar documento si se proporciona uno nuevo
-        if data.numero_documento:
-            if cliente.numero_documento != data.numero_documento:
-                cliente.numero_documento = data.numero_documento
-                actualizado = True
-            if data.tipo_documento and cliente.tipo_documento != data.tipo_documento:
-                cliente.tipo_documento = data.tipo_documento
-                actualizado = True
+        # Actualizar documento si se proporciona uno nuevo o si viene del mayorista
+        if numero_doc and cliente.numero_documento != numero_doc:
+            cliente.numero_documento = numero_doc
+            actualizado = True
+        if tipo_doc and cliente.tipo_documento != tipo_doc:
+            cliente.tipo_documento = tipo_doc
+            actualizado = True
         if actualizado:
             cliente.save()
     
