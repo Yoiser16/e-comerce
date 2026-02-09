@@ -154,6 +154,58 @@
         </div>
       </div>
     </div>
+
+    <!-- Add to Cart Modal -->
+    <Teleport to="body">
+      <Transition name="modal-fade">
+        <div v-if="showCartModal" class="fixed inset-0 z-[60]">
+          <div class="absolute inset-0 bg-black/40" @click="closeCartModal"></div>
+          <div class="relative flex min-h-full items-center justify-center px-4 py-8">
+            <div class="w-full max-w-md rounded-2xl bg-[#FAFAFA] shadow-2xl border border-[#C9A962]/20">
+              <div class="px-6 pt-6 pb-4">
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <p class="text-[11px] tracking-[0.2em] uppercase text-[#C9A962] font-semibold">Portal Mayorista</p>
+                    <h3 class="font-luxury text-2xl text-[#1A1A1A] mt-2">Producto agregado</h3>
+                  </div>
+                  <button
+                    class="w-9 h-9 rounded-full border border-[#C9A962]/30 text-[#1A1A1A] hover:bg-[#C9A962]/10 transition-colors"
+                    @click="closeCartModal"
+                  >
+                    <svg class="w-4 h-4 mx-auto" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+
+                <div class="mt-5 rounded-xl bg-white border border-[#C9A962]/15 px-4 py-3">
+                  <p class="text-sm text-[#4A4A4A]">Agregaste</p>
+                  <p class="text-base font-semibold text-[#1A1A1A] mt-1">
+                    {{ modalQuantity }} unidades de {{ modalProductName }}
+                  </p>
+                </div>
+
+                <div class="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
+                  <router-link
+                    to="/portal/carrito"
+                    class="inline-flex items-center justify-center bg-[#1A1A1A] hover:bg-black text-white font-medium px-5 py-3 rounded-xl transition-colors"
+                    @click="closeCartModal"
+                  >
+                    Ver carrito
+                  </router-link>
+                  <button
+                    class="inline-flex items-center justify-center border border-[#1A1A1A]/30 text-[#1A1A1A] hover:border-[#1A1A1A] font-medium px-5 py-3 rounded-xl transition-colors"
+                    @click="closeCartModal"
+                  >
+                    Seguir comprando
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
   </div>
 </template>
 
@@ -166,6 +218,10 @@ export default {
   setup() {
     const favoritos = ref([])
     const loading = ref(true)
+    const showCartModal = ref(false)
+    const modalProductName = ref('')
+    const modalQuantity = ref(0)
+    let modalTimer = null
     
     // User
     const user = computed(() => {
@@ -205,6 +261,25 @@ export default {
     
     function handleImageError(e) {
       e.target.src = '/placeholder.png'
+    }
+
+    function openCartModal(productName, quantity) {
+      modalProductName.value = productName || 'producto'
+      modalQuantity.value = quantity || 0
+      showCartModal.value = true
+
+      if (modalTimer) clearTimeout(modalTimer)
+      modalTimer = setTimeout(() => {
+        showCartModal.value = false
+      }, 3000)
+    }
+
+    function closeCartModal() {
+      showCartModal.value = false
+      if (modalTimer) {
+        clearTimeout(modalTimer)
+        modalTimer = null
+      }
     }
     
     async function cargarFavoritos() {
@@ -296,7 +371,7 @@ export default {
       }
       
       localStorage.setItem('b2b_cart', JSON.stringify(cart))
-      alert(`${CANTIDAD_MINIMA} unidades de ${producto.nombre || 'producto'} agregadas al carrito`)
+      openCartModal(producto.nombre || 'producto', CANTIDAD_MINIMA)
       
       // Actualizar contador del header
       window.dispatchEvent(new CustomEvent('cart-updated'))
@@ -310,18 +385,30 @@ export default {
     return {
       favoritos,
       loading,
+      showCartModal,
+      modalProductName,
+      modalQuantity,
       formatPrice,
       formatFecha,
       handleImageError,
       eliminarFavorito,
       limpiarFavoritos,
-      agregarAlCarrito
+      agregarAlCarrito,
+      closeCartModal
     }
   }
 }
 </script>
 
 <style scoped>
+.modal-fade-enter-active,
+.modal-fade-leave-active {
+  transition: opacity 0.2s ease;
+}
+.modal-fade-enter-from,
+.modal-fade-leave-to {
+  opacity: 0;
+}
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
