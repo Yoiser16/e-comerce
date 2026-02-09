@@ -266,6 +266,43 @@ async def process_approved_transaction(transaction: dict):
                     orden.estado = 'confirmada'
                     orden.notas_envio = (orden.notas_envio or '') + f" | Wompi TX: {tx_id} APROBADO"
                     orden.save()
+                    try:
+                        from infrastructure.notifications.email_service import send_order_status_email
+                        from infrastructure.persistence.django.models import LineaOrdenModel
+
+                        if orden.cliente:
+                            lineas_orden = LineaOrdenModel.objects.filter(orden=orden).select_related('producto').prefetch_related('producto__imagenes')
+                            productos_email = []
+                            for linea in lineas_orden:
+                                producto_data = {
+                                    'nombre': linea.producto.nombre if linea.producto else 'Producto',
+                                    'cantidad': linea.cantidad,
+                                    'imagen': ''
+                                }
+                                if linea.producto:
+                                    primera_imagen_obj = linea.producto.imagenes.filter(es_principal=True).first()
+                                    if not primera_imagen_obj:
+                                        primera_imagen_obj = linea.producto.imagenes.order_by('orden').first()
+
+                                    if primera_imagen_obj:
+                                        url_imagen = primera_imagen_obj.url
+                                        producto_data['imagen'] = url_imagen if url_imagen.startswith('http') else f"http://localhost:8000{url_imagen}"
+
+                                productos_email.append(producto_data)
+
+                            direccion_completa = ", ".join(filter(None, [orden.direccion_envio, orden.municipio, orden.departamento]))
+                            send_order_status_email(
+                                email=orden.cliente.email,
+                                nombre=f"{orden.cliente.nombre} {orden.cliente.apellido}".strip(),
+                                codigo=orden.codigo,
+                                estado='confirmada',
+                                total=float(orden.total_monto),
+                                direccion=direccion_completa,
+                                productos=productos_email,
+                                thread_id=orden.email_thread_id or None,
+                            )
+                    except Exception as err:
+                        print(f"❌ Error enviando email confirmado por Wompi: {err}")
                     print(f"✅ Orden {orden.codigo} confirmada automáticamente por Wompi")
                     return orden
             return None
