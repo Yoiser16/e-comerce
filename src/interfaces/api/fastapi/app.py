@@ -22,6 +22,7 @@ from .orden_router import router as orden_router
 from .inventario_router import router as inventario_router
 from .auth_router import router as auth_router
 from .mayoristas_router import router as mayoristas_router
+from .wompi_router import router as wompi_router
 from .exception_handlers import exception_handler_dominio
 from domain.exceptions.dominio import ExcepcionDominio
 from infrastructure.config.app_config import AppConfig
@@ -99,6 +100,7 @@ def crear_app(config: AppConfig) -> FastAPI:
     app.include_router(orden_router)      # Órdenes
     app.include_router(inventario_router) # Inventario y movimientos
     app.include_router(mayoristas_router) # Admin mayoristas B2B
+    app.include_router(wompi_router)       # Wompi pasarela de pagos
     
     # Servir archivos estáticos
     app.mount("/static", StaticFiles(directory="static"), name="static")

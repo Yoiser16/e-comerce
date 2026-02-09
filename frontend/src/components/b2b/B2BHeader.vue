@@ -156,7 +156,7 @@
               </div>
               <div class="hidden lg:flex flex-col leading-none">
                 <span class="text-[11px] text-white/50 leading-tight">Carrito</span>
-                <span class="text-[15px] font-bold text-white leading-tight">${{ formatPrice(cartTotal) }}</span>
+                <span class="text-[15px] font-bold text-white leading-tight">{{ cartCount }} {{ cartCount === 1 ? 'producto' : 'productos' }}</span>
               </div>
             </router-link>
 
@@ -842,9 +842,10 @@ export default {
       cartCount,
       favoritosCount,
       accountBalance,
-      cartTotal,
       defaultAddress,
       categorias,
+      notificationsCount,
+      showNotifications,
       
       // Methods
       formatPrice,

@@ -219,7 +219,9 @@ def _listar_ordenes_por_email_sync(email: str) -> List[dict]:
     queryset = (OrdenModel.objects
                 .filter(cliente=cliente)
                 .select_related('cliente')
-                .prefetch_related('lineas')
+                .prefetch_related(
+                    Prefetch('lineas', queryset=LineaOrdenModel.objects.select_related('producto'))
+                )
                 .order_by('-fecha_creacion'))
     
     ordenes = list(queryset)
@@ -229,14 +231,24 @@ def _listar_ordenes_por_email_sync(email: str) -> List[dict]:
         # Obtener items de la orden
         items = []
         for linea in orden.lineas.all():
+            producto = linea.producto
+            # Intentar obtener imagen: primero imagen_principal, luego primera imagen de la galería
+            imagen_url = None
+            if producto:
+                imagen_url = getattr(producto, 'imagen_principal', None) or None
+                if not imagen_url:
+                    primera_img = producto.imagenes.first() if hasattr(producto, 'imagenes') else None
+                    if primera_img:
+                        imagen_url = primera_img.url
+            
             items.append({
                 'id': str(linea.id),
-                'producto_id': str(linea.producto.id) if linea.producto else '',
-                'nombre': getattr(linea.producto, 'nombre', '') if linea.producto else '',
+                'producto_id': str(producto.id) if producto else '',
+                'nombre': getattr(producto, 'nombre', '') if producto else '',
                 'cantidad': linea.cantidad,
                 'precio': float(getattr(linea, 'precio_unitario_monto', 0) or 0),
                 'moneda': getattr(linea, 'precio_unitario_moneda', 'USD'),
-                'imagen': linea.producto.imagen_principal if linea.producto and hasattr(linea.producto, 'imagen_principal') else None
+                'imagen': imagen_url
             })
         
         resultado.append({
@@ -359,6 +371,9 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
             break
     
     # 3. Crear la orden
+    # Si el pago fue por Wompi, la orden ya está pagada → confirmada
+    estado_inicial = 'confirmada' if data.metodo_pago == 'wompi' else 'pendiente'
+    
     orden = OrdenModel.objects.create(
         id=uuid4(),
         cliente=cliente,
@@ -368,7 +383,7 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
         municipio=data.municipio,
         barrio=data.barrio or '',
         notas_envio=data.notas or '',
-        estado='pendiente',
+        estado=estado_inicial,
         metodo_pago=data.metodo_pago,
         subtotal_monto=Decimal(str(data.subtotal)),
         envio_monto=Decimal(str(data.envio)),

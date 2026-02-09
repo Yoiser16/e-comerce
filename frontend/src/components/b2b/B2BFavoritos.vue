@@ -64,21 +64,22 @@
               class="block relative aspect-square bg-gray-50 overflow-hidden"
             >
               <img 
-                :src="item.producto?.imagen_principal || '/placeholder.png'" 
+                :src="item.producto?.imagen_principal || item.producto?.imagen || '/placeholder.png'" 
                 :alt="item.producto?.nombre || 'Producto'"
                 class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                 @error="handleImageError"
+                loading="lazy"
               />
               
               <!-- Stock Badge -->
               <div 
-                v-if="item.producto?.stock_actual <= 5 && item.producto?.stock_actual > 0"
+                v-if="(item.producto?.stock_actual || 0) <= 5 && (item.producto?.stock_actual || 0) > 0"
                 class="absolute top-3 left-3 bg-orange-500 text-white text-xs font-bold px-2.5 py-1 rounded-full"
               >
-                ¡Últimas {{ item.producto.stock_actual }}!
+                ¡Últimas {{ item.producto?.stock_actual || 0 }}!
               </div>
               <div 
-                v-else-if="item.producto?.stock_actual === 0"
+                v-else-if="(item.producto?.stock_actual || 0) === 0"
                 class="absolute top-3 left-3 bg-red-500 text-white text-xs font-bold px-2.5 py-1 rounded-full"
               >
                 Agotado
@@ -112,26 +113,26 @@
               <!-- Pricing -->
               <div class="flex items-end gap-2 mb-4">
                 <span class="text-xl font-bold text-gray-900">
-                  ${{ formatPrice(item.producto?.precio_mayorista || item.producto?.monto_precio) }}
+                  ${{ formatPrice(item.producto?.precio_mayorista || item.producto?.monto_precio || item.producto?.precio || 0) }}
                 </span>
                 <span 
-                  v-if="item.producto?.precio && item.producto?.precio > (item.producto?.precio_mayorista || item.producto?.monto_precio)"
+                  v-if="item.producto?.precio && item.producto?.precio > (item.producto?.precio_mayorista || item.producto?.monto_precio || 0)"
                   class="text-sm text-gray-400 line-through"
                 >
-                  ${{ formatPrice(item.producto?.precio) }}
+                  ${{ formatPrice(item.producto.precio) }}
                 </span>
               </div>
               
               <!-- Add to Cart Button -->
               <button 
                 @click="agregarAlCarrito(item)"
-                :disabled="item.producto?.stock_actual === 0"
+                :disabled="(item.producto?.stock_actual || 0) === 0"
                 class="w-full py-3 bg-[#1A1A1A] hover:bg-black text-white font-medium rounded-xl flex items-center justify-center gap-2 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
                 </svg>
-                {{ item.producto?.stock_actual === 0 ? 'Sin stock' : 'Agregar al carrito' }}
+                {{ (item.producto?.stock_actual || 0) === 0 ? 'Sin stock' : 'Agregar al carrito' }}
               </button>
               
               <!-- Date Added -->
@@ -158,7 +159,7 @@
 
 <script>
 import { ref, onMounted, computed } from 'vue'
-import { favoritosService, productosService } from '@/services/productos'
+import { obtenerProducto as obtenerProductoB2B } from '@/services/mayoristas'
 
 export default {
   name: 'B2BFavoritos',
@@ -204,98 +205,96 @@ export default {
     async function cargarFavoritos() {
       try {
         loading.value = true
-        const apiData = await favoritosService.listar()
-        favoritos.value = apiData
-        // Sincronizar localStorage con la API
-        syncLocalFavoritos()
-      } catch (err) {
-        console.error('Error cargando favoritos de API:', err)
-        // Fallback: cargar desde localStorage
-        try {
-          const storedIds = JSON.parse(localStorage.getItem('b2b_favoritos') || '[]')
-          if (storedIds.length > 0) {
-            // Cargar info de productos desde la API
-            const productos = await Promise.all(
-              storedIds.map(async (id) => {
-                try {
-                  const producto = await productosService.getProducto(id)
-                  return { producto_id: id, producto, fecha_agregado: new Date().toISOString() }
-                } catch {
-                  return null
-                }
-              })
-            )
-            favoritos.value = productos.filter(Boolean)
-          } else {
-            favoritos.value = []
-          }
-        } catch {
+        
+        // Para B2B, cargar directamente desde localStorage con precios mayoristas
+        // Esto evita problemas de autenticación y es más rápido
+        const storedIds = JSON.parse(localStorage.getItem('b2b_favoritos') || '[]')
+        
+        if (storedIds.length === 0) {
           favoritos.value = []
+          return
         }
+        
+        // Cargar info de productos con precios mayoristas desde la API B2B
+        const productos = await Promise.all(
+          storedIds.map(async (id) => {
+            try {
+              const productoData = await obtenerProductoB2B(id)
+              return {
+                id: productoData.id || id,
+                producto_id: productoData.id || id,
+                fecha_agregado: new Date().toISOString(),
+                producto: {
+                  id: productoData.id,
+                  nombre: productoData.nombre || 'Producto',
+                  imagen_principal: productoData.imagen_principal || productoData.imagen,
+                  precio_mayorista: productoData.precio_mayorista,
+                  monto_precio: productoData.monto_precio,
+                  precio: productoData.precio || productoData.monto_precio,
+                  stock_actual: productoData.stock_actual || 0,
+                  sku: productoData.sku,
+                  categoria: productoData.categoria
+                }
+              }
+            } catch (err) {
+              return null
+            }
+          })
+        )
+        
+        favoritos.value = productos.filter(Boolean)
+        
+      } catch (err) {
+        favoritos.value = []
       } finally {
         loading.value = false
       }
     }
     
     async function eliminarFavorito(item) {
-      try {
-        const id = item.producto?.id || item.producto_id
-        await favoritosService.eliminar(id)
-        favoritos.value = favoritos.value.filter(f => 
-          (f.producto?.id || f.producto_id) !== id
-        )
-        syncLocalFavoritos()
-      } catch (err) {
-        console.error('Error eliminando favorito:', err)
-        // Aún así eliminar localmente para UX
-        const id = item.producto?.id || item.producto_id
-        favoritos.value = favoritos.value.filter(f => 
-          (f.producto?.id || f.producto_id) !== id
-        )
-        syncLocalFavoritos()
-      }
+      const id = item.producto?.id || item.producto_id
+      favoritos.value = favoritos.value.filter(f => 
+        (f.producto?.id || f.producto_id) !== id
+      )
+      syncLocalFavoritos()
     }
     
     async function limpiarFavoritos() {
       if (!confirm('¿Estás seguro de eliminar todos tus favoritos?')) return
       
-      try {
-        // Eliminar uno por uno
-        for (const item of favoritos.value) {
-          await favoritosService.eliminar(item.producto?.id || item.producto_id)
-        }
-        favoritos.value = []
-        syncLocalFavoritos()
-      } catch (err) {
-        console.error('Error limpiando favoritos:', err)
-        // Limpiar localmente de todas formas
-        favoritos.value = []
-        syncLocalFavoritos()
-      }
+      favoritos.value = []
+      syncLocalFavoritos()
     }
     
     function agregarAlCarrito(item) {
       const producto = item.producto
-      if (!producto || producto.stock_actual === 0) return
+      if (!producto || (producto.stock_actual || 0) === 0) return
+      
+      const CANTIDAD_MINIMA = 10 // Compra mínima para mayoristas
       
       // Agregar al carrito del storage
       const cart = JSON.parse(localStorage.getItem('b2b_cart') || '{"items":[]}')
-      const existingIndex = cart.items.findIndex(i => i.id === producto.id)
+      const existingIndex = cart.items.findIndex(i => i.id === (producto.id || item.producto_id))
       
       if (existingIndex >= 0) {
-        cart.items[existingIndex].cantidad += 1
+        cart.items[existingIndex].cantidad += CANTIDAD_MINIMA
       } else {
         cart.items.push({
-          id: producto.id,
-          nombre: producto.nombre,
-          imagen: producto.imagen_principal,
-          precio: producto.precio_mayorista || producto.monto_precio,
-          cantidad: 1
+          id: producto.id || item.producto_id,
+          nombre: producto.nombre || 'Producto',
+          imagen: producto.imagen_principal || producto.imagen || '/placeholder.png',
+          precio: producto.precio_mayorista || producto.monto_precio || producto.precio || 0,
+          cantidad: CANTIDAD_MINIMA,
+          sku: producto.sku || null,
+          categoria: producto.categoria?.nombre || 'Productos'
         })
       }
       
       localStorage.setItem('b2b_cart', JSON.stringify(cart))
-      alert(`${producto.nombre} agregado al carrito`)
+      alert(`${CANTIDAD_MINIMA} unidades de ${producto.nombre || 'producto'} agregadas al carrito`)
+      
+      // Actualizar contador del header
+      window.dispatchEvent(new CustomEvent('cart-updated'))
     }
     
     // Lifecycle

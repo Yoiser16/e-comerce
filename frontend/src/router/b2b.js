@@ -22,6 +22,7 @@ const B2BFavoritos = () => import('../components/b2b/B2BFavoritos.vue')
 const B2BRegistro = () => import('../components/b2b/B2BRegistro.vue')
 const B2BAyuda = () => import('../components/b2b/B2BAyuda.vue')
 const B2BCupones = () => import('../components/b2b/B2BCupones.vue')
+const B2BPagoResultado = () => import('../components/b2b/B2BPagoResultado.vue')
 
 // Variable global para acceder al router desde listeners
 let routerInstance = null
@@ -121,6 +122,12 @@ const routes = [
         name: 'B2BCuenta',
         component: B2BCuenta,
         meta: { title: 'Mi Cuenta | Kharis Pro' }
+      },
+      {
+        path: 'pago-resultado',
+        name: 'B2BPagoResultado',
+        component: B2BPagoResultado,
+        meta: { title: 'Resultado del Pago | Kharis Pro' }
       },
       {
         path: 'ayuda',

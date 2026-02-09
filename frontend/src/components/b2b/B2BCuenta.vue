@@ -501,87 +501,180 @@
             <p class="text-[13px] text-[#666]">Cargando pedidos...</p>
           </div>
 
-          <!-- Orders List - Estilo Limpio tipo ML -->
+          <!-- Orders List - Accordion style -->
           <div v-else-if="filteredOrders.length > 0" class="space-y-3">
             <div 
               v-for="order in filteredOrders" 
               :key="order.id"
-              @click="viewOrderDetail(order)"
-              class="bg-white rounded-lg border border-[#e5e5e5] p-4 hover:shadow-md transition-all cursor-pointer group"
+              class="bg-white rounded-lg border border-[#e5e5e5] overflow-hidden transition-all"
+              :class="expandedOrderId === order.id ? 'shadow-md border-[#d0d0d0]' : 'hover:shadow-sm'"
             >
-              <div class="flex items-start gap-4">
-                <!-- Product Images -->
-                <div class="flex-shrink-0 relative">
-                  <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-[#f5f5f5] overflow-hidden">
-                    <img 
-                      v-if="order.products?.[0]?.image" 
-                      :src="order.products[0].image" 
-                      :alt="order.products[0].name"
-                      class="w-full h-full object-cover"
-                    />
-                    <div v-else class="w-full h-full flex items-center justify-center">
-                      <svg class="w-8 h-8 text-[#ccc]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+              <!-- Order Summary Row (clickable) -->
+              <div 
+                @click="toggleOrderDetail(order)"
+                class="p-4 cursor-pointer group"
+              >
+                <div class="flex items-start gap-4">
+                  <!-- Product Image -->
+                  <div class="flex-shrink-0 relative">
+                    <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-[#f5f5f5] overflow-hidden">
+                      <img 
+                        v-if="order.products?.[0]?.image" 
+                        :src="order.products[0].image" 
+                        :alt="order.products[0].name"
+                        class="w-full h-full object-cover"
+                        @error="$event.target.style.display='none'; $event.target.nextElementSibling && ($event.target.nextElementSibling.style.display='flex')"
+                      />
+                      <div v-if="!order.products?.[0]?.image" class="w-full h-full flex items-center justify-center">
+                        <svg class="w-8 h-8 text-[#ccc]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                      </div>
+                      <!-- Hidden fallback for broken images -->
+                      <div v-if="order.products?.[0]?.image" class="w-full h-full items-center justify-center" style="display:none">
+                        <svg class="w-8 h-8 text-[#ccc]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                      </div>
                     </div>
+                    <span v-if="order.items > 1" class="absolute -bottom-1 -right-1 bg-white border border-[#e0e0e0] text-[10px] text-[#666] font-medium px-1.5 py-0.5 rounded-full shadow-sm">
+                      +{{ order.items - 1 }}
+                    </span>
                   </div>
-                  <span v-if="order.items > 1" class="absolute -bottom-1 -right-1 bg-white border border-[#e0e0e0] text-[10px] text-[#666] font-medium px-1.5 py-0.5 rounded-full shadow-sm">
-                    +{{ order.items - 1 }}
-                  </span>
-                </div>
 
-                <!-- Order Info -->
-                <div class="flex-1 min-w-0">
-                  <div class="flex items-start justify-between gap-3">
-                    <div class="min-w-0">
-                      <!-- Status Badge -->
-                      <div class="flex items-center gap-2 mb-1.5">
-                        <span :class="[
-                          'inline-flex items-center gap-1 text-[13px] font-medium',
-                          order.status === 'Entregado' ? 'text-emerald-600' : 
-                          order.status === 'En Camino' ? 'text-blue-600' : 
-                          order.status === 'Procesando' ? 'text-amber-600' : 'text-[#666]'
-                        ]">
-                          <span v-if="order.status === 'Entregado'" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
-                          <span v-else-if="order.status === 'En Camino'" class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
-                          <span v-else-if="order.status === 'Procesando'" class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
-                          <span v-else class="w-1.5 h-1.5 rounded-full bg-[#999]"></span>
-                          {{ order.status }}
-                        </span>
+                  <!-- Order Info -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-3">
+                      <div class="min-w-0">
+                        <!-- Status Badge -->
+                        <div class="flex items-center gap-2 mb-1.5">
+                          <span :class="[
+                            'inline-flex items-center gap-1 text-[13px] font-medium',
+                            order.status === 'Entregado' ? 'text-emerald-600' : 
+                            order.status === 'En Camino' ? 'text-blue-600' : 
+                            order.status === 'Pagada' ? 'text-green-600' : 
+                            order.status === 'Pendiente' ? 'text-amber-600' : 'text-[#666]'
+                          ]">
+                            <span v-if="order.status === 'Entregado'" class="w-1.5 h-1.5 rounded-full bg-emerald-500"></span>
+                            <span v-else-if="order.status === 'En Camino'" class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>
+                            <span v-else-if="order.status === 'Pagada'" class="w-1.5 h-1.5 rounded-full bg-green-500"></span>
+                            <span v-else-if="order.status === 'Pendiente'" class="w-1.5 h-1.5 rounded-full bg-amber-500"></span>
+                            <span v-else class="w-1.5 h-1.5 rounded-full bg-[#999]"></span>
+                            {{ order.status }}
+                            <span v-if="order.metodoPago === 'wompi'" class="text-[10px] text-[#999] font-normal ml-1">· Wompi</span>
+                          </span>
+                        </div>
+                        
+                        <!-- Product name or order summary -->
+                        <p class="text-[15px] text-[#333] font-medium mb-0.5 truncate">
+                          {{ order.products?.[0]?.name || `Pedido ${order.numero}` }}
+                        </p>
+                        
+                        <!-- Order metadata -->
+                        <p class="text-[13px] text-[#999]">
+                          {{ order.numero }} · {{ order.date }} · {{ order.items }} {{ order.items === 1 ? 'producto' : 'productos' }}
+                        </p>
                       </div>
                       
-                      <!-- Product name or order summary -->
-                      <p class="text-[15px] text-[#333] font-medium mb-0.5 truncate">
-                        {{ order.products?.[0]?.name || `Pedido #${order.id}` }}
-                      </p>
-                      
-                      <!-- Order metadata -->
-                      <p class="text-[13px] text-[#999]">
-                        {{ order.date }} · {{ order.items }} {{ order.items === 1 ? 'producto' : 'productos' }}
-                      </p>
+                      <!-- Price + Arrow -->
+                      <div class="text-right flex-shrink-0 flex items-start gap-2">
+                        <div>
+                          <p class="text-[16px] font-semibold text-[#333]">${{ formatPrice(order.total) }}</p>
+                        </div>
+                        <svg 
+                          :class="[
+                            'w-5 h-5 text-[#ccc] flex-shrink-0 hidden sm:block transition-all duration-300',
+                            expandedOrderId === order.id ? 'rotate-90 text-[#2563eb]' : 'group-hover:text-[#2563eb]'
+                          ]" 
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                        </svg>
+                      </div>
                     </div>
                     
-                    <!-- Price -->
-                    <div class="text-right flex-shrink-0">
-                      <p class="text-[16px] font-semibold text-[#333]">${{ formatPrice(order.total) }}</p>
-                      <p v-if="order.savings" class="text-[12px] text-emerald-600">-${{ formatPrice(order.savings) }}</p>
+                    <!-- Ver detalle link -->
+                    <div class="mt-2">
+                      <span class="text-[13px] text-[#2563eb] font-medium">
+                        {{ expandedOrderId === order.id ? 'Ocultar detalle' : 'Ver detalle' }}
+                      </span>
                     </div>
                   </div>
-                  
-                  <!-- Quick Actions (visible on hover) -->
-                  <div class="flex items-center gap-3 mt-3 pt-3 border-t border-[#f0f0f0] opacity-0 group-hover:opacity-100 transition-opacity">
-                    <button @click.stop="viewOrderDetail(order)" class="text-[13px] text-[#2563eb] hover:underline font-medium">
-                      Ver detalle
-                    </button>
-                    <button v-if="order.status === 'Entregado'" @click.stop="reorderItems(order)" class="text-[13px] text-[#2563eb] hover:underline font-medium">
-                      Volver a comprar
-                    </button>
-                    <button v-if="order.tracking" @click.stop="trackOrder(order)" class="text-[13px] text-[#2563eb] hover:underline font-medium">
-                      Seguir envío
-                    </button>
+                </div>
+              </div>
+
+              <!-- Expanded Detail (accordion) -->
+              <div 
+                v-if="expandedOrderId === order.id" 
+                class="border-t border-[#e8e8e8] animate-slideDown"
+              >
+                <!-- Products List -->
+                <div class="p-4 space-y-2">
+                  <p class="text-[12px] font-semibold text-[#888] uppercase tracking-wider mb-3">Productos del pedido</p>
+                  <div v-for="(item, idx) in order.products" :key="idx" class="flex gap-3 p-3 bg-[#fafafa] rounded-lg">
+                    <div class="w-14 h-14 rounded-md bg-[#f0f0f0] overflow-hidden flex-shrink-0">
+                      <img 
+                        v-if="item.image" 
+                        :src="item.image" 
+                        :alt="item.name"
+                        class="w-full h-full object-cover"
+                        @error="$event.target.style.display='none'"
+                      />
+                      <div v-else class="w-full h-full flex items-center justify-center">
+                        <svg class="w-6 h-6 text-[#ccc]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
+                      </div>
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h4 class="text-[14px] font-medium text-[#333]">{{ item.name }}</h4>
+                      <p class="text-[12px] text-[#888]">Cantidad: {{ item.quantity }} · ${{ formatPrice(item.price) }}/ud</p>
+                    </div>
+                    <div class="text-right flex-shrink-0">
+                      <p class="text-[14px] font-semibold text-[#333]">${{ formatPrice(item.price * item.quantity) }}</p>
+                    </div>
                   </div>
                 </div>
-                
-                <!-- Arrow indicator -->
-                <svg class="w-5 h-5 text-[#ccc] flex-shrink-0 hidden sm:block group-hover:text-[#2563eb] transition-colors" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" /></svg>
+
+                <!-- Order Summary -->
+                <div class="px-4 pb-4">
+                  <div class="bg-[#fafafa] rounded-lg p-4 space-y-2">
+                    <div class="flex justify-between text-[13px] text-[#666]">
+                      <span>Subtotal</span>
+                      <span>${{ formatPrice(order.subtotal || order.total) }}</span>
+                    </div>
+                    <div class="flex justify-between text-[13px] text-[#666]">
+                      <span>Envío</span>
+                      <span>{{ order.envio ? `$${formatPrice(order.envio)}` : 'Gratis' }}</span>
+                    </div>
+                    <div class="flex justify-between text-[15px] font-bold text-[#333] pt-2 border-t border-[#e5e5e5]">
+                      <span>Total</span>
+                      <span>${{ formatPrice(order.total) }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Payment & Order Info -->
+                <div class="px-4 pb-4">
+                  <div class="flex flex-wrap gap-4 text-[12px] text-[#888]">
+                    <div class="flex items-center gap-1.5">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" /></svg>
+                      <span>{{ order.metodoPago === 'wompi' ? 'Pago en línea (Wompi)' : 'Pago por WhatsApp' }}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" /></svg>
+                      <span>{{ order.date }}</span>
+                    </div>
+                    <div class="flex items-center gap-1.5">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 20l4-16m2 16l4-16M6 9h14M4 15h14" /></svg>
+                      <span>{{ order.numero }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="px-4 pb-4 flex items-center gap-3">
+                  <button v-if="order.status === 'Entregado'" @click.stop="reorderItems(order)" class="text-[13px] text-[#2563eb] hover:underline font-medium">
+                    Volver a comprar
+                  </button>
+                  <button v-if="order.tracking" @click.stop="trackOrder(order)" class="text-[13px] text-[#2563eb] hover:underline font-medium">
+                    Seguir envío
+                  </button>
+                </div>
               </div>
             </div>
           </div>
@@ -898,46 +991,6 @@
     </div>
     <!-- end address modal -->
 
-    <!-- Modal: Detalle de Pedido -->
-    <div v-if="showDetailModal" class="fixed inset-0 z-50 flex items-center justify-center p-4">
-      <div class="absolute inset-0 bg-black/50" @click="showDetailModal = false"></div>
-      <div class="relative bg-white rounded-lg w-full max-w-lg max-h-[90vh] overflow-hidden" style="box-shadow: 0 20px 60px rgba(0,0,0,0.15);">
-        <div class="px-5 py-4 border-b border-[#e8e8e8] flex items-center justify-between">
-          <div>
-            <h3 class="text-[15px] font-bold text-[#333]">Pedido #{{ selectedOrder?.id }}</h3>
-            <p class="text-[12px] text-[#888]">{{ selectedOrder?.date }}</p>
-          </div>
-          <button @click="showDetailModal = false" class="text-[#999] hover:text-[#333] p-1 rounded transition-colors">
-            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" /></svg>
-          </button>
-        </div>
-        <div class="p-5 overflow-y-auto max-h-[55vh]">
-          <div class="space-y-3">
-            <div v-for="(item, idx) in selectedOrder?.products || []" :key="idx" class="flex gap-3 p-3 bg-[#fafafa] rounded-md">
-              <div class="w-12 h-12 rounded bg-[#f0f0f0] overflow-hidden flex-shrink-0">
-                <img :src="item.image || `https://placehold.co/80x80/f5f5f5/1a1a1a?text=${idx+1}`" class="w-full h-full object-cover" />
-              </div>
-              <div class="flex-1 min-w-0">
-                <h4 class="text-[13px] font-medium text-[#333]">{{ item.name }}</h4>
-                <p class="text-[11px] text-[#888]">Cantidad: {{ item.quantity }}</p>
-              </div>
-              <div class="text-right flex-shrink-0">
-                <p class="text-[13px] font-semibold text-[#333]">${{ formatPrice(item.price * item.quantity) }}</p>
-                <p class="text-[10px] text-[#999]">${{ formatPrice(item.price) }}/ud</p>
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="p-5 border-t border-[#e8e8e8] bg-[#fafafa]">
-          <div class="flex justify-between items-center">
-            <span class="text-[14px] font-semibold text-[#555]">Total del Pedido</span>
-            <span class="text-xl font-bold text-[#333]">${{ formatPrice(selectedOrder?.total) }}</span>
-          </div>
-        </div>
-      </div>
-    </div>
-    <!-- end detail modal -->
-
       </div><!-- end max-w-960 -->
     </div><!-- end flex-1 content -->
   </div><!-- end flex container -->
@@ -986,20 +1039,19 @@ export default {
     const isLoadingOrders = ref(true)
     const selectedStatus = ref('all')
     const searchQuery = ref('')
-    const showDetailModal = ref(false)
-    const selectedOrder = ref(null)
+    const expandedOrderId = ref(null)
 
     const ordersStats = computed(() => ({
       delivered: orders.value.filter(o => o.status === 'Entregado').length,
       shipping: orders.value.filter(o => o.status === 'En Camino').length,
-      processing: orders.value.filter(o => o.status === 'Procesando' || o.status === 'Pendiente').length,
+      processing: orders.value.filter(o => o.status === 'Pagada' || o.status === 'Pendiente').length,
       totalSpent: orders.value.reduce((sum, o) => sum + o.total, 0)
     }))
 
     const ordersStatuses = computed(() => [
       { value: 'all', label: 'Todos', count: orders.value.length },
       { value: 'Pendiente', label: 'Pendientes', count: orders.value.filter(o => o.status === 'Pendiente').length },
-      { value: 'Procesando', label: 'Procesando', count: orders.value.filter(o => o.status === 'Procesando').length },
+      { value: 'Pagada', label: 'Pagadas', count: orders.value.filter(o => o.status === 'Pagada').length },
       { value: 'En Camino', label: 'En Camino', count: orders.value.filter(o => o.status === 'En Camino').length },
       { value: 'Entregado', label: 'Entregados', count: orders.value.filter(o => o.status === 'Entregado').length },
     ])
@@ -1011,7 +1063,10 @@ export default {
       }
       if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase()
-        result = result.filter(o => o.id.toLowerCase().includes(query))
+        result = result.filter(o => 
+          o.numero?.toLowerCase().includes(query) ||
+          o.products?.some(p => p.name?.toLowerCase().includes(query))
+        )
       }
       return result
     })
@@ -1020,8 +1075,8 @@ export default {
       const classes = {
         'Entregado': 'bg-emerald-100 text-emerald-700',
         'En Camino': 'bg-blue-100 text-blue-700',
-        'Procesando': 'bg-amber-100 text-amber-700',
-        'Pendiente': 'bg-gray-100 text-gray-600',
+        'Pagada': 'bg-green-50 text-green-700',
+        'Pendiente': 'bg-amber-50 text-amber-700',
         'Cancelado': 'bg-red-100 text-red-700',
       }
       return classes[status] || classes['Pendiente']
@@ -1030,26 +1085,59 @@ export default {
     function getStatusLabel(value) {
       const labels = {
         'all': 'todas',
-        'Pendientes': 'pendientes',
-        'Procesando': 'procesando',
+        'Pendiente': 'pendientes',
+        'Pagada': 'pagadas',
         'En Camino': 'en camino',
-        'Entregados': 'entregados'
+        'Entregado': 'entregados'
       }
       return labels[value] || value
     }
 
+    function mapEstado(estado, metodoPago) {
+      const raw = (estado || 'pendiente').toLowerCase()
+      const map = {
+        'pendiente': metodoPago === 'wompi' ? 'Pagada' : 'Pendiente',
+        'confirmada': 'Pagada',
+        'pagada': 'Pagada',
+        'en_proceso': 'En Camino',
+        'enviada': 'En Camino',
+        'completada': 'Entregado',
+        'entregada': 'Entregado',
+        'cancelada': 'Cancelado',
+      }
+      return map[raw] || 'Pendiente'
+    }
+
+    function formatFecha(fecha) {
+      if (!fecha) return ''
+      const d = new Date(fecha)
+      if (isNaN(d)) return String(fecha)
+      return d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })
+    }
+
     function normalizarOrden(orden) {
+      const metodoPago = orden.metodo_pago || 'whatsapp'
       return {
         id: orden.id || orden.numero_orden,
-        date: orden.fecha || orden.date || new Date().toLocaleDateString('es-CO'),
+        numero: orden.numero || orden.codigo || `ORD-${(orden.id || '').substring(0, 8)}`,
+        date: formatFecha(orden.fecha || orden.date),
         total: orden.total || orden.monto_total || 0,
+        subtotal: orden.subtotal || orden.total || 0,
+        envio: orden.envio || 0,
         savings: orden.ahorro || orden.savings || 0,
         items: (orden.items?.length || orden.cantidad_items || 0),
-        status: orden.estado || orden.status || 'Pendiente',
+        status: mapEstado(orden.estado || orden.status, metodoPago),
+        metodoPago,
         tracking: orden.numero_seguimiento || orden.tracking || null,
         estimatedDelivery: orden.fecha_entrega_estimada || orden.estimatedDelivery,
         invoice: orden.numero_factura || orden.invoice,
-        products: orden.items || []
+        products: (orden.items || []).map(item => ({
+          name: item.nombre || item.name || 'Producto',
+          image: item.imagen || item.image || null,
+          quantity: item.cantidad || item.quantity || 1,
+          price: item.precio || item.price || item.precio_unitario || 0,
+          id: item.id || item.producto_id || ''
+        }))
       }
     }
 
@@ -1074,9 +1162,8 @@ export default {
       return value?.toString() || '0'
     }
 
-    function viewOrderDetail(order) {
-      selectedOrder.value = order
-      showDetailModal.value = true
+    function toggleOrderDetail(order) {
+      expandedOrderId.value = expandedOrderId.value === order.id ? null : order.id
     }
 
     function reorderItems(order) {
@@ -1480,9 +1567,9 @@ export default {
       onDepartamentoChange, onMunicipioChange,
       sendVerificationEmail, dismissVerification,
       // Pedidos
-      orders, isLoadingOrders, selectedStatus, searchQuery, showDetailModal, selectedOrder,
+      orders, isLoadingOrders, selectedStatus, searchQuery, expandedOrderId,
       ordersStats, ordersStatuses, filteredOrders, getStatusClass, getStatusLabel, formatCompact,
-      viewOrderDetail, reorderItems, trackOrder,
+      toggleOrderDetail, reorderItems, trackOrder,
       // Cupones
       loadingCupones, cuponCode, aplicandoCupon, cuponFeedback, cuponToast,
       cuponesActivos, niveles, formatDate, aplicarCupon, copiarCodigo
@@ -1490,3 +1577,21 @@ export default {
   }
 }
 </script>
+
+<style scoped>
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    max-height: 0;
+    transform: translateY(-8px);
+  }
+  to {
+    opacity: 1;
+    max-height: 800px;
+    transform: translateY(0);
+  }
+}
+.animate-slideDown {
+  animation: slideDown 0.3s ease-out;
+}
+</style>

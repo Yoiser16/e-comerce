@@ -444,6 +444,16 @@
                     <p class="font-medium text-gray-900">Pagar en línea (Wompi)</p>
                   </div>
                   <p class="text-sm text-gray-500 mt-1">Tarjeta de crédito/débito, PSE, Bancolombia, Nequi, Efecty</p>
+                  <div class="flex items-center gap-3 mt-2.5 flex-wrap">
+                    <span class="inline-flex items-center gap-1 text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                      Pago seguro
+                    </span>
+                    <span class="text-xs text-gray-400">Visa</span>
+                    <span class="text-xs text-gray-400">Mastercard</span>
+                    <span class="text-xs text-gray-400">PSE</span>
+                    <span class="text-xs text-gray-400">Nequi</span>
+                  </div>
                 </div>
               </label>
             </div>
@@ -478,6 +488,14 @@
                 </svg>
                 {{ isSubmitting ? 'Procesando...' : form.metodoPago === 'whatsapp' ? 'Enviar por WhatsApp' : 'Pagar ahora' }}
               </button>
+            </div>
+
+            <!-- Wompi security badge -->
+            <div v-if="form.metodoPago === 'wompi'" class="mt-4 flex items-center justify-center gap-2 text-gray-400">
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+              </svg>
+              <span class="text-xs">Pago seguro procesado por Wompi &middot; Modo Sandbox</span>
             </div>
           </div>
         </div>
@@ -532,6 +550,8 @@
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import apiClient from '@/services/api'
+import { generateReference, toCents, buildCheckoutUrl, loadWompiSDK } from '@/services/wompi'
+import { crearOrden, validarStock } from '@/services/mayoristas'
 
 // API de Colombia - Datos oficiales de departamentos y municipios
 const COLOMBIA_API = {
@@ -903,7 +923,62 @@ export default {
       isSubmitting.value = true
 
       try {
+        // 1. Validar stock antes de proceder
+        const stockItems = cartItems.value.map(item => ({
+          producto_id: item.id || item.producto_id,
+          cantidad: item.cantidad || item.quantity || 1,
+          precio_unitario: item.precio || item.wholesalePrice || 0,
+          nombre: item.nombre || item.name
+        }))
+
+        try {
+          const stockResult = await validarStock(stockItems)
+          if (!stockResult.disponible) {
+            const sinStock = stockResult.productos
+              .filter(p => !p.disponible)
+              .map(p => `• ${p.nombre}: solo ${p.stock_disponible} disponibles`)
+              .join('\n')
+            alert(`Stock insuficiente:\n${sinStock}`)
+            isSubmitting.value = false
+            return
+          }
+        } catch (stockErr) {
+          console.warn('No se pudo validar stock, continuando...', stockErr)
+        }
+
+        // Obtener datos del usuario B2B
+        const userData = JSON.parse(localStorage.getItem('b2b_user') || '{}')
+
         if (form.metodoPago === 'whatsapp') {
+          // --- FLUJO WHATSAPP: Crear orden + enviar mensaje ---
+          const ordenData = {
+            email: userData.email || '',
+            nombre: userData.nombre || form.nombreContacto.split(' ')[0] || '',
+            apellido: userData.apellido || form.nombreContacto.split(' ').slice(1).join(' ') || '',
+            telefono: form.telefono,
+            tipo_documento: userData.tipo_documento || 'CC',
+            numero_documento: userData.numero_documento || '',
+            direccion: form.direccion,
+            departamento: form.departamento,
+            municipio: form.municipio,
+            barrio: form.barrio || '',
+            notas: form.notas || '',
+            items: stockItems,
+            subtotal: subtotal.value,
+            envio: shippingCost.value,
+            total: total.value,
+            metodo_pago: 'whatsapp'
+          }
+
+          // Crear orden en el backend
+          let ordenResult = null
+          try {
+            ordenResult = await crearOrden(ordenData)
+            console.log('✅ Orden creada:', ordenResult.codigo)
+          } catch (err) {
+            console.error('Error creando orden:', err)
+          }
+
           const itemsText = cartItems.value.map(item => {
             const name = item.nombre || item.name
             const qty = item.cantidad || item.quantity
@@ -919,7 +994,8 @@ export default {
             form.departamento
           ].filter(Boolean).join(', ')
 
-          const message = `🛒 *PEDIDO MAYORISTA*%0A%0A` +
+          const codigoOrden = ordenResult ? ordenResult.codigo : ''
+          const message = `🛒 *PEDIDO MAYORISTA${codigoOrden ? ` ${codigoOrden}` : ''}*%0A%0A` +
             `📦 *Productos:*%0A${itemsText}%0A%0A` +
             `💰 *Subtotal:* $${formatPrice(subtotal.value)}%0A` +
             `🚚 *Envío:* $${formatPrice(shippingCost.value)}%0A` +
@@ -933,12 +1009,68 @@ export default {
           const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '573001234567'
           window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank')
           localStorage.removeItem('b2b_cart')
-          router.push({ path: '/portal/pedidos', query: { success: 'whatsapp' } })
+          router.push({ path: '/portal/cuenta', query: { tab: 'pedidos', success: 'whatsapp' } })
+
         } else {
-          // TODO: Integrar Wompi widget
-          alert('Redirigiendo a Wompi para completar el pago...')
-          localStorage.removeItem('b2b_cart')
-          router.push({ path: '/portal/pedidos', query: { success: 'wompi', pending: 'true' } })
+          // --- FLUJO WOMPI: Guardar datos + redirigir a pasarela ---
+          const reference = generateReference('B2B')
+          const amountInCents = toCents(total.value)
+          const cleanPhone = (form.telefono || '').replace(/\D/g, '').slice(-10)
+
+          if (!cleanPhone || cleanPhone.length < 10) {
+            alert('Por favor ingresa un número de teléfono válido de 10 dígitos')
+            isSubmitting.value = false
+            return
+          }
+
+          // Guardar datos del pedido en localStorage para crear orden al volver de Wompi
+          const pendingOrder = {
+            reference,
+            items: cartItems.value.map(item => ({
+              id: item.id || item.producto_id,
+              nombre: item.nombre || item.name,
+              cantidad: item.cantidad || item.quantity || 1,
+              precio: item.precio || item.wholesalePrice || 0
+            })),
+            subtotal: subtotal.value,
+            envio: shippingCost.value,
+            total: total.value,
+            customer: {
+              email: userData.email || '',
+              nombre: userData.nombre || form.nombreContacto.split(' ')[0] || '',
+              apellido: userData.apellido || form.nombreContacto.split(' ').slice(1).join(' ') || '',
+              telefono: cleanPhone,
+              tipo_documento: userData.tipo_documento || 'CC',
+              numero_documento: userData.numero_documento || '',
+              direccion: form.direccion,
+              departamento: form.departamento,
+              municipio: form.municipio,
+              barrio: form.barrio || '',
+              notas: form.notas || `Pago Wompi - Ref: ${reference}`
+            },
+            createdAt: new Date().toISOString()
+          }
+          localStorage.setItem('b2b_pending_order', JSON.stringify(pendingOrder))
+
+          console.log('💳 Redirigiendo a Wompi B2B:', {
+            reference,
+            amountInCents,
+            email: userData.email
+          })
+
+          // Construir URL de checkout Wompi y redirigir (async: obtiene firma del backend)
+          const redirectUrl = `${window.location.origin}/portal/pago-resultado`
+          const wompiUrl = await buildCheckoutUrl({
+            amountInCents,
+            reference,
+            redirectUrl,
+            email: userData.email || '',
+            fullName: `${userData.nombre || ''} ${userData.apellido || ''}`.trim() || form.nombreContacto,
+            phone: cleanPhone
+          })
+
+          console.log('🔗 URL Wompi:', wompiUrl)
+          window.location.href = wompiUrl
         }
       } catch (error) {
         console.error('Error al procesar pedido:', error)
@@ -956,6 +1088,9 @@ export default {
       if (cartItems.value.length === 0) {
         router.replace('/portal/carrito')
       }
+
+      // Pre-cargar SDK de Wompi
+      loadWompiSDK().catch(() => {})
     })
 
     return {

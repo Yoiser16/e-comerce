@@ -776,7 +776,7 @@ import B2BSkeleton from './ui/B2BSkeleton.vue'
 import { obtenerProductos, obtenerProductosDestacados } from '@/services/mayoristas'
 import { getImageUrl } from '@/services/api'
 import { ordenesService } from '@/services/ordenes'
-import { vistosService, favoritosService } from '@/services/productos'
+import { vistosService } from '@/services/productos'
 
 export default {
   name: 'B2BDashboard',
@@ -1045,33 +1045,38 @@ export default {
             // Silenciar errores de productos vistos
           }
           
-          // 2. Agregar productos favoritos (sin duplicar)
-          const hasToken = localStorage.getItem('b2b_access_token') || localStorage.getItem('access_token')
-          
-          if (hasToken) {
-            try {
-              const favoritos = await favoritosService.listar()
+          // 2. Agregar productos favoritos desde localStorage (sin duplicar)
+          try {
+            const storedFavoritos = localStorage.getItem('b2b_favoritos')
+            if (storedFavoritos) {
+              const favoritosIds = JSON.parse(storedFavoritos)
               
-              if (favoritos && favoritos.length > 0) {
-                favoritos.forEach(f => {
-                if (!productosUnicos.has(f.producto_id)) {
-                  productosUnicos.add(f.producto_id)
-                  productosHabituales.push({
-                    id: f.producto_id,
-                    name: f.nombre,
-                    category: 'Favorito',
-                    price: f.precio_monto || 0,
-                    originalPrice: f.precio_monto || 0,
-                    stock: 100, // Los favoritos no tienen stock en el DTO
-                    image: normalizeMediaUrl(f.imagen_principal || f.imagen || f.imagen_url),
-                    badge: 'favorito' // Badge para identificar origen
-                  })
+              // Cargar solo los primeros 3 favoritos para no saturar
+              const limitedIds = favoritosIds.slice(0, 3)
+              
+              for (const productoId of limitedIds) {
+                if (!productosUnicos.has(productoId)) {
+                  try {
+                    const producto = await obtenerProducto(productoId)
+                    productosUnicos.add(productoId)
+                    productosHabituales.push({
+                      id: producto.id,
+                      name: producto.nombre,
+                      category: producto.categoria_nombre || 'Favorito',
+                      price: producto.precio_mayorista || producto.monto_precio || 0,
+                      originalPrice: producto.monto_precio || 0,
+                      stock: producto.stock_actual || 0,
+                      image: normalizeMediaUrl(producto.imagen_principal),
+                      badge: 'favorito'
+                    })
+                  } catch {
+                    // Producto no disponible, continuar con el siguiente
+                  }
                 }
-              })
+              }
             }
-          } catch (err) {
-            // Silenciar error - endpoint no soporta B2B
-          }
+          } catch {
+            // Silenciar errores de favoritos
           }
         }
         

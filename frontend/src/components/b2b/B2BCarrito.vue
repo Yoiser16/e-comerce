@@ -79,16 +79,17 @@
                   <div class="flex items-center border border-gray-200 rounded">
                     <button 
                       @click="updateQuantity(item.id, (item.cantidad || item.quantity) - 1)"
-                      :disabled="(item.cantidad || item.quantity) <= (item.minOrder || 1)"
+                      :disabled="(item.cantidad || item.quantity) <= 10"
+                      :title="(item.cantidad || item.quantity) <= 10 ? 'Compra mínima: 10 unidades' : ''"
                       class="w-8 h-8 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                     >
                       <span class="text-lg">−</span>
                     </button>
                     <input 
                       :value="item.cantidad || item.quantity"
-                      @change="updateQuantity(item.id, parseInt($event.target.value) || (item.minOrder || 1))"
+                      @change="updateQuantity(item.id, parseInt($event.target.value) || 10)"
                       type="number"
-                      :min="item.minOrder || 1"
+                      :min="10"
                       class="w-12 h-8 text-center border-x border-gray-200 focus:outline-none text-sm font-medium"
                     />
                     <button 
@@ -109,10 +110,10 @@
 
               <!-- Aviso de mínimo -->
               <p 
-                v-if="(item.cantidad || item.quantity) < (item.minOrder || 1)" 
-                class="text-xs text-gray-500 mt-2"
+                v-if="(item.cantidad || item.quantity) < 10" 
+                class="text-xs text-red-500 mt-2 font-medium"
               >
-                Mínimo: {{ item.minOrder || 1 }} unidades
+                ⚠️ La compra mínima es de 10 unidades por producto
               </p>
             </div>
           </div>
@@ -283,7 +284,8 @@ export default {
 
     const canCheckout = computed(() => {
       if (cartItems.value.length === 0) return false
-      return cartItems.value.every(item => getQuantity(item) >= (item.minOrder || 1))
+      // Validar que todos los productos tengan al menos 10 unidades
+      return cartItems.value.every(item => getQuantity(item) >= 10)
     })
 
     // Methods
@@ -298,8 +300,16 @@ export default {
     function updateQuantity(itemId, newQuantity) {
       const item = cartItems.value.find(i => i.id === itemId)
       if (item) {
-        const minQty = item.minOrder || 1
+        const ORDEN_MINIMA = 10 // Compra mínima para mayoristas
+        const minQty = Math.max(item.minOrder || 1, ORDEN_MINIMA)
         const maxQty = item.stock || 999
+        
+        // Validar que la cantidad no sea menor a la orden mínima
+        if (newQuantity < ORDEN_MINIMA) {
+          alert(`La compra mínima para mayoristas es de ${ORDEN_MINIMA} unidades por producto.`)
+          return
+        }
+        
         const qty = Math.max(minQty, Math.min(newQuantity, maxQty))
         // Compatibilidad: usar el campo que ya existe o crear quantity
         if ('cantidad' in item) {

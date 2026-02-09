@@ -26,6 +26,10 @@ class FavoritoDTO(BaseModel):
     imagen_principal: str | None
     precio_monto: float
     precio_moneda: str
+    precio_mayorista: float | None
+    sku: str | None
+    stock_actual: int
+    categoria_nombre: str | None
     fecha_agregado: datetime
     
     class Config:
@@ -64,6 +68,10 @@ def listar_favoritos(
                 imagen_principal=fav.producto.imagen_principal,
                 precio_monto=float(fav.producto.monto_precio),
                 precio_moneda=fav.producto.moneda_precio,
+                precio_mayorista=float(fav.producto.precio_mayorista) if fav.producto.precio_mayorista else None,
+                sku=fav.producto.sku,
+                stock_actual=fav.producto.stock_actual,
+                categoria_nombre=fav.producto.categoria.nombre if fav.producto.categoria else None,
                 fecha_agregado=fav.fecha_agregado
             ))
         

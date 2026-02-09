@@ -722,7 +722,7 @@
 <script>
 import { ref, computed, reactive, onMounted, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { productosService, favoritosService, vistosService } from '@/services/productos'
+import { productosService, vistosService } from '@/services/productos'
 import { obtenerProducto as obtenerProductoB2B, obtenerProductos as obtenerProductosB2B } from '@/services/mayoristas'
 import { B2BToast, useToast } from './ui'
 import { getImageUrl } from '@/services/api'
@@ -960,22 +960,9 @@ export default {
       window.dispatchEvent(new CustomEvent('favoritos-updated'))
     }
     
-    async function toggleFavorito() {
-      try {
-        if (esFavorito.value) {
-          await favoritosService.eliminar(producto.value.id)
-          esFavorito.value = false
-          updateLocalFavoritos(producto.value.id, false)
-        } else {
-          await favoritosService.agregar(producto.value.id)
-          esFavorito.value = true
-          updateLocalFavoritos(producto.value.id, true)
-        }
-      } catch (err) {
-        console.error('Error al toggle favorito:', err)
-        esFavorito.value = !esFavorito.value
-        updateLocalFavoritos(producto.value.id, esFavorito.value)
-      }
+    function toggleFavorito() {
+      esFavorito.value = !esFavorito.value
+      updateLocalFavoritos(producto.value.id, esFavorito.value)
     }
 
     async function compartirProducto() {
@@ -1047,24 +1034,17 @@ export default {
           }
         }
         
-        // Verificar si es favorito (API + localStorage fallback)
+        // Verificar si es favorito desde localStorage
         try {
-          esFavorito.value = await favoritosService.verificar(id)
-          // Sincronizar con localStorage
-          updateLocalFavoritos(id, esFavorito.value)
-        } catch (err) {
-          // Fallback: revisar localStorage
-          try {
-            const stored = localStorage.getItem('b2b_favoritos')
-            if (stored) {
-              const favs = JSON.parse(stored)
-              esFavorito.value = favs.includes(id)
-            } else {
-              esFavorito.value = false
-            }
-          } catch {
+          const stored = localStorage.getItem('b2b_favoritos')
+          if (stored) {
+            const favs = JSON.parse(stored)
+            esFavorito.value = favs.includes(id)
+          } else {
             esFavorito.value = false
           }
+        } catch {
+          esFavorito.value = false
         }
         
         // Cargar productos relacionados (misma categoría) con precios B2B

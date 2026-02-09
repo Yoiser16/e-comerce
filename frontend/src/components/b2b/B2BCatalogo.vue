@@ -607,8 +607,15 @@ export default {
     }
 
     function handleAddToCart({ product, quantity }) {
+      const CANTIDAD_MINIMA = 10 // Compra mínima para mayoristas
+      
+      // Validar cantidad mínima
+      if (quantity < CANTIDAD_MINIMA) {
+        alert(`La compra mínima para mayoristas es de ${CANTIDAD_MINIMA} unidades por producto.`)
+        return
+      }
+      
       console.log('Agregando al carrito:', product.name, 'x', quantity)
-      // TODO: Integrar con servicio de carrito B2B
       const cart = JSON.parse(localStorage.getItem('b2b_cart') || '{"items":[]}')
       const existing = cart.items.find(i => i.id === product.id)
       if (existing) {
