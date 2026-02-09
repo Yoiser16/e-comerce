@@ -261,6 +261,7 @@ export default {
     // Guardar carrito en localStorage
     function saveCart() {
       localStorage.setItem('b2b_cart', JSON.stringify({ items: cartItems.value }))
+      window.dispatchEvent(new CustomEvent('cart-updated'))
     }
 
     // Computed

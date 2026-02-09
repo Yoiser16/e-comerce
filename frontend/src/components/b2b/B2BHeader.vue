@@ -625,6 +625,7 @@ export default {
     // Data
     const accountBalance = ref(0)
     const cartTotal = ref(0)
+    const cartCount = ref(0)
     const defaultAddress = ref(null)
     const categorias = ref([])
     const favoritosCount = ref(0)
@@ -645,14 +646,21 @@ export default {
       return nombre.split(' ').map(n => n[0]).join('').substring(0, 2).toUpperCase()
     })
 
-    const cartCount = computed(() => {
+    function updateCartCount() {
       const cart = localStorage.getItem('b2b_cart')
-      if (cart) { 
-        try { return JSON.parse(cart).items?.length || 0 } 
-        catch { return 0 } 
+      if (cart) {
+        try { cartCount.value = JSON.parse(cart).items?.length || 0 }
+        catch { cartCount.value = 0 }
+      } else {
+        cartCount.value = 0
       }
-      return 0
-    })
+    }
+
+    function handleCartStorage(event) {
+      if (event.key === 'b2b_cart') {
+        updateCartCount()
+      }
+    }
 
     // Smart Sticky Logic with scroll delta threshold
     function handleScroll() {
@@ -807,8 +815,11 @@ export default {
     onMounted(() => {
       window.addEventListener('scroll', handleScroll, { passive: true })
       document.addEventListener('click', handleClickOutside)
+      window.addEventListener('cart-updated', updateCartCount)
+      window.addEventListener('storage', handleCartStorage)
       window.addEventListener('favoritos-updated', updateFavoritosCount)
       
+      updateCartCount()
       updateFavoritosCount()
       loadDefaultAddress()
       loadCategorias()
@@ -817,6 +828,8 @@ export default {
     onUnmounted(() => {
       window.removeEventListener('scroll', handleScroll)
       document.removeEventListener('click', handleClickOutside)
+      window.removeEventListener('cart-updated', updateCartCount)
+      window.removeEventListener('storage', handleCartStorage)
       window.removeEventListener('favoritos-updated', updateFavoritosCount)
     })
 

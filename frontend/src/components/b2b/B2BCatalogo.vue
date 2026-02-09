@@ -624,6 +624,7 @@ export default {
         cart.items.push({ ...product, quantity })
       }
       localStorage.setItem('b2b_cart', JSON.stringify(cart))
+      window.dispatchEvent(new CustomEvent('cart-updated'))
       alert(`✓ ${quantity} unidades de "${product.name}" agregadas al carrito`)
     }
 

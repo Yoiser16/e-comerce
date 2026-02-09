@@ -1017,6 +1017,7 @@ export default {
         }
         
         localStorage.setItem('b2b_cart', JSON.stringify(cart))
+        window.dispatchEvent(new CustomEvent('cart-updated'))
         
         // Feedback visual con toast
         toast.success(`${producto.value.nombre} agregado al carrito (${cantidad.value} unidades)`, 3000)
