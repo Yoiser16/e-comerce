@@ -420,8 +420,19 @@
             <!-- Imagen -->
             <div class="relative">
               <div class="aspect-square overflow-hidden bg-gray-50">
-                <img 
-                  :src="product.image" 
+                <video
+                  v-if="isVideoUrl(product.image) && !hasMediaError(product)"
+                  :src="product.image"
+                  class="w-full h-full object-cover"
+                  muted
+                  playsinline
+                  loop
+                  autoplay
+                  @error="handleVideoError(product)"
+                ></video>
+                <img
+                  v-else
+                  :src="getDisplayImage(product)"
                   :alt="product.name"
                   class="w-full h-full object-cover"
                   @error="handleProductImageError($event, product)"
@@ -587,8 +598,19 @@
             
             <!-- Imagen centrada -->
             <div class="flex-1 flex items-center justify-center px-4 mb-5">
-              <img 
-                :src="featuredProducts[0].image" 
+              <video
+                v-if="isVideoUrl(featuredProducts[0].image) && !hasMediaError(featuredProducts[0])"
+                :src="featuredProducts[0].image"
+                class="max-w-full max-h-[280px] object-contain"
+                muted
+                playsinline
+                loop
+                autoplay
+                @error="handleVideoError(featuredProducts[0])"
+              ></video>
+              <img
+                v-else
+                :src="getDisplayImage(featuredProducts[0])"
                 :alt="featuredProducts[0].name"
                 class="max-w-full max-h-[280px] object-contain"
                 @error="handleProductImageError($event, featuredProducts[0])"
@@ -658,8 +680,19 @@
                 >
                   <!-- Imagen -->
                   <div class="w-full aspect-[3/4] overflow-hidden rounded bg-gray-50 mb-2.5">
-                    <img 
-                      :src="product.image" 
+                    <video
+                      v-if="isVideoUrl(product.image) && !hasMediaError(product)"
+                      :src="product.image"
+                      class="w-full h-full object-contain"
+                      muted
+                      playsinline
+                      loop
+                      autoplay
+                      @error="handleVideoError(product)"
+                    ></video>
+                    <img
+                      v-else
+                      :src="getDisplayImage(product)"
                       :alt="product.name"
                       class="w-full h-full object-contain"
                       @error="handleProductImageError($event, product)"

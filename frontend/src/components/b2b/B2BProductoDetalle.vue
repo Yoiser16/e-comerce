@@ -130,10 +130,10 @@
                     <video
                       v-if="isVideoUrl(imagenActual) && !hasMediaError(imagenActual)"
                       :src="imagenActual"
-                      class="w-full h-full object-cover cursor-zoom-in"
-                      muted playsinline loop autoplay
+                      class="w-full h-full object-cover"
+                      playsinline
+                      controls
                       @error="handleVideoError(imagenActual)"
-                      @click="abrirZoom"
                     ></video>
                     <img 
                       v-else
@@ -788,7 +788,14 @@ export default {
       return imgs.length > 0 ? imgs : ['/placeholder.png']
     })
     
-    const imagenActual = computed(() => imagenes.value[imagenActualIndex.value] || '/placeholder.png')
+    const imagenActual = computed(() => {
+      const current = imagenes.value[imagenActualIndex.value] || null
+      const fallbackVideo = videoActual.value
+      if (!current || current === '/placeholder.png') {
+        return fallbackVideo || '/placeholder.png'
+      }
+      return current
+    })
 
     // Video section
     const videosProducto = computed(() => {

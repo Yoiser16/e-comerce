@@ -289,11 +289,22 @@
                         class="w-full px-4 py-3 hover:bg-[#f9f9f9] transition-colors flex items-center gap-3 text-left border-b border-text-dark/5 last:border-b-0"
                       >
                         <div class="w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-[#f9f9f9]">
-                          <img 
-                            v-if="producto.imagen_principal"
+                          <video
+                            v-if="producto.imagen_principal && isVideo(getImageUrl(producto.imagen_principal))"
+                            :src="getImageUrl(producto.imagen_principal)"
+                            class="w-full h-full object-cover"
+                            muted
+                            playsinline
+                            loop
+                            autoplay
+                            preload="metadata"
+                          ></video>
+                          <img
+                            v-else-if="producto.imagen_principal"
                             :src="getImageUrl(producto.imagen_principal)"
                             :alt="producto.nombre"
                             class="w-full h-full object-cover"
+                            @error="handleImageError"
                           />
                         </div>
                         <div class="flex-1 min-w-0">
@@ -879,9 +890,19 @@
                 </div>
 
                 <!-- Imagen Principal -->
-                <img 
-                  v-if="producto.imagen_principal"
-                  :src="getImageUrl(producto.imagen_principal)" 
+                <video
+                  v-if="producto.imagen_principal && isVideo(getImageUrl(producto.imagen_principal))"
+                  :src="getImageUrl(producto.imagen_principal)"
+                  class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  muted
+                  playsinline
+                  loop
+                  autoplay
+                  preload="metadata"
+                ></video>
+                <img
+                  v-else-if="producto.imagen_principal"
+                  :src="getImageUrl(producto.imagen_principal)"
                   :alt="producto.nombre"
                   class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                   @error="handleImageError"
