@@ -39,8 +39,16 @@
           >
             <!-- Imagen pequeña -->
             <div class="w-16 h-16 rounded bg-gray-100 overflow-hidden flex-shrink-0">
+              <video
+                v-if="isVideo(getCartMediaUrl(item))"
+                :src="getCartMediaUrl(item)"
+                class="w-full h-full object-cover"
+                muted
+                playsinline
+              ></video>
               <img 
-                :src="item.imagen || item.image || '/placeholder.png'"
+                v-else
+                :src="getCartMediaUrl(item)"
                 :alt="item.nombre || item.name"
                 class="w-full h-full object-cover"
                 @error="handleImageError"
@@ -230,6 +238,7 @@
 
 <script>
 import { ref, computed, onMounted, watch } from 'vue'
+import { getImageUrl } from '@/services/api'
 import { useRouter } from 'vue-router'
 
 export default {
@@ -298,6 +307,17 @@ export default {
       e.target.src = '/placeholder.png'
     }
 
+    function isVideo(url) {
+      if (!url) return false
+      const cleanUrl = url.split('?')[0].toLowerCase()
+      return ['.mp4', '.webm', '.ogg', '.mov'].some(ext => cleanUrl.endsWith(ext))
+    }
+
+    function getCartMediaUrl(item) {
+      const raw = item.imagen || item.image || item.imagen_principal || ''
+      return getImageUrl(raw) || '/placeholder.png'
+    }
+
     function updateQuantity(itemId, newQuantity) {
       const item = cartItems.value.find(i => i.id === itemId)
       if (item) {
@@ -350,6 +370,7 @@ export default {
       cartItems, orderNotes,
       totalUnits, subtotal, totalDiscount, shippingCost, total, canCheckout,
       formatPrice, handleImageError, updateQuantity, removeItem, limpiarCarrito, proceedToCheckout
+      , isVideo, getCartMediaUrl
     }
   }
 }

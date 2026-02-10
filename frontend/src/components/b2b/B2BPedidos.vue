@@ -170,7 +170,26 @@
             :key="idx"
             class="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0"
           >
-            <img :src="product.image || `https://placehold.co/100x100/f5f5f5/1a1a1a?text=${idx+1}`" :alt="product.name" class="w-full h-full object-cover" />
+            <video
+              v-if="isVideo(getOrderMediaUrl(product))"
+              :src="getOrderMediaUrl(product)"
+              class="w-full h-full object-cover"
+              muted
+              playsinline
+              preload="metadata"
+            />
+            <img
+              v-else-if="getOrderMediaUrl(product)"
+              :src="getOrderMediaUrl(product)"
+              :alt="product.name"
+              class="w-full h-full object-cover"
+            />
+            <img
+              v-else
+              :src="`https://placehold.co/100x100/f5f5f5/1a1a1a?text=${idx+1}`"
+              :alt="product.name"
+              class="w-full h-full object-cover"
+            />
           </div>
           <span v-if="order.items > 5" class="text-xs text-gray-400 flex-shrink-0">+{{ order.items - 5 }} más</span>
         </div>
@@ -292,7 +311,24 @@
               <div class="space-y-4">
                 <div v-for="(item, idx) in selectedOrder?.products || []" :key="idx" class="flex gap-4 p-3 bg-gray-50 rounded-xl">
                   <div class="w-16 h-16 rounded-lg bg-gray-200 overflow-hidden">
-                    <img :src="item.image || `https://placehold.co/100x100/f5f5f5/1a1a1a?text=${idx+1}`" class="w-full h-full object-cover" />
+                    <video
+                      v-if="isVideo(getOrderMediaUrl(item))"
+                      :src="getOrderMediaUrl(item)"
+                      class="w-full h-full object-cover"
+                      muted
+                      playsinline
+                      preload="metadata"
+                    />
+                    <img
+                      v-else-if="getOrderMediaUrl(item)"
+                      :src="getOrderMediaUrl(item)"
+                      class="w-full h-full object-cover"
+                    />
+                    <img
+                      v-else
+                      :src="`https://placehold.co/100x100/f5f5f5/1a1a1a?text=${idx+1}`"
+                      class="w-full h-full object-cover"
+                    />
                   </div>
                   <div class="flex-1">
                     <h4 class="font-medium text-gray-900">{{ item.name }}</h4>
@@ -322,6 +358,7 @@
 <script>
 import { ref, computed, onMounted } from 'vue'
 import { obtenerMisPedidos } from '@/services/mayoristas'
+import { getImageUrl } from '@/services/api'
 import { useToast } from './ui'
 
 export default {
@@ -374,6 +411,17 @@ export default {
         'Cancelado': 'bg-red-100 text-red-700',
       }
       return classes[status] || classes['Pendiente']
+    }
+
+    function isVideo(url) {
+      if (!url) return false
+      const cleanUrl = url.split('?')[0].toLowerCase()
+      return ['.mp4', '.webm', '.ogg', '.mov'].some(ext => cleanUrl.endsWith(ext))
+    }
+
+    function getOrderMediaUrl(item) {
+      const raw = item?.image || item?.imagen || item?.imagen_principal || ''
+      return getImageUrl(raw) || ''
     }
 
     // =========================================================================
@@ -454,7 +502,8 @@ export default {
       selectedStatus, searchQuery, stats, statuses, filteredOrders,
       showDetailModal, selectedOrder, isLoadingOrders,
       getStatusClass, formatPrice, formatCompact,
-      viewOrderDetail, reorderItems, trackOrder
+      viewOrderDetail, reorderItems, trackOrder,
+      isVideo, getOrderMediaUrl
     }
   }
 }

@@ -518,18 +518,29 @@
                   <!-- Product Image -->
                   <div class="flex-shrink-0 relative">
                     <div class="w-16 h-16 sm:w-20 sm:h-20 rounded-lg bg-[#f5f5f5] overflow-hidden">
-                      <img 
-                        v-if="order.products?.[0]?.image" 
-                        :src="order.products[0].image" 
-                        :alt="order.products[0].name"
+                      <video
+                        v-if="isVideo(getOrderMediaUrl(order.products?.[0]))"
+                        :src="getOrderMediaUrl(order.products?.[0])"
+                        class="w-full h-full object-cover"
+                        muted
+                        playsinline
+                        preload="metadata"
+                      />
+                      <img
+                        v-else-if="getOrderMediaUrl(order.products?.[0])"
+                        :src="getOrderMediaUrl(order.products?.[0])"
+                        :alt="order.products?.[0]?.name"
                         class="w-full h-full object-cover"
                         @error="$event.target.style.display='none'; $event.target.nextElementSibling && ($event.target.nextElementSibling.style.display='flex')"
                       />
-                      <div v-if="!order.products?.[0]?.image" class="w-full h-full flex items-center justify-center">
+                      <div v-else class="w-full h-full flex items-center justify-center">
                         <svg class="w-8 h-8 text-[#ccc]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
                       </div>
-                      <!-- Hidden fallback for broken images -->
-                      <div v-if="order.products?.[0]?.image" class="w-full h-full items-center justify-center" style="display:none">
+                      <div
+                        v-if="getOrderMediaUrl(order.products?.[0]) && !isVideo(getOrderMediaUrl(order.products?.[0]))"
+                        class="w-full h-full items-center justify-center"
+                        style="display:none"
+                      >
                         <svg class="w-8 h-8 text-[#ccc]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" /></svg>
                       </div>
                     </div>
@@ -609,9 +620,17 @@
                   <p class="text-[12px] font-semibold text-[#888] uppercase tracking-wider mb-3">Productos del pedido</p>
                   <div v-for="(item, idx) in order.products" :key="idx" class="flex gap-3 p-3 bg-[#fafafa] rounded-lg">
                     <div class="w-14 h-14 rounded-md bg-[#f0f0f0] overflow-hidden flex-shrink-0">
-                      <img 
-                        v-if="item.image" 
-                        :src="item.image" 
+                      <video
+                        v-if="isVideo(getOrderMediaUrl(item))"
+                        :src="getOrderMediaUrl(item)"
+                        class="w-full h-full object-cover"
+                        muted
+                        playsinline
+                        preload="metadata"
+                      />
+                      <img
+                        v-else-if="getOrderMediaUrl(item)"
+                        :src="getOrderMediaUrl(item)"
                         :alt="item.name"
                         class="w-full h-full object-cover"
                         @error="$event.target.style.display='none'"
@@ -999,7 +1018,7 @@
 <script>
 import { ref, computed, reactive, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
-import apiClient from '@/services/api'
+import apiClient, { getImageUrl } from '@/services/api'
 import { obtenerMisPedidos } from '@/services/mayoristas'
 
 const COLOMBIA_API = {
@@ -1113,6 +1132,17 @@ export default {
       const d = new Date(fecha)
       if (isNaN(d)) return String(fecha)
       return d.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })
+    }
+
+    function isVideo(url) {
+      if (!url) return false
+      const cleanUrl = url.split('?')[0].toLowerCase()
+      return ['.mp4', '.webm', '.ogg', '.mov'].some(ext => cleanUrl.endsWith(ext))
+    }
+
+    function getOrderMediaUrl(item) {
+      const raw = item?.image || item?.imagen || item?.imagen_principal || ''
+      return getImageUrl(raw) || ''
     }
 
     function normalizarOrden(orden) {
@@ -1570,6 +1600,7 @@ export default {
       orders, isLoadingOrders, selectedStatus, searchQuery, expandedOrderId,
       ordersStats, ordersStatuses, filteredOrders, getStatusClass, getStatusLabel, formatCompact,
       toggleOrderDetail, reorderItems, trackOrder,
+      isVideo, getOrderMediaUrl,
       // Cupones
       loadingCupones, cuponCode, aplicandoCupon, cuponFeedback, cuponToast,
       cuponesActivos, niveles, formatDate, aplicarCupon, copiarCodigo
