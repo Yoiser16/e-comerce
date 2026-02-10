@@ -43,7 +43,9 @@ class Producto(EntidadBase):
         origen: Optional[str] = None,
         metodo: Optional[str] = None,
         calidad: Optional[str] = None,
-        destacado: bool = False
+        destacado: bool = False,
+        disponible_b2b: bool = True,
+        porcentaje_descuento_b2b: Optional[int] = None
     ):
         super().__init__(id, fecha_creacion, fecha_modificacion, activo)
         self._codigo = codigo
@@ -61,6 +63,8 @@ class Producto(EntidadBase):
         self._metodo = metodo
         self._calidad = calidad
         self._destacado = destacado
+        self._disponible_b2b = disponible_b2b
+        self._porcentaje_descuento_b2b = porcentaje_descuento_b2b
     
     @property
     def categoria(self) -> Optional[str]:
@@ -111,6 +115,24 @@ class Producto(EntidadBase):
     @destacado.setter
     def destacado(self, valor: bool) -> None:
         self._destacado = valor
+        self.marcar_modificado()
+
+    @property
+    def disponible_b2b(self) -> bool:
+        return self._disponible_b2b
+
+    @disponible_b2b.setter
+    def disponible_b2b(self, valor: bool) -> None:
+        self._disponible_b2b = valor
+        self.marcar_modificado()
+
+    @property
+    def porcentaje_descuento_b2b(self) -> Optional[int]:
+        return self._porcentaje_descuento_b2b
+
+    @porcentaje_descuento_b2b.setter
+    def porcentaje_descuento_b2b(self, valor: Optional[int]) -> None:
+        self._porcentaje_descuento_b2b = valor
         self.marcar_modificado()
     
     @property

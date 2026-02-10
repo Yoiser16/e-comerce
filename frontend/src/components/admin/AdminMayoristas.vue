@@ -4,7 +4,7 @@
     <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
       <div>
         <h1 class="text-2xl font-semibold text-text-dark">Solicitudes Mayoristas</h1>
-        <p class="text-text-light mt-1">Gestiona las solicitudes de cuentas B2B</p>
+        <p class="text-text-light mt-1">Gestiona las solicitudes de cuentas mayoristas</p>
       </div>
       
       <!-- Stats rápidas -->

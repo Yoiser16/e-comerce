@@ -460,9 +460,17 @@
               </p>
               
               <!-- Precio -->
-              <p class="text-gray-900 font-bold text-base sm:text-lg">
-                ${{ (product?.price || 0).toLocaleString() }}
+              <p v-if="product?.originalPrice && product.originalPrice > product.price" class="text-gray-400 text-xs line-through">
+                ${{ (product?.originalPrice || 0).toLocaleString() }}
               </p>
+              <div class="flex items-baseline gap-2">
+                <p class="text-gray-900 font-bold text-base sm:text-lg">
+                  ${{ (product?.price || 0).toLocaleString() }}
+                </p>
+                <span v-if="product?.discount" class="text-emerald-600 text-xs font-semibold">
+                  {{ product.discount }}% OFF
+                </span>
+              </div>
               
               <!-- Envío / Stock -->
               <div class="flex items-center gap-1.5 mt-1.5">
@@ -779,7 +787,7 @@
                 ¿Necesitas asesoría personalizada?
               </h3>
               <p class="text-white/50 text-sm">
-                Nuestro equipo B2B está disponible para ayudarte con tu pedido
+                Nuestro equipo mayorista está disponible para ayudarte con tu pedido
               </p>
             </div>
             
@@ -1019,20 +1027,29 @@ export default {
       return getImageUrl(resolved)
     }
 
+    function getDiscountPercent(price, originalPrice) {
+      const base = Number(originalPrice || 0)
+      const current = Number(price || 0)
+      if (!base || !current || current >= base) return null
+      return Math.round(((base - current) / base) * 100)
+    }
+
     function normalizarProducto(producto) {
       const image = normalizeMediaUrl(
         producto.imagen_principal || producto.imagen || producto.imagen_url || producto.image
       )
+      const originalPrice = producto.precio_retail || producto.precio_original || producto.retailPrice || producto.originalPrice || producto.precio || producto.monto_precio || 0
+      const price = producto.precio_mayorista || producto.wholesalePrice || producto.monto_precio || producto.price || 0
       return {
         id: producto.id || producto.producto_id,
         name: producto.nombre || producto.name,
         category: producto.categoria || producto.category || 'Sin categoría',
-        price: producto.precio_mayorista || producto.wholesalePrice || producto.price || 0,
-        originalPrice: producto.precio_retail || producto.retailPrice || producto.originalPrice || 0,
+        price,
+        originalPrice,
         stock: producto.stock || 0,
         image,
         badge: producto.stock < 5 ? 'low' : null,
-        discount: null
+        discount: getDiscountPercent(price, originalPrice)
       }
     }
 
@@ -1065,16 +1082,19 @@ export default {
               vistos.forEach(v => {
                 if (!productosUnicos.has(v.producto_id)) {
                   productosUnicos.add(v.producto_id)
+                  const originalPrice = v.precio || 0
+                  const price = v.precio_mayorista || originalPrice
                   productosHabituales.push({
                     id: v.producto_id,
                     name: v.nombre,
                     category: v.categoria || 'Sin categoría',
-                    price: v.precio_mayorista || v.precio || 0,
-                    originalPrice: v.precio || 0,
+                    price,
+                    originalPrice,
                     stock: v.stock || 0,
                     image: normalizeMediaUrl(v.imagen_principal || v.imagen || v.imagen_url),
                     badge: 'visto', // Badge para identificar origen
-                    veces_visto: v.veces_visto
+                    veces_visto: v.veces_visto,
+                    discount: getDiscountPercent(price, originalPrice)
                   })
                 }
               })
@@ -1097,15 +1117,18 @@ export default {
                   try {
                     const producto = await obtenerProducto(productoId)
                     productosUnicos.add(productoId)
+                    const originalPrice = producto.precio_retail || producto.precio_original || producto.precio || producto.monto_precio || 0
+                    const price = producto.precio_mayorista || producto.monto_precio || originalPrice
                     productosHabituales.push({
                       id: producto.id,
                       name: producto.nombre,
                       category: producto.categoria_nombre || 'Favorito',
-                      price: producto.precio_mayorista || producto.monto_precio || 0,
-                      originalPrice: producto.monto_precio || 0,
+                      price,
+                      originalPrice,
                       stock: producto.stock_actual || 0,
                       image: normalizeMediaUrl(producto.imagen_principal),
-                      badge: 'favorito'
+                      badge: 'favorito',
+                      discount: getDiscountPercent(price, originalPrice)
                     })
                   } catch {
                     // Producto no disponible, continuar con el siguiente

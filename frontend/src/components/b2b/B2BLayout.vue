@@ -59,7 +59,7 @@
 
               <!-- Col 2: Portal -->
               <div>
-                <h4 class="text-xs font-semibold tracking-[0.15em] uppercase text-gray-300 mb-4">Portal B2B</h4>
+                <h4 class="text-xs font-semibold tracking-[0.15em] uppercase text-gray-300 mb-4">Portal Mayorista</h4>
                 <ul class="space-y-2.5">
                   <li><router-link to="/portal/catalogo" class="text-gray-400 hover:text-white text-sm transition-colors">Catálogo</router-link></li>
                   <li><router-link to="/portal/pedidos" class="text-gray-400 hover:text-white text-sm transition-colors">Mis Pedidos</router-link></li>

@@ -6,16 +6,16 @@
         class="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4"
         @click.self="closeModal"
       >
-        <div class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl max-h-[90vh] overflow-hidden flex flex-col">
+        <div class="bg-[#FAFAFA] rounded-3xl shadow-2xl w-full max-w-6xl max-h-[90vh] overflow-hidden flex flex-col border border-black/5">
           <!-- Header -->
-          <div class="flex items-center justify-between p-5 border-b border-gray-100">
+          <div class="flex items-center justify-between p-6 border-b border-black/5 bg-white">
             <div>
-              <h2 class="text-xl font-bold text-gray-900">{{ isEditing ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
-              <p class="text-gray-500 text-sm">{{ isEditing ? 'Modifica los datos del producto' : 'Agrega un nuevo producto al catálogo' }}</p>
+              <h2 class="text-2xl font-semibold text-text-dark">{{ isEditing ? 'Editar Producto' : 'Nuevo Producto' }}</h2>
+              <p class="text-text-medium text-sm">{{ isEditing ? 'Modifica los datos del producto' : 'Agrega un nuevo producto al catálogo' }}</p>
             </div>
             <button 
               @click="closeModal"
-              class="p-2 hover:bg-gray-100 rounded-lg transition-colors"
+              class="p-2 hover:bg-black/5 rounded-lg transition-colors"
             >
               <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -24,7 +24,7 @@
           </div>
 
           <!-- Body - Scrollable -->
-          <div class="flex-1 overflow-y-auto p-5">
+          <div class="flex-1 overflow-y-auto p-6">
             <!-- Error Alert -->
             <div v-if="error" class="bg-red-50 border border-red-200 rounded-xl p-3 flex items-center gap-3 mb-4">
               <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
@@ -52,8 +52,8 @@
                 <div class="lg:col-span-8 space-y-6">
                   
                   <!-- ═══ BLOQUE: INFORMACIÓN GENERAL ═══ -->
-                  <div class="space-y-4">
-                    <h3 class="text-xs font-semibold text-text-medium uppercase tracking-wider">DETALLES</h3>
+                  <div class="space-y-4 bg-white border border-black/5 rounded-2xl p-5 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+                    <h3 class="text-[11px] font-semibold text-text-medium uppercase tracking-[0.2em]">DETALLES</h3>
                     
                     <!-- Nombre (Ancho completo) -->
                     <div>
@@ -80,11 +80,11 @@
                   </div>
 
                   <!-- ═══ BLOQUE: PRECIOS E INVENTARIO ═══ -->
-                  <div class="space-y-4">
-                    <h3 class="text-xs font-semibold text-text-medium uppercase tracking-wider">PRECIOS E INVENTARIO</h3>
+                  <div class="space-y-4 bg-white border border-black/5 rounded-2xl p-5 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+                    <h3 class="text-[11px] font-semibold text-text-medium uppercase tracking-[0.2em]">PRECIOS E INVENTARIO</h3>
                     
                     <!-- Fila 1: Precio, Costo, SKU -->
-                    <div class="grid grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <div>
                         <label class="block text-sm font-medium text-text-dark mb-2">Precio <span class="text-red-500">*</span></label>
                         <div class="relative">
@@ -127,7 +127,7 @@
                     </div>
 
                     <!-- Fila 2: Stock y Stock Mínimo -->
-                    <div class="grid grid-cols-2 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label class="block text-sm font-medium text-text-dark mb-2">Stock Actual <span class="text-red-500">*</span></label>
                         <input 
@@ -159,16 +159,39 @@
                         >
                       </div>
                     </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      <div>
+                        <label class="block text-sm font-medium text-text-dark mb-2">Disponible en mayoristas</label>
+                        <label class="flex items-center justify-between px-4 py-3 bg-[#FAFAFA] border border-text-dark/10 rounded-lg cursor-pointer hover:bg-white transition-all">
+                          <span class="text-sm text-text-dark">{{ form.disponible_b2b ? 'Activo' : 'Oculto' }}</span>
+                          <input v-model="form.disponible_b2b" type="checkbox" class="sr-only peer">
+                          <div class="relative w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-[#D81B60]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D81B60]"></div>
+                        </label>
+                      </div>
+                      <div>
+                        <label class="block text-sm font-medium text-text-dark mb-2">Descuento mayorista (%)</label>
+                        <input
+                          v-model.number="form.porcentaje_descuento_b2b"
+                          type="number"
+                          min="0"
+                          max="90"
+                          class="w-full px-4 py-3 bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white transition-all text-sm"
+                          placeholder="Ej: 15"
+                        >
+                        <p class="text-xs text-text-light mt-1">Se aplica sobre el precio base cuando el producto está en canal mayorista.</p>
+                      </div>
+                    </div>
                   </div>
 
                   <!-- ═══ BLOQUE: ATRIBUTOS (Opcional) ═══ -->
-                  <div class="space-y-4">
+                  <div class="space-y-4 bg-white border border-black/5 rounded-2xl p-5 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
                     <div class="flex items-center justify-between">
-                      <h3 class="text-xs font-semibold text-text-medium uppercase tracking-wider">ATRIBUTOS</h3>
+                      <h3 class="text-[11px] font-semibold text-text-medium uppercase tracking-[0.2em]">ATRIBUTOS</h3>
                       <span class="text-xs text-text-light">Opcional</span>
                     </div>
                     
-                    <div class="grid grid-cols-3 gap-4">
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
                       <!-- Método -->
                       <div class="space-y-2">
                         <label class="flex items-center gap-2 cursor-pointer">
@@ -268,8 +291,8 @@
                 <div class="lg:col-span-4 space-y-6">
                   
 <!-- ═══ BLOQUE: IMÁGENES DEL PRODUCTO ═══ -->
-                <div class="space-y-4">
-                  <h3 class="text-xs font-semibold text-text-medium uppercase tracking-wider">IMÁGENES DEL PRODUCTO</h3>
+                <div class="space-y-4 bg-white border border-black/5 rounded-2xl p-5 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+                  <h3 class="text-[11px] font-semibold text-text-medium uppercase tracking-[0.2em]">IMÁGENES DEL PRODUCTO</h3>
                   
                   <!-- Input para agregar URL -->
                   <div class="flex items-center gap-2">
@@ -381,8 +404,8 @@
                   </div>
 
                   <!-- ═══ BLOQUE: ORGANIZACIÓN ═══ -->
-                  <div class="space-y-4">
-                    <h3 class="text-xs font-semibold text-text-medium uppercase tracking-wider">ORGANIZACIÓN</h3>
+                  <div class="space-y-4 bg-white border border-black/5 rounded-2xl p-5 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+                    <h3 class="text-[11px] font-semibold text-text-medium uppercase tracking-[0.2em]">ORGANIZACIÓN</h3>
                     
                     <!-- Categoría -->
                     <div>
@@ -445,7 +468,8 @@
           </div>
 
           <!-- Footer - Actions -->
-          <div class="flex items-center justify-end gap-3 p-4 border-t border-gray-100 bg-gray-50">
+          <div class="flex items-center justify-between gap-3 p-4 border-t border-black/5 bg-white">
+            <p class="text-xs text-text-light hidden sm:block">Los cambios se aplican de inmediato en el catálogo</p>
             <button 
               type="button"
               @click="closeModal"
@@ -457,7 +481,7 @@
               type="submit"
               form="product-form"
               :disabled="saving"
-              class="px-5 py-2.5 text-white bg-brand-600 hover:bg-brand-700 rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2 text-sm"
+              class="px-6 py-2.5 text-white bg-text-dark hover:bg-black rounded-lg font-medium transition-colors disabled:opacity-50 flex items-center gap-2 text-sm"
             >
               <svg v-if="saving" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                 <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -525,7 +549,9 @@ const form = ref({
   imagen_principal: '',
   imagenes: [],
   activo: true,
-  destacado: false
+  destacado: false,
+  disponible_b2b: true,
+  porcentaje_descuento_b2b: null
 })
 
 // Checkboxes para habilitar atributos
@@ -558,7 +584,9 @@ const resetForm = () => {
     imagen_principal: '',
     imagenes: [],
     activo: true,
-    destacado: false
+    destacado: false,
+    disponible_b2b: true,
+    porcentaje_descuento_b2b: null
   }
   enabledAttrs.value = {
     metodo: false,
@@ -729,7 +757,9 @@ const loadProduct = async () => {
       imagen_principal: producto.imagen_principal || '',
       imagenes: Array.isArray(producto.imagenes) ? producto.imagenes : [],
       activo: producto.activo !== false,
-      destacado: producto.destacado || false
+      destacado: producto.destacado || false,
+      disponible_b2b: producto.disponible_b2b !== false,
+      porcentaje_descuento_b2b: producto.porcentaje_descuento_b2b ?? null
     }
 
     // Construir galleryUrls incluyendo la imagen principal
@@ -816,7 +846,9 @@ const submitForm = async () => {
       imagen_principal: imagenUrl || null,
       imagenes: galleryUrls.value,
       destacado: form.value.destacado,
-      cantidad_minima_mayorista: form.value.cantidad_minima_mayorista ?? 1
+      cantidad_minima_mayorista: form.value.cantidad_minima_mayorista ?? 1,
+      disponible_b2b: !!form.value.disponible_b2b,
+      porcentaje_descuento_b2b: form.value.porcentaje_descuento_b2b ?? null
     }
     
     if (isEditing.value) {

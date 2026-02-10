@@ -30,6 +30,8 @@ class CrearProductoDTO:
     metodo: Optional[str] = None
     calidad: Optional[str] = None
     destacado: bool = False
+    disponible_b2b: bool = True
+    porcentaje_descuento_b2b: Optional[int] = None
 
 
 @dataclass
@@ -52,6 +54,8 @@ class ActualizarProductoDTO:
     metodo: Optional[str] = None
     calidad: Optional[str] = None
     destacado: Optional[bool] = None
+    disponible_b2b: Optional[bool] = None
+    porcentaje_descuento_b2b: Optional[int] = None
 
 
 @dataclass
@@ -79,6 +83,8 @@ class ProductoDTO:
     metodo: Optional[str] = None
     calidad: Optional[str] = None
     destacado: bool = False
+    disponible_b2b: bool = True
+    porcentaje_descuento_b2b: Optional[int] = None
     
     @classmethod
     def desde_entidad(cls, producto: Producto) -> 'ProductoDTO':
@@ -107,4 +113,6 @@ class ProductoDTO:
             metodo=getattr(producto, 'metodo', None),
             calidad=getattr(producto, 'calidad', None),
             destacado=getattr(producto, 'destacado', False),
+            disponible_b2b=getattr(producto, 'disponible_b2b', True),
+            porcentaje_descuento_b2b=getattr(producto, 'porcentaje_descuento_b2b', None),
         )

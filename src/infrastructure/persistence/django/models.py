@@ -178,6 +178,10 @@ class ProductoModel(models.Model):
 
     # Campo requerido para ventas mayoristas
     cantidad_minima_mayorista = models.IntegerField(default=1, help_text='Cantidad mínima para venta mayorista')
+
+    # Configuracion B2B
+    disponible_b2b = models.BooleanField(default=True, db_index=True)
+    porcentaje_descuento_b2b = models.PositiveSmallIntegerField(null=True, blank=True, help_text='Porcentaje de descuento B2B')
     
     # Atributos específicos de cabello
     color = models.CharField(max_length=50, choices=COLOR_CHOICES, null=True, blank=True, db_index=True)

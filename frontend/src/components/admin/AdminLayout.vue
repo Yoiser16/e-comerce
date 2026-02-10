@@ -871,7 +871,7 @@ export default {
         '/admin/inventario': 'Inventario',
         '/admin/categorias': 'Categorías',
         '/admin/usuarios': 'Usuarios',
-        '/admin/mayoristas': 'Mayoristas B2B',
+        '/admin/mayoristas': 'Mayoristas',
         '/admin/config': 'Configuración'
       }
       return titles[route.path] || 'Admin'

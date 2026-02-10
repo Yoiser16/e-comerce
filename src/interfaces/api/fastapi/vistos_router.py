@@ -66,10 +66,18 @@ def listar_vistos_recientemente(
             email=email
         ).select_related('producto', 'producto__categoria').order_by('-fecha_visto')[:limit]
         
+        def calcular_precio_mayorista(producto) -> float:
+            precio_base = float(producto.monto_precio or 0)
+            pct = producto.porcentaje_descuento_b2b
+            if pct is None:
+                return precio_base
+            pct_value = max(min(float(pct), 90.0), 0.0)
+            return precio_base * (1.0 - (pct_value / 100.0))
+
         resultado = []
         for visto in vistos:
             producto = visto.producto
-            if producto and producto.activo:
+            if producto and producto.activo and producto.disponible_b2b:
                 resultado.append(ProductoVistoDTO(
                     id=visto.id,
                     producto_id=producto.id,
@@ -77,7 +85,7 @@ def listar_vistos_recientemente(
                     categoria=producto.categoria.nombre if producto.categoria else None,
                     imagen_principal=producto.imagen_principal,
                     precio=float(producto.monto_precio or 0),
-                    precio_mayorista=None,  # Campo no existe en ProductoModel
+                    precio_mayorista=calcular_precio_mayorista(producto),
                     stock=producto.stock_actual,
                     fecha_visto=visto.fecha_visto,
                     veces_visto=visto.veces_visto

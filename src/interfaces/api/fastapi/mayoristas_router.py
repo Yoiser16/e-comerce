@@ -68,6 +68,16 @@ class ProductoB2B(BaseModel):
     cantidad_minima: int = 1
 
 
+def calcular_precio_mayorista(producto) -> float:
+    """Calcula precio mayorista segun descuento por producto (B2B)."""
+    precio_base = float(producto.monto_precio or 0)
+    pct = producto.porcentaje_descuento_b2b
+    if pct is None:
+        return precio_base
+    pct_value = max(min(float(pct), 90.0), 0.0)
+    return precio_base * (1.0 - (pct_value / 100.0))
+
+
 @router.get("/b2b/productos", response_model=List[ProductoB2B])
 def obtener_productos_b2b(
     limit: int = 20, 
@@ -95,7 +105,8 @@ def obtener_productos_b2b(
         # Consultar productos activos de la BD
         queryset = ProductoModel.objects.filter(
             activo=True,
-            stock_actual__gt=0
+            stock_actual__gt=0,
+            disponible_b2b=True
         )
         
         # Filtro de búsqueda por nombre, código o descripción
@@ -124,7 +135,7 @@ def obtener_productos_b2b(
                 codigo=p.codigo,
                 imagen=p.imagen_principal,
                 precio_retail=float(p.monto_precio_original or p.monto_precio),
-                precio_mayorista=float(p.monto_precio) * (1.0 - (float(mayorista.descuento_mayorista) / 100.0) if mayorista and mayorista.descuento_mayorista > 0 else 0.85),  # Descuento dinámico o 15% default
+                precio_mayorista=calcular_precio_mayorista(p),
                 stock=p.stock_actual - p.stock_reservado,
                 cantidad_minima=5 if p.metodo == 'bundle' else 1
             ))
@@ -152,7 +163,8 @@ def obtener_productos_destacados_b2b(
         # Consultar productos más vendidos
         productos = ProductoModel.objects.filter(
             activo=True,
-            stock_actual__gt=0
+            stock_actual__gt=0,
+            disponible_b2b=True
         ).order_by('-total_vendidos', '-valoracion_promedio')[:limit]
         
         result = []
@@ -164,7 +176,7 @@ def obtener_productos_destacados_b2b(
                 codigo=p.codigo,
                 imagen=p.imagen_principal,
                 precio_retail=float(p.monto_precio_original or p.monto_precio),
-                precio_mayorista=float(p.monto_precio) * (1.0 - (float(mayorista.descuento_mayorista) / 100.0) if mayorista and mayorista.descuento_mayorista > 0 else 0.85),  # Descuento dinámico o 15% default
+                precio_mayorista=calcular_precio_mayorista(p),
                 stock=p.stock_actual - p.stock_reservado,
                 cantidad_minima=5 if p.metodo == 'bundle' else 1
             ))
@@ -224,15 +236,13 @@ def obtener_producto_b2b(
             p = ProductoModel.objects.select_related('categoria').get(id=uid)
         except ProductoModel.DoesNotExist:
             raise HTTPException(status_code=404, detail="Producto no encontrado")
+
+        if not p.disponible_b2b:
+            raise HTTPException(status_code=404, detail="Producto no disponible en B2B")
         
         precio_retail = float(p.monto_precio_original or p.monto_precio or 0)
         
-        # Calcular descuento dinámico
-        factor_descuento = 0.85  # Default 15% off (factor 0.85)
-        if mayorista and mayorista.descuento_mayorista > 0:
-            factor_descuento = 1.0 - (float(mayorista.descuento_mayorista) / 100.0)
-            
-        precio_mayorista = float(p.monto_precio or 0) * factor_descuento
+        precio_mayorista = calcular_precio_mayorista(p)
         
         # Parsear imágenes adicionales
         imagenes = []

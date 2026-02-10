@@ -59,7 +59,9 @@ class ProductoRepositoryImpl(ProductoRepository):
             origen=model.origen,
             metodo=model.metodo,
             calidad=model.calidad,
-            destacado=model.destacado
+            destacado=model.destacado,
+            disponible_b2b=model.disponible_b2b,
+            porcentaje_descuento_b2b=model.porcentaje_descuento_b2b
         )
 
         # Incluir TODAS las imágenes adicionales del modelo ImagenProductoModel
@@ -93,7 +95,9 @@ class ProductoRepositoryImpl(ProductoRepository):
             stock_reservado=getattr(entity, 'stock_reservado', 0),
             activo=entity.activo,
             fecha_creacion=entity.fecha_creacion,
-            fecha_modificacion=entity.fecha_modificacion
+            fecha_modificacion=entity.fecha_modificacion,
+            disponible_b2b=getattr(entity, 'disponible_b2b', True),
+            porcentaje_descuento_b2b=getattr(entity, 'porcentaje_descuento_b2b', None)
         )
     
     def obtener_por_id(self, id: UUID) -> Optional[Producto]:
@@ -212,6 +216,10 @@ class ProductoRepositoryImpl(ProductoRepository):
                         model_anterior.calidad = atributos_adicionales['calidad']
                     if 'destacado' in atributos_adicionales:
                         model_anterior.destacado = atributos_adicionales['destacado']
+                    if 'disponible_b2b' in atributos_adicionales:
+                        model_anterior.disponible_b2b = atributos_adicionales['disponible_b2b']
+                    if 'porcentaje_descuento_b2b' in atributos_adicionales:
+                        model_anterior.porcentaje_descuento_b2b = atributos_adicionales['porcentaje_descuento_b2b']
                 model = model_anterior
             else:
                 # Crear nuevo modelo
@@ -237,6 +245,10 @@ class ProductoRepositoryImpl(ProductoRepository):
                         model.calidad = atributos_adicionales['calidad']
                     if 'destacado' in atributos_adicionales:
                         model.destacado = atributos_adicionales['destacado']
+                    if 'disponible_b2b' in atributos_adicionales:
+                        model.disponible_b2b = atributos_adicionales['disponible_b2b']
+                    if 'porcentaje_descuento_b2b' in atributos_adicionales:
+                        model.porcentaje_descuento_b2b = atributos_adicionales['porcentaje_descuento_b2b']
             
             model.save()
 

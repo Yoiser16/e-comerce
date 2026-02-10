@@ -55,6 +55,14 @@ def listar_favoritos(
     Lista todos los favoritos del usuario autenticado.
     """
     try:
+        def calcular_precio_mayorista(producto) -> float:
+            precio_base = float(producto.monto_precio or 0)
+            pct = producto.porcentaje_descuento_b2b
+            if pct is None:
+                return precio_base
+            pct_value = max(min(float(pct), 90.0), 0.0)
+            return precio_base * (1.0 - (pct_value / 100.0))
+
         favoritos = FavoritoModel.objects.filter(
             usuario_id=usuario_id
         ).select_related('producto')
@@ -68,7 +76,7 @@ def listar_favoritos(
                 imagen_principal=fav.producto.imagen_principal,
                 precio_monto=float(fav.producto.monto_precio),
                 precio_moneda=fav.producto.moneda_precio,
-                precio_mayorista=float(fav.producto.precio_mayorista) if fav.producto.precio_mayorista else None,
+                precio_mayorista=calcular_precio_mayorista(fav.producto),
                 sku=fav.producto.sku,
                 stock_actual=fav.producto.stock_actual,
                 categoria_nombre=fav.producto.categoria.nombre if fav.producto.categoria else None,
