@@ -41,7 +41,7 @@
       
       <!-- Breadcrumb -->
       <div class="border-b border-gray-200">
-        <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
+        <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-3">
           <nav class="flex items-center gap-2 text-sm text-gray-400">
             <router-link to="/portal" class="text-[#007185] hover:text-[#C7511F] hover:underline transition-colors">Portal</router-link>
             <span class="text-gray-300">›</span>
@@ -59,7 +59,7 @@
       <!-- ============================================
            MAIN PRODUCT AREA - White card on gray bg
       ============================================ -->
-      <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-6">
+      <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-6">
         
         <!-- Main white card wrapping all product content -->
         <div class="bg-white rounded-lg overflow-hidden">
@@ -67,20 +67,21 @@
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
           
           <!-- ====================================
-               COLUMN 1: GALERÍA - Thumbnails verticales estilo ML
+               COLUMN 1: GALERÍA - Thumbnails verticales estilo Amazon
           ==================================== -->
-          <div class="lg:col-span-5 xl:col-span-5">
+          <div class="lg:col-span-5">
             <div class="lg:sticky lg:top-24">
               
               <div class="flex gap-3">
-                <!-- Thumbnails Verticales (izquierda) - estilo ML -->
-                <div v-if="imagenes.length > 1" class="hidden sm:flex flex-col gap-2 flex-shrink-0">
+                <!-- Thumbnails Verticales (izquierda) - estilo Amazon -->
+                <div v-if="imagenes.length > 1" class="hidden sm:flex flex-col gap-1.5 flex-shrink-0">
                   <button 
                     v-for="(img, idx) in imagenes" 
                     :key="idx"
                     @click="imagenActualIndex = idx"
-                    class="w-14 h-14 rounded-md overflow-hidden border-2 transition-all flex-shrink-0"
-                    :class="imagenActualIndex === idx ? 'border-[#007185] shadow-sm' : 'border-gray-200 hover:border-[#007185]'"
+                    @mouseenter="imagenActualIndex = idx"
+                    class="w-[52px] h-[52px] rounded overflow-hidden border transition-all flex-shrink-0"
+                    :class="imagenActualIndex === idx ? 'border-[#007185] shadow-sm ring-1 ring-[#007185]' : 'border-gray-200 hover:border-[#007185]'"
                   >
                     <video
                       v-if="isVideoUrl(img) && !hasMediaError(img)"
@@ -126,7 +127,7 @@
                   </button>
                   
                   <!-- Imagen Principal -->
-                  <div class="aspect-[4/5] bg-gray-50 rounded-lg overflow-hidden border border-gray-100">
+                  <div class="aspect-square max-h-[480px] rounded-lg overflow-hidden">
                     <video
                       v-if="isVideoUrl(imagenActual) && !hasMediaError(imagenActual)"
                       :src="imagenActual"
@@ -148,13 +149,13 @@
               </div>
               
               <!-- Thumbnails Horizontal Mobile -->
-              <div v-if="imagenes.length > 1" class="flex sm:hidden gap-2 mt-3 overflow-x-auto pb-2 scrollbar-hide">
+              <div v-if="imagenes.length > 1" class="flex sm:hidden gap-1.5 mt-3 overflow-x-auto pb-2 scrollbar-hide">
                 <button 
                   v-for="(img, idx) in imagenes" 
                   :key="idx"
                   @click="imagenActualIndex = idx"
-                  class="flex-shrink-0 w-14 h-14 rounded-md overflow-hidden border-2 transition-all"
-                  :class="imagenActualIndex === idx ? 'border-[#007185]' : 'border-gray-200'"
+                  class="flex-shrink-0 w-12 h-12 rounded overflow-hidden border transition-all"
+                  :class="imagenActualIndex === idx ? 'border-[#007185] ring-1 ring-[#007185]' : 'border-gray-200'"
                 >
                   <video
                     v-if="isVideoUrl(img) && !hasMediaError(img)"
@@ -190,7 +191,7 @@
           <!-- ====================================
                COLUMN 2: INFO DEL PRODUCTO
           ==================================== -->
-          <div class="lg:col-span-4 xl:col-span-4 space-y-5">
+          <div class="lg:col-span-4 space-y-4">
             
             <!-- Categoría + SKU -->
             <div>
@@ -219,32 +220,23 @@
               <span class="px-3 py-1 rounded-full bg-white border border-gray-200 text-[#5A5A5A]">
                 Lote minimo {{ LOTE_MINIMO }}
               </span>
-              <span class="px-3 py-1 rounded-full bg-white border border-gray-200 text-[#5A5A5A]">
-                Envio 24-48h
-              </span>
-              <span v-if="producto.marca" class="px-3 py-1 rounded-full bg-white border border-gray-200 text-[#5A5A5A]">
-                Marca {{ producto.marca }}
+              <span v-if="producto.metodo" class="px-3 py-1 rounded-full bg-white border border-gray-200 text-[#5A5A5A]">
+                {{ producto.metodo }}
               </span>
             </div>
             
             <!-- Separador -->
             <hr class="border-gray-200">
             
-            <!-- Características Rápidas -->
-            <div>
+            <!-- Características Rápidas (datos reales del producto) -->
+            <div v-if="tieneCaracteristicas">
               <h3 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3">Características</h3>
               <ul class="space-y-2">
-                <li v-if="producto.textura" class="flex items-center gap-2.5 text-sm text-gray-700">
+                <li v-if="producto.tipo" class="flex items-center gap-2.5 text-sm text-gray-700">
                   <svg class="w-4 h-4 text-[#007185] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                   </svg>
-                  Textura {{ producto.textura }}
-                </li>
-                <li v-if="producto.longitud" class="flex items-center gap-2.5 text-sm text-gray-700">
-                  <svg class="w-4 h-4 text-[#007185] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
-                  </svg>
-                  Largo: {{ producto.longitud }}"
+                  Tipo: {{ producto.tipo }}
                 </li>
                 <li v-if="producto.color" class="flex items-center gap-2.5 text-sm text-gray-700">
                   <svg class="w-4 h-4 text-[#007185] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -252,23 +244,35 @@
                   </svg>
                   Color: {{ producto.color }}
                 </li>
-                <li v-if="producto.densidad" class="flex items-center gap-2.5 text-sm text-gray-700">
+                <li v-if="producto.largo" class="flex items-center gap-2.5 text-sm text-gray-700">
                   <svg class="w-4 h-4 text-[#007185] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                   </svg>
-                  Densidad: {{ producto.densidad }}
+                  Largo: {{ producto.largo }}
                 </li>
-                <li class="flex items-center gap-2.5 text-sm text-gray-700">
+                <li v-if="producto.origen" class="flex items-center gap-2.5 text-sm text-gray-700">
                   <svg class="w-4 h-4 text-[#007185] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                   </svg>
-                  Calidad premium garantizada
+                  Origen: {{ producto.origen }}
                 </li>
-                <li class="flex items-center gap-2.5 text-sm text-gray-700">
+                <li v-if="producto.calidad" class="flex items-center gap-2.5 text-sm text-gray-700">
                   <svg class="w-4 h-4 text-[#007185] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                   </svg>
-                  Ideal para reventa
+                  Calidad: {{ producto.calidad }}
+                </li>
+                <li v-if="producto.peso_gramos" class="flex items-center gap-2.5 text-sm text-gray-700">
+                  <svg class="w-4 h-4 text-[#007185] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Peso: {{ producto.peso_gramos }}g
+                </li>
+                <li v-if="producto.metodo" class="flex items-center gap-2.5 text-sm text-gray-700">
+                  <svg class="w-4 h-4 text-[#007185] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+                  </svg>
+                  Método: {{ producto.metodo }}
                 </li>
               </ul>
             </div>
@@ -278,34 +282,6 @@
             
             <!-- Separador -->
             <hr class="border-gray-200">
-            
-            <!-- Por qué este producto - Business Benefits -->
-            <div class="bg-[#F7FAFA] rounded-lg p-4 border border-[#D5DBDB]">
-              <h3 class="text-xs font-bold text-gray-600 uppercase tracking-wider mb-3 flex items-center gap-2">
-                <svg class="w-4 h-4 text-[#007185]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6"/>
-                </svg>
-                Por qué vende bien
-              </h3>
-              <ul class="space-y-2 text-sm text-gray-700">
-                <li class="flex items-start gap-2">
-                  <span class="text-[#007185] font-bold">—</span>
-                  Alta demanda en salones
-                </li>
-                <li class="flex items-start gap-2">
-                  <span class="text-[#007185] font-bold">—</span>
-                  Margen sugerido: <strong class="text-gray-900">40% - 60%</strong>
-                </li>
-                <li class="flex items-start gap-2">
-                  <span class="text-[#007185] font-bold">—</span>
-                  Producto de rotación rápida
-                </li>
-                <li class="flex items-start gap-2">
-                  <span class="text-[#007185] font-bold">—</span>
-                  Calidad constante por lote
-                </li>
-              </ul>
-            </div>
             
             <!-- Precios por Volumen - Tabla limpia estilo ML -->
             <div class="border border-gray-200 rounded-lg overflow-hidden">
@@ -358,25 +334,33 @@
                       <td class="py-2 text-gray-500">Categoría</td>
                       <td class="py-2 text-gray-900">{{ producto.categoria.nombre }}</td>
                     </tr>
-                    <tr v-if="producto.marca" class="border-b border-gray-100">
-                      <td class="py-2 text-gray-500">Marca</td>
-                      <td class="py-2 text-gray-900">{{ producto.marca }}</td>
-                    </tr>
-                    <tr v-if="producto.longitud" class="border-b border-gray-100">
-                      <td class="py-2 text-gray-500">Longitud</td>
-                      <td class="py-2 text-gray-900">{{ producto.longitud }}"</td>
+                    <tr v-if="producto.tipo" class="border-b border-gray-100">
+                      <td class="py-2 text-gray-500">Tipo</td>
+                      <td class="py-2 text-gray-900">{{ producto.tipo }}</td>
                     </tr>
                     <tr v-if="producto.color" class="border-b border-gray-100">
                       <td class="py-2 text-gray-500">Color</td>
                       <td class="py-2 text-gray-900">{{ producto.color }}</td>
                     </tr>
-                    <tr v-if="producto.textura" class="border-b border-gray-100">
-                      <td class="py-2 text-gray-500">Textura</td>
-                      <td class="py-2 text-gray-900">{{ producto.textura }}</td>
+                    <tr v-if="producto.largo" class="border-b border-gray-100">
+                      <td class="py-2 text-gray-500">Largo</td>
+                      <td class="py-2 text-gray-900">{{ producto.largo }}</td>
                     </tr>
-                    <tr v-if="producto.peso" class="border-b border-gray-100">
+                    <tr v-if="producto.origen" class="border-b border-gray-100">
+                      <td class="py-2 text-gray-500">Origen</td>
+                      <td class="py-2 text-gray-900">{{ producto.origen }}</td>
+                    </tr>
+                    <tr v-if="producto.calidad" class="border-b border-gray-100">
+                      <td class="py-2 text-gray-500">Calidad</td>
+                      <td class="py-2 text-gray-900">{{ producto.calidad }}</td>
+                    </tr>
+                    <tr v-if="producto.metodo" class="border-b border-gray-100">
+                      <td class="py-2 text-gray-500">Método</td>
+                      <td class="py-2 text-gray-900">{{ producto.metodo }}</td>
+                    </tr>
+                    <tr v-if="producto.peso_gramos" class="border-b border-gray-100">
                       <td class="py-2 text-gray-500">Peso</td>
-                      <td class="py-2 text-gray-900">{{ producto.peso }}g</td>
+                      <td class="py-2 text-gray-900">{{ producto.peso_gramos }}g</td>
                     </tr>
                     <tr class="border-b border-gray-100">
                       <td class="py-2 text-gray-500">Stock</td>
@@ -409,7 +393,7 @@
                     <span class="text-gray-400 text-sm">/unidad</span>
                   </div>
                   <p v-if="descuentoTotal > 0" class="text-emerald-400 text-sm mt-1.5 font-medium">
-                    {{ descuentoTotal }}% menos que retail
+                    {{ descuentoTotal }}% menos que precio al público
                   </p>
                 </div>
                 
@@ -630,68 +614,6 @@
           </div>
         </div>
 
-        <!-- ========================================
-             VIDEOS DEL PRODUCTO - Amazon style
-        ======================================== -->
-        <div v-if="videosProducto.length > 0" class="mt-4 bg-white rounded-lg p-4 sm:p-6">
-          <h2 class="font-bold text-base sm:text-lg text-gray-900 mb-4">Videos del producto</h2>
-          
-          <div class="flex flex-col lg:flex-row gap-0">
-            <!-- Video player principal (constrained) -->
-            <div class="lg:flex-1 lg:max-w-[680px]">
-              <div class="relative bg-black rounded-l-lg lg:rounded-r-none rounded-lg overflow-hidden" style="aspect-ratio: 16/9; max-height: 380px;">
-                <video 
-                  :key="videoActual"
-                  :src="videoActual" 
-                  controls 
-                  preload="metadata"
-                  class="w-full h-full object-contain"
-                  controlslist="nodownload"
-                >
-                  Tu navegador no soporta video.
-                </video>
-              </div>
-              <div class="mt-2 px-1">
-                <p class="text-[13px] text-gray-500 truncate">{{ producto.nombre }}</p>
-              </div>
-            </div>
-            
-            <!-- Sidebar de videos (derecho, compacto como Amazon) -->
-            <div class="lg:w-56 xl:w-64 flex-shrink-0 lg:border-l border-gray-200">
-              <div class="px-3 pt-2 pb-1.5 border-b border-gray-200 hidden lg:block">
-                <p class="text-[13px] font-bold text-gray-900">Videos de este producto</p>
-              </div>
-              <div class="flex lg:flex-col gap-2 overflow-x-auto lg:overflow-x-visible lg:max-h-[340px] lg:overflow-y-auto pt-3 lg:pt-0 scrollbar-hide">
-                <button 
-                  v-for="(vid, idx) in videosProducto" 
-                  :key="idx"
-                  @click="videoActualIndex = idx"
-                  class="flex-shrink-0 flex items-start gap-2.5 px-3 py-2 transition-all duration-150 text-left border-l-2 lg:border-l-2"
-                  :class="videoActualIndex === idx 
-                    ? 'border-[#E77600] bg-gray-50' 
-                    : 'border-transparent hover:bg-gray-50'"
-                >
-                  <div class="relative w-24 flex-shrink-0 aspect-video bg-gray-900 rounded overflow-hidden">
-                    <video 
-                      :src="vid" 
-                      preload="metadata" 
-                      muted 
-                      class="w-full h-full object-cover"
-                    ></video>
-                    <div class="absolute inset-0 flex items-center justify-center bg-black/20">
-                      <svg class="w-5 h-5 text-white drop-shadow" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg>
-                    </div>
-                    <span v-if="videoActualIndex === idx" class="absolute bottom-0.5 left-0.5 text-[9px] bg-[#E77600] text-white px-1 py-0.5 rounded-sm font-medium leading-none">Reproduci...</span>
-                  </div>
-                  <div class="hidden lg:block min-w-0 pt-0.5">
-                    <p class="text-[12px] font-medium text-gray-800 line-clamp-2 leading-tight">{{ producto.nombre }}</p>
-                    <p class="text-[11px] text-gray-400 mt-0.5">Video {{ idx + 1 }}</p>
-                  </div>
-                </button>
-              </div>
-            </div>
-          </div>
-        </div>
       </div>
     </div>
     
@@ -774,45 +696,32 @@ export default {
     }
 
     const imagenes = computed(() => {
-      const imgs = []
+      const media = []
       const principal = normalizeMediaUrl(
         producto.value.imagen_principal || producto.value.imagen_url || producto.value.imagen
       )
-      if (principal && !isVideoUrl(principal)) imgs.push(principal)
+      if (principal) media.push(principal)
       if (producto.value.imagenes && Array.isArray(producto.value.imagenes)) {
         const adicionales = producto.value.imagenes
           .map(img => normalizeMediaUrl(img))
-          .filter(img => !!img && img !== principal && !isVideoUrl(img))
-        imgs.push(...adicionales)
+          .filter(img => !!img && img !== principal)
+        media.push(...adicionales)
       }
-      return imgs.length > 0 ? imgs : ['/placeholder.png']
+      return media.length > 0 ? [...new Set(media)] : ['/placeholder.png']
     })
     
     const imagenActual = computed(() => {
       const current = imagenes.value[imagenActualIndex.value] || null
-      const fallbackVideo = videoActual.value
       if (!current || current === '/placeholder.png') {
-        return fallbackVideo || '/placeholder.png'
+        return '/placeholder.png'
       }
       return current
     })
-
-    // Video section
-    const videosProducto = computed(() => {
-      const allMedia = []
-      const principal = normalizeMediaUrl(producto.value.imagen_principal)
-      if (principal) allMedia.push(principal)
-      if (producto.value.imagenes && Array.isArray(producto.value.imagenes)) {
-        producto.value.imagenes.forEach(img => {
-          const normalized = normalizeMediaUrl(img)
-          if (normalized) allMedia.push(normalized)
-        })
-      }
-      return [...new Set(allMedia)].filter(url => isVideoUrl(url))
+    
+    const tieneCaracteristicas = computed(() => {
+      const p = producto.value
+      return p.tipo || p.color || p.largo || p.origen || p.calidad || p.peso_gramos || p.metodo
     })
-
-    const videoActualIndex = ref(0)
-    const videoActual = computed(() => videosProducto.value[videoActualIndex.value] || null)
     
     const precioMayorista = computed(() => {
       return producto.value.precio_mayorista || producto.value.monto_precio || 0
@@ -1115,9 +1024,7 @@ export default {
       esFavorito,
       agregando,
       productosRelacionados,
-      videosProducto,
-      videoActualIndex,
-      videoActual,
+      tieneCaracteristicas,
       // Computed precios
       precioMayorista,
       precioRetail,

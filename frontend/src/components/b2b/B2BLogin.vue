@@ -297,7 +297,7 @@
         <!-- ===== Footer Links ===== -->
         <div class="mt-8 pt-6 border-t border-gray-100 text-center">
           <p class="text-text-light text-xs">
-            ¿Eres cliente retail? 
+            ¿Eres cliente particular? 
             <a :href="retailUrl" class="text-[#C9A962] hover:underline">
               Visita nuestra tienda
             </a>

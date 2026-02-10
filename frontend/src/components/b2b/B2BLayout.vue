@@ -64,7 +64,7 @@
                   <li><router-link to="/portal/catalogo" class="text-gray-400 hover:text-white text-sm transition-colors">Catálogo</router-link></li>
                   <li><router-link to="/portal/pedidos" class="text-gray-400 hover:text-white text-sm transition-colors">Mis Pedidos</router-link></li>
                   <li><router-link to="/portal/perfil" class="text-gray-400 hover:text-white text-sm transition-colors">Mi Cuenta</router-link></li>
-                  <li><a :href="retailUrl" class="text-gray-400 hover:text-white text-sm transition-colors">Tienda Retail</a></li>
+                  <li><a :href="retailUrl" class="text-gray-400 hover:text-white text-sm transition-colors">Tienda al Público</a></li>
                 </ul>
               </div>
 
@@ -132,6 +132,8 @@
                 <a href="https://105code.cloud" target="_blank" rel="noopener noreferrer" class="text-gray-400 hover:text-white font-medium transition-colors">105 Code</a>
                 <span class="text-gray-600 mx-1">·</span>
                 <span class="text-gray-400 font-medium">Labeste</span>
+                <span class="text-gray-600 mx-1">·</span>
+                <span class="text-gray-400 font-medium">Websarrollab</span>
               </div>
             </div>
           </div>

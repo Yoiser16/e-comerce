@@ -192,6 +192,7 @@ class ProductoDetalleB2B(BaseModel):
     id: str
     nombre: str
     descripcion: Optional[str] = None
+    descripcion_corta: Optional[str] = None
     categoria: Optional[dict] = None
     categoria_nombre: Optional[str] = None
     codigo: Optional[str] = None
@@ -211,6 +212,7 @@ class ProductoDetalleB2B(BaseModel):
     tipo: Optional[str] = None
     origen: Optional[str] = None
     calidad: Optional[str] = None
+    peso_gramos: Optional[int] = None
     activo: bool = True
 
 
@@ -233,7 +235,7 @@ def obtener_producto_b2b(
             raise HTTPException(status_code=400, detail="ID de producto inválido")
         
         try:
-            p = ProductoModel.objects.select_related('categoria').get(id=uid)
+            p = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').get(id=uid)
         except ProductoModel.DoesNotExist:
             raise HTTPException(status_code=404, detail="Producto no encontrado")
 
@@ -248,13 +250,26 @@ def obtener_producto_b2b(
         imagenes = []
         if p.imagen_principal:
             imagenes.append(p.imagen_principal)
-        if p.imagenes and isinstance(p.imagenes, list):
-            imagenes.extend([img for img in p.imagenes if img and img != p.imagen_principal])
+        try:
+            imagenes_qs = p.imagenes.all().order_by('orden')
+            imagenes.extend([img.url for img in imagenes_qs if img.url and img.url != p.imagen_principal])
+        except Exception:
+            pass
+        
+        # Helper para obtener label legible de choices
+        def get_choice_label(value, choices):
+            if not value:
+                return None
+            for k, v in choices:
+                if k == value:
+                    return v
+            return value
         
         return ProductoDetalleB2B(
             id=str(p.id),
             nombre=p.nombre,
             descripcion=p.descripcion,
+            descripcion_corta=p.descripcion_corta if p.descripcion_corta else None,
             categoria={
                 'id': str(p.categoria.id) if p.categoria else None,
                 'nombre': p.categoria.nombre if p.categoria else None,
@@ -272,12 +287,13 @@ def obtener_producto_b2b(
             stock=p.stock_actual - p.stock_reservado,
             stock_actual=p.stock_actual,
             cantidad_minima=10 if p.metodo == 'bundle' else 1,
-            metodo=p.metodo,
-            color=p.color,
-            largo=p.largo,
-            tipo=p.tipo,
-            origen=p.origen,
-            calidad=p.calidad,
+            metodo=get_choice_label(p.metodo, ProductoModel.METODO_CHOICES),
+            color=get_choice_label(p.color, ProductoModel.COLOR_CHOICES),
+            largo=f"{p.largo} pulgadas" if p.largo else None,
+            tipo=get_choice_label(p.tipo, ProductoModel.TIPO_CHOICES),
+            origen=get_choice_label(p.origen, ProductoModel.ORIGEN_CHOICES),
+            calidad=get_choice_label(p.calidad, ProductoModel.CALIDAD_CHOICES),
+            peso_gramos=p.peso_gramos,
             activo=p.activo
         )
     except HTTPException:
