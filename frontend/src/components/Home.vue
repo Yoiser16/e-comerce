@@ -1323,7 +1323,7 @@
          ======================================== -->
     <!-- Instagram Button -->
     <a 
-      href="https://www.instagram.com/kharis_hair21/"
+      href="https://www.instagram.com/kharisdistribuidora/"
       target="_blank"
       class="fixed bottom-24 sm:bottom-28 right-4 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 text-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all duration-300 z-40 group touch-target"
     >

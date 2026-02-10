@@ -250,7 +250,7 @@ export default {
       notifNuevaOrden: true,
       notifStockBajo: true,
       umbralStockBajo: 5,
-      instagram: 'https://instagram.com/kharis_hair',
+      instagram: 'https://www.instagram.com/kharisdistribuidora/',
       whatsapp: '+573001234567',
       facebook: '',
       tiktok: ''
