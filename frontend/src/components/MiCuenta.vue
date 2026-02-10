@@ -191,8 +191,17 @@
                 class="flex gap-4"
               >
                 <div class="w-16 h-20 bg-nude-50 flex-shrink-0">
-                  <img 
-                    :src="item.imagen || '/placeholder.jpg'" 
+                  <video
+                    v-if="isVideo(getCompraMediaUrl(item))"
+                    :src="getCompraMediaUrl(item)"
+                    class="w-full h-full object-cover"
+                    muted
+                    playsinline
+                    preload="metadata"
+                  />
+                  <img
+                    v-else
+                    :src="getCompraMediaUrl(item) || '/placeholder.jpg'"
                     :alt="item.nombre"
                     class="w-full h-full object-cover"
                   />
@@ -357,6 +366,17 @@ export default {
         loadingCompras.value = false
       }
     }
+
+    const isVideo = (url) => {
+      if (!url) return false
+      const cleanUrl = url.split('?')[0].toLowerCase()
+      return ['.mp4', '.webm', '.ogg', '.mov'].some(ext => cleanUrl.endsWith(ext))
+    }
+
+    const getCompraMediaUrl = (item) => {
+      const raw = item?.imagen || item?.image || item?.imagen_principal || ''
+      return getImageUrl(raw)
+    }
     
     const quitarFavorito = async (productoId) => {
       try {
@@ -455,7 +475,9 @@ export default {
       formatPrice,
       formatDate,
       getEstadoClass,
-      getImageUrl
+      getImageUrl,
+      isVideo,
+      getCompraMediaUrl
     }
   }
 }
