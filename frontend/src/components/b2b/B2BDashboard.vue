@@ -142,7 +142,7 @@
                     </router-link>
                     
                     <a 
-                      href="https://wa.me/573001234567"
+                      href="https://wa.me/4796657763"
                       target="_blank"
                       class="inline-flex items-center gap-2 px-5 py-3 border border-[#8B7355]/40 text-[#2C1810] text-sm font-medium rounded-full hover:bg-[#8B7355]/10 transition-all"
                     >
@@ -784,7 +784,7 @@
             </div>
             
             <a 
-              href="https://wa.me/573001234567?text=Hola,%20soy%20mayorista%20y%20necesito%20asesoría"
+              href="https://wa.me/4796657763?text=Hola,%20soy%20mayorista%20y%20necesito%20asesoría"
               target="_blank"
               class="shrink-0 px-6 py-3 bg-white/10 hover:bg-white/20 text-white text-sm font-medium rounded-lg transition-all duration-300 flex items-center gap-2 border border-white/10"
             >

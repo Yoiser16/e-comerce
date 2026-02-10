@@ -873,7 +873,7 @@ export default {
         `💰 Total: $${formatPrice(subtotal.value)}\n\n` +
         `Link: ${window.location.href}`
       )
-      return `https://wa.me/573001234567?text=${mensaje}` // Cambiar número
+      return `https://wa.me/4796657763?text=${mensaje}` // Cambiar número
     })
     
     // Methods

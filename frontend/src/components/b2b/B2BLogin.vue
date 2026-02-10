@@ -688,7 +688,7 @@
               <!-- Botón de acción (contactar soporte) -->
               <a 
                 v-if="statusModal.showSupport"
-                href="https://wa.me/573001234567?text=Hola,%20necesito%20ayuda%20con%20mi%20cuenta%20mayorista"
+                href="https://wa.me/4796657763?text=Hola,%20necesito%20ayuda%20con%20mi%20cuenta%20mayorista"
                 target="_blank"
                 class="px-6 py-3 bg-green-500 hover:bg-green-600 text-white font-medium rounded-lg transition-colors inline-flex items-center justify-center gap-2"
               >

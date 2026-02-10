@@ -201,7 +201,7 @@
             <div class="mt-6 pt-4 border-t border-gray-100 text-center">
               <p class="text-xs text-gray-400 mb-1">¿Necesitas ajustar el pedido?</p>
               <a 
-                href="https://wa.me/573001234567"
+                href="https://wa.me/4796657763"
                 target="_blank"
                 class="text-xs text-gray-500 hover:text-gray-700 transition-colors"
               >

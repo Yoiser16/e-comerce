@@ -670,7 +670,7 @@ export default {
         router.push('/portal/login')
       } else if (action === 'support') {
         // Abrir WhatsApp de soporte
-        window.open('https://wa.me/573001234567?text=Hola, necesito ayuda con mi cuenta mayorista', '_blank')
+        window.open('https://wa.me/4796657763?text=Hola, necesito ayuda con mi cuenta mayorista', '_blank')
       }
     }
 

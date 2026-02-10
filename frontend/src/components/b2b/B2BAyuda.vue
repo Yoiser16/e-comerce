@@ -9,7 +9,7 @@
     <!-- Quick Actions -->
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-10">
       <a 
-        href="https://wa.me/573001234567?text=Hola,%20necesito%20ayuda%20con%20mi%20pedido" 
+        href="https://wa.me/4796657763?text=Hola,%20necesito%20ayuda%20con%20mi%20pedido" 
         target="_blank"
         class="flex items-center gap-4 p-5 bg-white rounded-xl border border-gray-100 hover:border-emerald-200 hover:shadow-lg transition-all group"
       >
@@ -36,7 +36,7 @@
       </a>
 
       <a 
-        href="tel:+573001234567"
+        href="tel:+4796657763"
         class="flex items-center gap-4 p-5 bg-white rounded-xl border border-gray-100 hover:border-blue-200 hover:shadow-lg transition-all group"
       >
         <div class="w-12 h-12 rounded-xl bg-blue-50 flex items-center justify-center group-hover:bg-blue-100 transition-colors">

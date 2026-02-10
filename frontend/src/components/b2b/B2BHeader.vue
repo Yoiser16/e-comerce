@@ -451,7 +451,7 @@
               Centro de ayuda
             </router-link>
             <a 
-              href="https://wa.me/573001234567" 
+              href="https://wa.me/4796657763" 
               target="_blank" 
               class="flex items-center gap-1 px-2.5 py-1.5 text-[12px] text-white/50 hover:text-white/80 hover:bg-white/[0.05] rounded transition-colors"
             >
