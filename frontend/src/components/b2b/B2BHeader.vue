@@ -560,46 +560,8 @@
       <transition name="slide-fullscreen">
         <div 
           v-if="showMobileMenu" 
-          class="lg:hidden fixed inset-0 z-[100] bg-white flex flex-col"
+          class="lg:hidden fixed top-14 inset-x-0 bottom-0 z-[100] bg-white flex flex-col"
         >
-          <!-- Header con búsqueda -->
-          <div class="bg-[#131A2B] px-4 py-3">
-            <div class="flex items-center gap-3">
-              <!-- Logo -->
-              <router-link to="/portal" @click="showMobileMenu = false" class="flex-shrink-0">
-                <img src="/logo%20blanco.png" alt="Kharis" class="h-7 w-auto" />
-              </router-link>
-              
-              <!-- Search -->
-              <div class="flex-1 relative">
-                <input
-                  type="text"
-                  placeholder="Buscar en Kharis..."
-                  class="w-full h-9 pl-3 pr-8 bg-white rounded text-sm text-gray-800 placeholder:text-gray-400 outline-none"
-                  @focus="showMobileMenu = false; showMobileSearch = true"
-                />
-                <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
-                </svg>
-              </div>
-              
-              <!-- Cart & Close -->
-              <router-link to="/portal/carrito" @click="showMobileMenu = false" class="relative p-1.5 text-white">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121 0 2.052-.868 2.178-1.977l.672-5.927A1.125 1.125 0 0014.732 5.25H4.51M7.5 14.25L5.106 5.272M8.25 18.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM17.25 18.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/>
-                </svg>
-                <span v-if="cartItemsCount > 0" class="absolute -top-1 -right-1 w-4 h-4 bg-[#C9A962] text-[#131A2B] text-[10px] font-bold flex items-center justify-center rounded-full">
-                  {{ cartItemsCount > 9 ? '9+' : cartItemsCount }}
-                </span>
-              </router-link>
-              <button @click="showMobileMenu = false" class="p-1.5 text-white">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-              </button>
-            </div>
-          </div>
-          
           <!-- Contenido scrolleable -->
           <div class="flex-1 overflow-y-auto">
             <!-- Perfil de usuario -->
