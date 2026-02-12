@@ -346,43 +346,58 @@
                 <label class="block text-xs lg:text-sm font-medium text-text-dark mb-1">
                   Foto de {{ form.tipoDocumento === 'NIT' ? 'RUT' : 'Cédula' }} (Frente) *
                 </label>
-                <div 
-                  @click="triggerFileInput('frente')"
-                  @dragover.prevent="dragOver = 'frente'"
-                  @dragleave="dragOver = null"
-                  @drop.prevent="handleDrop($event, 'frente')"
-                  :class="[
-                    'border-2 border-dashed rounded-lg p-3 lg:p-6 text-center cursor-pointer transition-all',
-                    dragOver === 'frente' ? 'border-[#C9A962] bg-[#C9A962]/5' : 
-                    errors.cedulaFrente ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-[#C9A962]/50 hover:bg-gray-50'
-                  ]"
-                >
-                  <!-- Preview si hay imagen -->
-                  <div v-if="previews.frente" class="relative inline-block">
-                    <img :src="previews.frente" alt="Cédula Frente" class="max-h-20 lg:max-h-32 rounded-lg mx-auto" />
+                
+                <!-- Si ya hay preview -->
+                <div v-if="previews.frente" class="border-2 border-[#C9A962] rounded-lg p-3 lg:p-4 bg-[#C9A962]/5">
+                  <div class="relative inline-block w-full">
+                    <img :src="previews.frente" alt="Cédula Frente" class="w-full max-h-28 lg:max-h-40 object-contain rounded-lg mx-auto" />
                     <button 
                       type="button"
                       @click.stop="removeFile('frente')"
-                      class="absolute -top-2 -right-2 w-5 h-5 lg:w-6 lg:h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                      class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 shadow-lg"
                     >
-                      <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
-                    <p class="text-xs text-text-medium mt-1">{{ form.cedulaFrente?.name }}</p>
                   </div>
+                  <p class="text-xs text-center text-[#C9A962] font-medium mt-2">✓ Foto capturada</p>
+                </div>
+                
+                <!-- Si no hay preview - Botones de acción -->
+                <div v-else class="flex gap-2">
+                  <!-- Botón Cámara (SOLO MÓVIL) -->
+                  <button
+                    v-if="isMobile"
+                    type="button"
+                    @click="openCamera('frente')"
+                    class="flex-1 border-2 border-dashed rounded-lg p-3 lg:p-4 text-center transition-all"
+                    :class="errors.cedulaFrente ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-[#C9A962] hover:bg-[#C9A962]/5'"
+                  >
+                    <svg class="w-6 h-6 lg:w-8 lg:h-8 mx-auto text-[#C9A962] mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <p class="text-xs lg:text-sm font-medium text-[#C9A962]">Tomar foto</p>
+                  </button>
                   
-                  <!-- Estado vacío -->
-                  <div v-else>
-                    <svg class="w-8 h-8 lg:w-10 lg:h-10 mx-auto text-gray-400 mb-1 lg:mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <!-- Botón Archivo -->
+                  <button
+                    type="button"
+                    @click="triggerFileInput('frente')"
+                    class="border-2 border-dashed rounded-lg p-3 lg:p-4 text-center transition-all"
+                    :class="[
+                      isMobile ? 'flex-1' : 'w-full',
+                      errors.cedulaFrente ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-400 hover:bg-gray-50'
+                    ]"
+                  >
+                    <svg class="w-6 h-6 lg:w-8 lg:h-8 mx-auto text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <p class="text-xs lg:text-sm text-text-medium">
-                      <span class="text-[#C9A962] font-medium">Subir foto</span> o arrastrar
-                    </p>
-                    <p class="text-[10px] lg:text-xs text-text-light mt-0.5">PNG, JPG hasta 5MB</p>
-                  </div>
+                    <p class="text-xs lg:text-sm text-gray-500">Subir archivo</p>
+                  </button>
                 </div>
+                
                 <input 
                   ref="inputFrente"
                   type="file"
@@ -398,43 +413,58 @@
                 <label class="block text-xs lg:text-sm font-medium text-text-dark mb-1">
                   Foto de {{ form.tipoDocumento === 'NIT' ? 'RUT' : 'Cédula' }} (Dorso) *
                 </label>
-                <div 
-                  @click="triggerFileInput('dorso')"
-                  @dragover.prevent="dragOver = 'dorso'"
-                  @dragleave="dragOver = null"
-                  @drop.prevent="handleDrop($event, 'dorso')"
-                  :class="[
-                    'border-2 border-dashed rounded-lg p-3 lg:p-6 text-center cursor-pointer transition-all',
-                    dragOver === 'dorso' ? 'border-[#C9A962] bg-[#C9A962]/5' : 
-                    errors.cedulaDorso ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-[#C9A962]/50 hover:bg-gray-50'
-                  ]"
-                >
-                  <!-- Preview si hay imagen -->
-                  <div v-if="previews.dorso" class="relative inline-block">
-                    <img :src="previews.dorso" alt="Cédula Dorso" class="max-h-20 lg:max-h-32 rounded-lg mx-auto" />
+                
+                <!-- Si ya hay preview -->
+                <div v-if="previews.dorso" class="border-2 border-[#C9A962] rounded-lg p-3 lg:p-4 bg-[#C9A962]/5">
+                  <div class="relative inline-block w-full">
+                    <img :src="previews.dorso" alt="Cédula Dorso" class="w-full max-h-28 lg:max-h-40 object-contain rounded-lg mx-auto" />
                     <button 
                       type="button"
                       @click.stop="removeFile('dorso')"
-                      class="absolute -top-2 -right-2 w-5 h-5 lg:w-6 lg:h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                      class="absolute top-1 right-1 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600 shadow-lg"
                     >
-                      <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
-                    <p class="text-xs text-text-medium mt-1">{{ form.cedulaDorso?.name }}</p>
                   </div>
+                  <p class="text-xs text-center text-[#C9A962] font-medium mt-2">✓ Foto capturada</p>
+                </div>
+                
+                <!-- Si no hay preview - Botones de acción -->
+                <div v-else class="flex gap-2">
+                  <!-- Botón Cámara (SOLO MÓVIL) -->
+                  <button
+                    v-if="isMobile"
+                    type="button"
+                    @click="openCamera('dorso')"
+                    class="flex-1 border-2 border-dashed rounded-lg p-3 lg:p-4 text-center transition-all"
+                    :class="errors.cedulaDorso ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-[#C9A962] hover:bg-[#C9A962]/5'"
+                  >
+                    <svg class="w-6 h-6 lg:w-8 lg:h-8 mx-auto text-[#C9A962] mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z" />
+                    </svg>
+                    <p class="text-xs lg:text-sm font-medium text-[#C9A962]">Tomar foto</p>
+                  </button>
                   
-                  <!-- Estado vacío -->
-                  <div v-else>
-                    <svg class="w-8 h-8 lg:w-10 lg:h-10 mx-auto text-gray-400 mb-1 lg:mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <!-- Botón Archivo -->
+                  <button
+                    type="button"
+                    @click="triggerFileInput('dorso')"
+                    class="border-2 border-dashed rounded-lg p-3 lg:p-4 text-center transition-all"
+                    :class="[
+                      isMobile ? 'flex-1' : 'w-full',
+                      errors.cedulaDorso ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-gray-400 hover:bg-gray-50'
+                    ]"
+                  >
+                    <svg class="w-6 h-6 lg:w-8 lg:h-8 mx-auto text-gray-400 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <p class="text-xs lg:text-sm text-text-medium">
-                      <span class="text-[#C9A962] font-medium">Subir foto</span> o arrastrar
-                    </p>
-                    <p class="text-[10px] lg:text-xs text-text-light mt-0.5">PNG, JPG hasta 5MB</p>
-                  </div>
+                    <p class="text-xs lg:text-sm text-gray-500">Subir archivo</p>
+                  </button>
                 </div>
+                
                 <input 
                   ref="inputDorso"
                   type="file"
@@ -506,6 +536,162 @@
       </div>
     </div>
     
+    <!-- =========================================================================
+         MODAL DE CÁMARA PROFESIONAL (estilo ML/Nequi)
+    ========================================================================== -->
+    <Teleport to="body">
+      <Transition name="camera-modal">
+        <div 
+          v-if="camera.show" 
+          class="fixed inset-0 z-[100] bg-black flex flex-col"
+        >
+          <!-- Header de la cámara -->
+          <div class="relative z-20 flex items-center justify-between p-4 bg-gradient-to-b from-black/80 to-transparent">
+            <button 
+              @click="closeCamera"
+              class="w-10 h-10 flex items-center justify-center text-white"
+            >
+              <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+            <span class="text-white font-medium text-sm">
+              {{ camera.type === 'frente' ? 'Parte frontal del documento' : 'Parte trasera del documento' }}
+            </span>
+            <div class="w-10"></div>
+          </div>
+
+          <!-- Área del video con overlay -->
+          <div class="flex-1 relative overflow-hidden flex items-center justify-center">
+            <!-- Video de la cámara -->
+            <video 
+              ref="videoRef"
+              autoplay 
+              playsinline
+              class="absolute inset-0 w-full h-full object-cover"
+              :class="{ 'camera-filter': camera.enhanceMode }"
+            ></video>
+            
+            <!-- Canvas oculto para captura -->
+            <canvas ref="canvasRef" class="hidden"></canvas>
+            
+            <!-- Overlay con marco guía (solo cuando la cámara está activa) -->
+            <div v-if="camera.isStreaming && !camera.captured" class="absolute inset-0 pointer-events-none">
+              <!-- Oscurecer áreas fuera del marco -->
+              <div class="absolute inset-0 bg-black/50"></div>
+              
+              <!-- Marco del documento (área clara) -->
+              <div class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[85%] max-w-md aspect-[1.6/1]">
+                <!-- Recorte transparente -->
+                <div class="absolute inset-0 bg-black/50" style="box-shadow: 0 0 0 100vmax rgba(0,0,0,0.5);"></div>
+                
+                <!-- Marco con esquinas decorativas -->
+                <div class="absolute inset-0 border-2 border-white/80 rounded-xl">
+                  <!-- Esquinas animadas -->
+                  <div class="absolute -top-0.5 -left-0.5 w-6 h-6 border-t-4 border-l-4 border-[#C9A962] rounded-tl-xl"></div>
+                  <div class="absolute -top-0.5 -right-0.5 w-6 h-6 border-t-4 border-r-4 border-[#C9A962] rounded-tr-xl"></div>
+                  <div class="absolute -bottom-0.5 -left-0.5 w-6 h-6 border-b-4 border-l-4 border-[#C9A962] rounded-bl-xl"></div>
+                  <div class="absolute -bottom-0.5 -right-0.5 w-6 h-6 border-b-4 border-r-4 border-[#C9A962] rounded-br-xl"></div>
+                </div>
+                
+                <!-- Texto guía -->
+                <div class="absolute -bottom-12 left-0 right-0 text-center">
+                  <p class="text-white text-sm font-medium">Coloca tu documento dentro del marco</p>
+                  <p class="text-white/60 text-xs mt-1">Asegúrate de que esté bien iluminado</p>
+                </div>
+              </div>
+            </div>
+            
+            <!-- Preview de captura -->
+            <div v-if="camera.captured" class="absolute inset-0 flex items-center justify-center bg-black">
+              <img 
+                :src="camera.capturedImage" 
+                alt="Foto capturada" 
+                class="max-w-full max-h-full object-contain"
+                :class="{ 'camera-filter': camera.enhanceMode }"
+              />
+            </div>
+            
+            <!-- Mensaje de cargando -->
+            <div v-if="camera.loading" class="absolute inset-0 flex items-center justify-center bg-black/70 z-30">
+              <div class="text-center">
+                <svg class="w-12 h-12 mx-auto animate-spin text-[#C9A962]" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <p class="text-white mt-3 text-sm">Procesando imagen...</p>
+              </div>
+            </div>
+            
+            <!-- Error de cámara -->
+            <div v-if="camera.error" class="absolute inset-0 flex items-center justify-center bg-black z-30 p-6">
+              <div class="text-center">
+                <svg class="w-16 h-16 mx-auto text-red-500 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                </svg>
+                <p class="text-white font-medium mb-2">No se pudo acceder a la cámara</p>
+                <p class="text-white/60 text-sm mb-6">{{ camera.error }}</p>
+                <button 
+                  @click="closeCamera"
+                  class="px-6 py-2.5 bg-white text-black rounded-lg font-medium"
+                >
+                  Cerrar
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Controles de la cámara -->
+          <div class="relative z-20 p-6 pb-8 bg-gradient-to-t from-black via-black/90 to-transparent">
+            <!-- Toggle de filtro de mejora -->
+            <div class="flex justify-center mb-4">
+              <button 
+                @click="camera.enhanceMode = !camera.enhanceMode"
+                class="flex items-center gap-2 px-4 py-2 rounded-full transition-colors"
+                :class="camera.enhanceMode ? 'bg-[#C9A962] text-white' : 'bg-white/20 text-white'"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" />
+                </svg>
+                <span class="text-xs font-medium">Mejorar nitidez</span>
+              </button>
+            </div>
+            
+            <!-- Botones de acción -->
+            <div class="flex items-center justify-center gap-8">
+              <!-- Si no hay captura -->
+              <template v-if="!camera.captured">
+                <!-- Botón capturar -->
+                <button 
+                  @click="capturePhoto"
+                  :disabled="!camera.isStreaming || camera.loading"
+                  class="w-16 h-16 rounded-full bg-white flex items-center justify-center disabled:opacity-50 transition-transform active:scale-95"
+                >
+                  <div class="w-14 h-14 rounded-full border-4 border-black/20"></div>
+                </button>
+              </template>
+              
+              <!-- Si ya hay captura - botones retomar/usar -->
+              <template v-else>
+                <button 
+                  @click="retakePhoto"
+                  class="flex-1 max-w-[140px] py-3 border-2 border-white text-white rounded-lg font-medium transition-colors hover:bg-white/10"
+                >
+                  Retomar
+                </button>
+                <button 
+                  @click="usePhoto"
+                  class="flex-1 max-w-[140px] py-3 bg-[#C9A962] text-white rounded-lg font-medium transition-colors hover:bg-[#B8944F]"
+                >
+                  Usar foto
+                </button>
+              </template>
+            </div>
+          </div>
+        </div>
+      </Transition>
+    </Teleport>
+
     <!-- =========================================================================
          MODAL DE ESTADO (Cuenta en revisión, rechazada, etc.)
     ========================================================================== -->
@@ -625,6 +811,30 @@ export default {
     
     const inputFrente = ref(null)
     const inputDorso = ref(null)
+    
+    // Detección de dispositivo móvil
+    const isMobile = ref(false)
+    if (typeof window !== 'undefined') {
+      isMobile.value = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent) 
+        || (navigator.maxTouchPoints && navigator.maxTouchPoints > 2)
+    }
+    
+    // Refs para la cámara
+    const videoRef = ref(null)
+    const canvasRef = ref(null)
+    
+    // Estado de la cámara profesional
+    const camera = ref({
+      show: false,
+      type: null, // 'frente' o 'dorso'
+      isStreaming: false,
+      loading: false,
+      error: null,
+      captured: false,
+      capturedImage: null,
+      enhanceMode: true, // Filtro de mejora activado por defecto
+      stream: null
+    })
     
     const form = reactive({
       // Paso 1
@@ -859,6 +1069,157 @@ export default {
       }
     }
     
+    // =========================================================================
+    // CAMERA METHODS (Profesional estilo ML/Nequi)
+    // =========================================================================
+    
+    async function openCamera(type) {
+      camera.value = {
+        show: true,
+        type: type,
+        isStreaming: false,
+        loading: true,
+        error: null,
+        captured: false,
+        capturedImage: null,
+        enhanceMode: true,
+        stream: null
+      }
+      
+      // Esperar a que el video ref esté disponible
+      await new Promise(resolve => setTimeout(resolve, 100))
+      
+      try {
+        // Solicitar acceso a la cámara (preferir trasera en móviles)
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: {
+            facingMode: { ideal: 'environment' }, // Cámara trasera
+            width: { ideal: 1920 },
+            height: { ideal: 1080 }
+          },
+          audio: false
+        })
+        
+        camera.value.stream = stream
+        
+        if (videoRef.value) {
+          videoRef.value.srcObject = stream
+          videoRef.value.onloadedmetadata = () => {
+            camera.value.isStreaming = true
+            camera.value.loading = false
+          }
+        }
+      } catch (err) {
+        console.error('Error al acceder a la cámara:', err)
+        camera.value.loading = false
+        
+        if (err.name === 'NotAllowedError') {
+          camera.value.error = 'Permiso de cámara denegado. Por favor, permite el acceso a la cámara en la configuración de tu navegador.'
+        } else if (err.name === 'NotFoundError') {
+          camera.value.error = 'No se encontró ninguna cámara en tu dispositivo.'
+        } else {
+          camera.value.error = 'Error al iniciar la cámara. Intenta subir la imagen manualmente.'
+        }
+      }
+    }
+    
+    function closeCamera() {
+      // Detener el stream de la cámara
+      if (camera.value.stream) {
+        camera.value.stream.getTracks().forEach(track => track.stop())
+      }
+      camera.value.show = false
+    }
+    
+    function capturePhoto() {
+      if (!videoRef.value || !canvasRef.value) return
+      
+      const video = videoRef.value
+      const canvas = canvasRef.value
+      const ctx = canvas.getContext('2d')
+      
+      // Configurar el canvas con las dimensiones del video
+      canvas.width = video.videoWidth
+      canvas.height = video.videoHeight
+      
+      // Dibujar el frame actual del video
+      ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+      
+      // Aplicar filtros de mejora si está activado
+      if (camera.value.enhanceMode) {
+        applyEnhanceFilter(ctx, canvas.width, canvas.height)
+      }
+      
+      // Convertir a imagen
+      const imageData = canvas.toDataURL('image/jpeg', 0.92)
+      
+      camera.value.captured = true
+      camera.value.capturedImage = imageData
+    }
+    
+    function applyEnhanceFilter(ctx, width, height) {
+      // Obtener los datos de la imagen
+      const imageData = ctx.getImageData(0, 0, width, height)
+      const data = imageData.data
+      
+      // Aplicar mejoras para documentos:
+      // - Aumentar contraste
+      // - Aumentar brillo ligeramente
+      // - Sharpening sutil
+      
+      const contrast = 1.15 // 15% más contraste
+      const brightness = 10 // Un poco más de brillo
+      
+      for (let i = 0; i < data.length; i += 4) {
+        // Aplicar contraste y brillo
+        data[i] = Math.min(255, Math.max(0, ((data[i] - 128) * contrast) + 128 + brightness))     // R
+        data[i+1] = Math.min(255, Math.max(0, ((data[i+1] - 128) * contrast) + 128 + brightness)) // G
+        data[i+2] = Math.min(255, Math.max(0, ((data[i+2] - 128) * contrast) + 128 + brightness)) // B
+      }
+      
+      ctx.putImageData(imageData, 0, 0)
+    }
+    
+    function retakePhoto() {
+      camera.value.captured = false
+      camera.value.capturedImage = null
+    }
+    
+    function usePhoto() {
+      if (!camera.value.capturedImage) return
+      
+      // Convertir base64 a File
+      const blob = dataURLtoBlob(camera.value.capturedImage)
+      const timestamp = Date.now()
+      const file = new File([blob], `documento_${camera.value.type}_${timestamp}.jpg`, { type: 'image/jpeg' })
+      
+      // Guardar en el formulario
+      if (camera.value.type === 'frente') {
+        form.cedulaFrente = file
+        previews.frente = camera.value.capturedImage
+        delete errors.cedulaFrente
+      } else {
+        form.cedulaDorso = file
+        previews.dorso = camera.value.capturedImage
+        delete errors.cedulaDorso
+      }
+      
+      // Cerrar la cámara
+      closeCamera()
+    }
+    
+    function dataURLtoBlob(dataURL) {
+      const parts = dataURL.split(',')
+      const mime = parts[0].match(/:(.*?);/)[1]
+      const bstr = atob(parts[1])
+      let n = bstr.length
+      const u8arr = new Uint8Array(n)
+      while (n--) {
+        u8arr[n] = bstr.charCodeAt(n)
+      }
+      return new Blob([u8arr], { type: mime })
+    }
+    
     async function handleSubmit() {
       if (!validateStep2()) return
       
@@ -923,6 +1284,10 @@ export default {
       dragOver,
       inputFrente,
       inputDorso,
+      isMobile,
+      videoRef,
+      canvasRef,
+      camera,
       form,
       previews,
       errors,
@@ -935,7 +1300,12 @@ export default {
       removeFile,
       handleSubmit,
       closeStatusModal,
-      handleModalAction
+      handleModalAction,
+      openCamera,
+      closeCamera,
+      capturePhoto,
+      retakePhoto,
+      usePhoto
     }
   }
 }
@@ -962,5 +1332,22 @@ input[type="checkbox"]:checked {
 .modal-enter-from .relative,
 .modal-leave-to .relative {
   transform: scale(0.95) translateY(10px);
+}
+
+/* Camera modal transitions */
+.camera-modal-enter-active,
+.camera-modal-leave-active {
+  transition: all 0.3s ease;
+}
+
+.camera-modal-enter-from,
+.camera-modal-leave-to {
+  opacity: 0;
+  transform: translateY(100%);
+}
+
+/* Filtro de mejora para documentos */
+.camera-filter {
+  filter: contrast(1.1) brightness(1.05) saturate(0.9);
 }
 </style>
