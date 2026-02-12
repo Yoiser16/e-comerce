@@ -112,16 +112,16 @@
     </div>
   </div>
 
-  <!-- LIST VIEW -->
+  <!-- LIST VIEW (estilo Mercado Libre) -->
   <div 
     v-else
-    class="bg-white rounded-lg border border-gray-100 overflow-hidden shadow-sm flex h-32 sm:h-36"
+    class="bg-white border-b border-gray-100 overflow-hidden flex py-4 px-3 hover:bg-gray-50/50 transition-colors"
     :class="{ 'opacity-60': !product.inStock }"
   >
-    <!-- Image (compact, fixed size) -->
+    <!-- Image (compact, square) -->
     <router-link 
       :to="`/portal/producto/${product.id}`"
-      class="relative w-32 sm:w-36 h-full flex-shrink-0 bg-gray-50 overflow-hidden cursor-pointer"
+      class="relative w-[100px] h-[100px] sm:w-28 sm:h-28 flex-shrink-0 bg-white rounded-xl overflow-hidden cursor-pointer shadow-sm border border-gray-100"
     >
       <video
         v-if="isVideo && !imageError"
@@ -141,60 +141,68 @@
         @error="handleImageError"
       />
 
-      <!-- Badges -->
-      <div class="absolute top-2 left-2 flex flex-col gap-1">
-        <span 
-          v-if="discountPercentage > 0"
-          class="px-2 py-0.5 bg-[#1A1A1A] text-white text-[10px] font-bold rounded-full"
-        >
-          -{{ discountPercentage }}%
-        </span>
-        <span 
-          v-if="product.isNew"
-          class="px-2 py-0.5 bg-emerald-500 text-white text-[10px] font-bold uppercase tracking-wider rounded-full"
-        >
-          Nuevo
-        </span>
-      </div>
+      <!-- Favorite button -->
+      <button class="absolute top-1.5 right-1.5 w-7 h-7 bg-white/90 rounded-full flex items-center justify-center shadow-sm">
+        <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+        </svg>
+      </button>
     </router-link>
 
-    <!-- Info -->
-    <div class="flex-1 p-3 sm:p-4 flex flex-col justify-between min-w-0 overflow-hidden">
+    <!-- Info (estilo ML mejorado) -->
+    <div class="flex-1 pl-3 sm:pl-4 flex flex-col justify-between min-w-0">
+      <!-- Title -->
       <div>
-        <div class="flex items-start justify-between gap-3">
-          <div class="min-w-0">
-            <p class="text-gray-400 text-[10px] sm:text-xs uppercase tracking-wider mb-0.5">{{ product.category }}</p>
-            <router-link :to="`/portal/producto/${product.id}`" class="block">
-              <h3 class="font-semibold text-gray-900 text-xs sm:text-sm line-clamp-1 sm:line-clamp-2 leading-snug">
-                {{ product.name }}
-              </h3>
-            </router-link>
-            <p v-if="product.sku" class="text-gray-400 text-[10px] mt-0.5">SKU: {{ product.sku }}</p>
-          </div>
-          <span 
-            class="px-2 py-1 text-[10px] font-semibold rounded-full flex-shrink-0"
-            :class="stockBadgeClass"
-          >
-            {{ stockLabel }}
-          </span>
-        </div>
+        <router-link :to="`/portal/producto/${product.id}`" class="block group">
+          <h3 class="text-gray-800 text-sm sm:text-[15px] leading-snug line-clamp-2 group-hover:text-[#C9A962] transition-colors">
+            {{ product.name }}
+          </h3>
+        </router-link>
       </div>
 
-      <div class="flex items-end justify-between gap-2 sm:gap-4 mt-2">
-        <!-- Pricing -->
-        <div class="flex items-baseline gap-2 sm:gap-3">
-          <p class="text-[#C9A962] font-bold text-base sm:text-lg">
+      <!-- Pricing Section -->
+      <div class="mt-2">
+        <!-- Price original tachado -->
+        <p v-if="product.retailPrice && discountPercentage > 0" class="text-gray-400 text-[11px] line-through mb-0.5">
+          ${{ formatPrice(product.retailPrice) }}
+        </p>
+        
+        <!-- Precio actual + descuento -->
+        <div class="flex items-baseline gap-2 flex-wrap">
+          <p class="text-gray-900 font-semibold text-xl sm:text-2xl tracking-tight">
             ${{ formatPrice(product.wholesalePrice) }}
           </p>
-          <p v-if="product.retailPrice" class="text-gray-400 text-[10px] sm:text-xs line-through">
-            ${{ formatPrice(product.retailPrice) }}
-          </p>
+          <span v-if="discountPercentage > 0" class="text-emerald-600 text-[11px] sm:text-xs font-semibold">
+            {{ discountPercentage }}% OFF
+          </span>
         </div>
-        <!-- Meta -->
-        <div class="hidden sm:flex items-center gap-4 text-xs text-gray-500 flex-shrink-0">
-          <span>Mín. {{ product.minOrder }} uds</span>
-          <span>{{ product.stock }} disp.</span>
-        </div>
+        
+        <!-- Cuotas -->
+        <p v-if="product.wholesalePrice >= 50000" class="text-emerald-600 text-[11px] sm:text-xs mt-1">
+          3 cuotas de ${{ formatPrice(Math.round(product.wholesalePrice / 3)) }} con 0% interés
+        </p>
+        
+        <!-- Envío gratis -->
+        <p v-if="product.wholesalePrice >= 150000" class="text-emerald-500 text-[11px] sm:text-xs font-medium mt-1 flex items-center gap-1">
+          <svg class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M20 8h-3V4H3c-1.1 0-2 .9-2 2v11h2c0 1.66 1.34 3 3 3s3-1.34 3-3h6c0 1.66 1.34 3 3 3s3-1.34 3-3h2v-5l-3-4zM6 18.5c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5zm13.5-9l1.96 2.5H17V9.5h2.5zm-1.5 9c-.83 0-1.5-.67-1.5-1.5s.67-1.5 1.5-1.5 1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/>
+          </svg>
+          Envío gratis
+        </p>
+      </div>
+
+      <!-- Stock info -->
+      <div class="flex items-center gap-2 mt-2 text-[10px] sm:text-[11px]">
+        <span class="text-emerald-600 flex items-center gap-1">
+          <span class="w-1.5 h-1.5 bg-emerald-500 rounded-full"></span>
+          {{ product.stock }} disponibles
+        </span>
+        <span 
+          v-if="product.stock <= 5 && product.stock > 0"
+          class="text-amber-600 font-medium"
+        >
+          ¡Últimas unidades!
+        </span>
       </div>
     </div>
   </div>

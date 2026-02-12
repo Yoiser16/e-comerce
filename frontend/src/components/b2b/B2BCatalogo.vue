@@ -199,6 +199,28 @@
           <!-- Controles en línea -->
           <div class="flex items-center gap-2 w-full sm:w-auto">
 
+            <!-- Toggle Vista Grid/Lista (móvil) -->
+            <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden lg:hidden">
+              <button 
+                @click="viewMode = 'list'"
+                class="p-2 transition-colors"
+                :class="viewMode === 'list' ? 'bg-[#C9A962] text-white' : 'bg-white text-gray-500 hover:bg-gray-50'"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16"/>
+                </svg>
+              </button>
+              <button 
+                @click="viewMode = 'grid'"
+                class="p-2 transition-colors"
+                :class="viewMode === 'grid' ? 'bg-[#C9A962] text-white' : 'bg-white text-gray-500 hover:bg-gray-50'"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM14 5a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1V5zM4 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1H5a1 1 0 01-1-1v-4zM14 15a1 1 0 011-1h4a1 1 0 011 1v4a1 1 0 01-1 1h-4a1 1 0 01-1-1v-4z"/>
+                </svg>
+              </button>
+            </div>
+
             <!-- Ordenar -->
             <div class="flex items-center gap-2 flex-1 sm:flex-none">
               <span class="text-sm text-gray-500 hidden sm:inline whitespace-nowrap">Ordenar por</span>
@@ -231,15 +253,20 @@
         </div>
       </div>
 
-      <!-- Grid de Productos -->
+      <!-- Grid/List de Productos -->
       <div 
         v-if="filteredProducts.length > 0"
-        class="grid gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4"
+        :class="[
+          viewMode === 'list' 
+            ? 'flex flex-col gap-3 lg:grid lg:gap-4 lg:grid-cols-3 xl:grid-cols-4' 
+            : 'grid gap-4 grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4'
+        ]"
       >
         <B2BProductCard 
           v-for="product in filteredProducts" 
           :key="product.id"
           :product="product"
+          :view-mode="viewMode"
           @add-to-cart="handleAddToCart"
         />
       </div>
@@ -355,7 +382,7 @@ export default {
     // State
     const searchQuery = ref('')
     const sortBy = ref('relevance')
-    const viewMode = ref('grid')
+    const viewMode = ref(window.innerWidth < 1024 ? 'list' : 'grid')
     const currentPage = ref(1)
     const itemsPerPage = 20
     const showMobileFilters = ref(false)

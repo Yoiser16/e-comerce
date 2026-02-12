@@ -57,24 +57,341 @@
       </div>
 
       <!-- ============================================
-           MAIN PRODUCT AREA - White card on gray bg
+           MOBILE VIEW - Mercado Libre Style (lg:hidden)
       ============================================ -->
-      <div class="max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-6">
+      <div class="lg:hidden">
+        <!-- Mobile Gallery with Swipe -->
+        <div class="relative bg-white">
+          <!-- Main Swipeable Gallery -->
+          <div 
+            class="relative aspect-square overflow-hidden"
+            @touchstart="handleTouchStart"
+            @touchmove="handleTouchMove"
+            @touchend="handleTouchEnd"
+          >
+            <!-- Image Counter Badge -->
+            <div class="absolute top-3 left-3 z-20 px-2.5 py-1 bg-black/60 rounded-full">
+              <span class="text-white text-xs font-medium">{{ imagenActualIndex + 1 }}/{{ imagenes.length }}</span>
+            </div>
+            
+            <!-- Favorite Button -->
+            <button 
+              @click="toggleFavorito"
+              class="absolute top-3 right-3 z-20 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center"
+              :class="esFavorito ? 'text-rose-500' : 'text-gray-400'"
+            >
+              <svg class="w-5 h-5" :fill="esFavorito ? 'currentColor' : 'none'" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"/>
+              </svg>
+            </button>
+            
+            <!-- Share Button -->
+            <button 
+              @click="compartirProducto"
+              class="absolute top-3 right-16 z-20 w-10 h-10 bg-white rounded-full shadow-md flex items-center justify-center text-gray-500"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z"/>
+              </svg>
+            </button>
+            
+            <!-- Main Image -->
+            <video
+              v-if="isVideoUrl(imagenActual) && !hasMediaError(imagenActual)"
+              :src="imagenActual"
+              class="w-full h-full object-contain bg-white"
+              playsinline
+              controls
+              @error="handleVideoError(imagenActual)"
+            ></video>
+            <img 
+              v-else
+              :src="getDisplayMedia(imagenActual)" 
+              :alt="producto.nombre"
+              class="w-full h-full object-contain bg-white"
+              @error="handleImageError(imagenActual, $event)"
+            />
+          </div>
+          
+          <!-- Dot Indicators -->
+          <div v-if="imagenes.length > 1" class="flex justify-center gap-1.5 py-3 bg-white">
+            <button 
+              v-for="(img, idx) in imagenes" 
+              :key="idx"
+              @click="imagenActualIndex = idx"
+              class="w-2 h-2 rounded-full transition-all"
+              :class="imagenActualIndex === idx ? 'bg-[#1A1A1A] w-5' : 'bg-gray-300'"
+            ></button>
+          </div>
+        </div>
+        
+        <!-- Mobile Product Info -->
+        <div class="bg-white px-4 pb-4">
+          <!-- Condition & Sold Count -->
+          <div class="flex items-center gap-2 text-xs text-gray-500 mb-2">
+            <span>Nuevo</span>
+            <span>|</span>
+            <span>Mayorista</span>
+            <span v-if="producto.stock_actual <= 20" class="text-orange-600 font-medium">• Últimas {{ producto.stock_actual }} uds</span>
+          </div>
+          
+          <!-- Title -->
+          <h1 class="text-base font-normal text-gray-900 leading-snug mb-3">
+            {{ producto.nombre }}
+          </h1>
+          
+          <!-- Price Section -->
+          <div class="mb-3">
+            <!-- Original Price (tachado) -->
+            <p v-if="descuento > 0" class="text-sm text-gray-400 line-through">
+              ${{ formatPrice(precioRetail) }}
+            </p>
+            
+            <!-- Current Price + Discount -->
+            <div class="flex items-baseline gap-2">
+              <span class="text-[32px] font-light text-gray-900">${{ formatPrice(precioUnitarioActual) }}</span>
+              <span v-if="descuentoTotal > 0" class="text-base font-medium text-green-600">{{ descuentoTotal }}% OFF</span>
+            </div>
+            
+            <!-- Cuotas info -->
+            <p class="text-sm text-gray-600 mt-1">
+              en <span class="text-green-600 font-medium">12x ${{ formatPrice(Math.ceil(precioUnitarioActual / 12)) }}</span> sin interés
+            </p>
+          </div>
+          
+          <!-- Envío Gratis -->
+          <div class="flex items-center gap-2 mb-4">
+            <svg class="w-5 h-5 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/>
+            </svg>
+            <span class="text-green-600 text-sm font-medium">Envío gratis a todo el país</span>
+          </div>
+          
+          <!-- Quick Specs -->
+          <div class="flex flex-wrap gap-2 mb-4">
+            <span class="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+              Lote mín: {{ LOTE_MINIMO }} uds
+            </span>
+            <span v-if="producto.tipo" class="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+              {{ producto.tipo }}
+            </span>
+            <span v-if="producto.origen" class="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
+              {{ producto.origen }}
+            </span>
+          </div>
+          
+          <!-- Quantity Selector Mobile - Card compacta -->
+          <div class="border border-gray-200 rounded-xl p-4 mt-4 bg-white">
+            <!-- Header -->
+            <p class="text-xs text-gray-500 uppercase tracking-wider font-medium mb-3">Selecciona cantidad</p>
+            
+            <!-- Quick Quantity Buttons -->
+            <div class="grid grid-cols-4 gap-2 mb-4">
+              <button 
+                v-for="lote in [10, 20, 50, 100]" 
+                :key="lote"
+                @click="seleccionarLote(lote)"
+                :disabled="lote > producto.stock_actual"
+                class="py-2.5 text-sm font-medium rounded-lg border-2 transition-all"
+                :class="cantidad === lote 
+                  ? 'bg-[#1A1A1A] text-white border-[#1A1A1A]' 
+                  : lote > producto.stock_actual 
+                    ? 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed' 
+                    : 'bg-white text-gray-700 border-gray-200 hover:border-[#1A1A1A]'"
+              >
+                {{ lote }}
+              </button>
+            </div>
+            
+            <!-- Custom Quantity Row -->
+            <div class="flex items-center gap-3 mb-4">
+              <span class="text-sm text-gray-500">Otra cantidad:</span>
+              <div class="flex items-center border-2 border-gray-200 rounded-lg overflow-hidden">
+                <button 
+                  @click="decrementarLote"
+                  :disabled="cantidad <= LOTE_MINIMO"
+                  class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-30"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20 12H4"/>
+                  </svg>
+                </button>
+                <span class="w-12 text-center font-bold text-gray-900">{{ cantidad }}</span>
+                <button 
+                  @click="incrementarLote"
+                  :disabled="cantidad + LOTE_MINIMO > producto.stock_actual"
+                  class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-30"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4"/>
+                  </svg>
+                </button>
+              </div>
+            </div>
+            
+            <!-- Divider -->
+            <div class="border-t border-gray-100 my-4"></div>
+            
+            <!-- Total Row -->
+            <div class="flex justify-between items-center mb-4">
+              <div>
+                <p class="text-sm text-gray-500">Total</p>
+                <p class="text-xs text-gray-400">{{ cantidad }} unidades</p>
+              </div>
+              <div class="text-right">
+                <p class="text-2xl font-bold text-gray-900">${{ formatPrice(subtotal) }}</p>
+                <p v-if="ahorroTotal > 0" class="text-sm text-green-600 font-medium">
+                  Ahorras ${{ formatPrice(ahorroTotal) }}
+                </p>
+              </div>
+            </div>
+            
+            <!-- Add to Cart Button -->
+            <button 
+              @click="agregarAlCarrito"
+              :disabled="producto.stock_actual < LOTE_MINIMO || agregando"
+              class="w-full py-4 bg-[#1A1A1A] hover:bg-black text-white font-bold text-base rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
+            >
+              <svg v-if="!agregando" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
+              </svg>
+              <svg v-else class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"/>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"/>
+              </svg>
+              {{ agregando ? 'Agregando...' : 'Agregar al pedido' }}
+            </button>
+          </div>
+          
+          <!-- Descripción expandible -->
+          <details v-if="producto.descripcion || tieneCaracteristicas" class="border-t border-gray-100 pt-4">
+            <summary class="flex items-center justify-between py-2 cursor-pointer">
+              <span class="text-sm font-medium text-gray-900">Ver descripción y características</span>
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </summary>
+            <div class="pt-3 pb-2">
+              <div v-if="producto.descripcion" class="text-sm text-gray-600 mb-4" v-html="producto.descripcion"></div>
+              <div v-if="tieneCaracteristicas" class="space-y-2">
+                <div v-if="producto.tipo" class="flex text-sm">
+                  <span class="text-gray-500 w-24">Tipo:</span>
+                  <span class="text-gray-900">{{ producto.tipo }}</span>
+                </div>
+                <div v-if="producto.color" class="flex text-sm">
+                  <span class="text-gray-500 w-24">Color:</span>
+                  <span class="text-gray-900">{{ producto.color }}</span>
+                </div>
+                <div v-if="producto.largo" class="flex text-sm">
+                  <span class="text-gray-500 w-24">Largo:</span>
+                  <span class="text-gray-900">{{ producto.largo }}</span>
+                </div>
+                <div v-if="producto.origen" class="flex text-sm">
+                  <span class="text-gray-500 w-24">Origen:</span>
+                  <span class="text-gray-900">{{ producto.origen }}</span>
+                </div>
+                <div v-if="producto.calidad" class="flex text-sm">
+                  <span class="text-gray-500 w-24">Calidad:</span>
+                  <span class="text-gray-900">{{ producto.calidad }}</span>
+                </div>
+                <div v-if="producto.peso_gramos" class="flex text-sm">
+                  <span class="text-gray-500 w-24">Peso:</span>
+                  <span class="text-gray-900">{{ producto.peso_gramos }}g</span>
+                </div>
+              </div>
+            </div>
+          </details>
+          
+          <!-- Precios por volumen expandible -->
+          <details class="border-t border-gray-100 pt-2">
+            <summary class="flex items-center justify-between py-2 cursor-pointer">
+              <span class="text-sm font-medium text-gray-900">Precios por volumen</span>
+              <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+              </svg>
+            </summary>
+            <div class="pt-2 pb-2 space-y-2">
+              <div 
+                v-for="tier in preciosPorVolumen" 
+                :key="tier.cantidad"
+                @click="seleccionarLote(tier.cantidad)"
+                class="flex items-center justify-between p-2 rounded-lg cursor-pointer transition-colors"
+                :class="cantidad >= tier.cantidad ? 'bg-[#FAF5F2]' : 'hover:bg-gray-50'"
+              >
+                <div>
+                  <span class="font-medium text-gray-900">{{ tier.cantidad }} uds</span>
+                  <span class="text-xs text-gray-500 ml-2">{{ tier.descripcion }}</span>
+                </div>
+                <span class="font-bold text-gray-900">${{ formatPrice(tier.precioUnitario) }}/ud</span>
+              </div>
+            </div>
+          </details>
+          
+          <!-- WhatsApp consulta -->
+          <a 
+            :href="whatsappUrl"
+            target="_blank"
+            class="flex items-center justify-center gap-2 w-full py-3 mt-4 border border-gray-200 rounded-lg text-gray-700 hover:bg-gray-50"
+          >
+            <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+            </svg>
+            <span class="font-medium text-sm">Consultar por WhatsApp</span>
+          </a>
+        </div>
+        
+        <!-- Mobile Related Products -->
+        <div v-if="productosRelacionados.length > 0" class="mt-3 px-4 pb-6">
+          <div class="flex items-center justify-between mb-3">
+            <h2 class="font-bold text-base text-gray-900">Productos relacionados</h2>
+            <router-link to="/portal/catalogo" class="text-sm text-[#8B7355] font-medium">
+              Ver más
+            </router-link>
+          </div>
+          <div class="flex gap-3 overflow-x-auto pb-2 -mx-4 px-4 scrollbar-hide">
+            <router-link 
+              v-for="prod in productosRelacionados" 
+              :key="prod.id"
+              :to="`/portal/producto/${prod.id}`"
+              class="flex-shrink-0 w-36 border border-gray-100 rounded-lg overflow-hidden bg-white"
+            >
+              <div class="aspect-square bg-gray-50 overflow-hidden">
+                <img 
+                  :src="getDisplayMedia(prod.imagen_principal)" 
+                  :alt="prod.nombre"
+                  class="w-full h-full object-cover"
+                  @error="handleImageError(prod.imagen_principal, $event)"
+                />
+              </div>
+              <div class="p-2.5">
+                <p class="text-gray-800 text-xs line-clamp-2 leading-snug mb-1.5 min-h-[2rem]">{{ prod.nombre }}</p>
+                <p class="text-gray-900 font-bold text-sm">${{ formatPrice(prod.precio_mayorista || prod.monto_precio) }}</p>
+                <p class="text-green-600 text-[10px] font-medium mt-0.5">Envío gratis</p>
+              </div>
+            </router-link>
+          </div>
+        </div>
+      </div>
+
+      <!-- ============================================
+           DESKTOP VIEW - Original Layout (hidden on mobile)
+      ============================================ -->
+      <div class="hidden lg:block max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-8 py-5 lg:py-6">
         
         <!-- Main white card wrapping all product content -->
         <div class="bg-white rounded-lg overflow-hidden">
           <div class="p-4 sm:p-6 lg:p-8">
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 lg:gap-8">
+            <div class="grid grid-cols-12 gap-6 lg:gap-8">
           
           <!-- ====================================
                COLUMN 1: GALERÍA - Thumbnails verticales estilo Amazon
           ==================================== -->
-          <div class="lg:col-span-5">
-            <div class="lg:sticky lg:top-24">
+          <div class="col-span-5">
+            <div class="sticky top-24">
               
               <div class="flex gap-3">
                 <!-- Thumbnails Verticales (izquierda) - estilo Amazon -->
-                <div v-if="imagenes.length > 1" class="hidden sm:flex flex-col gap-1.5 flex-shrink-0">
+                <div v-if="imagenes.length > 1" class="flex flex-col gap-1.5 flex-shrink-0">
                   <button 
                     v-for="(img, idx) in imagenes" 
                     :key="idx"
@@ -616,28 +933,6 @@
 
       </div>
     </div>
-    
-    <!-- ========================================
-         MOBILE STICKY CTA
-    ======================================== -->
-    <div class="lg:hidden fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 px-4 py-3 shadow-[0_-4px_20px_rgba(0,0,0,0.08)] z-40">
-      <div class="flex items-center gap-3">
-        <div class="flex-1 min-w-0">
-          <p class="text-[11px] text-gray-500 uppercase tracking-wider font-medium">Total ({{ cantidad }} uds)</p>
-          <p class="text-xl font-bold text-[#0F1111]">${{ formatPrice(subtotal) }}</p>
-        </div>
-        <button 
-          @click="agregarAlCarrito"
-          :disabled="producto.stock_actual < LOTE_MINIMO || agregando"
-          class="flex-shrink-0 py-3.5 px-6 bg-[#1A1A1A] hover:bg-black text-white font-bold text-sm rounded-md flex items-center justify-center gap-2 disabled:opacity-50"
-        >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/>
-          </svg>
-          Agregar
-        </button>
-      </div>
-    </div>
   </div>
 </template>
 
@@ -903,6 +1198,31 @@ export default {
       }
     }
     
+    // ===== TOUCH SWIPE HANDLERS =====
+    const touchStartX = ref(0)
+    const touchEndX = ref(0)
+    
+    function handleTouchStart(e) {
+      touchStartX.value = e.touches[0].clientX
+    }
+    
+    function handleTouchMove(e) {
+      touchEndX.value = e.touches[0].clientX
+    }
+    
+    function handleTouchEnd() {
+      const diff = touchStartX.value - touchEndX.value
+      const threshold = 50
+      
+      if (diff > threshold && imagenActualIndex.value < imagenes.value.length - 1) {
+        // Swipe left - next image
+        imagenActualIndex.value++
+      } else if (diff < -threshold && imagenActualIndex.value > 0) {
+        // Swipe right - previous image
+        imagenActualIndex.value--
+      }
+    }
+    
     async function agregarAlCarrito() {
       if (agregando.value) return
       
@@ -1051,7 +1371,11 @@ export default {
       decrementarCantidad,
       toggleFavorito,
       compartirProducto,
-      agregarAlCarrito
+      agregarAlCarrito,
+      // Touch handlers
+      handleTouchStart,
+      handleTouchMove,
+      handleTouchEnd
     }
   }
 }

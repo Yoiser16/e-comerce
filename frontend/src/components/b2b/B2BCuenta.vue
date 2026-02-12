@@ -348,37 +348,184 @@
             </div>
           </div>
           
-          <!-- MOBILE: Pedidos -->
-          <div v-if="activeTab === 'pedidos'" class="space-y-4">
-            <h2 class="text-lg font-bold text-gray-800 mb-3">Mis Pedidos</h2>
-            
-            <div v-if="orders.length === 0" class="text-center py-8">
-              <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+          <!-- MOBILE: Pedidos - Diseño mejorado con accordion -->
+          <div v-if="activeTab === 'pedidos'" class="space-y-3">
+            <!-- Header con contador -->
+            <div class="flex items-center justify-between mb-4">
+              <h2 class="text-lg font-bold text-[#1A1A1A]">Mis Pedidos</h2>
+              <span v-if="orders.length > 0" class="text-xs text-gray-400">{{ orders.length }} pedidos</span>
+            </div>
+
+            <!-- Loading -->
+            <div v-if="isLoadingOrders" class="py-12 text-center">
+              <svg class="w-6 h-6 text-[#C9A962] mx-auto mb-2 animate-spin" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
               </svg>
-              <p class="text-gray-500 text-sm">No tienes pedidos aún</p>
-              <router-link to="/portal/catalogo" class="inline-block mt-3 px-4 py-2 bg-[#C9A962] text-white text-sm rounded-lg">
+              <p class="text-sm text-gray-500">Cargando pedidos...</p>
+            </div>
+            
+            <!-- Empty state -->
+            <div v-else-if="orders.length === 0" class="text-center py-10 bg-white rounded-xl border border-gray-100">
+              <div class="w-14 h-14 mx-auto mb-4 bg-[#FAF5F2] rounded-full flex items-center justify-center">
+                <svg class="w-7 h-7 text-[#C9A962]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+                </svg>
+              </div>
+              <p class="text-[#1A1A1A] font-medium mb-1">No tienes pedidos aún</p>
+              <p class="text-gray-400 text-sm mb-4">Explora nuestro catálogo y haz tu primer pedido</p>
+              <router-link to="/portal/catalogo" class="inline-flex items-center gap-2 px-5 py-2.5 bg-[#1A1A1A] text-white text-sm font-medium rounded-xl">
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 11V7a4 4 0 00-8 0v4M5 9h14l1 12H4L5 9z"/></svg>
                 Explorar catálogo
               </router-link>
             </div>
             
-            <div v-for="order in orders" :key="order.id" class="bg-white rounded-lg border border-gray-200 p-4">
-              <div class="flex items-center justify-between mb-2">
-                <span class="font-medium text-gray-800 text-sm">#{{ order.numero || order.id }}</span>
-                <span 
-                  class="text-xs px-2 py-0.5 rounded-full"
-                  :class="{
-                    'bg-yellow-100 text-yellow-700': order.estado === 'pendiente',
-                    'bg-blue-100 text-blue-700': order.estado === 'procesando',
-                    'bg-emerald-100 text-emerald-700': order.estado === 'completado',
-                    'bg-red-100 text-red-700': order.estado === 'cancelado'
-                  }"
-                >
-                  {{ order.estado }}
-                </span>
+            <!-- Orders list with accordion -->
+            <div 
+              v-for="order in orders" 
+              :key="order.id" 
+              class="bg-white rounded-xl border overflow-hidden transition-all duration-200"
+              :class="expandedOrderId === order.id ? 'border-[#C9A962]/30 shadow-sm' : 'border-gray-100'"
+            >
+              <!-- Order Header (clickable) -->
+              <div 
+                @click="toggleOrderDetail(order)"
+                class="p-4 cursor-pointer active:bg-gray-50"
+              >
+                <div class="flex gap-3">
+                  <!-- Product Image -->
+                  <div class="w-14 h-14 rounded-lg bg-gray-100 overflow-hidden flex-shrink-0">
+                    <img
+                      v-if="getOrderMediaUrl(order.products?.[0])"
+                      :src="getOrderMediaUrl(order.products?.[0])"
+                      :alt="order.products?.[0]?.name"
+                      class="w-full h-full object-cover"
+                      @error="$event.target.style.display='none'"
+                    />
+                    <div class="w-full h-full flex items-center justify-center">
+                      <svg class="w-6 h-6 text-gray-300" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/></svg>
+                    </div>
+                  </div>
+
+                  <!-- Order Info -->
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-start justify-between gap-2">
+                      <div class="min-w-0">
+                        <!-- Status badge -->
+                        <span :class="[
+                          'inline-flex items-center gap-1 text-xs font-medium mb-1',
+                          order.status === 'Entregado' ? 'text-emerald-600' : 
+                          order.status === 'En Camino' ? 'text-blue-600' : 
+                          order.status === 'Pagada' ? 'text-green-600' : 
+                          order.status === 'Pendiente' ? 'text-amber-600' : 'text-gray-500'
+                        ]">
+                          <span :class="[
+                            'w-1.5 h-1.5 rounded-full',
+                            order.status === 'Entregado' ? 'bg-emerald-500' : 
+                            order.status === 'En Camino' ? 'bg-blue-500' : 
+                            order.status === 'Pagada' ? 'bg-green-500' : 
+                            order.status === 'Pendiente' ? 'bg-amber-500' : 'bg-gray-400'
+                          ]"></span>
+                          {{ order.status }}
+                        </span>
+                        <!-- Order number -->
+                        <p class="text-sm font-semibold text-[#1A1A1A] truncate">{{ order.numero }}</p>
+                        <!-- Date and items -->
+                        <p class="text-xs text-gray-400 mt-0.5">{{ order.date }} · {{ order.items }} productos</p>
+                      </div>
+                      <!-- Total + Arrow -->
+                      <div class="text-right flex-shrink-0">
+                        <p class="text-base font-bold text-[#1A1A1A]">${{ formatPrice(order.total) }}</p>
+                        <svg 
+                          :class="[
+                            'w-4 h-4 text-gray-300 mt-1 mx-auto transition-transform duration-200',
+                            expandedOrderId === order.id ? 'rotate-180 text-[#C9A962]' : ''
+                          ]" 
+                          fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        >
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"/>
+                        </svg>
+                      </div>
+                    </div>
+                  </div>
+                </div>
               </div>
-              <p class="text-gray-500 text-xs">{{ formatDate(order.fecha_creacion) }}</p>
-              <p class="text-[#C9A962] font-semibold text-sm mt-1">${{ formatPrice(order.total) }}</p>
+
+              <!-- Expanded Details (accordion) -->
+              <div v-if="expandedOrderId === order.id" class="border-t border-gray-100 bg-[#FAFAFA]">
+                <!-- Products -->
+                <div class="p-4 space-y-2">
+                  <p class="text-[10px] font-bold text-gray-400 uppercase tracking-wider mb-2">Productos</p>
+                  <div v-for="(item, idx) in order.products" :key="idx" class="flex gap-3 p-3 bg-white rounded-lg">
+                    <div class="w-11 h-11 rounded-md bg-gray-100 overflow-hidden flex-shrink-0">
+                      <img
+                        v-if="getOrderMediaUrl(item)"
+                        :src="getOrderMediaUrl(item)"
+                        :alt="item.name"
+                        class="w-full h-full object-cover"
+                        @error="$event.target.style.display='none'"
+                      />
+                    </div>
+                    <div class="flex-1 min-w-0">
+                      <h4 class="text-sm font-medium text-[#1A1A1A] line-clamp-1">{{ item.name }}</h4>
+                      <p class="text-xs text-gray-400">{{ item.quantity }} × ${{ formatPrice(item.price) }}</p>
+                    </div>
+                    <div class="text-right">
+                      <p class="text-sm font-semibold text-[#1A1A1A]">${{ formatPrice(item.price * item.quantity) }}</p>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Summary -->
+                <div class="px-4 pb-3">
+                  <div class="bg-white rounded-lg p-3 space-y-1.5">
+                    <div class="flex justify-between text-xs text-gray-500">
+                      <span>Subtotal</span>
+                      <span>${{ formatPrice(order.subtotal || order.total) }}</span>
+                    </div>
+                    <div class="flex justify-between text-xs text-gray-500">
+                      <span>Envío</span>
+                      <span>{{ order.envio ? `$${formatPrice(order.envio)}` : 'Gratis' }}</span>
+                    </div>
+                    <div class="flex justify-between text-sm font-bold text-[#1A1A1A] pt-2 border-t border-gray-100">
+                      <span>Total</span>
+                      <span>${{ formatPrice(order.total) }}</span>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Info extras -->
+                <div class="px-4 pb-3">
+                  <div class="flex flex-wrap gap-3 text-[10px] text-gray-400">
+                    <span class="flex items-center gap-1">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/></svg>
+                      {{ order.metodoPago === 'wompi' ? 'Pago online' : 'WhatsApp' }}
+                    </span>
+                    <span class="flex items-center gap-1">
+                      <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z"/></svg>
+                      {{ order.date }}
+                    </span>
+                  </div>
+                </div>
+
+                <!-- Actions -->
+                <div class="px-4 pb-4 flex gap-2">
+                  <button 
+                    v-if="order.status === 'Entregado'"
+                    @click.stop="reorderItems(order)"
+                    class="flex-1 py-2.5 text-xs font-medium text-[#C9A962] bg-[#FAF5F2] rounded-lg hover:bg-[#C9A962]/20 transition-colors"
+                  >
+                    Volver a comprar
+                  </button>
+                  <a 
+                    href="https://wa.me/4796657763"
+                    target="_blank"
+                    class="flex-1 py-2.5 text-xs font-medium text-gray-600 bg-white border border-gray-200 rounded-lg text-center hover:bg-gray-50 transition-colors"
+                  >
+                    Consultar
+                  </a>
+                </div>
+              </div>
             </div>
           </div>
           
@@ -386,14 +533,14 @@
           <div v-if="activeTab === 'cupones'" class="space-y-4">
             <h2 class="text-lg font-bold text-gray-800 mb-3">Mis Cupones</h2>
             
-            <div v-if="!coupons || coupons.length === 0" class="text-center py-8">
+            <div v-if="!cuponesActivos || cuponesActivos.length === 0" class="text-center py-8">
               <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/>
               </svg>
               <p class="text-gray-500 text-sm">No tienes cupones disponibles</p>
             </div>
             
-            <div v-for="coupon in coupons" :key="coupon.id" class="bg-white rounded-lg border border-gray-200 p-4">
+            <div v-for="coupon in cuponesActivos" :key="coupon.id" class="bg-white rounded-lg border border-gray-200 p-4">
               <div class="flex items-center justify-between">
                 <div>
                   <p class="font-bold text-[#C9A962] text-lg">{{ coupon.codigo }}</p>
@@ -1641,7 +1788,9 @@ export default {
     ]
 
     function formatDate(dateStr) {
+      if (!dateStr) return 'Sin fecha'
       const date = new Date(dateStr)
+      if (isNaN(date.getTime())) return 'Sin fecha'
       return date.toLocaleDateString('es-CO', { day: 'numeric', month: 'short', year: 'numeric' })
     }
 

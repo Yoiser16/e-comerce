@@ -589,71 +589,81 @@
            BENEFITS BAR - Cards con imágenes premium
       ====================================================================== -->
       <section class="mb-12 sm:mb-16">
-        <div class="bg-white rounded-2xl shadow-sm border border-gray-200/60 overflow-hidden">
+        <div class="bg-gradient-to-br from-[#FAF8F5] to-[#F5F0EA] rounded-2xl sm:rounded-3xl border border-[#E8E0D5] overflow-hidden">
           
-          <!-- Header estilo ML: fondo gris, título + botón -->
-          <div class="px-5 sm:px-6 lg:px-8 py-4 sm:py-5 bg-[#F5F5F5] border-b border-gray-200/60 flex items-center justify-between gap-4">
-            <h2 class="text-base sm:text-lg font-extrabold text-gray-900 tracking-tight uppercase">Los mejores beneficios para tu negocio</h2>
+          <!-- Header sutil y elegante -->
+          <div class="px-5 sm:px-6 lg:px-8 py-5 sm:py-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 border-b border-[#E8E0D5]">
+            <div>
+              <span class="text-[#C9A962] text-[10px] sm:text-xs font-semibold tracking-[0.15em] uppercase mb-1 block">Exclusivo para mayoristas</span>
+              <h2 class="text-base sm:text-lg lg:text-xl font-bold text-[#2C1810]">Los mejores beneficios para tu negocio</h2>
+            </div>
             <router-link 
               to="/portal/catalogo"
-              class="flex-shrink-0 inline-flex items-center gap-1.5 px-4 py-2 sm:px-5 sm:py-2.5 bg-[#C9A962] hover:bg-[#B8944F] text-white text-xs sm:text-sm font-bold rounded-md transition-colors duration-200"
+              class="flex-shrink-0 inline-flex items-center gap-2 px-5 py-2.5 sm:px-6 sm:py-3 bg-[#2C1810] hover:bg-[#1A0F0A] text-white text-xs sm:text-sm font-medium rounded-full transition-all duration-300"
             >
               Ver productos
+              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3"/>
+              </svg>
             </router-link>
           </div>
           
           <div class="grid grid-cols-2 lg:grid-cols-4">
             
             <!-- Benefit 1: Envío gratis -->
-            <div class="relative p-5 sm:p-6 lg:p-8 flex flex-col items-center text-center border-b lg:border-b-0 border-r border-gray-100">
-              <div class="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-2xl overflow-hidden mb-4 shadow-sm">
+            <div class="relative p-4 sm:p-6 lg:p-8 flex flex-col items-center text-center border-b lg:border-b-0 border-r border-[#E8E0D5] hover:bg-white/60 transition-colors duration-300">
+              <div class="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-2xl overflow-hidden mb-3 sm:mb-4 bg-white shadow-md">
                 <img 
                   src="/images/card%20panel/1.png" 
                   alt="Envío gratis" 
-                  class="w-full h-full object-cover"
+                  class="w-full h-full object-cover blur-[0.3px]"
+                  style="image-rendering: auto;"
                   loading="lazy"
                 />
               </div>
-              <p class="font-semibold text-gray-900 text-sm sm:text-base leading-snug mb-1">Envíos gratis en productos desde $150.000</p>
+              <p class="font-medium text-[#2C1810] text-xs sm:text-sm leading-snug">Envíos gratis en productos desde $150.000</p>
             </div>
             
             <!-- Benefit 2: 100% Humano -->
-            <div class="relative p-5 sm:p-6 lg:p-8 flex flex-col items-center text-center border-b lg:border-b-0 lg:border-r border-gray-100">
-              <div class="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-2xl overflow-hidden mb-4 shadow-sm">
+            <div class="relative p-4 sm:p-6 lg:p-8 flex flex-col items-center text-center border-b lg:border-b-0 lg:border-r border-[#E8E0D5] hover:bg-white/60 transition-colors duration-300">
+              <div class="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-2xl overflow-hidden mb-3 sm:mb-4 bg-white shadow-md">
                 <img 
                   src="/images/card%20panel/2.png" 
                   alt="Calidad Premium" 
-                  class="w-full h-full object-cover"
+                  class="w-full h-full object-cover blur-[0.3px]"
+                  style="image-rendering: auto;"
                   loading="lazy"
                 />
               </div>
-              <p class="font-semibold text-gray-900 text-sm sm:text-base leading-snug mb-1">Cabello 100% humano Remy certificado</p>
+              <p class="font-medium text-[#2C1810] text-xs sm:text-sm leading-snug">Cabello 100% humano Remy certificado</p>
             </div>
             
             <!-- Benefit 3: Pago Seguro -->
-            <div class="relative p-5 sm:p-6 lg:p-8 flex flex-col items-center text-center border-r border-gray-100">
-              <div class="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-2xl overflow-hidden mb-4 shadow-sm">
+            <div class="relative p-4 sm:p-6 lg:p-8 flex flex-col items-center text-center border-r border-[#E8E0D5] hover:bg-white/60 transition-colors duration-300">
+              <div class="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-2xl overflow-hidden mb-3 sm:mb-4 bg-white shadow-md">
                 <img 
                   src="/images/card%20panel/3.png" 
                   alt="Pago Seguro" 
-                  class="w-full h-full object-cover"
+                  class="w-full h-full object-cover blur-[0.3px]"
+                  style="image-rendering: auto;"
                   loading="lazy"
                 />
               </div>
-              <p class="font-semibold text-gray-900 text-sm sm:text-base leading-snug mb-1">Pago seguro con encriptación SSL</p>
+              <p class="font-medium text-[#2C1810] text-xs sm:text-sm leading-snug">Pago seguro con encriptación SSL</p>
             </div>
             
             <!-- Benefit 4: Soporte VIP -->
-            <div class="relative p-5 sm:p-6 lg:p-8 flex flex-col items-center text-center">
-              <div class="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-2xl overflow-hidden mb-4 shadow-sm">
+            <div class="relative p-4 sm:p-6 lg:p-8 flex flex-col items-center text-center hover:bg-white/60 transition-colors duration-300">
+              <div class="w-20 h-20 sm:w-24 sm:h-24 lg:w-28 lg:h-28 rounded-2xl overflow-hidden mb-3 sm:mb-4 bg-white shadow-md">
                 <img 
                   src="/images/card%20panel/4.png" 
                   alt="Asesoría VIP" 
-                  class="w-full h-full object-cover"
+                  class="w-full h-full object-cover blur-[0.3px]"
+                  style="image-rendering: auto;"
                   loading="lazy"
                 />
               </div>
-              <p class="font-semibold text-gray-900 text-sm sm:text-base leading-snug mb-1">Asesor personal disponible 24/7</p>
+              <p class="font-medium text-[#2C1810] text-xs sm:text-sm leading-snug">Asesor personal disponible 24/7</p>
             </div>
             
           </div>

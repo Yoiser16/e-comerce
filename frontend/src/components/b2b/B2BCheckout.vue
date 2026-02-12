@@ -11,27 +11,28 @@
         <span class="text-gray-700">Checkout</span>
       </nav>
 
-      <!-- Step Indicator -->
-      <div class="flex items-center justify-center gap-2 mb-8">
+      <!-- Step Indicator - Mejorado para móvil -->
+      <div class="flex items-center justify-center gap-1 sm:gap-2 mb-6 sm:mb-8">
         <div 
           v-for="(stepInfo, index) in visibleSteps" 
           :key="index"
-          class="flex items-center gap-2"
+          class="flex items-center gap-1 sm:gap-2"
         >
           <div 
-            class="w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors"
+            class="w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-sm font-bold transition-all shadow-sm"
             :class="getStepClass(index)"
           >
             <svg v-if="isStepComplete(index)" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7"/>
             </svg>
             <span v-else>{{ index + 1 }}</span>
           </div>
-          <span 
-            class="text-sm hidden sm:inline"
-            :class="currentStep >= index ? 'text-gray-900' : 'text-gray-400'"
-          >{{ stepInfo.title }}</span>
-          <div v-if="index < visibleSteps.length - 1" class="w-12 h-px bg-gray-300 mx-2"></div>
+          <div v-if="index < visibleSteps.length - 1" class="w-8 sm:w-16 h-0.5 bg-gray-200 mx-1 sm:mx-2 rounded-full overflow-hidden">
+            <div 
+              class="h-full bg-[#1A1A1A] transition-all duration-300"
+              :style="{ width: currentStep > index ? '100%' : '0%' }"
+            ></div>
+          </div>
         </div>
       </div>
 
@@ -70,9 +71,9 @@
                 :key="address.id"
                 @click="selectedAddressId = address.id"
                 :class="[
-                  'border rounded-lg p-4 sm:p-5 cursor-pointer transition-colors',
+                  'border rounded-xl p-4 sm:p-5 cursor-pointer transition-all',
                   selectedAddressId === address.id 
-                    ? 'border-blue-500 bg-blue-50/50' 
+                    ? 'border-[#1A1A1A] bg-[#FAF5F2]' 
                     : 'border-gray-200 hover:border-gray-300'
                 ]"
               >
@@ -80,7 +81,7 @@
                   <input 
                     type="radio" 
                     :checked="selectedAddressId === address.id"
-                    class="mt-1 w-4 h-4 text-blue-600"
+                    class="mt-1 w-4 h-4 text-[#1A1A1A] accent-[#1A1A1A]"
                     @click.stop
                     @change="selectedAddressId = address.id"
                   />
@@ -88,7 +89,7 @@
                     <div class="flex items-center justify-between mb-1">
                       <div class="flex items-center gap-2">
                         <span class="font-medium text-gray-900">{{ address.etiqueta || 'Mi dirección' }}</span>
-                        <span v-if="address.is_default" class="text-xs px-2 py-0.5 bg-blue-100 text-blue-700 rounded-full">Principal</span>
+                        <span v-if="address.is_default" class="text-xs px-2 py-0.5 bg-[#FAF5F2] text-[#8B7355] rounded-full border border-[#C9A962]/30">Principal</span>
                       </div>
                       <span class="text-gray-700 font-medium">${{ formatPrice(shippingCost) }}</span>
                     </div>
@@ -105,7 +106,7 @@
               <!-- Botón agregar nueva dirección -->
               <button 
                 @click="showAddressForm = true"
-                class="w-full p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50/30 transition-all flex items-center justify-center gap-2 text-gray-600 hover:text-blue-600"
+                class="w-full p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-[#C9A962] hover:bg-[#FAF5F2] transition-all flex items-center justify-center gap-2 text-gray-600 hover:text-[#8B7355]"
               >
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
@@ -119,7 +120,7 @@
               <button 
                 @click="continueWithSavedAddress"
                 :disabled="!selectedAddressId"
-                class="px-10 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                class="px-10 py-3.5 bg-[#1A1A1A] hover:bg-black text-white font-medium rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 Continuar
               </button>
@@ -151,14 +152,14 @@
             <button 
               @click="getMyLocation"
               :disabled="loadingLocation"
-              class="w-full mb-6 p-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-blue-400 hover:bg-blue-50/30 transition-all flex items-center justify-center gap-3 group"
+              class="w-full mb-6 p-4 border-2 border-dashed border-gray-300 rounded-xl hover:border-[#C9A962] hover:bg-[#FAF5F2] transition-all flex items-center justify-center gap-3 group"
             >
-              <div class="w-10 h-10 bg-blue-100 rounded-full flex items-center justify-center group-hover:bg-blue-200 transition-colors">
-                <svg v-if="!loadingLocation" class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div class="w-10 h-10 bg-[#FAF5F2] rounded-full flex items-center justify-center group-hover:bg-[#F5EBE5] transition-colors">
+                <svg v-if="!loadingLocation" class="w-5 h-5 text-[#8B7355]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
                 </svg>
-                <svg v-else class="w-5 h-5 text-blue-600 animate-spin" fill="none" viewBox="0 0 24 24">
+                <svg v-else class="w-5 h-5 text-[#8B7355] animate-spin" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
                 </svg>
@@ -180,7 +181,7 @@
                   v-model="form.direccion"
                   type="text"
                   placeholder="Ej: Carrera 71d #1-14 Sur"
-                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-colors"
+                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#1A1A1A]/20 focus:border-[#1A1A1A] text-sm transition-colors"
                 />
               </div>
 
@@ -193,7 +194,7 @@
                   v-model="form.complemento"
                   type="text"
                   placeholder="Ej: Apto 201, Torre B"
-                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-colors"
+                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#1A1A1A]/20 focus:border-[#1A1A1A] text-sm transition-colors"
                 />
               </div>
 
@@ -209,7 +210,7 @@
                       v-model="form.departamentoId"
                       @change="onDepartamentoChange"
                       :disabled="loadingDepartamentos"
-                      class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-colors appearance-none bg-white"
+                      class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#1A1A1A]/20 focus:border-[#1A1A1A] text-sm transition-colors appearance-none bg-white"
                     >
                       <option :value="null" disabled>Selecciona un departamento</option>
                       <option 
@@ -242,7 +243,7 @@
                       v-model="form.municipioId"
                       @change="onMunicipioChange"
                       :disabled="!form.departamentoId || loadingMunicipios"
-                      class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-colors appearance-none bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
+                      class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#1A1A1A]/20 focus:border-[#1A1A1A] text-sm transition-colors appearance-none bg-white disabled:bg-gray-100 disabled:cursor-not-allowed"
                     >
                       <option :value="null" disabled>{{ form.departamentoId ? 'Selecciona un municipio' : 'Primero selecciona departamento' }}</option>
                       <option 
@@ -275,7 +276,7 @@
                   v-model="form.barrio"
                   type="text"
                   placeholder="Ej: Kennedy, Chapinero, Centro"
-                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-colors"
+                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#1A1A1A]/20 focus:border-[#1A1A1A] text-sm transition-colors"
                 />
               </div>
 
@@ -289,7 +290,7 @@
                   placeholder="Ej: Entre calles, color del edificio, no tiene timbre..."
                   maxlength="128"
                   rows="2"
-                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-colors resize-none"
+                  class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#1A1A1A]/20 focus:border-[#1A1A1A] text-sm transition-colors resize-none"
                 ></textarea>
                 <p class="text-xs text-gray-400 mt-1 text-right">{{ form.indicaciones?.length || 0 }} / 128 caracteres</p>
               </div>
@@ -303,7 +304,7 @@
                       v-model="form.tipoDomicilio"
                       type="radio"
                       value="Residencial"
-                      class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                      class="w-4 h-4 text-[#1A1A1A] accent-[#1A1A1A] focus:ring-[#1A1A1A]"
                     />
                     <span class="text-sm text-gray-700">Residencial</span>
                   </label>
@@ -312,7 +313,7 @@
                       v-model="form.tipoDomicilio"
                       type="radio"
                       value="Laboral"
-                      class="w-4 h-4 text-blue-600 focus:ring-blue-500"
+                      class="w-4 h-4 text-[#1A1A1A] accent-[#1A1A1A] focus:ring-[#1A1A1A]"
                     />
                     <span class="text-sm text-gray-700">Laboral</span>
                   </label>
@@ -336,7 +337,7 @@
                       v-model="form.nombreContacto"
                       type="text"
                       placeholder="Nombre completo"
-                      class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-colors"
+                      class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#1A1A1A]/20 focus:border-[#1A1A1A] text-sm transition-colors"
                     />
                   </div>
                   <div>
@@ -347,25 +348,25 @@
                       v-model="form.telefono"
                       type="tel"
                       placeholder="Ej: 3217355070"
-                      class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 text-sm transition-colors"
+                      class="w-full px-4 py-3 border border-gray-200 rounded-lg focus:ring-2 focus:ring-[#1A1A1A]/20 focus:border-[#1A1A1A] text-sm transition-colors"
                     />
                   </div>
                 </div>
               </div>
 
               <!-- Botones -->
-              <div class="pt-4 flex gap-3">
+              <div class="pt-4 flex flex-col sm:flex-row gap-3">
                 <button 
                   v-if="hasSavedAddress && showAddressForm"
                   @click="showAddressForm = false"
-                  class="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                  class="px-6 py-3.5 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors"
                 >
                   Cancelar
                 </button>
                 <button 
                   @click="saveAddressAndContinue"
                   :disabled="!isAddressValid || savingAddress"
-                  class="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  class="flex-1 sm:flex-initial px-8 py-3.5 bg-[#1A1A1A] hover:bg-black text-white font-medium rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
                 >
                   <svg v-if="savingAddress" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -380,79 +381,93 @@
           <!-- ====================================
                STEP 1: MÉTODO DE PAGO
           ==================================== -->
-          <div v-if="currentStep === 1" class="bg-white rounded-lg border border-gray-200 p-5 sm:p-6">
-            <h2 class="text-xl font-semibold text-gray-900 mb-1">Elige el método de pago</h2>
-            <p class="text-sm text-gray-500 mb-6">Selecciona cómo deseas completar tu pedido</p>
+          <div v-if="currentStep === 1" class="bg-white rounded-xl border border-gray-200 p-4 sm:p-6">
+            <h2 class="text-lg sm:text-xl font-bold text-gray-900 mb-1">Elige el método de pago</h2>
+            <p class="text-sm text-gray-500 mb-5">Selecciona cómo deseas completar tu pedido</p>
 
-            <!-- Mostrar dirección seleccionada -->
-            <div class="bg-gray-50 rounded-lg p-4 mb-6 flex items-start gap-3">
-              <svg class="w-5 h-5 text-gray-500 flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
-              </svg>
-              <div class="flex-1">
-                <p class="text-sm text-gray-700 font-medium">Envío a:</p>
-                <p class="text-sm text-gray-600">{{ fullAddress }}</p>
-                <button 
-                  @click="goToStep(0)"
-                  class="text-blue-600 hover:text-blue-700 text-sm mt-1"
-                >
-                  Cambiar dirección
-                </button>
+            <!-- Mostrar dirección seleccionada - Más compacto en móvil -->
+            <div class="bg-[#FAF5F2] rounded-xl p-3 sm:p-4 mb-5 border border-[#C9A962]/20">
+              <div class="flex items-start gap-3">
+                <div class="w-8 h-8 rounded-full bg-white flex items-center justify-center flex-shrink-0 shadow-sm">
+                  <svg class="w-4 h-4 text-[#8B7355]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z"/>
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  </svg>
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-xs text-[#8B7355] font-medium uppercase tracking-wide">Envío a:</p>
+                  <p class="text-sm text-gray-800 mt-0.5 truncate">{{ fullAddress }}</p>
+                  <button 
+                    @click="goToStep(0)"
+                    class="text-[#8B7355] hover:text-[#6B5344] text-xs font-medium mt-1"
+                  >
+                    Cambiar dirección
+                  </button>
+                </div>
               </div>
             </div>
 
             <div class="space-y-3">
               <!-- WhatsApp Option -->
               <label 
-                class="flex items-start gap-4 p-4 border rounded-lg cursor-pointer transition-colors"
-                :class="form.metodoPago === 'whatsapp' ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'"
+                class="block p-4 border-2 rounded-xl cursor-pointer transition-all"
+                :class="form.metodoPago === 'whatsapp' ? 'border-[#1A1A1A] bg-gray-50 shadow-sm' : 'border-gray-200 hover:border-gray-300'"
               >
-                <input 
-                  v-model="form.metodoPago"
-                  type="radio"
-                  value="whatsapp"
-                  class="mt-1 w-4 h-4 text-gray-900 focus:ring-gray-500"
-                />
-                <div class="flex-1">
-                  <div class="flex items-center gap-2">
-                    <svg class="w-5 h-5 text-green-600" fill="currentColor" viewBox="0 0 24 24">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                    </svg>
-                    <p class="font-medium text-gray-900">Finalizar por WhatsApp</p>
+                <div class="flex items-start gap-3">
+                  <div class="flex-shrink-0 mt-0.5">
+                    <div 
+                      class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
+                      :class="form.metodoPago === 'whatsapp' ? 'border-[#1A1A1A] bg-[#1A1A1A]' : 'border-gray-300'"
+                    >
+                      <div v-if="form.metodoPago === 'whatsapp'" class="w-2 h-2 rounded-full bg-white"></div>
+                    </div>
                   </div>
-                  <p class="text-sm text-gray-500 mt-1">Enviaremos tu pedido a nuestro asesor para coordinar el pago (transferencia, Nequi, Daviplata)</p>
+                  <input v-model="form.metodoPago" type="radio" value="whatsapp" class="sr-only" />
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                      <svg class="w-5 h-5 text-green-600 flex-shrink-0" fill="currentColor" viewBox="0 0 24 24">
+                        <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+                      </svg>
+                      <p class="font-bold text-gray-900">Finalizar por WhatsApp</p>
+                    </div>
+                    <p class="text-sm text-gray-500 leading-snug">Enviaremos tu pedido a nuestro asesor para coordinar el pago (transferencia, Nequi, Daviplata)</p>
+                  </div>
                 </div>
               </label>
 
               <!-- Wompi Option -->
               <label 
-                class="flex items-start gap-4 p-4 border rounded-lg cursor-pointer transition-colors"
-                :class="form.metodoPago === 'wompi' ? 'border-gray-900 bg-gray-50' : 'border-gray-200 hover:border-gray-300'"
+                class="block p-4 border-2 rounded-xl cursor-pointer transition-all"
+                :class="form.metodoPago === 'wompi' ? 'border-[#1A1A1A] bg-gray-50 shadow-sm' : 'border-gray-200 hover:border-gray-300'"
               >
-                <input 
-                  v-model="form.metodoPago"
-                  type="radio"
-                  value="wompi"
-                  class="mt-1 w-4 h-4 text-gray-900 focus:ring-gray-500"
-                />
-                <div class="flex-1">
-                  <div class="flex items-center gap-2">
-                    <svg class="w-5 h-5 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
-                    </svg>
-                    <p class="font-medium text-gray-900">Pagar en línea (Wompi)</p>
+                <div class="flex items-start gap-3">
+                  <div class="flex-shrink-0 mt-0.5">
+                    <div 
+                      class="w-5 h-5 rounded-full border-2 flex items-center justify-center transition-colors"
+                      :class="form.metodoPago === 'wompi' ? 'border-[#1A1A1A] bg-[#1A1A1A]' : 'border-gray-300'"
+                    >
+                      <div v-if="form.metodoPago === 'wompi'" class="w-2 h-2 rounded-full bg-white"></div>
+                    </div>
                   </div>
-                  <p class="text-sm text-gray-500 mt-1">Tarjeta de crédito/débito, PSE, Bancolombia, Nequi, Efecty</p>
-                  <div class="flex items-center gap-3 mt-2.5 flex-wrap">
-                    <span class="inline-flex items-center gap-1 text-xs text-gray-400 bg-gray-100 px-2 py-1 rounded">
-                      <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
-                      Pago seguro
-                    </span>
-                    <span class="text-xs text-gray-400">Visa</span>
-                    <span class="text-xs text-gray-400">Mastercard</span>
-                    <span class="text-xs text-gray-400">PSE</span>
-                    <span class="text-xs text-gray-400">Nequi</span>
+                  <input v-model="form.metodoPago" type="radio" value="wompi" class="sr-only" />
+                  <div class="flex-1 min-w-0">
+                    <div class="flex items-center gap-2 mb-1">
+                      <svg class="w-5 h-5 text-[#1A1A1A] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z"/>
+                      </svg>
+                      <p class="font-bold text-gray-900">Pagar en línea (Wompi)</p>
+                    </div>
+                    <p class="text-sm text-gray-500 leading-snug">Tarjeta de crédito/débito, PSE, Bancolombia, Nequi, Efecty</p>
+                    <div class="flex items-center gap-2 mt-2 flex-wrap">
+                      <span class="inline-flex items-center gap-1 text-[10px] text-gray-500 bg-gray-100 px-2 py-0.5 rounded-full">
+                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/></svg>
+                        Pago seguro
+                      </span>
+                      <span class="text-[10px] text-gray-400 px-1.5 py-0.5 bg-gray-50 rounded">Visa</span>
+                      <span class="text-[10px] text-gray-400 px-1.5 py-0.5 bg-gray-50 rounded">Mastercard</span>
+                      <span class="text-[10px] text-gray-400 px-1.5 py-0.5 bg-gray-50 rounded">PSE</span>
+                      <span class="text-[10px] text-gray-400 px-1.5 py-0.5 bg-gray-50 rounded">Nequi</span>
+                    </div>
                   </div>
                 </div>
               </label>
@@ -469,22 +484,25 @@
               ></textarea>
             </div>
 
-            <!-- Buttons -->
-            <div class="flex gap-3 mt-6">
+            <!-- Buttons - Mejorados para móvil -->
+            <div class="flex flex-col-reverse sm:flex-row gap-3 mt-6">
               <button 
                 @click="goToStep(0)"
-                class="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+                class="px-6 py-3 border border-gray-300 text-gray-700 font-medium rounded-xl hover:bg-gray-50 transition-colors text-sm sm:text-base"
               >
                 ← Volver
               </button>
               <button 
                 @click="submitOrder"
                 :disabled="isSubmitting"
-                class="flex-1 sm:flex-none px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-lg transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                class="flex-1 py-4 sm:py-3 bg-[#1A1A1A] hover:bg-black text-white font-bold rounded-xl transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center justify-center gap-2 text-base"
               >
-                <svg v-if="isSubmitting" class="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                <svg v-if="isSubmitting" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                   <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                   <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                </svg>
+                <svg v-else-if="form.metodoPago === 'whatsapp'" class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
                 </svg>
                 {{ isSubmitting ? 'Procesando...' : form.metodoPago === 'whatsapp' ? 'Enviar por WhatsApp' : 'Pagar ahora' }}
               </button>
@@ -500,21 +518,21 @@
           </div>
         </div>
 
-        <!-- Right Column: Order Summary -->
-        <div class="lg:col-span-4">
-          <div class="bg-white rounded-lg border border-gray-200 p-5 sticky top-24">
-            <h3 class="font-semibold text-gray-900 mb-4">Resumen de compra</h3>
+        <!-- Right Column: Order Summary - Mejorado para móvil -->
+        <div class="lg:col-span-4 order-first lg:order-last">
+          <div class="bg-white rounded-xl border border-gray-200 p-4 sm:p-5 lg:sticky lg:top-24">
+            <h3 class="font-bold text-gray-900 mb-4 text-base">Resumen de compra</h3>
             
             <!-- Items count and subtotal -->
-            <div class="space-y-2 text-sm">
+            <div class="space-y-2.5 text-sm">
               <div class="flex justify-between">
-                <span class="text-gray-600">Producto</span>
-                <span class="text-gray-900">${{ formatPrice(subtotal) }}</span>
+                <span class="text-gray-500">Productos</span>
+                <span class="text-gray-900 font-medium">${{ formatPrice(subtotal) }}</span>
               </div>
               <div class="flex justify-between">
-                <span class="text-gray-600">Envío</span>
-                <span :class="shippingCost === 0 ? 'text-green-600' : 'text-gray-900'">
-                  {{ shippingCost === 0 ? 'Gratis' : `$${formatPrice(shippingCost)}` }}
+                <span class="text-gray-500">Envío</span>
+                <span :class="shippingCost === 0 ? 'text-green-600 font-medium' : 'text-gray-900'">
+                  {{ shippingCost === 0 ? '¡Gratis!' : `$${formatPrice(shippingCost)}` }}
                 </span>
               </div>
             </div>
@@ -523,20 +541,34 @@
 
             <!-- Total -->
             <div class="flex justify-between items-baseline">
-              <span class="text-gray-900 font-medium">Total</span>
-              <span class="text-2xl font-bold text-gray-900">${{ formatPrice(total) }}</span>
+              <span class="text-gray-700 font-medium">Total a pagar</span>
+              <span class="text-2xl font-bold text-[#1A1A1A]">${{ formatPrice(total) }}</span>
             </div>
 
             <!-- Free shipping progress -->
-            <div v-if="shippingCost > 0" class="mt-4 p-3 bg-blue-50 rounded-lg">
-              <p class="text-xs text-blue-800">
-                🚚 Agrega <strong>${{ formatPrice(freeShippingThreshold - subtotal) }}</strong> más para envío gratis
+            <div v-if="shippingCost > 0" class="mt-4 p-3 bg-[#FAF5F2] rounded-xl border border-[#C9A962]/20">
+              <p class="text-xs text-[#8B7355]">
+                🚚 Agrega <strong class="text-[#6B5344]">${{ formatPrice(freeShippingThreshold - subtotal) }}</strong> más para envío gratis
               </p>
-              <div class="mt-2 h-1.5 bg-blue-100 rounded-full overflow-hidden">
+              <div class="mt-2 h-1.5 bg-[#E5DED6] rounded-full overflow-hidden">
                 <div 
-                  class="h-full bg-blue-600 rounded-full transition-all"
+                  class="h-full bg-[#C9A962] rounded-full transition-all"
                   :style="{ width: `${Math.min((subtotal / freeShippingThreshold) * 100, 100)}%` }"
                 ></div>
+              </div>
+            </div>
+            
+            <!-- Trust badges - Solo en móvil debajo del resumen -->
+            <div class="mt-4 pt-4 border-t border-gray-100 lg:hidden">
+              <div class="flex items-center justify-center gap-4 text-xs text-gray-400">
+                <div class="flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg>
+                  <span>Pago seguro</span>
+                </div>
+                <div class="flex items-center gap-1">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 8h14M5 8a2 2 0 110-4h14a2 2 0 110 4M5 8v10a2 2 0 002 2h10a2 2 0 002-2V8m-9 4h4"/></svg>
+                  <span>Envío garantizado</span>
+                </div>
               </div>
             </div>
           </div>
