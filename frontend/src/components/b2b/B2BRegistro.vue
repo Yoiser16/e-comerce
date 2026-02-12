@@ -3,7 +3,7 @@
     <!-- =========================================================================
          LADO IZQUIERDO - Branding (igual que login)
     ========================================================================== -->
-    <div class="relative lg:w-5/12 h-48 sm:h-64 lg:h-screen overflow-hidden">
+    <div class="relative lg:w-5/12 h-24 sm:h-40 lg:h-screen overflow-hidden">
       <!-- Gradient de fondo -->
       <div class="absolute inset-0 bg-gradient-to-br from-[#1A1A1A] via-[#2D2D2D] to-[#1A1A1A]"></div>
       
@@ -16,15 +16,15 @@
       <div class="absolute inset-0 bg-black/40"></div>
       
       <!-- Contenido -->
-      <div class="relative z-10 h-full flex flex-col justify-between p-6 sm:p-8 lg:p-12">
+      <div class="relative z-10 h-full flex flex-col justify-between p-4 sm:p-6 lg:p-12">
         <!-- Logo -->
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-white/10 p-2 flex items-center justify-center">
+        <div class="flex items-center gap-2 lg:gap-3">
+          <div class="w-8 h-8 lg:w-12 lg:h-12 rounded-full bg-white/10 p-1.5 lg:p-2 flex items-center justify-center">
             <img src="/logo-kharis.png" alt="Kharis" class="w-full h-full object-contain" />
           </div>
           <div>
-            <span class="text-[#C9A962] font-luxury text-lg lg:text-xl tracking-wider">KHARIS</span>
-            <span class="text-white/60 text-xs lg:text-sm block -mt-1">PRO</span>
+            <span class="text-[#C9A962] font-luxury text-base lg:text-xl tracking-wider">KHARIS</span>
+            <span class="text-white/60 text-[10px] lg:text-sm block -mt-0.5 lg:-mt-1">PRO</span>
           </div>
         </div>
         
@@ -84,7 +84,7 @@
     <!-- =========================================================================
          LADO DERECHO - Formulario de Registro
     ========================================================================== -->
-    <div class="flex-1 lg:w-7/12 flex items-center justify-center bg-[#FAFAFA] p-6 sm:p-8 lg:p-12 overflow-y-auto">
+    <div class="flex-1 lg:w-7/12 flex items-start lg:items-center justify-center bg-[#FAFAFA] px-4 py-4 sm:p-6 lg:p-12 overflow-y-auto">
       <div class="w-full max-w-lg">
         
         <!-- ===== ESTADO: Solicitud Enviada ===== -->
@@ -134,51 +134,51 @@
         <!-- ===== FORMULARIO WIZARD ===== -->
         <div v-else>
           <!-- Header -->
-          <div class="text-center lg:text-left mb-6">
-            <h2 class="text-2xl lg:text-3xl font-luxury text-text-dark mb-2">
+          <div class="text-center lg:text-left mb-4 lg:mb-6">
+            <h2 class="text-lg lg:text-3xl font-luxury text-text-dark mb-1 lg:mb-2">
               Solicitud de Cuenta Mayorista
             </h2>
-            <p class="text-text-light">
+            <p class="text-text-light text-xs lg:text-base">
               Completa el formulario para unirte a nuestra red de distribuidores
             </p>
           </div>
 
           <!-- Progress Steps -->
-          <div class="flex items-center justify-center gap-4 mb-8">
-            <div class="flex items-center gap-2">
+          <div class="flex items-center justify-center gap-3 lg:gap-4 mb-5 lg:mb-8">
+            <div class="flex items-center gap-1.5 lg:gap-2">
               <div 
                 :class="[
-                  'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors',
+                  'w-6 h-6 lg:w-8 lg:h-8 rounded-full flex items-center justify-center text-xs lg:text-sm font-medium transition-colors',
                   currentStep >= 1 ? 'bg-[#C9A962] text-white' : 'bg-gray-200 text-gray-500'
                 ]"
               >
-                <svg v-if="currentStep > 1" class="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                <svg v-if="currentStep > 1" class="w-3 h-3 lg:w-4 lg:h-4" fill="currentColor" viewBox="0 0 20 20">
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                 </svg>
                 <span v-else>1</span>
               </div>
-              <span :class="currentStep >= 1 ? 'text-text-dark font-medium' : 'text-text-light'" class="text-sm hidden sm:block">
+              <span :class="currentStep >= 1 ? 'text-text-dark font-medium' : 'text-text-light'" class="text-[10px] lg:text-sm hidden sm:block">
                 Información Personal
               </span>
             </div>
             
-            <div class="w-12 h-0.5 bg-gray-200">
+            <div class="w-8 lg:w-12 h-0.5 bg-gray-200">
               <div 
                 class="h-full bg-[#C9A962] transition-all duration-300"
                 :style="{ width: currentStep > 1 ? '100%' : '0%' }"
               ></div>
             </div>
             
-            <div class="flex items-center gap-2">
+            <div class="flex items-center gap-1.5 lg:gap-2">
               <div 
                 :class="[
-                  'w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium transition-colors',
+                  'w-6 h-6 lg:w-8 lg:h-8 rounded-full flex items-center justify-center text-xs lg:text-sm font-medium transition-colors',
                   currentStep >= 2 ? 'bg-[#C9A962] text-white' : 'bg-gray-200 text-gray-500'
                 ]"
               >
                 2
               </div>
-              <span :class="currentStep >= 2 ? 'text-text-dark font-medium' : 'text-text-light'" class="text-sm hidden sm:block">
+              <span :class="currentStep >= 2 ? 'text-text-dark font-medium' : 'text-text-light'" class="text-[10px] lg:text-sm hidden sm:block">
                 Verificación de Identidad
               </span>
             </div>
@@ -188,153 +188,148 @@
           <form @submit.prevent="handleSubmit">
             
             <!-- ===== PASO 1: Información Personal ===== -->
-            <div v-show="currentStep === 1" class="space-y-4">
-              <div class="grid sm:grid-cols-2 gap-4">
+            <div v-show="currentStep === 1" class="space-y-3 lg:space-y-4">
+              <div class="grid sm:grid-cols-2 gap-3 lg:gap-4">
                 <div>
-                  <label class="block text-sm font-medium text-text-dark mb-1.5">Nombre *</label>
+                  <label class="block text-xs lg:text-sm font-medium text-text-dark mb-1">Nombre *</label>
                   <input
                     v-model="form.nombre"
                     type="text"
                     required
                     placeholder="Tu nombre"
-                    class="w-full px-4 py-3 bg-white border rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
+                    class="w-full px-3 py-2 lg:px-4 lg:py-3 text-sm lg:text-base bg-white border rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
                     :class="errors.nombre ? 'border-red-300' : 'border-gray-200'"
                   />
-                  <p v-if="errors.nombre" class="mt-1 text-sm text-red-500">{{ errors.nombre }}</p>
+                  <p v-if="errors.nombre" class="mt-1 text-xs text-red-500">{{ errors.nombre }}</p>
                 </div>
                 <div>
-                  <label class="block text-sm font-medium text-text-dark mb-1.5">Apellidos *</label>
+                  <label class="block text-xs lg:text-sm font-medium text-text-dark mb-1">Apellidos *</label>
                   <input
                     v-model="form.apellido"
                     type="text"
                     required
                     placeholder="Tus apellidos"
-                    class="w-full px-4 py-3 bg-white border rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
+                    class="w-full px-3 py-2 lg:px-4 lg:py-3 text-sm lg:text-base bg-white border rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
                     :class="errors.apellido ? 'border-red-300' : 'border-gray-200'"
                   />
-                  <p v-if="errors.apellido" class="mt-1 text-sm text-red-500">{{ errors.apellido }}</p>
+                  <p v-if="errors.apellido" class="mt-1 text-xs text-red-500">{{ errors.apellido }}</p>
                 </div>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-text-dark mb-1.5">Celular / WhatsApp *</label>
+                <label class="block text-xs lg:text-sm font-medium text-text-dark mb-1">Celular / WhatsApp *</label>
                 <div class="relative">
-                  <span class="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400">+57</span>
+                  <span class="absolute left-3 lg:left-4 top-1/2 -translate-y-1/2 text-gray-400 text-sm">+57</span>
                   <input
                     v-model="form.telefono"
                     type="tel"
                     required
                     placeholder="300 123 4567"
-                    class="w-full px-4 py-3 pl-14 bg-white border rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
+                    class="w-full px-3 py-2 lg:px-4 lg:py-3 pl-11 lg:pl-14 text-sm lg:text-base bg-white border rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
                     :class="errors.telefono ? 'border-red-300' : 'border-gray-200'"
                   />
                 </div>
-                <p v-if="errors.telefono" class="mt-1 text-sm text-red-500">{{ errors.telefono }}</p>
+                <p v-if="errors.telefono" class="mt-1 text-xs text-red-500">{{ errors.telefono }}</p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-text-dark mb-1.5">Correo Electrónico *</label>
+                <label class="block text-xs lg:text-sm font-medium text-text-dark mb-1">Correo Electrónico *</label>
                 <input
                   v-model="form.email"
                   type="email"
                   required
                   placeholder="tu@empresa.com"
-                  class="w-full px-4 py-3 bg-white border rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
+                  class="w-full px-3 py-2 lg:px-4 lg:py-3 text-sm lg:text-base bg-white border rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
                   :class="errors.email ? 'border-red-300' : 'border-gray-200'"
                 />
-                <p v-if="errors.email" class="mt-1 text-sm text-red-500">{{ errors.email }}</p>
+                <p v-if="errors.email" class="mt-1 text-xs text-red-500">{{ errors.email }}</p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-text-dark mb-1.5">Contraseña *</label>
+                <label class="block text-xs lg:text-sm font-medium text-text-dark mb-1">Contraseña *</label>
                 <div class="relative">
                   <input
                     v-model="form.password"
                     :type="showPassword ? 'text' : 'password'"
                     required
                     placeholder="Mínimo 8 caracteres"
-                    class="w-full px-4 py-3 pr-12 bg-white border rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
+                    class="w-full px-3 py-2 lg:px-4 lg:py-3 pr-10 lg:pr-12 text-sm lg:text-base bg-white border rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
                     :class="errors.password ? 'border-red-300' : 'border-gray-200'"
                   />
                   <button 
                     type="button"
                     @click="showPassword = !showPassword"
-                    class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                    class="absolute right-3 lg:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
                   >
-                    <svg v-if="showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg v-if="showPassword" class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                     </svg>
-                    <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg v-else class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                     </svg>
                   </button>
                 </div>
-                <p v-if="errors.password" class="mt-1 text-sm text-red-500">{{ errors.password }}</p>
+                <p v-if="errors.password" class="mt-1 text-xs text-red-500">{{ errors.password }}</p>
               </div>
 
               <div>
-                <label class="block text-sm font-medium text-text-dark mb-1.5">Confirmar Contraseña *</label>
+                <label class="block text-xs lg:text-sm font-medium text-text-dark mb-1">Confirmar Contraseña *</label>
                 <input
                   v-model="form.passwordConfirm"
                   type="password"
                   required
                   placeholder="Repite tu contraseña"
-                  class="w-full px-4 py-3 bg-white border rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
+                  class="w-full px-3 py-2 lg:px-4 lg:py-3 text-sm lg:text-base bg-white border rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
                   :class="errors.passwordConfirm ? 'border-red-300' : 'border-gray-200'"
                 />
-                <p v-if="errors.passwordConfirm" class="mt-1 text-sm text-red-500">{{ errors.passwordConfirm }}</p>
+                <p v-if="errors.passwordConfirm" class="mt-1 text-xs text-red-500">{{ errors.passwordConfirm }}</p>
               </div>
 
               <!-- Botón Siguiente -->
               <button
                 type="button"
                 @click="nextStep"
-                class="w-full py-4 bg-[#1A1A1A] hover:bg-black text-white font-medium rounded-lg
-                       transition-all duration-200 flex items-center justify-center gap-2 group mt-6"
+                class="w-full py-2.5 lg:py-4 bg-[#1A1A1A] hover:bg-black text-white text-sm lg:text-base font-medium rounded-lg
+                       transition-all duration-200 flex items-center justify-center gap-2 group mt-4 lg:mt-6"
               >
                 <span>Siguiente</span>
-                <svg class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 lg:w-5 lg:h-5 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                 </svg>
               </button>
             </div>
 
             <!-- ===== PASO 2: Verificación de Identidad ===== -->
-            <div v-show="currentStep === 2" class="space-y-5">
-              <!-- Tipo de Documento -->
+            <div v-show="currentStep === 2" class="space-y-3 lg:space-y-5">
+              <!-- Tipo + Número de Documento en una fila -->
               <div>
-                <label class="block text-sm font-medium text-text-dark mb-1.5">Tipo de Documento *</label>
-                <select
-                  v-model="form.tipoDocumento"
-                  class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
-                >
-                  <option value="CC">Cédula de Ciudadanía</option>
-                  <option value="CE">Cédula de Extranjería</option>
-                  <option value="NIT">NIT (Empresa)</option>
-                  <option value="PASAPORTE">Pasaporte</option>
-                </select>
-              </div>
-
-              <!-- Número de Documento -->
-              <div>
-                <label class="block text-sm font-medium text-text-dark mb-1.5">
-                  {{ form.tipoDocumento === 'NIT' ? 'NIT' : 'Número de Documento' }} *
-                </label>
-                <input
-                  v-model="form.numeroDocumento"
-                  type="text"
-                  required
-                  :placeholder="form.tipoDocumento === 'NIT' ? '900.123.456-7' : '1.234.567.890'"
-                  class="w-full px-4 py-3 bg-white border rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
-                  :class="errors.numeroDocumento ? 'border-red-300' : 'border-gray-200'"
-                />
-                <p v-if="errors.numeroDocumento" class="mt-1 text-sm text-red-500">{{ errors.numeroDocumento }}</p>
+                <label class="block text-xs lg:text-sm font-medium text-text-dark mb-1">Documento de Identidad *</label>
+                <div class="flex gap-2">
+                  <select
+                    v-model="form.tipoDocumento"
+                    class="w-20 lg:w-24 px-2 py-2 lg:px-3 lg:py-3 text-xs lg:text-sm bg-white border border-gray-200 rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
+                  >
+                    <option value="CC">CC</option>
+                    <option value="CE">CE</option>
+                    <option value="NIT">NIT</option>
+                    <option value="PASAPORTE">PAS</option>
+                  </select>
+                  <input
+                    v-model="form.numeroDocumento"
+                    type="text"
+                    required
+                    :placeholder="form.tipoDocumento === 'NIT' ? '900.123.456-7' : '123.456.789'"
+                    class="flex-1 px-3 py-2 lg:px-4 lg:py-3 text-sm lg:text-base bg-white border rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
+                    :class="errors.numeroDocumento ? 'border-red-300' : 'border-gray-200'"
+                  />
+                </div>
+                <p v-if="errors.numeroDocumento" class="mt-1 text-xs text-red-500">{{ errors.numeroDocumento }}</p>
               </div>
 
               <!-- Nombre de Empresa (Opcional) -->
               <div>
-                <label class="block text-sm font-medium text-text-dark mb-1.5">
+                <label class="block text-xs lg:text-sm font-medium text-text-dark mb-1">
                   Nombre de Empresa / Negocio
                   <span class="text-text-light font-normal">(opcional)</span>
                 </label>
@@ -342,13 +337,13 @@
                   v-model="form.nombreEmpresa"
                   type="text"
                   placeholder="Mi Salón de Belleza S.A.S"
-                  class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
+                  class="w-full px-3 py-2 lg:px-4 lg:py-3 text-sm lg:text-base bg-white border border-gray-200 rounded-lg outline-none transition-all focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962]"
                 />
               </div>
 
               <!-- Upload Cédula Frente -->
               <div>
-                <label class="block text-sm font-medium text-text-dark mb-1.5">
+                <label class="block text-xs lg:text-sm font-medium text-text-dark mb-1">
                   Foto de {{ form.tipoDocumento === 'NIT' ? 'RUT' : 'Cédula' }} (Frente) *
                 </label>
                 <div 
@@ -357,35 +352,35 @@
                   @dragleave="dragOver = null"
                   @drop.prevent="handleDrop($event, 'frente')"
                   :class="[
-                    'border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all',
+                    'border-2 border-dashed rounded-lg p-3 lg:p-6 text-center cursor-pointer transition-all',
                     dragOver === 'frente' ? 'border-[#C9A962] bg-[#C9A962]/5' : 
                     errors.cedulaFrente ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-[#C9A962]/50 hover:bg-gray-50'
                   ]"
                 >
                   <!-- Preview si hay imagen -->
                   <div v-if="previews.frente" class="relative inline-block">
-                    <img :src="previews.frente" alt="Cédula Frente" class="max-h-32 rounded-lg mx-auto" />
+                    <img :src="previews.frente" alt="Cédula Frente" class="max-h-20 lg:max-h-32 rounded-lg mx-auto" />
                     <button 
                       type="button"
                       @click.stop="removeFile('frente')"
-                      class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                      class="absolute -top-2 -right-2 w-5 h-5 lg:w-6 lg:h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
                     >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
-                    <p class="text-sm text-text-medium mt-2">{{ form.cedulaFrente?.name }}</p>
+                    <p class="text-xs text-text-medium mt-1">{{ form.cedulaFrente?.name }}</p>
                   </div>
                   
                   <!-- Estado vacío -->
                   <div v-else>
-                    <svg class="w-10 h-10 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-8 h-8 lg:w-10 lg:h-10 mx-auto text-gray-400 mb-1 lg:mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <p class="text-sm text-text-medium">
-                      <span class="text-[#C9A962] font-medium">Haz clic para subir</span> o arrastra aquí
+                    <p class="text-xs lg:text-sm text-text-medium">
+                      <span class="text-[#C9A962] font-medium">Subir foto</span> o arrastrar
                     </p>
-                    <p class="text-xs text-text-light mt-1">PNG, JPG hasta 5MB</p>
+                    <p class="text-[10px] lg:text-xs text-text-light mt-0.5">PNG, JPG hasta 5MB</p>
                   </div>
                 </div>
                 <input 
@@ -395,12 +390,12 @@
                   class="hidden"
                   @change="handleFileChange($event, 'frente')"
                 />
-                <p v-if="errors.cedulaFrente" class="mt-1 text-sm text-red-500">{{ errors.cedulaFrente }}</p>
+                <p v-if="errors.cedulaFrente" class="mt-1 text-xs text-red-500">{{ errors.cedulaFrente }}</p>
               </div>
 
               <!-- Upload Cédula Dorso -->
               <div>
-                <label class="block text-sm font-medium text-text-dark mb-1.5">
+                <label class="block text-xs lg:text-sm font-medium text-text-dark mb-1">
                   Foto de {{ form.tipoDocumento === 'NIT' ? 'RUT' : 'Cédula' }} (Dorso) *
                 </label>
                 <div 
@@ -409,35 +404,35 @@
                   @dragleave="dragOver = null"
                   @drop.prevent="handleDrop($event, 'dorso')"
                   :class="[
-                    'border-2 border-dashed rounded-lg p-6 text-center cursor-pointer transition-all',
+                    'border-2 border-dashed rounded-lg p-3 lg:p-6 text-center cursor-pointer transition-all',
                     dragOver === 'dorso' ? 'border-[#C9A962] bg-[#C9A962]/5' : 
                     errors.cedulaDorso ? 'border-red-300 bg-red-50' : 'border-gray-200 hover:border-[#C9A962]/50 hover:bg-gray-50'
                   ]"
                 >
                   <!-- Preview si hay imagen -->
                   <div v-if="previews.dorso" class="relative inline-block">
-                    <img :src="previews.dorso" alt="Cédula Dorso" class="max-h-32 rounded-lg mx-auto" />
+                    <img :src="previews.dorso" alt="Cédula Dorso" class="max-h-20 lg:max-h-32 rounded-lg mx-auto" />
                     <button 
                       type="button"
                       @click.stop="removeFile('dorso')"
-                      class="absolute -top-2 -right-2 w-6 h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
+                      class="absolute -top-2 -right-2 w-5 h-5 lg:w-6 lg:h-6 bg-red-500 text-white rounded-full flex items-center justify-center hover:bg-red-600"
                     >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <svg class="w-3 h-3 lg:w-4 lg:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
                       </svg>
                     </button>
-                    <p class="text-sm text-text-medium mt-2">{{ form.cedulaDorso?.name }}</p>
+                    <p class="text-xs text-text-medium mt-1">{{ form.cedulaDorso?.name }}</p>
                   </div>
                   
                   <!-- Estado vacío -->
                   <div v-else>
-                    <svg class="w-10 h-10 mx-auto text-gray-400 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <svg class="w-8 h-8 lg:w-10 lg:h-10 mx-auto text-gray-400 mb-1 lg:mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
-                    <p class="text-sm text-text-medium">
-                      <span class="text-[#C9A962] font-medium">Haz clic para subir</span> o arrastra aquí
+                    <p class="text-xs lg:text-sm text-text-medium">
+                      <span class="text-[#C9A962] font-medium">Subir foto</span> o arrastrar
                     </p>
-                    <p class="text-xs text-text-light mt-1">PNG, JPG hasta 5MB</p>
+                    <p class="text-[10px] lg:text-xs text-text-light mt-0.5">PNG, JPG hasta 5MB</p>
                   </div>
                 </div>
                 <input 
@@ -447,35 +442,35 @@
                   class="hidden"
                   @change="handleFileChange($event, 'dorso')"
                 />
-                <p v-if="errors.cedulaDorso" class="mt-1 text-sm text-red-500">{{ errors.cedulaDorso }}</p>
+                <p v-if="errors.cedulaDorso" class="mt-1 text-xs text-red-500">{{ errors.cedulaDorso }}</p>
               </div>
 
               <!-- Términos -->
-              <div class="flex items-start gap-3 pt-2">
+              <div class="flex items-start gap-2 lg:gap-3 pt-1 lg:pt-2">
                 <input 
                   id="terminos"
                   v-model="form.aceptaTerminos"
                   type="checkbox"
                   required
-                  class="mt-1 w-4 h-4 text-[#C9A962] border-gray-300 rounded focus:ring-[#C9A962]"
+                  class="mt-0.5 w-3.5 h-3.5 lg:w-4 lg:h-4 text-[#C9A962] border-gray-300 rounded focus:ring-[#C9A962]"
                 />
-                <label for="terminos" class="text-sm text-text-medium">
+                <label for="terminos" class="text-[11px] lg:text-sm text-text-medium leading-tight">
                   Acepto los <a href="#" class="text-[#C9A962] hover:underline">Términos y Condiciones</a> 
                   y autorizo el tratamiento de mis datos personales según la 
                   <a href="#" class="text-[#C9A962] hover:underline">Política de Privacidad</a>
                 </label>
               </div>
-              <p v-if="errors.aceptaTerminos" class="text-sm text-red-500 -mt-3">{{ errors.aceptaTerminos }}</p>
+              <p v-if="errors.aceptaTerminos" class="text-xs text-red-500 -mt-2">{{ errors.aceptaTerminos }}</p>
 
               <!-- Botones -->
-              <div class="flex gap-4 pt-4">
+              <div class="flex gap-3 lg:gap-4 pt-2 lg:pt-4">
                 <button
                   type="button"
                   @click="prevStep"
-                  class="flex-1 py-4 border border-gray-300 text-text-dark font-medium rounded-lg
-                         hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-2"
+                  class="flex-1 py-2.5 lg:py-4 border border-gray-300 text-text-dark text-sm lg:text-base font-medium rounded-lg
+                         hover:bg-gray-50 transition-all duration-200 flex items-center justify-center gap-1.5 lg:gap-2"
                 >
-                  <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <svg class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
                   </svg>
                   <span>Atrás</span>
@@ -484,11 +479,11 @@
                 <button
                   type="submit"
                   :disabled="loading"
-                  class="flex-1 py-4 bg-[#C9A962] hover:bg-[#B8944F] text-white font-medium rounded-lg
+                  class="flex-1 py-2.5 lg:py-4 bg-[#C9A962] hover:bg-[#B8944F] text-white text-sm lg:text-base font-medium rounded-lg
                          transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
-                         flex items-center justify-center gap-2"
+                         flex items-center justify-center gap-1.5 lg:gap-2"
                 >
-                  <svg v-if="loading" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                  <svg v-if="loading" class="w-4 h-4 lg:w-5 lg:h-5 animate-spin" fill="none" viewBox="0 0 24 24">
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
@@ -499,8 +494,8 @@
           </form>
 
           <!-- Link Login -->
-          <div class="mt-8 pt-6 border-t border-gray-100 text-center">
-            <p class="text-text-medium text-sm">
+          <div class="mt-5 lg:mt-8 pt-4 lg:pt-6 border-t border-gray-100 text-center">
+            <p class="text-text-medium text-xs lg:text-sm">
               ¿Ya tienes cuenta? 
               <router-link to="/portal/login" class="text-[#C9A962] hover:underline font-medium">
                 Inicia sesión
