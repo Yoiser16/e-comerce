@@ -94,7 +94,15 @@ async def login(request: LoginRequest):
             user={
                 'id': str(user.id), 
                 'email': user.email, 
-                'nombre': user.nombre, 
+                'nombre': user.nombre,
+                'apellido': getattr(user, 'apellido', ''),
+                'telefono': getattr(user, 'telefono', ''),
+                'whatsapp': getattr(user, 'telefono', ''),  # Usar telefono como whatsapp por ahora
+                'empresa': getattr(user, 'nombre_empresa', ''),
+                'nit': getattr(user, 'nit_empresa', '') or getattr(user, 'numero_documento', ''),
+                'cedula': getattr(user, 'numero_documento', ''),
+                'tipo_documento': getattr(user, 'tipo_documento', ''),
+                'tipoNegocio': getattr(user, 'tipo_negocio', '') or 'Mayorista',
                 'rol': user.rol,
                 'tipo': user.tipo,
                 'es_mayorista': user.tipo == 'MAYORISTA'
@@ -106,7 +114,7 @@ async def login(request: LoginRequest):
         import traceback
         print(f"Error en login: {str(e)}")
         traceback.print_exc()
-        raise HTTPException(status_code=500, detail="Error al procesar la solicitud")
+        raise HTTPException(status_code=500, detail=f"Error al procesar: {str(e)}")
 
 @router.post("/login/google", response_model=LoginResponse)
 async def login_google(request: GoogleLoginRequest):

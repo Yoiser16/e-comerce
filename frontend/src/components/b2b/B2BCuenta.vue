@@ -1,7 +1,452 @@
 <template>
-  <div class="flex min-h-[calc(100vh-106px)]">
+  <div class="flex min-h-[calc(100vh-106px)] lg:min-h-[calc(100vh-106px)]">
 
-    <!-- ==================== SIDEBAR FIXED LEFT (like MercadoLibre) ==================== -->
+    <!-- ==================== MOBILE VIEW (estilo Mercado Libre) ==================== -->
+    <div class="lg:hidden w-full bg-[#FAFAFA]">
+      
+      <!-- Header con avatar centrado - SOLO en vista principal -->
+      <div v-if="activeTab === 'profile'" class="bg-gradient-to-b from-[#C9A962] to-[#D4B574] pt-8 pb-12 px-4">
+        <div class="flex flex-col items-center">
+          <div class="w-20 h-20 rounded-full bg-white flex items-center justify-center shadow-lg mb-3">
+            <span class="text-[#C9A962] text-2xl font-bold">{{ userInitials }}</span>
+          </div>
+          <h1 class="text-lg font-bold text-[#2C1810]">{{ user.nombre }}</h1>
+          <p class="text-sm text-[#2C1810]/70">{{ user.email }}</p>
+        </div>
+      </div>
+      
+      <!-- Contenido -->
+      <div :class="activeTab === 'profile' ? 'bg-white -mt-4 rounded-t-2xl min-h-[60vh]' : 'bg-white min-h-[80vh] pt-6'">
+        
+        <!-- Vista principal: Lista de opciones -->
+        <div v-if="activeTab === 'profile'" class="py-2">
+          <!-- Info personal -->
+          <button 
+            @click="activeTab = 'mydata'"
+            class="w-full flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-100"
+          >
+            <svg class="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+            </svg>
+            <span class="flex-1 text-left text-[15px] text-gray-800">Tu información</span>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+            </svg>
+          </button>
+          
+          <!-- Direcciones -->
+          <button 
+            @click="activeTab = 'addresses'"
+            class="w-full flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-100"
+          >
+            <svg class="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/>
+              <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/>
+            </svg>
+            <span class="flex-1 text-left text-[15px] text-gray-800">Direcciones</span>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+            </svg>
+          </button>
+          
+          <!-- Seguridad -->
+          <button 
+            @click="activeTab = 'security'"
+            class="w-full flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-100"
+          >
+            <svg class="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"/>
+            </svg>
+            <span class="flex-1 text-left text-[15px] text-gray-800">Seguridad</span>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+            </svg>
+          </button>
+          
+          <!-- Mis Pedidos -->
+          <button 
+            @click="activeTab = 'pedidos'"
+            class="w-full flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-100"
+          >
+            <svg class="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+            </svg>
+            <span class="flex-1 text-left text-[15px] text-gray-800">Mis Pedidos</span>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+            </svg>
+          </button>
+          
+          <!-- Cupones -->
+          <button 
+            @click="activeTab = 'cupones'"
+            class="w-full flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-100"
+          >
+            <svg class="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/>
+            </svg>
+            <span class="flex-1 text-left text-[15px] text-gray-800">Cupones</span>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+            </svg>
+          </button>
+          
+          <!-- Comunicaciones -->
+          <button 
+            @click="activeTab = 'notifications'"
+            class="w-full flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-100"
+          >
+            <svg class="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
+            </svg>
+            <span class="flex-1 text-left text-[15px] text-gray-800">Comunicaciones</span>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+            </svg>
+          </button>
+          
+          <!-- Ayuda -->
+          <a 
+            href="https://wa.me/4796657763"
+            target="_blank"
+            class="w-full flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors border-b border-gray-100"
+          >
+            <svg class="w-5 h-5 text-gray-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/>
+            </svg>
+            <span class="flex-1 text-left text-[15px] text-gray-800">Ayuda</span>
+            <svg class="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+            </svg>
+          </a>
+          
+          <!-- Cerrar sesión -->
+          <button 
+            @click="logout"
+            class="w-full flex items-center gap-4 px-5 py-4 hover:bg-gray-50 transition-colors mt-4"
+          >
+            <svg class="w-5 h-5 text-red-500 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+            </svg>
+            <span class="flex-1 text-left text-[15px] text-red-500">Cerrar sesión</span>
+          </button>
+        </div>
+        
+        <!-- Vista de detalle móvil (cuando selecciona una opción) -->
+        <div v-else class="px-4 py-3">
+          <!-- Header con back button -->
+          <button 
+            @click="activeTab = 'profile'" 
+            class="flex items-center gap-2 text-[14px] text-[#C9A962] font-medium mb-4"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
+            </svg>
+            Volver
+          </button>
+          
+          <!-- MOBILE: Tu información -->
+          <div v-if="activeTab === 'mydata'" class="space-y-4">
+            <div class="flex items-center justify-between mb-2">
+              <h2 class="text-lg font-bold text-gray-800">Tu información</h2>
+              <button 
+                v-if="!mobileEditMode"
+                @click="mobileEditMode = true"
+                class="text-[#C9A962] text-sm font-medium"
+              >
+                Editar
+              </button>
+              <button 
+                v-else
+                @click="mobileEditMode = false; saveProfile()"
+                class="text-[#C9A962] text-sm font-medium"
+              >
+                Guardar
+              </button>
+            </div>
+            
+            <!-- MODO RESUMEN (solo lectura) -->
+            <div v-if="!mobileEditMode" class="space-y-3">
+              <!-- Datos Personales -->
+              <div class="bg-white rounded-xl border border-gray-100 divide-y divide-gray-100">
+                <div class="px-4 py-3">
+                  <p class="text-xs text-gray-400 mb-0.5">Nombre completo</p>
+                  <p class="text-[15px] text-gray-800">{{ user.nombre || 'Sin especificar' }}</p>
+                </div>
+                <div class="px-4 py-3">
+                  <p class="text-xs text-gray-400 mb-0.5">Email</p>
+                  <p class="text-[15px] text-gray-800">{{ user.email || 'Sin especificar' }}</p>
+                </div>
+                <div class="px-4 py-3">
+                  <p class="text-xs text-gray-400 mb-0.5">Teléfono</p>
+                  <p class="text-[15px] text-gray-800">{{ user.telefono || 'Sin especificar' }}</p>
+                </div>
+                <div class="px-4 py-3">
+                  <p class="text-xs text-gray-400 mb-0.5">WhatsApp</p>
+                  <p class="text-[15px] text-gray-800">{{ user.whatsapp || 'Sin especificar' }}</p>
+                </div>
+              </div>
+              
+              <!-- Datos Empresariales -->
+              <div class="bg-white rounded-xl border border-gray-100">
+                <div class="px-4 py-3 border-b border-gray-100">
+                  <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Información Empresarial</p>
+                </div>
+                <div class="divide-y divide-gray-100">
+                  <div class="px-4 py-3">
+                    <p class="text-xs text-gray-400 mb-0.5">Empresa</p>
+                    <p class="text-[15px] text-gray-800">{{ user.empresa || 'Sin especificar' }}</p>
+                  </div>
+                  <div class="px-4 py-3">
+                    <p class="text-xs text-gray-400 mb-0.5">NIT / Cédula</p>
+                    <p class="text-[15px] text-gray-800">{{ user.nit || user.cedula || 'Sin especificar' }}</p>
+                  </div>
+                  <div class="px-4 py-3">
+                    <p class="text-xs text-gray-400 mb-0.5">Tipo de negocio</p>
+                    <p class="text-[15px] text-gray-800">{{ user.tipoNegocio || user.tipo_negocio || 'Sin especificar' }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+            
+            <!-- MODO EDICIÓN -->
+            <div v-else class="space-y-3">
+              <div class="bg-white rounded-xl border border-gray-100 p-4 space-y-4">
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1">Nombre Completo</label>
+                  <input 
+                    v-model="editForm.nombre"
+                    type="text"
+                    class="w-full h-11 px-3 text-sm text-gray-800 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A962] focus:border-transparent bg-gray-50"
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1">Email</label>
+                  <input 
+                    :value="user.email"
+                    type="email"
+                    class="w-full h-11 px-3 text-sm text-gray-400 border border-gray-200 rounded-lg bg-gray-100"
+                    disabled
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1">Teléfono</label>
+                  <input 
+                    v-model="editForm.telefono"
+                    type="tel"
+                    placeholder="+57 300 123 4567"
+                    class="w-full h-11 px-3 text-sm text-gray-800 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A962] focus:border-transparent bg-gray-50"
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1">WhatsApp</label>
+                  <input 
+                    v-model="editForm.whatsapp"
+                    type="tel"
+                    placeholder="+57 300 123 4567"
+                    class="w-full h-11 px-3 text-sm text-gray-800 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A962] focus:border-transparent bg-gray-50"
+                  />
+                </div>
+              </div>
+              
+              <div class="bg-white rounded-xl border border-gray-100 p-4 space-y-4">
+                <p class="text-xs font-semibold text-gray-500 uppercase tracking-wide">Información Empresarial</p>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1">Nombre de la Empresa</label>
+                  <input 
+                    v-model="editForm.empresa"
+                    type="text"
+                    class="w-full h-11 px-3 text-sm text-gray-800 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A962] focus:border-transparent bg-gray-50"
+                  />
+                </div>
+                <div>
+                  <label class="block text-xs font-medium text-gray-500 mb-1">NIT / Cédula</label>
+                  <input 
+                    v-model="editForm.nit"
+                    type="text"
+                    class="w-full h-11 px-3 text-sm text-gray-800 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A962] focus:border-transparent bg-gray-50"
+                  />
+                </div>
+              </div>
+              
+              <button 
+                @click="cancelEdit"
+                class="w-full py-3 text-gray-500 text-sm font-medium"
+              >
+                Cancelar
+              </button>
+            </div>
+          </div>
+          
+          <!-- MOBILE: Direcciones -->
+          <div v-if="activeTab === 'addresses'" class="space-y-4">
+            <h2 class="text-lg font-bold text-gray-800 mb-3">Mis Direcciones</h2>
+            
+            <div v-if="addresses.length === 0" class="text-center py-8">
+              <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/>
+                <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/>
+              </svg>
+              <p class="text-gray-500 text-sm">No tienes direcciones guardadas</p>
+            </div>
+            
+            <div v-for="addr in addresses" :key="addr.id" class="bg-white rounded-lg border border-gray-200 p-4">
+              <div class="flex items-start justify-between">
+                <div>
+                  <p class="font-medium text-gray-800 text-sm">{{ addr.direccion }}</p>
+                  <p class="text-gray-500 text-xs mt-1">{{ addr.ciudad }}, {{ addr.departamento }}</p>
+                </div>
+                <span v-if="addr.es_principal" class="text-xs px-2 py-0.5 bg-emerald-100 text-emerald-700 rounded-full">Principal</span>
+              </div>
+            </div>
+            
+            <button 
+              @click="showAddressModal = true"
+              class="w-full py-3 border-2 border-dashed border-gray-300 text-gray-500 rounded-lg hover:border-[#C9A962] hover:text-[#C9A962] transition-colors text-sm font-medium"
+            >
+              + Agregar dirección
+            </button>
+          </div>
+          
+          <!-- MOBILE: Seguridad -->
+          <div v-if="activeTab === 'security'" class="space-y-4">
+            <h2 class="text-lg font-bold text-gray-800 mb-3">Seguridad</h2>
+            
+            <div class="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
+              <h3 class="font-semibold text-gray-700 text-sm">Cambiar contraseña</h3>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Contraseña actual</label>
+                <input 
+                  v-model="passwordForm.current"
+                  type="password"
+                  class="w-full h-10 px-3 text-sm text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A962] focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Nueva contraseña</label>
+                <input 
+                  v-model="passwordForm.new"
+                  type="password"
+                  class="w-full h-10 px-3 text-sm text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A962] focus:border-transparent"
+                />
+              </div>
+              <div>
+                <label class="block text-xs font-medium text-gray-500 mb-1">Confirmar nueva contraseña</label>
+                <input 
+                  v-model="passwordForm.confirm"
+                  type="password"
+                  class="w-full h-10 px-3 text-sm text-gray-800 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#C9A962] focus:border-transparent"
+                />
+              </div>
+              <button 
+                @click="changePassword"
+                :disabled="changingPassword"
+                class="w-full py-3 bg-[#C9A962] hover:bg-[#B8944D] text-white font-semibold rounded-lg transition-colors disabled:opacity-50"
+              >
+                {{ changingPassword ? 'Actualizando...' : 'Actualizar contraseña' }}
+              </button>
+            </div>
+          </div>
+          
+          <!-- MOBILE: Pedidos -->
+          <div v-if="activeTab === 'pedidos'" class="space-y-4">
+            <h2 class="text-lg font-bold text-gray-800 mb-3">Mis Pedidos</h2>
+            
+            <div v-if="orders.length === 0" class="text-center py-8">
+              <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+              </svg>
+              <p class="text-gray-500 text-sm">No tienes pedidos aún</p>
+              <router-link to="/portal/catalogo" class="inline-block mt-3 px-4 py-2 bg-[#C9A962] text-white text-sm rounded-lg">
+                Explorar catálogo
+              </router-link>
+            </div>
+            
+            <div v-for="order in orders" :key="order.id" class="bg-white rounded-lg border border-gray-200 p-4">
+              <div class="flex items-center justify-between mb-2">
+                <span class="font-medium text-gray-800 text-sm">#{{ order.numero || order.id }}</span>
+                <span 
+                  class="text-xs px-2 py-0.5 rounded-full"
+                  :class="{
+                    'bg-yellow-100 text-yellow-700': order.estado === 'pendiente',
+                    'bg-blue-100 text-blue-700': order.estado === 'procesando',
+                    'bg-emerald-100 text-emerald-700': order.estado === 'completado',
+                    'bg-red-100 text-red-700': order.estado === 'cancelado'
+                  }"
+                >
+                  {{ order.estado }}
+                </span>
+              </div>
+              <p class="text-gray-500 text-xs">{{ formatDate(order.fecha_creacion) }}</p>
+              <p class="text-[#C9A962] font-semibold text-sm mt-1">${{ formatPrice(order.total) }}</p>
+            </div>
+          </div>
+          
+          <!-- MOBILE: Cupones -->
+          <div v-if="activeTab === 'cupones'" class="space-y-4">
+            <h2 class="text-lg font-bold text-gray-800 mb-3">Mis Cupones</h2>
+            
+            <div v-if="!coupons || coupons.length === 0" class="text-center py-8">
+              <svg class="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/>
+              </svg>
+              <p class="text-gray-500 text-sm">No tienes cupones disponibles</p>
+            </div>
+            
+            <div v-for="coupon in coupons" :key="coupon.id" class="bg-white rounded-lg border border-gray-200 p-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-bold text-[#C9A962] text-lg">{{ coupon.codigo }}</p>
+                  <p class="text-gray-500 text-xs">{{ coupon.descripcion }}</p>
+                </div>
+                <span class="text-lg font-bold text-gray-800">{{ coupon.descuento }}%</span>
+              </div>
+            </div>
+          </div>
+          
+          <!-- MOBILE: Comunicaciones -->
+          <div v-if="activeTab === 'notifications'" class="space-y-4">
+            <h2 class="text-lg font-bold text-gray-800 mb-3">Comunicaciones</h2>
+            
+            <div class="bg-white rounded-lg border border-gray-200 p-4 space-y-4">
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium text-gray-800 text-sm">Ofertas por email</p>
+                  <p class="text-gray-500 text-xs">Recibe promociones exclusivas</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" v-model="notificationSettings.offers" class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C9A962]"></div>
+                </label>
+              </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium text-gray-800 text-sm">Estado de pedidos</p>
+                  <p class="text-gray-500 text-xs">Notificaciones de envío</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" v-model="notificationSettings.orders" class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C9A962]"></div>
+                </label>
+              </div>
+              <div class="flex items-center justify-between">
+                <div>
+                  <p class="font-medium text-gray-800 text-sm">Nuevos productos</p>
+                  <p class="text-gray-500 text-xs">Aviso de lanzamientos</p>
+                </div>
+                <label class="relative inline-flex items-center cursor-pointer">
+                  <input type="checkbox" v-model="notificationSettings.newProducts" class="sr-only peer">
+                  <div class="w-11 h-6 bg-gray-200 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#C9A962]"></div>
+                </label>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ==================== DESKTOP VIEW (original) ==================== -->
+    <!-- SIDEBAR FIXED LEFT (like MercadoLibre) -->
     <aside class="hidden lg:block w-[240px] flex-shrink-0 border-r border-[#e0e0e0] bg-white">
       <div class="sticky top-[106px] py-6 px-5">
         <h2 class="text-[15px] font-bold text-[#333] mb-5">Mi cuenta</h2>
@@ -43,8 +488,8 @@
       </div>
     </aside>
 
-    <!-- ==================== MAIN CONTENT AREA ==================== -->
-    <div class="flex-1 min-w-0">
+    <!-- ==================== MAIN CONTENT AREA (DESKTOP ONLY) ==================== -->
+    <div class="hidden lg:block flex-1 min-w-0">
       <div class="max-w-[960px] mx-auto px-5 sm:px-8 py-6 lg:py-8">
 
         <!-- Avatar + Name (like MercadoLibre - circular) -->
@@ -55,52 +500,6 @@
           <div>
             <h1 class="text-xl font-bold text-[#333]">{{ user.nombre }}</h1>
             <p class="text-[14px] text-[#666]">{{ user.email }}</p>
-          </div>
-        </div>
-
-        <!-- Mobile Sidebar (below header on mobile) -->
-        <div class="lg:hidden mb-5">
-          <div class="bg-white rounded-lg border border-[#e0e0e0] p-4" style="box-shadow: 0 1px 2px 0 rgba(0,0,0,0.05);">
-            <!-- Stats -->
-            <div class="flex items-center gap-2 mb-3">
-              <div class="w-1.5 h-1.5 rounded-full bg-emerald-500"></div>
-              <span class="text-[12px] font-semibold text-emerald-700">Mayorista Verificado</span>
-            </div>
-            <div class="grid grid-cols-4 gap-3 text-center text-[12px] mb-3 pb-3 border-b border-[#e8e8e8]">
-              <div><span class="block font-semibold text-[#333]">{{ user.tier || 'Gold' }}</span><span class="text-[#999]">Nivel</span></div>
-              <div><span class="block font-semibold text-emerald-600">{{ user.descuento || '15' }}%</span><span class="text-[#999]">Dto.</span></div>
-              <div><span class="block font-semibold text-[#333]">${{ formatPrice(user.credito || 0) }}</span><span class="text-[#999]">Crédito</span></div>
-              <div><span class="block font-semibold text-[#333]">{{ user.totalOrders || 0 }}</span><span class="text-[#999]">Pedidos</span></div>
-            </div>
-            <!-- Mobile nav -->
-            <div class="flex flex-wrap gap-2">
-              <button 
-                v-for="tab in tabs" 
-                :key="tab.id"
-                @click="activeTab = tab.id"
-                :class="[
-                  'px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors',
-                  (activeTab === tab.id || (tab.id === 'profile' && activeTab === 'mydata'))
-                    ? 'bg-[#2563eb] text-white' 
-                    : 'bg-[#f0f0f0] text-[#555] hover:bg-[#e5e5e5]'
-                ]"
-              >
-                {{ tab.label }}
-              </button>
-              <button 
-                v-for="link in sidebarLinks"
-                :key="link.id"
-                @click="activeTab = link.id"
-                :class="[
-                  'px-3 py-1.5 rounded-full text-[12px] font-medium transition-colors',
-                  activeTab === link.id
-                    ? 'bg-[#2563eb] text-white' 
-                    : 'bg-[#f0f0f0] text-[#555] hover:bg-[#e5e5e5]'
-                ]"
-              >
-                {{ link.label }}
-              </button>
-            </div>
           </div>
         </div>
 
@@ -421,9 +820,10 @@
                 <div>
                   <button 
                     @click="changePassword"
-                    class="h-[36px] px-5 text-[13px] font-medium text-white bg-[#2563eb] hover:bg-[#1d4ed8] rounded-md transition-colors"
+                    :disabled="changingPassword"
+                    class="h-[36px] px-5 text-[13px] font-medium text-white bg-[#2563eb] hover:bg-[#1d4ed8] rounded-md transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
-                    Actualizar Contraseña
+                    {{ changingPassword ? 'Actualizando...' : 'Actualizar Contraseña' }}
                   </button>
                 </div>
               </div>
@@ -1013,6 +1413,9 @@
       </div><!-- end max-w-960 -->
     </div><!-- end flex-1 content -->
   </div><!-- end flex container -->
+  
+  <!-- Toast Notifications -->
+  <B2BToast />
 </template>
 
 <script>
@@ -1020,6 +1423,7 @@ import { ref, computed, reactive, onMounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import apiClient, { getImageUrl } from '@/services/api'
 import { obtenerMisPedidos } from '@/services/mayoristas'
+import B2BToast, { useToast } from '@/components/b2b/ui/B2BToast.vue'
 
 const COLOMBIA_API = {
   departamentos: 'https://api-colombia.com/api/v1/Department',
@@ -1028,6 +1432,9 @@ const COLOMBIA_API = {
 
 export default {
   name: 'B2BCuenta',
+  components: {
+    B2BToast
+  },
   setup() {
     const activeTab = ref('profile')
     const router = useRouter()
@@ -1197,11 +1604,19 @@ export default {
     }
 
     function reorderItems(order) {
-      alert(`Agregando ${order.items} productos al carrito...`)
+      showToast({
+        type: 'info',
+        title: 'Agregando al carrito',
+        message: `Agregando ${order.items} productos al carrito...`
+      })
     }
 
     function trackOrder(order) {
-      alert(`Rastreando envío: ${order.tracking}`)
+      showToast({
+        type: 'info',
+        title: 'Rastreo de envío',
+        message: `Tracking: ${order.tracking}`
+      })
     }
 
     // =======================================================================
@@ -1335,6 +1750,20 @@ export default {
       { id: 'newsletter', label: 'Newsletter', description: 'Novedades, tendencias y tips para tu negocio', enabled: true },
     ])
 
+    // Variables para vista móvil
+    const changingPassword = ref(false)
+    const mobileEditMode = ref(false)
+    const notificationSettings = reactive({
+      offers: true,
+      orders: true,
+      newProducts: false
+    })
+    
+    function cancelEdit() {
+      mobileEditMode.value = false
+      loadForm() // Restaurar valores originales
+    }
+
     function formatPrice(value) {
       return value?.toLocaleString('es-CO') || '0'
     }
@@ -1353,25 +1782,71 @@ export default {
       loadForm()
     }
 
+    const { showToast } = useToast()
+
     function saveProfile() {
       const userData = { ...user.value, ...editForm }
       localStorage.setItem('b2b_user', JSON.stringify(userData))
-      alert('Perfil actualizado correctamente')
+      showToast({
+        type: 'success',
+        title: 'Perfil actualizado',
+        message: 'Tus datos han sido guardados correctamente'
+      })
     }
 
-    function changePassword() {
+    async function changePassword() {
       if (passwordForm.new !== passwordForm.confirm) {
-        alert('Las contraseñas no coinciden')
+        showToast({
+          type: 'error',
+          title: 'Error',
+          message: 'Las contraseñas no coinciden'
+        })
         return
       }
       if (passwordForm.new.length < 8) {
-        alert('La contraseña debe tener al menos 8 caracteres')
+        showToast({
+          type: 'error', 
+          title: 'Error',
+          message: 'La contraseña debe tener al menos 8 caracteres'
+        })
         return
       }
-      alert('Contraseña actualizada correctamente')
-      passwordForm.current = ''
-      passwordForm.new = ''
-      passwordForm.confirm = ''
+      if (!passwordForm.current) {
+        showToast({
+          type: 'error',
+          title: 'Error', 
+          message: 'Debes ingresar tu contraseña actual'
+        })
+        return
+      }
+      
+      changingPassword.value = true
+      try {
+        await apiClient.post('/b2b/me/cambiar-password', {
+          current_password: passwordForm.current,
+          new_password: passwordForm.new
+        })
+        
+        showToast({
+          type: 'success',
+          title: 'Contraseña actualizada',
+          message: 'Tu contraseña ha sido cambiada correctamente'
+        })
+        
+        passwordForm.current = ''
+        passwordForm.new = ''
+        passwordForm.confirm = ''
+      } catch (error) {
+        console.error('Error al cambiar contraseña:', error)
+        const message = error.response?.data?.detail || 'Error al cambiar la contraseña'
+        showToast({
+          type: 'error',
+          title: 'Error',
+          message
+        })
+      } finally {
+        changingPassword.value = false
+      }
     }
 
     // API de Colombia
@@ -1505,7 +1980,11 @@ export default {
         
       } catch (error) {
         console.error('Error guardando dirección:', error)
-        alert('Error al guardar la dirección. Por favor intenta nuevamente.')
+        showToast({
+          type: 'error',
+          title: 'Error',
+          message: 'Error al guardar la dirección. Por favor intenta nuevamente.'
+        })
       } finally {
         savingAddress.value = false
       }
@@ -1519,7 +1998,11 @@ export default {
         await loadAddresses()
       } catch (error) {
         console.error('Error eliminando dirección:', error)
-        alert('Error al eliminar la dirección')
+        showToast({
+          type: 'error',
+          title: 'Error',
+          message: 'Error al eliminar la dirección'
+        })
       }
     }
 
@@ -1543,9 +2026,17 @@ export default {
     async function sendVerificationEmail() {
       try {
         await apiClient.post('/b2b/me/send-verification')
-        alert('Hemos enviado un correo de verificación a ' + user.value.email + '. Revisa tu bandeja de entrada.')
+        showToast({
+          type: 'success',
+          title: 'Correo enviado',
+          message: 'Revisa tu bandeja de entrada para verificar tu email.'
+        })
       } catch (error) {
-        alert('Se ha enviado un correo de verificación a tu email. Revisa tu bandeja de entrada y carpeta de spam.')
+        showToast({
+          type: 'info',
+          title: 'Verificación',
+          message: 'Revisa tu bandeja de entrada y carpeta de spam.'
+        })
       }
     }
 
@@ -1589,6 +2080,7 @@ export default {
     return {
       activeTab, tabs, sidebarLinks, router, user, userInitials,
       editForm, passwordForm, addresses, notificationPrefs,
+      changingPassword, notificationSettings, mobileEditMode, cancelEdit,
       showAddressModal, editingAddress, loadingAddresses, savingAddress,
       isEmailVerified, verificationDismissed,
       departamentos, municipios, addressForm, isAddressFormValid,

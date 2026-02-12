@@ -30,7 +30,7 @@
     <!-- Botón Flotante Instalar PWA -->
     <transition name="slide-up">
       <div 
-        v-if="installPrompt"
+        v-if="showFloater"
         class="fixed bottom-6 left-6 z-[9000] flex flex-col items-start gap-2"
         role="alert"
       >
@@ -78,7 +78,8 @@
 </template>
 
 <script>
-import { ref, onMounted, onUnmounted } from 'vue'
+import { ref, onMounted, onUnmounted, computed } from 'vue'
+import { useRoute } from 'vue-router'
 
 const INSTALL_PROMPT_KEY = 'kharis_pwa_prompt_dismissed'
 const HOURS_24 = 24 * 60 * 60 * 1000 // 24 horas en ms
@@ -86,9 +87,15 @@ const HOURS_24 = 24 * 60 * 60 * 1000 // 24 horas en ms
 export default {
   name: 'AppB2B',
   setup() {
+    const route = useRoute()
     const showPreloader = ref(true)
     const installPrompt = ref(null)
     const deferredPrompt = ref(null) // Guardar el evento original
+    
+    // Ocultar floater en pagina de cuenta
+    const showFloater = computed(() => {
+      return installPrompt.value && !route.path.includes('/cuenta')
+    })
 
     // Verificar si el popup debe mostrarse (han pasado 24h desde la última vez)
     function shouldShowInstallPrompt() {
@@ -157,6 +164,7 @@ export default {
     return {
       showPreloader,
       installPrompt,
+      showFloater,
       installApp,
       dismissInstallPrompt
     }

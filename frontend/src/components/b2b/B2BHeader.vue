@@ -8,24 +8,24 @@
     ]"
   >
     <!-- ============================== -->
-    <!-- ROW 1: Main Header (Logo + Address + Search + Actions) -->
+    <!-- ROW 1: Main Header -->
     <!-- ============================== -->
     <div class="bg-[#131A2B]">
-      <div class="w-full px-4 sm:px-6 lg:px-8">
-        <div class="flex items-center h-[56px] lg:h-[68px] gap-3 lg:gap-5">
+      <div class="w-full px-3 lg:px-8">
+        <div class="flex items-center h-[48px] lg:h-[68px] gap-2 lg:gap-5">
           
           <!-- Logo -->
-          <router-link to="/portal" class="flex items-center gap-3 group shrink-0">
-            <div class="w-10 h-10 lg:w-11 lg:h-11 rounded-xl overflow-hidden bg-white flex items-center justify-center shadow-md">
-              <img src="/logo-kharis.png" alt="Kharis Pro" class="w-7 h-7 lg:w-8 lg:h-8 object-contain" />
+          <router-link to="/portal" class="flex items-center gap-2 lg:gap-3 group shrink-0">
+            <div class="w-8 h-8 lg:w-11 lg:h-11 rounded-lg lg:rounded-xl overflow-hidden bg-white flex items-center justify-center shadow-md">
+              <img src="/logo-kharis.png" alt="Kharis Pro" class="w-5 h-5 lg:w-8 lg:h-8 object-contain" />
             </div>
-            <div class="hidden sm:block">
+            <div class="hidden lg:block">
               <span class="text-white font-extrabold text-lg lg:text-xl tracking-wide leading-tight">KHARIS</span>
               <span class="block text-[#C9A962] text-[10px] tracking-[0.15em] uppercase font-bold">Portal Mayorista</span>
             </div>
           </router-link>
 
-          <!-- Address (Desktop) - Amazon style next to logo -->
+          <!-- Address (SOLO Desktop) - Amazon style -->
           <router-link 
             to="/portal/cuenta?tab=addresses" 
             class="hidden lg:flex items-center gap-1.5 shrink-0 hover:bg-white/[0.04] rounded px-2 py-1.5 transition-colors"
@@ -41,8 +41,63 @@
             </div>
           </router-link>
 
-          <!-- Search Bar -->
-          <div class="hidden md:flex flex-1 mx-3 lg:mx-6">
+          <!-- Search Bar MÓVIL (inline en row 1) -->
+          <div class="flex-1 lg:hidden">
+            <div class="relative w-full">
+              <input 
+                v-model="searchQuery"
+                type="text" 
+                placeholder="Buscar en Kharis..."
+                class="w-full h-[36px] pl-3 pr-9 bg-white text-sm text-gray-900 placeholder:text-gray-400 rounded-md outline-none focus:ring-2 focus:ring-[#C9A962] transition-all"
+                @keydown.enter="handleSearch"
+                @focus="showMobileSearchResults = true"
+              />
+              <button 
+                @click="handleSearch"
+                class="absolute right-0 top-0 h-full w-9 flex items-center justify-center text-gray-400"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </button>
+              
+              <!-- Resultados de búsqueda móvil -->
+              <transition name="dropdown">
+                <div 
+                  v-if="showMobileSearchResults && searchQuery.length >= 2 && searchResults.length > 0"
+                  class="absolute top-full left-0 right-0 mt-1 bg-white rounded-lg shadow-xl border border-gray-200 overflow-hidden z-50 max-h-[60vh] overflow-y-auto"
+                >
+                  <router-link 
+                    v-for="product in searchResults.slice(0, 5)" 
+                    :key="product.id" 
+                    :to="`/portal/producto/${product.id}`"
+                    class="flex items-center gap-3 p-3 hover:bg-slate-50 transition-colors border-b border-gray-50 last:border-0"
+                    @click="showMobileSearchResults = false; searchQuery = ''"
+                  >
+                    <img 
+                      :src="product.imagen_principal || '/placeholder.png'" 
+                      :alt="product.nombre"
+                      class="w-10 h-10 object-cover rounded bg-gray-100"
+                    />
+                    <div class="flex-1 min-w-0">
+                      <h4 class="font-medium text-gray-900 text-sm truncate">{{ product.nombre }}</h4>
+                      <p class="text-xs text-gray-500">{{ product.categoria_nombre }}</p>
+                    </div>
+                    <span class="text-[#0F172A] font-semibold text-sm whitespace-nowrap">${{ formatPrice(product.precio_mayorista || product.precio) }}</span>
+                  </router-link>
+                  <button 
+                    @click="handleSearch; showMobileSearchResults = false"
+                    class="w-full p-2.5 text-center text-[#C9A962] font-medium text-sm hover:bg-slate-50 transition-colors"
+                  >
+                    Ver todos →
+                  </button>
+                </div>
+              </transition>
+            </div>
+          </div>
+
+          <!-- Search Bar DESKTOP -->
+          <div class="hidden lg:flex flex-1 mx-3 lg:mx-6">
             <div class="relative w-full group">
               <input 
                 v-model="searchQuery"
@@ -104,26 +159,10 @@
             </div>
           </div>
 
-          <!-- Right: Actions - Amazon-style with text labels -->
-          <div class="flex items-center gap-0.5 sm:gap-1 shrink-0">
-            <!-- Mobile Search Toggle -->
-            <button 
-              @click="showMobileSearch = true"
-              class="md:hidden p-2.5 text-white hover:text-[#C9A962] transition-colors"
-            >
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </button>
-
-            <!-- B2B Balance - Prominent -->
-            <div class="hidden sm:flex flex-col items-end px-3 py-1 cursor-default mx-1 hover:bg-white/[0.04] rounded transition-colors">
-              <span class="text-[11px] text-white/50 leading-tight">Saldo</span>
-              <span class="text-[15px] font-bold text-[#C9A962] leading-tight">${{ formatPrice(accountBalance) }}</span>
-            </div>
-
-            <!-- Notifications -->
-            <div class="relative" ref="notificationsRef">
+          <!-- Right: Actions -->
+          <div class="flex items-center gap-0 lg:gap-1 shrink-0">
+            <!-- Notifications (SOLO DESKTOP) -->
+            <div class="relative hidden lg:block" ref="notificationsRef">
               <button 
                 class="relative p-2.5 text-white hover:text-[#C9A962] transition-colors"
                 @click="toggleNotifications"
@@ -133,7 +172,7 @@
                 </svg>
                 <span 
                   v-if="notificationsCount > 0" 
-                  class="absolute top-0.5 right-0.5 min-w-[18px] h-[18px] px-1 bg-red-500 text-white text-[10px] font-bold rounded-full flex items-center justify-center"
+                  class="absolute top-0 right-0 lg:top-0.5 lg:right-0.5 min-w-[16px] lg:min-w-[18px] h-[16px] lg:h-[18px] px-1 bg-red-500 text-white text-[9px] lg:text-[10px] font-bold rounded-full flex items-center justify-center"
                 >
                   {{ notificationsCount > 9 ? '9+' : notificationsCount }}
                 </span>
@@ -193,12 +232,12 @@
               class="relative flex items-center gap-1.5 p-2 lg:px-3 text-white hover:bg-white/[0.04] rounded transition-colors group"
             >
               <div class="relative">
-                <svg class="w-6 h-6 lg:w-7 lg:h-7" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 lg:w-7 lg:h-7" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
                 </svg>
                 <span 
                   v-if="cartCount > 0" 
-                  class="absolute -top-2 -right-2 min-w-[18px] h-[18px] px-1 bg-[#C9A962] text-[#131A2B] text-[10px] font-bold rounded-full flex items-center justify-center"
+                  class="absolute -top-1.5 -right-1.5 lg:-top-2 lg:-right-2 min-w-[16px] lg:min-w-[18px] h-[16px] lg:h-[18px] px-1 bg-[#C9A962] text-[#131A2B] text-[9px] lg:text-[10px] font-bold rounded-full flex items-center justify-center"
                 >
                   {{ cartCount > 99 ? '99+' : cartCount }}
                 </span>
@@ -209,8 +248,8 @@
               </div>
             </router-link>
 
-            <!-- User Menu -->
-            <div class="relative" ref="userMenuRef">
+            <!-- User Menu (hidden on mobile, shown on lg) -->
+            <div class="relative hidden lg:block" ref="userMenuRef">
               <button 
                 @click="showUserMenu = !showUserMenu" 
                 class="flex items-center gap-1.5 p-2 lg:px-3 hover:bg-white/[0.04] rounded transition-colors"
@@ -218,7 +257,7 @@
                 <svg class="w-6 h-6 lg:w-7 lg:h-7 text-white" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
-                <div class="hidden lg:flex flex-col leading-none">
+                <div class="flex flex-col leading-none">
                   <span class="text-[11px] text-white/50 leading-tight">Hola, {{ user.nombre?.split(' ')[0] }}</span>
                   <span class="text-[15px] font-bold text-white flex items-center gap-0.5 leading-tight">
                     Cuenta
@@ -307,17 +346,68 @@
             <!-- Mobile Menu Toggle -->
             <button 
               @click="showMobileMenu = !showMobileMenu" 
-              class="lg:hidden p-2.5 text-white hover:text-[#C9A962] transition-colors"
+              class="lg:hidden p-2 text-white hover:text-[#C9A962] transition-colors"
             >
-              <svg v-if="!showMobileMenu" class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg v-if="!showMobileMenu" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5m-16.5 5.25h16.5" />
               </svg>
-              <svg v-else class="w-6 h-6" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
         </div>
+      </div>
+    </div>
+
+    <!-- ============================== -->
+    <!-- ROW 2 MÓVIL: Barra de navegación estilo Amazon -->
+    <!-- ============================== -->
+    <div class="lg:hidden bg-[#1a2332] border-t border-white/[0.08]">
+      <div class="flex items-center gap-1 px-3 py-1.5 overflow-x-auto scrollbar-hide">
+        <router-link 
+          to="/portal/catalogo?oferta=true"
+          class="shrink-0 px-3 py-1.5 text-[12px] font-semibold text-[#C9A962] hover:bg-white/[0.08] rounded transition-colors whitespace-nowrap"
+        >
+          Ofertas
+        </router-link>
+        <router-link 
+          to="/portal/cupones"
+          class="shrink-0 px-3 py-1.5 text-[12px] font-medium text-white/90 hover:text-white hover:bg-white/[0.08] rounded transition-colors whitespace-nowrap"
+        >
+          Cupones
+        </router-link>
+        <router-link 
+          to="/portal/catalogo?nuevo=true"
+          class="shrink-0 px-3 py-1.5 text-[12px] font-medium text-white/90 hover:text-white hover:bg-white/[0.08] rounded transition-colors whitespace-nowrap flex items-center gap-1"
+        >
+          Nuevos
+          <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>
+        </router-link>
+        <router-link 
+          to="/portal/catalogo"
+          class="shrink-0 px-3 py-1.5 text-[12px] font-medium text-white/90 hover:text-white hover:bg-white/[0.08] rounded transition-colors whitespace-nowrap"
+        >
+          Catálogo
+        </router-link>
+        <router-link 
+          to="/portal/pedidos"
+          class="shrink-0 px-3 py-1.5 text-[12px] font-medium text-white/90 hover:text-white hover:bg-white/[0.08] rounded transition-colors whitespace-nowrap"
+        >
+          Mis Pedidos
+        </router-link>
+        <router-link 
+          to="/portal/favoritos"
+          class="shrink-0 px-3 py-1.5 text-[12px] font-medium text-white/90 hover:text-white hover:bg-white/[0.08] rounded transition-colors whitespace-nowrap flex items-center gap-1"
+        >
+          Favoritos
+          <span 
+            v-if="favoritosCount > 0" 
+            class="text-[9px] px-1 py-0.5 bg-[#C9A962] text-[#131A2B] rounded-full font-bold"
+          >
+            {{ favoritosCount }}
+          </span>
+        </router-link>
       </div>
     </div>
 
@@ -465,81 +555,235 @@
       </div>
     </div>
 
-    <!-- Mobile Menu -->
-    <transition name="slide">
-      <div v-if="showMobileMenu" class="lg:hidden bg-[#131A2B] border-t border-white/[0.06]">
-        <div class="max-w-7xl mx-auto px-4 py-4 space-y-1">
-          <!-- Mobile Balance -->
-          <div class="flex items-center justify-between px-4 py-3 bg-[#C9A962]/5 border border-[#C9A962]/25 rounded-lg mb-3">
-            <span class="text-sm text-slate-300">Saldo disponible</span>
-            <span class="text-base font-bold text-[#C9A962]">${{ formatPrice(accountBalance) }}</span>
+    <!-- Mobile Menu Fullscreen (estilo Mercado Libre) -->
+    <Teleport to="body">
+      <transition name="slide-fullscreen">
+        <div 
+          v-if="showMobileMenu" 
+          class="lg:hidden fixed inset-0 z-[100] bg-white flex flex-col"
+        >
+          <!-- Header con búsqueda -->
+          <div class="bg-[#131A2B] px-4 py-3">
+            <div class="flex items-center gap-3">
+              <!-- Logo -->
+              <router-link to="/portal" @click="showMobileMenu = false" class="flex-shrink-0">
+                <img src="/logo%20blanco.png" alt="Kharis" class="h-7 w-auto" />
+              </router-link>
+              
+              <!-- Search -->
+              <div class="flex-1 relative">
+                <input
+                  type="text"
+                  placeholder="Buscar en Kharis..."
+                  class="w-full h-9 pl-3 pr-8 bg-white rounded text-sm text-gray-800 placeholder:text-gray-400 outline-none"
+                  @focus="showMobileMenu = false; showMobileSearch = true"
+                />
+                <svg class="absolute right-2.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z"/>
+                </svg>
+              </div>
+              
+              <!-- Cart & Close -->
+              <router-link to="/portal/carrito" @click="showMobileMenu = false" class="relative p-1.5 text-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121 0 2.052-.868 2.178-1.977l.672-5.927A1.125 1.125 0 0014.732 5.25H4.51M7.5 14.25L5.106 5.272M8.25 18.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0zM17.25 18.75a.75.75 0 11-1.5 0 .75.75 0 011.5 0z"/>
+                </svg>
+                <span v-if="cartItemsCount > 0" class="absolute -top-1 -right-1 w-4 h-4 bg-[#C9A962] text-[#131A2B] text-[10px] font-bold flex items-center justify-center rounded-full">
+                  {{ cartItemsCount > 9 ? '9+' : cartItemsCount }}
+                </span>
+              </router-link>
+              <button @click="showMobileMenu = false" class="p-1.5 text-white">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
           </div>
           
-          <!-- Categories -->
-          <p class="px-4 py-2 text-[10px] text-slate-600 uppercase tracking-widest font-medium">Categorías</p>
-          <router-link 
-            v-for="cat in categorias" 
-            :key="cat.id" 
-            :to="`/portal/catalogo?categoria=${cat.slug}`"
-            class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors text-sm"
-            @click="showMobileMenu = false"
-          >
-            {{ cat.nombre }}
-          </router-link>
-          
-          <div class="border-t border-slate-800 my-3"></div>
-          
-          <!-- Special Links -->
-          <router-link 
-            to="/portal/catalogo?nuevo=true" 
-            class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors text-sm"
-            @click="showMobileMenu = false"
-          >
-            Nuevos Lanzamientos
-            <span class="w-1.5 h-1.5 bg-emerald-400 rounded-full"></span>
-          </router-link>
-          <router-link 
-            to="/portal/catalogo?oferta=true" 
-            class="flex items-center gap-3 px-4 py-2.5 text-amber-400/90 hover:text-amber-300 hover:bg-slate-800/50 rounded-lg transition-colors text-sm"
-            @click="showMobileMenu = false"
-          >
-            Ofertas
-          </router-link>
-          <router-link 
-            to="/portal/cupones" 
-            class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors text-sm"
-            @click="showMobileMenu = false"
-          >
-            Cupones
-          </router-link>
-          
-          <div class="border-t border-slate-800 my-3"></div>
-          <p class="px-4 py-2 text-[10px] text-slate-600 uppercase tracking-widest font-medium">Mi cuenta</p>
-          
-          <router-link 
-            to="/portal" 
-            class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors text-sm"
-            @click="showMobileMenu = false"
-          >
-            Dashboard
-          </router-link>
-          <router-link 
-            to="/portal/catalogo" 
-            class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors text-sm"
-            @click="showMobileMenu = false"
-          >
-            Catálogo Completo
-          </router-link>
-          <router-link 
-            to="/portal/pedidos" 
-            class="flex items-center gap-3 px-4 py-2.5 text-slate-300 hover:text-white hover:bg-slate-800/50 rounded-lg transition-colors text-sm"
-            @click="showMobileMenu = false"
-          >
-            Mis Pedidos
-          </router-link>
+          <!-- Contenido scrolleable -->
+          <div class="flex-1 overflow-y-auto">
+            <!-- Perfil de usuario -->
+            <router-link 
+              to="/portal/cuenta" 
+              class="block px-4 py-4 border-b border-gray-100 hover:bg-gray-50 transition-colors"
+              @click="showMobileMenu = false"
+            >
+              <div class="flex items-center gap-3">
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#C9A962] to-[#D4B574] flex items-center justify-center text-white font-bold text-sm">
+                  {{ userInitials }}
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="font-semibold text-gray-800 text-sm truncate">{{ user?.nombre || 'Cliente' }}</p>
+                  <p class="text-xs text-gray-500">Mi perfil ›</p>
+                </div>
+              </div>
+            </router-link>
+            
+            <!-- Saldo disponible -->
+            <div class="mx-4 my-3 px-4 py-3 bg-gradient-to-r from-[#C9A962] to-[#D4B574] rounded-lg flex items-center justify-between">
+              <span class="text-sm text-[#2C1810] font-medium">Saldo disponible</span>
+              <span class="text-lg font-bold text-[#2C1810]">${{ formatPrice(accountBalance) }}</span>
+            </div>
+            
+            <!-- Navegación principal -->
+            <nav class="py-2">
+              <router-link 
+                to="/portal" 
+                class="flex items-center gap-4 px-4 py-3.5 hover:bg-gray-50 transition-colors"
+                @click="showMobileMenu = false"
+              >
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25"/>
+                </svg>
+                <span class="text-gray-800 text-[15px]">Inicio</span>
+              </router-link>
+              
+              <router-link 
+                to="/portal/cuenta?tab=notifications" 
+                class="flex items-center gap-4 px-4 py-3.5 hover:bg-gray-50 transition-colors"
+                @click="showMobileMenu = false"
+              >
+                <div class="relative">
+                  <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.857 17.082a23.848 23.848 0 005.454-1.31A8.967 8.967 0 0118 9.75v-.7V9A6 6 0 006 9v.75a8.967 8.967 0 01-2.312 6.022c1.733.64 3.56 1.085 5.455 1.31m5.714 0a24.255 24.255 0 01-5.714 0m5.714 0a3 3 0 11-5.714 0"/>
+                  </svg>
+                  <span v-if="notificationsCount > 0" class="absolute -top-1 -right-1 w-4 h-4 bg-red-500 text-white text-[9px] font-bold flex items-center justify-center rounded-full">
+                    {{ notificationsCount > 9 ? '9+' : notificationsCount }}
+                  </span>
+                </div>
+                <span class="text-gray-800 text-[15px]">Notificaciones</span>
+              </router-link>
+              
+              <router-link 
+                to="/portal/pedidos" 
+                class="flex items-center gap-4 px-4 py-3.5 hover:bg-gray-50 transition-colors"
+                @click="showMobileMenu = false"
+              >
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z"/>
+                </svg>
+                <span class="text-gray-800 text-[15px]">Mis Pedidos</span>
+              </router-link>
+              
+              <router-link 
+                to="/portal/favoritos" 
+                class="flex items-center gap-4 px-4 py-3.5 hover:bg-gray-50 transition-colors"
+                @click="showMobileMenu = false"
+              >
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z"/>
+                </svg>
+                <span class="text-gray-800 text-[15px]">Favoritos</span>
+                <span v-if="favoritosCount > 0" class="ml-auto text-xs text-gray-400">{{ favoritosCount }}</span>
+              </router-link>
+              
+              <router-link 
+                to="/portal/catalogo?oferta=true" 
+                class="flex items-center gap-4 px-4 py-3.5 hover:bg-gray-50 transition-colors"
+                @click="showMobileMenu = false"
+              >
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z"/>
+                </svg>
+                <span class="text-gray-800 text-[15px]">Ofertas</span>
+              </router-link>
+              
+              <router-link 
+                to="/portal/cupones" 
+                class="flex items-center gap-4 px-4 py-3.5 hover:bg-gray-50 transition-colors"
+                @click="showMobileMenu = false"
+              >
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 6v.75m0 3v.75m0 3v.75m0 3V18m-9-5.25h5.25M7.5 15h3M3.375 5.25c-.621 0-1.125.504-1.125 1.125v3.026a2.999 2.999 0 010 5.198v3.026c0 .621.504 1.125 1.125 1.125h17.25c.621 0 1.125-.504 1.125-1.125v-3.026a2.999 2.999 0 010-5.198V6.375c0-.621-.504-1.125-1.125-1.125H3.375z"/>
+                </svg>
+                <span class="text-gray-800 text-[15px]">Cupones</span>
+              </router-link>
+            </nav>
+            
+            <div class="h-px bg-gray-100 mx-4"></div>
+            
+            <!-- Categorías -->
+            <div class="py-2">
+              <p class="px-4 py-2 text-xs text-gray-400 uppercase tracking-wider font-medium">Categorías</p>
+              <router-link 
+                v-for="cat in categorias" 
+                :key="cat.id" 
+                :to="`/portal/catalogo?categoria=${cat.slug}`"
+                class="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-colors"
+                @click="showMobileMenu = false"
+              >
+                <span class="text-gray-700 text-[15px]">{{ cat.nombre }}</span>
+              </router-link>
+              <router-link 
+                to="/portal/catalogo"
+                class="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-colors"
+                @click="showMobileMenu = false"
+              >
+                <span class="text-[#C9A962] text-[15px] font-medium">Ver todo el catálogo</span>
+                <svg class="w-4 h-4 text-[#C9A962] ml-auto" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5"/>
+                </svg>
+              </router-link>
+            </div>
+            
+            <div class="h-px bg-gray-100 mx-4"></div>
+            
+            <!-- Mi cuenta -->
+            <div class="py-2">
+              <p class="px-4 py-2 text-xs text-gray-400 uppercase tracking-wider font-medium">Mi cuenta</p>
+              
+              <router-link 
+                to="/portal/cuenta" 
+                class="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-colors"
+                @click="showMobileMenu = false"
+              >
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z"/>
+                </svg>
+                <span class="text-gray-700 text-[15px]">Mi perfil</span>
+              </router-link>
+              
+              <router-link 
+                to="/portal/cuenta?tab=addresses" 
+                class="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-colors"
+                @click="showMobileMenu = false"
+              >
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15 10.5a3 3 0 11-6 0 3 3 0 016 0z"/>
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M19.5 10.5c0 7.142-7.5 11.25-7.5 11.25S4.5 17.642 4.5 10.5a7.5 7.5 0 1115 0z"/>
+                </svg>
+                <span class="text-gray-700 text-[15px]">Mis direcciones</span>
+              </router-link>
+              
+              <a 
+                href="https://wa.me/4796657763" 
+                target="_blank" 
+                class="flex items-center gap-4 px-4 py-3 hover:bg-gray-50 transition-colors"
+              >
+                <svg class="w-5 h-5 text-gray-500" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M9.879 7.519c1.171-1.025 3.071-1.025 4.242 0 1.172 1.025 1.172 2.687 0 3.712-.203.179-.43.326-.67.442-.745.361-1.45.999-1.45 1.827v.75M21 12a9 9 0 11-18 0 9 9 0 0118 0zm-9 5.25h.008v.008H12v-.008z"/>
+                </svg>
+                <span class="text-gray-700 text-[15px]">Ayuda / Contacto</span>
+              </a>
+            </div>
+            
+            <!-- Cerrar sesión -->
+            <div class="p-4 mt-2">
+              <button 
+                @click="handleLogout"
+                class="w-full flex items-center justify-center gap-2 py-3 border border-gray-200 rounded-lg text-gray-500 hover:bg-gray-50 transition-colors text-sm"
+              >
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 9V5.25A2.25 2.25 0 0013.5 3h-6a2.25 2.25 0 00-2.25 2.25v13.5A2.25 2.25 0 007.5 21h6a2.25 2.25 0 002.25-2.25V15m3 0l3-3m0 0l-3-3m3 3H9"/>
+                </svg>
+                Cerrar sesión
+              </button>
+            </div>
+          </div>
         </div>
-      </div>
-    </transition>
+      </transition>
+    </Teleport>
 
     <!-- Mobile Search Modal -->
     <Teleport to="body">
@@ -658,6 +902,7 @@ export default {
     const showCategoriesMenu = ref(false)
     const showSearchSuggestions = ref(false)
     const showMobileSearch = ref(false)
+    const showMobileSearchResults = ref(false)
     
     // Search State
     const searchQuery = ref('')
@@ -953,6 +1198,7 @@ export default {
       showCategoriesMenu,
       showSearchSuggestions,
       showMobileSearch,
+      showMobileSearchResults,
       isScrolled,
       isVisible,
       
@@ -1027,6 +1273,20 @@ export default {
   transform: translateY(-10px);
 }
 
+/* Slide Fullscreen Transition for Mobile Menu (ML style) */
+.slide-fullscreen-enter-active, 
+.slide-fullscreen-leave-active { 
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); 
+}
+.slide-fullscreen-enter-from { 
+  opacity: 0;
+  transform: translateX(100%);
+}
+.slide-fullscreen-leave-to { 
+  opacity: 0;
+  transform: translateX(100%);
+}
+
 /* Custom scrollbar for search dropdown */
 .max-h-\[400px\]::-webkit-scrollbar {
   width: 4px;
@@ -1037,5 +1297,14 @@ export default {
 .max-h-\[400px\]::-webkit-scrollbar-thumb {
   background: #E91E63;
   border-radius: 2px;
+}
+
+/* Hide scrollbar for horizontal nav */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
 }
 </style>

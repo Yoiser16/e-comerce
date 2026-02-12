@@ -20,31 +20,65 @@
           
           <!-- ==================== SLIDE 1: Esmeralda ==================== -->
           <div class="w-full flex-shrink-0 bg-[#0b2820] relative">
-            <!-- Elementos decorativos -->
-            <div class="absolute inset-0 overflow-hidden">
+            <!-- Elementos decorativos (ocultos en móvil) -->
+            <div class="absolute inset-0 overflow-hidden hidden lg:block">
               <div class="absolute top-0 right-0 w-[600px] h-[600px] bg-[#0d3d30]/50 rounded-full translate-x-1/3 -translate-y-1/3"></div>
               <div class="absolute bottom-0 left-0 w-80 h-80 bg-[#C9A962]/5 rounded-full -translate-x-1/2 translate-y-1/2"></div>
             </div>
             
-            <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-              <div class="grid lg:grid-cols-2 gap-6 lg:gap-4 min-h-[380px] sm:min-h-[420px] lg:min-h-[460px] items-start py-6 sm:py-8 lg:py-10">
-                
+            <div class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
+              <!-- Móvil: Layout horizontal compacto -->
+              <div class="flex lg:hidden items-center min-h-[180px] py-4 gap-3">
+                <!-- Texto compacto móvil -->
+                <div class="flex-1 pr-2">
+                  <span class="text-[#C9A962] text-[9px] font-semibold tracking-[0.15em] uppercase">Mayorista</span>
+                  <h1 class="font-luxury leading-[1.15] mt-1">
+                    <span class="block text-white text-xl font-bold">Cabello <span class="text-[#C9A962]">Premium</span></span>
+                  </h1>
+                  <p class="text-white/60 text-xs leading-relaxed mt-2 line-clamp-2">
+                    Extensiones 100% Remy y pelucas de lujo
+                  </p>
+                  <router-link 
+                    to="/portal/catalogo"
+                    class="inline-flex items-center gap-1.5 mt-3 px-4 py-2 bg-[#C9A962] text-[#0b2820] text-xs font-bold rounded-full"
+                  >
+                    Ver Catálogo
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </router-link>
+                </div>
+                <!-- Imagen compacta móvil -->
+                <div class="relative w-28 h-28 flex-shrink-0">
+                  <img 
+                    src="/images/card%20panel/5.png" 
+                    alt="Productos Premium" 
+                    class="w-full h-full object-contain"
+                  />
+                  <div class="absolute -top-1 -right-1 bg-[#C9A962] rounded-lg px-2 py-1 rotate-3">
+                    <p class="text-[#0b2820] text-[8px] font-bold">30% OFF</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Desktop: Layout original -->
+              <div class="hidden lg:grid lg:grid-cols-2 gap-4 min-h-[460px] items-start py-10">
                 <!-- Texto -->
-                <div class="relative z-10 order-2 lg:order-1 pt-4 sm:pt-6">
+                <div class="relative z-10 pt-6">
                   <div class="inline-flex items-center gap-2 mb-4">
                     <span class="w-8 h-px bg-gradient-to-r from-[#C9A962] to-transparent"></span>
                     <span class="text-[#C9A962] text-[10px] font-semibold tracking-[0.2em] uppercase">Portal Mayorista</span>
                   </div>
                   
                   <h1 class="font-luxury leading-[1.1] mb-4">
-                    <span class="block text-white/80 text-lg sm:text-xl lg:text-2xl font-light mb-1">Impulsa tu Negocio con</span>
-                    <span class="block text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold">
+                    <span class="block text-white/80 text-2xl font-light mb-1">Impulsa tu Negocio con</span>
+                    <span class="block text-5xl xl:text-6xl font-bold">
                       <span class="text-white">Cabello </span>
                       <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#C9A962] via-[#E8D5A3] to-[#C9A962]">Premium</span>
                     </span>
                   </h1>
                   
-                  <p class="text-white/60 text-sm sm:text-base leading-relaxed mb-6 max-w-md">
+                  <p class="text-white/60 text-base leading-relaxed mb-6 max-w-md">
                     Extensiones 100% Remy, pelucas de lujo y sistemas capilares con los mejores márgenes.
                   </p>
                   
@@ -67,12 +101,10 @@
                       Ver Novedades
                     </router-link>
                   </div>
-                  
                 </div>
                 
                 <!-- Imagen con gradient mask -->
-                <div class="relative order-1 lg:order-2 flex items-center justify-center lg:justify-end h-[200px] sm:h-[260px] lg:h-[360px]">
-                  <!-- Gradient masks para fundir la imagen -->
+                <div class="relative flex items-center justify-end h-[360px]">
                   <div class="absolute inset-0 z-10 pointer-events-none" style="background: linear-gradient(90deg, #0b2820 0%, transparent 20%, transparent 80%, #0b2820 100%);"></div>
                   <div class="absolute inset-0 z-10 pointer-events-none" style="background: linear-gradient(180deg, #0b2820 0%, transparent 15%, transparent 85%, #0b2820 100%);"></div>
                   
@@ -83,8 +115,7 @@
                     style="filter: drop-shadow(0 20px 40px rgba(0,0,0,0.4));"
                   />
                   
-                  <!-- Badge OFF -->
-                  <div class="absolute top-2 right-2 lg:top-4 lg:right-8 z-20 bg-[#C9A962] rounded-xl px-4 py-2 shadow-xl rotate-3">
+                  <div class="absolute top-4 right-8 z-20 bg-[#C9A962] rounded-xl px-4 py-2 shadow-xl rotate-3">
                     <p class="text-[#0b2820] text-[9px] font-bold uppercase">Hasta</p>
                     <p class="text-[#0b2820] text-xl font-black -mt-1">30% OFF</p>
                   </div>
@@ -92,40 +123,74 @@
               </div>
             </div>
             
-            <!-- Gradiente inferior para fundido suave (verde oscuro) -->
-            <div class="absolute bottom-0 left-0 right-0 h-32 sm:h-40 lg:h-48 z-10 pointer-events-none" style="background: linear-gradient(to bottom, transparent 0%, rgba(11,40,32,0.6) 40%, #FAFAFA 100%);"></div>
-            <div class="h-12 sm:h-14 lg:h-16"></div>
+            <!-- Gradiente inferior para fundido suave -->
+            <div class="absolute bottom-0 left-0 right-0 h-16 lg:h-48 z-10 pointer-events-none" style="background: linear-gradient(to bottom, transparent 0%, rgba(11,40,32,0.6) 40%, #FAFAFA 100%);"></div>
+            <div class="h-6 lg:h-16"></div>
           </div>
           
           <!-- ==================== SLIDE 2: Champagne ==================== -->
           <div class="w-full flex-shrink-0 relative overflow-hidden" style="background: linear-gradient(135deg, #F5EBE0 0%, #E8D5C4 40%, #F2E6D9 70%, #DEC9B6 100%);">
             
-            <!-- Elementos decorativos de fondo -->
-            <div class="absolute inset-0 overflow-hidden">
+            <!-- Elementos decorativos de fondo (ocultos en móvil) -->
+            <div class="absolute inset-0 overflow-hidden hidden lg:block">
               <div class="absolute -top-20 -right-20 w-[400px] h-[400px] bg-[#C9A962]/10 rounded-full"></div>
               <div class="absolute bottom-0 left-0 w-80 h-80 bg-[#8B7355]/8 rounded-full -translate-x-1/3 translate-y-1/3"></div>
               <div class="absolute top-1/3 left-1/4 w-40 h-40 bg-[#D4A85A]/6 rounded-full"></div>
             </div>
             
-            <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 relative z-10">
-              <div class="grid lg:grid-cols-2 gap-6 lg:gap-4 min-h-[380px] sm:min-h-[420px] lg:min-h-[460px] items-start py-6 sm:py-8 lg:py-10">
-                
+            <div class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 relative z-10">
+              <!-- Móvil: Layout horizontal compacto -->
+              <div class="flex lg:hidden items-center min-h-[180px] py-4 gap-3">
+                <!-- Texto compacto móvil -->
+                <div class="flex-1 pr-2">
+                  <span class="text-[#8B7355] text-[9px] font-semibold tracking-[0.15em] uppercase">Certificado</span>
+                  <h1 class="font-luxury leading-[1.15] mt-1">
+                    <span class="block text-[#2C1810] text-xl font-bold">100% <span class="text-[#8B7355]">Remy</span></span>
+                  </h1>
+                  <p class="text-[#6B5B4E] text-xs leading-relaxed mt-2 line-clamp-2">
+                    Cabello humano de la más alta calidad
+                  </p>
+                  <router-link 
+                    to="/portal/catalogo"
+                    class="inline-flex items-center gap-1.5 mt-3 px-4 py-2 bg-[#2C1810] text-white text-xs font-bold rounded-full"
+                  >
+                    Ver Colección
+                    <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                    </svg>
+                  </router-link>
+                </div>
+                <!-- Imagen compacta móvil -->
+                <div class="relative w-28 h-28 flex-shrink-0">
+                  <img 
+                    src="/images/card%20panel/6.png" 
+                    alt="Extensiones Remy" 
+                    class="w-full h-full object-contain"
+                  />
+                  <div class="absolute -top-1 -right-1 bg-[#2C1810] rounded-lg px-2 py-1 rotate-3">
+                    <p class="text-[#C9A962] text-[8px] font-bold">100%</p>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Desktop: Layout original -->
+              <div class="hidden lg:grid lg:grid-cols-2 gap-4 min-h-[460px] items-start py-10">
                 <!-- Texto -->
-                <div class="relative z-10 order-2 lg:order-1 pt-4 sm:pt-6">
+                <div class="relative z-10 pt-6">
                   <div class="inline-flex items-center gap-2 mb-4">
                     <span class="w-8 h-px bg-gradient-to-r from-[#8B7355] to-transparent"></span>
                     <span class="text-[#8B7355] text-[10px] font-semibold tracking-[0.2em] uppercase">Calidad Certificada</span>
                   </div>
                   
                   <h1 class="font-luxury leading-[1.1] mb-4">
-                    <span class="block text-[#5C4A3A] text-lg sm:text-xl lg:text-2xl font-light mb-1">Extensiones y Pelucas</span>
-                    <span class="block text-3xl sm:text-4xl lg:text-5xl xl:text-6xl font-bold">
+                    <span class="block text-[#5C4A3A] text-2xl font-light mb-1">Extensiones y Pelucas</span>
+                    <span class="block text-5xl xl:text-6xl font-bold">
                       <span class="text-[#2C1810]">100% </span>
                       <span class="text-transparent bg-clip-text bg-gradient-to-r from-[#8B7355] via-[#C9A962] to-[#8B7355]">Remy</span>
                     </span>
                   </h1>
                   
-                  <p class="text-[#6B5B4E] text-sm sm:text-base leading-relaxed mb-6 max-w-md">
+                  <p class="text-[#6B5B4E] text-base leading-relaxed mb-6 max-w-md">
                     Cabello humano de la más alta calidad. Precios exclusivos para distribuidores profesionales.
                   </p>
                   
@@ -149,11 +214,10 @@
                       Contactar Asesor
                     </a>
                   </div>
-                  
                 </div>
                 
                 <!-- Imagen -->
-                <div class="relative order-1 lg:order-2 flex items-center justify-center lg:justify-end h-[200px] sm:h-[260px] lg:h-[360px]">
+                <div class="relative flex items-center justify-end h-[360px]">
                   <img 
                     src="/images/card%20panel/6.png" 
                     alt="Extensiones Remy" 
@@ -161,8 +225,7 @@
                     style="filter: drop-shadow(0 20px 40px rgba(44,24,16,0.25));"
                   />
                   
-                  <!-- Badge Calidad -->
-                  <div class="absolute top-2 right-2 lg:top-4 lg:right-8 bg-[#2C1810] rounded-xl px-4 py-2 shadow-xl rotate-3">
+                  <div class="absolute top-4 right-8 bg-[#2C1810] rounded-xl px-4 py-2 shadow-xl rotate-3">
                     <p class="text-[#C9A962] text-[9px] font-bold uppercase">Certificado</p>
                     <p class="text-white text-xl font-black -mt-1">100%</p>
                   </div>
@@ -171,50 +234,72 @@
             </div>
             
             <!-- Gradiente inferior para fundido suave -->
-            <div class="absolute bottom-0 left-0 right-0 h-24 sm:h-32 lg:h-40 z-10 pointer-events-none" style="background: linear-gradient(to bottom, transparent 0%, #FAFAFA 100%);"></div>
-            <div class="h-12 sm:h-14 lg:h-16"></div>
+            <div class="absolute bottom-0 left-0 right-0 h-12 lg:h-40 z-10 pointer-events-none" style="background: linear-gradient(to bottom, transparent 0%, #FAFAFA 100%);"></div>
+            <div class="h-6 lg:h-16"></div>
           </div>
           
           <!-- ==================== SLIDE 3: Promoción Estilo ML ==================== -->
           <div class="w-full flex-shrink-0 relative overflow-hidden" style="background: linear-gradient(135deg, #FFE600 0%, #FFB800 50%, #FF9500 100%);">
             
-            <!-- Elementos decorativos de fondo -->
-            <div class="absolute inset-0 overflow-hidden">
+            <!-- Elementos decorativos de fondo (ocultos en móvil) -->
+            <div class="absolute inset-0 overflow-hidden hidden lg:block">
               <div class="absolute top-0 left-0 w-96 h-96 bg-white/10 rounded-full -translate-x-1/2 -translate-y-1/2"></div>
               <div class="absolute bottom-0 right-0 w-[500px] h-[500px] bg-orange-500/20 rounded-full translate-x-1/3 translate-y-1/3"></div>
               <div class="absolute top-1/2 left-1/4 w-32 h-32 bg-[#E91E63]/10 rounded-full"></div>
-              <!-- Patrón de puntos decorativo -->
-              <div class="absolute top-10 right-20 grid grid-cols-5 gap-2 opacity-20">
-                <div v-for="i in 15" :key="i" class="w-2 h-2 bg-white rounded-full"></div>
-              </div>
             </div>
             
-            <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 relative z-10">
-              <div class="flex flex-col items-center justify-start min-h-[380px] sm:min-h-[420px] lg:min-h-[460px] py-6 sm:py-8 lg:py-10 text-center">
-                
+            <div class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12 relative z-10">
+              <!-- Móvil: Layout compacto horizontal -->
+              <div class="flex lg:hidden items-center justify-between min-h-[180px] py-4">
+                <!-- Texto izquierda -->
+                <div class="flex-1">
+                  <div class="inline-flex items-center gap-1.5 bg-[#E91E63] text-white px-2.5 py-1 rounded-full text-[9px] font-bold uppercase mb-2">
+                    <span class="w-1.5 h-1.5 bg-white rounded-full animate-pulse"></span>
+                    Oferta limitada
+                  </div>
+                  <h2 class="font-luxury text-[#1A1A1A] text-xl font-black leading-none mb-1">
+                    LIQUIDACIÓN
+                  </h2>
+                  <p class="text-[#1A1A1A]/70 text-xs">
+                    Descuentos <strong>exclusivos</strong> para mayoristas
+                  </p>
+                </div>
+                <!-- Porcentaje derecha -->
+                <div class="flex flex-col items-center justify-center pl-3">
+                  <span class="text-[#1A1A1A]/60 text-[10px] font-bold">HASTA</span>
+                  <div class="flex items-baseline">
+                    <span class="text-[#1A1A1A] text-4xl font-black leading-none">50</span>
+                    <span class="text-[#1A1A1A] text-lg font-black">%</span>
+                  </div>
+                  <span class="text-[#E91E63] text-xl font-black -mt-1">OFF</span>
+                </div>
+              </div>
+              
+              <!-- Desktop: Layout original centrado -->
+              <div class="hidden lg:flex flex-col items-center justify-start min-h-[460px] py-10 text-center">
                 <!-- Badge superior -->
-                <div class="inline-flex items-center gap-2 bg-[#E91E63] text-white px-4 py-2 rounded-full text-xs sm:text-sm font-bold uppercase tracking-wider mb-6 shadow-lg">
+                <div class="inline-flex items-center gap-2 bg-[#E91E63] text-white px-4 py-2 rounded-full text-sm font-bold uppercase tracking-wider mb-6 shadow-lg">
                   <span class="w-2 h-2 bg-white rounded-full animate-pulse"></span>
                   Oferta por tiempo limitado
                 </div>
                 
                 <!-- Título principal -->
-                <h2 class="font-luxury text-[#1A1A1A] text-4xl sm:text-5xl lg:text-7xl font-black leading-none mb-4 drop-shadow-sm">
+                <h2 class="font-luxury text-[#1A1A1A] text-7xl font-black leading-none mb-4 drop-shadow-sm">
                   LIQUIDACIÓN
                 </h2>
                 
                 <!-- Porcentaje destacado -->
-                <div class="flex items-center justify-center gap-3 sm:gap-4 mb-6">
-                  <span class="text-[#1A1A1A]/70 text-xl sm:text-2xl lg:text-3xl font-bold">HASTA</span>
+                <div class="flex items-center justify-center gap-4 mb-6">
+                  <span class="text-[#1A1A1A]/70 text-3xl font-bold">HASTA</span>
                   <div class="relative">
-                    <span class="text-[#1A1A1A] text-6xl sm:text-7xl lg:text-[120px] font-black leading-none">50</span>
-                    <span class="absolute -top-2 -right-8 sm:-right-12 text-[#1A1A1A] text-3xl sm:text-4xl lg:text-5xl font-black">%</span>
+                    <span class="text-[#1A1A1A] text-[120px] font-black leading-none">50</span>
+                    <span class="absolute -top-2 -right-12 text-[#1A1A1A] text-5xl font-black">%</span>
                   </div>
-                  <span class="text-[#E91E63] text-4xl sm:text-5xl lg:text-6xl font-black drop-shadow-lg">OFF</span>
+                  <span class="text-[#E91E63] text-6xl font-black drop-shadow-lg">OFF</span>
                 </div>
                 
                 <!-- Descripción -->
-                <p class="text-[#1A1A1A]/80 text-base sm:text-lg max-w-lg">
+                <p class="text-[#1A1A1A]/80 text-lg max-w-lg">
                   Extensiones, pelucas y sistemas capilares con <strong>descuentos exclusivos</strong> para mayoristas
                 </p>
                 
@@ -224,39 +309,39 @@
             </div>
             
             <!-- Gradiente inferior para fundido suave -->
-            <div class="absolute bottom-0 left-0 right-0 h-24 sm:h-32 lg:h-40 z-10 pointer-events-none" style="background: linear-gradient(to bottom, transparent 0%, #FAFAFA 100%);"></div>
-            <div class="h-12 sm:h-14 lg:h-16"></div>
+            <div class="absolute bottom-0 left-0 right-0 h-12 lg:h-40 z-10 pointer-events-none" style="background: linear-gradient(to bottom, transparent 0%, #FAFAFA 100%);"></div>
+            <div class="h-6 lg:h-16"></div>
           </div>
         </div>
         
-        <!-- Flechas de navegación -->
+        <!-- Flechas de navegación (solo desktop) -->
         <button 
           @click="prevScene"
-          class="absolute left-0 top-1/2 -translate-y-1/2 z-20 w-10 h-16 sm:w-12 sm:h-20 bg-white/95 hover:bg-white shadow-[2px_0_10px_rgba(0,0,0,0.1)] flex items-center justify-center transition-all rounded-r-xl group"
+          class="hidden lg:flex absolute left-0 top-1/2 -translate-y-1/2 z-20 w-12 h-20 bg-white/90 hover:bg-white shadow-[2px_0_10px_rgba(0,0,0,0.1)] items-center justify-center transition-all rounded-r-xl group"
         >
-          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 group-hover:text-gray-800 transition-colors" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <svg class="w-6 h-6 text-gray-500 group-hover:text-gray-800 transition-colors" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
           </svg>
         </button>
         <button 
           @click="nextScene"
-          class="absolute right-0 top-1/2 -translate-y-1/2 z-20 w-10 h-16 sm:w-12 sm:h-20 bg-white/95 hover:bg-white shadow-[-2px_0_10px_rgba(0,0,0,0.1)] flex items-center justify-center transition-all rounded-l-xl group"
+          class="hidden lg:flex absolute right-0 top-1/2 -translate-y-1/2 z-20 w-12 h-20 bg-white/90 hover:bg-white shadow-[-2px_0_10px_rgba(0,0,0,0.1)] items-center justify-center transition-all rounded-l-xl group"
         >
-          <svg class="w-5 h-5 sm:w-6 sm:h-6 text-gray-500 group-hover:text-gray-800 transition-colors" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+          <svg class="w-6 h-6 text-gray-500 group-hover:text-gray-800 transition-colors" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
           </svg>
         </button>
         
-        <!-- Indicadores de slide -->
-        <div class="absolute bottom-16 sm:bottom-18 lg:bottom-20 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+        <!-- Indicadores de slide (más abajo en móvil) -->
+        <div class="absolute bottom-8 lg:bottom-20 left-1/2 -translate-x-1/2 z-20 flex items-center gap-1.5 lg:gap-2">
           <button 
             v-for="(scene, index) in totalScenes" 
             :key="index"
             @click="goToScene(index)"
             class="rounded-full transition-all duration-300"
             :class="currentScene === index 
-              ? 'bg-white w-6 h-2.5 shadow-lg' 
-              : 'bg-white/40 w-2.5 h-2.5 hover:bg-white/60'"
+              ? 'bg-white w-5 lg:w-6 h-2 lg:h-2.5 shadow-lg' 
+              : 'bg-white/40 w-2 lg:w-2.5 h-2 lg:h-2.5 hover:bg-white/60'"
           ></button>
         </div>
       </div>
@@ -266,7 +351,7 @@
     <!-- =========================================================================
          TARJETAS DE CATEGORÍAS - Overlay sobre el carrusel
     ========================================================================== -->
-    <section class="relative z-20 -mt-16 sm:-mt-20 lg:-mt-24 pb-6">
+    <section class="relative z-20 -mt-6 lg:-mt-24 pb-6">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
         <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">

@@ -52,6 +52,11 @@ class CambiarPasswordRequest(BaseModel):
     new_password: str
 
 
+class CambiarMiPasswordRequest(BaseModel):
+    current_password: str
+    new_password: str
+
+
 # ═══════════════════════════════════════════════════════════════════════════
 # ENDPOINTS B2B - Productos para Mayoristas
 # ═══════════════════════════════════════════════════════════════════════════
@@ -1343,4 +1348,60 @@ async def marcar_direccion_principal(
         raise
     except Exception as e:
         print(f"❌ Error al marcar dirección como principal: {e}")
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# CAMBIO DE CONTRASEÑA - Usuario autenticado
+# ═══════════════════════════════════════════════════════════════════════════
+
+@router.post("/b2b/me/cambiar-password")
+async def cambiar_mi_password(
+    request: CambiarMiPasswordRequest,
+    email: str = Depends(get_current_user_email)
+):
+    """
+    Permite al mayorista autenticado cambiar su propia contraseña.
+    Requiere la contraseña actual para validación.
+    """
+    try:
+        if len(request.new_password) < 8:
+            raise HTTPException(status_code=400, detail="La contraseña debe tener al menos 8 caracteres")
+        
+        from infrastructure.notifications.inapp_notifications import create_b2b_notification
+        
+        mayorista = await sync_to_async(Usuario.objects.get)(email=email, tipo='MAYORISTA')
+        
+        # Verificar contraseña actual
+        password_valid = await sync_to_async(mayorista.check_password)(request.current_password)
+        if not password_valid:
+            raise HTTPException(status_code=400, detail="La contraseña actual es incorrecta")
+        
+        def do_change():
+            mayorista.set_password(request.new_password)
+            mayorista.save()
+        
+        await sync_to_async(do_change)()
+        
+        # Crear notificación
+        try:
+            create_b2b_notification(
+                email=mayorista.email,
+                tipo='password_changed',
+                titulo='Contraseña actualizada',
+                mensaje='Tu contraseña fue actualizada exitosamente.',
+                data={},
+            )
+        except Exception as e:
+            print(f"❌ Error creando notificación de contraseña: {e}")
+        
+        print(f"🔑 Mayorista cambió su contraseña: {email}")
+        return {"message": "Contraseña actualizada correctamente"}
+    
+    except Usuario.DoesNotExist:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"❌ Error al cambiar contraseña: {e}")
         raise HTTPException(status_code=500, detail=str(e))

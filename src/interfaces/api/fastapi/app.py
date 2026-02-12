@@ -75,10 +75,14 @@ def crear_app(config: AppConfig) -> FastAPI:
             # B2B subdomain
             "http://pro.localhost:5173",
             "http://pro.localhost:3000",
+            # Red local (desarrollo)
+            "http://192.168.0.11:5173",
+            "http://192.168.0.11:3000",
         ],
         allow_credentials=True,
         allow_methods=["*"],
         allow_headers=["*"],
+        expose_headers=["*"],
     )
     
     # Middleware para CORS en archivos estáticos (agregar DESPUÉS de CORSMiddleware)

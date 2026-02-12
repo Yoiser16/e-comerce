@@ -9,7 +9,7 @@
       <B2BHeader />
 
       <!-- Spacer for fixed header (main header + nav bar) -->
-      <div class="h-[56px] lg:h-[106px]"></div>
+      <div class="h-[84px] lg:h-[106px]"></div>
 
       <!-- Main Content (no gap) -->
       <main class="flex-1 -mt-px">
