@@ -5,7 +5,7 @@
          En móvil: aparece arriba como banner compacto
          En desktop: mitad izquierda de la pantalla
     ========================================================================== -->
-    <div class="relative lg:w-1/2 h-48 sm:h-64 lg:h-screen overflow-hidden">
+    <div class="relative lg:w-1/2 h-28 sm:h-40 lg:h-screen overflow-hidden">
       <!-- Imagen de fondo -->
       <img 
         src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&h=1200&fit=crop&q=80" 
@@ -25,10 +25,10 @@
       <div class="absolute inset-0 bg-black/40"></div>
       
       <!-- Contenido sobre la imagen -->
-      <div class="relative z-10 h-full flex flex-col justify-between p-6 sm:p-8 lg:p-12">
+      <div class="relative z-10 h-full flex flex-col justify-between p-4 sm:p-6 lg:p-12">
         <!-- Logo -->
-        <div class="flex items-center gap-3">
-          <div class="w-10 h-10 lg:w-12 lg:h-12 rounded-full bg-white/10 p-2 flex items-center justify-center">
+        <div class="flex items-center gap-2 lg:gap-3">
+          <div class="w-8 h-8 lg:w-12 lg:h-12 rounded-full bg-white/10 p-1.5 lg:p-2 flex items-center justify-center">
             <img 
               src="/logo-kharis.png" 
               alt="Kharis" 
@@ -36,8 +36,8 @@
             />
           </div>
           <div>
-            <span class="text-[#C9A962] font-luxury text-lg lg:text-xl tracking-wider">KHARIS</span>
-            <span class="text-white/60 text-xs lg:text-sm block -mt-1">PRO</span>
+            <span class="text-[#C9A962] font-luxury text-base lg:text-xl tracking-wider">KHARIS</span>
+            <span class="text-white/60 text-[10px] lg:text-sm block -mt-0.5 lg:-mt-1">PRO</span>
           </div>
         </div>
         
@@ -81,14 +81,14 @@
     <!-- =========================================================================
          LADO DERECHO - Formulario de Login
     ========================================================================== -->
-    <div class="flex-1 lg:w-1/2 flex items-center justify-center bg-[#FAFAFA] p-6 sm:p-8 lg:p-12">
+    <div class="flex-1 lg:w-1/2 flex items-start lg:items-center justify-center bg-[#FAFAFA] px-5 py-6 sm:p-6 lg:p-12 overflow-y-auto">
       <div class="w-full max-w-md">
         <!-- Header del formulario -->
-        <div class="text-center lg:text-left mb-8">
-          <h2 class="text-2xl lg:text-3xl font-luxury text-text-dark mb-2">
+        <div class="text-center lg:text-left mb-5 lg:mb-8">
+          <h2 class="text-xl lg:text-3xl font-luxury text-text-dark mb-1 lg:mb-2">
             Bienvenido de nuevo
           </h2>
-          <p class="text-text-light">
+          <p class="text-text-light text-sm lg:text-base">
             Ingresa tus credenciales para acceder al portal
           </p>
         </div>
@@ -139,10 +139,10 @@
         </transition>
 
         <!-- ===== Formulario ===== -->
-        <form @submit.prevent="handleLogin" class="space-y-5">
+        <form @submit.prevent="handleLogin" class="space-y-3 lg:space-y-5">
           <!-- Email -->
           <div>
-            <label for="email" class="block text-sm font-medium text-text-dark mb-1.5">
+            <label for="email" class="block text-xs lg:text-sm font-medium text-text-dark mb-1">
               Correo electrónico
             </label>
             <div class="relative">
@@ -154,13 +154,13 @@
                 autocomplete="email"
                 placeholder="tu@empresa.com"
                 :disabled="loading"
-                class="w-full px-4 py-3.5 pl-11 bg-white border border-gray-200 rounded-lg 
+                class="w-full px-3 py-2.5 lg:px-4 lg:py-3.5 pl-9 lg:pl-11 text-sm lg:text-base bg-white border border-gray-200 rounded-lg 
                        focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962] 
                        transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 :class="{ 'border-red-300': fieldErrors.email }"
               />
               <svg 
-                class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" 
+                class="absolute left-3 lg:left-4 top-1/2 -translate-y-1/2 w-4 h-4 lg:w-5 lg:h-5 text-gray-400" 
                 fill="none" stroke="currentColor" viewBox="0 0 24 24"
               >
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
@@ -173,14 +173,14 @@
 
           <!-- Password -->
           <div>
-            <div class="flex items-center justify-between mb-1.5">
-              <label for="password" class="block text-sm font-medium text-text-dark">
+            <div class="flex items-center justify-between mb-1">
+              <label for="password" class="block text-xs lg:text-sm font-medium text-text-dark">
                 Contraseña
               </label>
               <button 
                 type="button"
                 @click="showForgotPassword = true"
-                class="text-sm text-[#C9A962] hover:text-[#B8944F] transition-colors"
+                class="text-xs lg:text-sm text-[#C9A962] hover:text-[#B8944F] transition-colors"
               >
                 ¿Olvidaste tu contraseña?
               </button>
@@ -194,13 +194,13 @@
                 autocomplete="current-password"
                 placeholder="••••••••"
                 :disabled="loading"
-                class="w-full px-4 py-3.5 pl-11 pr-12 bg-white border border-gray-200 rounded-lg 
+                class="w-full px-3 py-2.5 lg:px-4 lg:py-3.5 pl-9 lg:pl-11 pr-10 lg:pr-12 text-sm lg:text-base bg-white border border-gray-200 rounded-lg 
                        focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962] 
                        transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 :class="{ 'border-red-300': fieldErrors.password }"
               />
               <svg 
-                class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" 
+                class="absolute left-3 lg:left-4 top-1/2 -translate-y-1/2 w-4 h-4 lg:w-5 lg:h-5 text-gray-400" 
                 fill="none" stroke="currentColor" viewBox="0 0 24 24"
               >
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -209,12 +209,12 @@
               <button 
                 type="button"
                 @click="showPassword = !showPassword"
-                class="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                class="absolute right-3 lg:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
               >
-                <svg v-if="showPassword" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-if="showPassword" class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                 </svg>
-                <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-else class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
@@ -231,10 +231,10 @@
               id="remember"
               v-model="form.remember" 
               type="checkbox" 
-              class="w-4 h-4 text-[#C9A962] bg-white border-gray-300 rounded 
+              class="w-3.5 h-3.5 lg:w-4 lg:h-4 text-[#C9A962] bg-white border-gray-300 rounded 
                      focus:ring-[#C9A962] focus:ring-2 cursor-pointer"
             />
-            <label for="remember" class="ml-2 text-sm text-text-medium cursor-pointer">
+            <label for="remember" class="ml-2 text-xs lg:text-sm text-text-medium cursor-pointer">
               Mantener sesión iniciada
             </label>
           </div>
@@ -243,13 +243,13 @@
           <button
             type="submit"
             :disabled="loading || !isFormValid"
-            class="w-full py-4 bg-[#1A1A1A] hover:bg-black text-white font-medium rounded-lg
+            class="w-full py-3 lg:py-4 bg-[#1A1A1A] hover:bg-black text-white text-sm lg:text-base font-medium rounded-lg
                    transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
                    flex items-center justify-center gap-2 group"
           >
             <svg 
               v-if="loading" 
-              class="w-5 h-5 animate-spin" 
+              class="w-4 h-4 lg:w-5 lg:h-5 animate-spin" 
               fill="none" viewBox="0 0 24 24"
             >
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -258,7 +258,7 @@
             <span>{{ loading ? 'Verificando...' : 'Ingresar al Portal' }}</span>
             <svg 
               v-if="!loading"
-              class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" 
+              class="w-4 h-4 lg:w-5 lg:h-5 transform group-hover:translate-x-1 transition-transform" 
               fill="none" stroke="currentColor" viewBox="0 0 24 24"
             >
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -267,26 +267,26 @@
         </form>
 
         <!-- ===== Divider ===== -->
-        <div class="my-8 flex items-center gap-4">
+        <div class="mt-8 mb-5 lg:my-8 flex items-center gap-3">
           <div class="flex-1 h-px bg-gray-200"></div>
-          <span class="text-text-light text-sm">¿Nuevo distribuidor?</span>
+          <span class="text-text-light text-xs lg:text-sm">¿Nuevo distribuidor?</span>
           <div class="flex-1 h-px bg-gray-200"></div>
         </div>
 
         <!-- ===== CTA Registro ===== -->
         <div class="text-center">
-          <p class="text-text-medium text-sm mb-4">
+          <p class="text-text-medium text-xs lg:text-sm mb-2.5 lg:mb-4">
             Únete a nuestra red de distribuidores y accede a beneficios exclusivos
           </p>
           <router-link 
             to="/portal/registro"
-            class="inline-flex items-center justify-center w-full py-3.5 px-6
+            class="inline-flex items-center justify-center w-full py-2.5 lg:py-3.5 px-4 lg:px-6 text-sm lg:text-base
                    border-2 border-[#C9A962] text-[#C9A962] font-medium rounded-lg
                    hover:bg-[#C9A962] hover:text-white transition-all duration-200 group"
           >
             <span>Solicita tu cuenta aquí</span>
             <svg 
-              class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" 
+              class="w-3.5 h-3.5 lg:w-4 lg:h-4 ml-2 transform group-hover:translate-x-1 transition-transform" 
               fill="none" stroke="currentColor" viewBox="0 0 24 24"
             >
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -295,18 +295,18 @@
         </div>
 
         <!-- ===== Footer Links ===== -->
-        <div class="mt-8 pt-6 border-t border-gray-100 text-center">
-          <p class="text-text-light text-xs">
+        <div class="mt-6 lg:mt-8 pt-4 lg:pt-6 border-t border-gray-100 text-center">
+          <p class="text-text-light text-[11px] lg:text-xs">
             ¿Eres cliente particular? 
             <a :href="retailUrl" class="text-[#C9A962] hover:underline">
               Visita nuestra tienda
             </a>
           </p>
-          <p class="text-text-light text-xs mt-2">
+          <p class="text-text-light text-[11px] lg:text-xs mt-1.5 lg:mt-2">
             <a href="#" class="hover:text-text-medium">Términos</a>
-            <span class="mx-2">·</span>
+            <span class="mx-1.5 lg:mx-2">·</span>
             <a href="#" class="hover:text-text-medium">Privacidad</a>
-            <span class="mx-2">·</span>
+            <span class="mx-1.5 lg:mx-2">·</span>
             <a href="#" class="hover:text-text-medium">Contacto</a>
           </p>
         </div>
