@@ -1125,83 +1125,52 @@
         <div class="text-center mb-14">
           <span class="inline-block text-brand-600 font-medium text-sm tracking-widest uppercase mb-4">Testimonios</span>
           <h2 class="font-luxury text-3xl sm:text-4xl lg:text-5xl text-text-dark mb-4">
-            Lo que dicen nuestras <em class="not-italic text-brand-600">clientas</em>
+            Lo que opinan quienes compran en <em class="not-italic text-brand-600">Kharis</em>
           </h2>
           <p class="text-text-medium max-w-xl mx-auto">
-            Miles de profesionales de la belleza confían en nosotros
+            Opiniones verificadas de compras reales
           </p>
         </div>
 
         <!-- Testimonials Grid -->
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          <!-- Testimonial 1 -->
-          <div class="bg-white rounded-3xl p-8 shadow-soft hover-lift">
-            <div class="flex items-center gap-1 mb-4">
-              <svg v-for="i in 5" :key="i" class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            </div>
-            <p class="text-text-medium mb-6 leading-relaxed">
-              "Las extensiones son de una calidad increíble. Mis clientas siempre quedan encantadas con el resultado. El cabello se siente natural y dura muchísimo."
-            </p>
+        <div v-if="resenasLoading" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div v-for="i in 3" :key="i" class="bg-white rounded-3xl p-8 shadow-soft">
+            <div class="h-4 w-28 bg-nude-100 rounded mb-4"></div>
+            <div class="h-14 w-full bg-nude-50 rounded mb-6"></div>
             <div class="flex items-center gap-4">
-              <img 
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&q=80" 
-                alt="María García"
-                class="w-12 h-12 rounded-full object-cover"
-              >
-              <div>
-                <p class="font-semibold text-text-dark">María García</p>
-                <p class="text-sm text-text-light">Estilista, CDMX</p>
+              <div class="w-12 h-12 rounded-full bg-nude-100"></div>
+              <div class="space-y-2">
+                <div class="h-3 w-28 bg-nude-100 rounded"></div>
+                <div class="h-3 w-36 bg-nude-50 rounded"></div>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Testimonial 2 -->
-          <div class="bg-white rounded-3xl p-8 shadow-soft hover-lift">
+        <div v-else-if="resenasDestacadas.length" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div v-for="resena in resenasDestacadas" :key="resena.id" class="bg-white rounded-3xl p-8 shadow-soft hover-lift">
             <div class="flex items-center gap-1 mb-4">
-              <svg v-for="i in 5" :key="i" class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20">
+              <svg v-for="i in 5" :key="i" class="w-5 h-5" :class="i <= resena.rating ? 'text-gold-400' : 'text-gray-200'" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
             </div>
             <p class="text-text-medium mb-6 leading-relaxed">
-              "El programa de mayoristas me ha ayudado a crecer mi negocio. Los precios son excelentes y el servicio al cliente es de primera. ¡Los recomiendo 100%!"
+              Calificación verificada de una compra real.
             </p>
             <div class="flex items-center gap-4">
-              <img 
-                src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&q=80" 
-                alt="Laura Mendoza"
-                class="w-12 h-12 rounded-full object-cover"
-              >
+              <div class="w-12 h-12 rounded-full bg-blush-100 text-brand-600 font-semibold flex items-center justify-center">
+                {{ getInitials(resena.cliente) }}
+              </div>
               <div>
-                <p class="font-semibold text-text-dark">Laura Mendoza</p>
-                <p class="text-sm text-text-light">Dueña de salón, Monterrey</p>
+                <p class="font-semibold text-text-dark">{{ resena.cliente }}</p>
+                <p class="text-sm text-text-light">Producto: {{ resena.producto_nombre }}</p>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Testimonial 3 -->
-          <div class="bg-white rounded-3xl p-8 shadow-soft hover-lift md:col-span-2 lg:col-span-1">
-            <div class="flex items-center gap-1 mb-4">
-              <svg v-for="i in 5" :key="i" class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            </div>
-            <p class="text-text-medium mb-6 leading-relaxed">
-              "Las pelucas lacefront son simplemente perfectas. El acabado es tan natural que nadie nota la diferencia. Mis clientas están felices con los resultados."
-            </p>
-            <div class="flex items-center gap-4">
-              <img 
-                src="https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=100&h=100&fit=crop&q=80" 
-                alt="Carmen Rodríguez"
-                class="w-12 h-12 rounded-full object-cover"
-              >
-              <div>
-                <p class="font-semibold text-text-dark">Carmen Rodríguez</p>
-                <p class="text-sm text-text-light">Especialista en pelucas, Guadalajara</p>
-              </div>
-            </div>
-          </div>
+        <div v-else class="text-center text-text-medium">
+          Aún no hay calificaciones aprobadas. Sé la primera persona en calificar.
         </div>
 
         <!-- Before/After Gallery Hint -->
@@ -1213,7 +1182,7 @@
               <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=60&h=60&fit=crop" class="w-8 h-8 rounded-full border-2 border-white object-cover" alt="">
             </div>
             <p class="text-sm text-text-medium">
-              <span class="font-semibold text-brand-600">+500 transformaciones</span> documentadas
+              <span class="font-semibold text-brand-600">Especialistas</span> en extensiones, pelucas y frontales premium
             </p>
           </div>
         </div>
@@ -1684,6 +1653,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { productosService, carritoService, authService, favoritosService } from '../services/productos'
+import { resenasService } from '../services/resenas'
 import { categoriasService } from '../services/categorias'
 import { getImageUrl } from '../services/api'
 
@@ -1694,6 +1664,8 @@ export default {
     const route = useRoute()
     const productos = ref([])
     const categorias = ref([])
+    const resenasDestacadas = ref([])
+    const resenasLoading = ref(true)
     const loading = ref(true)
     const error = ref(null)
     const cartCount = ref(0)
@@ -1731,6 +1703,24 @@ export default {
       toastTimeout = setTimeout(() => {
         toast.value.show = false
       }, 4000) // 4 segundos para el toast con producto
+    }
+
+    const getInitials = (fullName) => {
+      if (!fullName) return 'C'
+      const parts = String(fullName).trim().split(' ').filter(Boolean)
+      if (parts.length === 1) return parts[0][0]?.toUpperCase() || 'C'
+      return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+    }
+
+    const cargarResenasDestacadas = async () => {
+      resenasLoading.value = true
+      try {
+        resenasDestacadas.value = await resenasService.getDestacadas(6)
+      } catch (e) {
+        resenasDestacadas.value = []
+      } finally {
+        resenasLoading.value = false
+      }
     }
     
     // Toast especial para carrito con producto
@@ -2423,6 +2413,7 @@ export default {
     onMounted(() => {
       const categoriasPromise = cargarCategorias()
       const productosPromise = cargarProductos()
+      cargarResenasDestacadas()
       cargarResumenCarrito()
       window.addEventListener('scroll', handleScroll)
       window.addEventListener('user-logged-in', handleUserLoggedIn)
@@ -2458,6 +2449,8 @@ export default {
     return {
       productos,
       categorias,
+      resenasDestacadas,
+      resenasLoading,
       loading,
       error,
       cartCount,
@@ -2498,6 +2491,7 @@ export default {
       toast,
       showToast,
       showCartToast,
+      getInitials,
       // Cart Drawer
       showCartDrawer,
       cartItems,

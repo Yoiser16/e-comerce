@@ -27,6 +27,7 @@ const AdminUsuarios = () => import('../components/admin/AdminUsuarios.vue')
 const AdminConfig = () => import('../components/admin/AdminConfig.vue')
 const AdminCategorias = () => import('../components/admin/AdminCategorias.vue')
 const AdminMayoristas = () => import('../components/admin/AdminMayoristas.vue')
+const AdminResenas = () => import('../components/admin/AdminResenas.vue')
 
 const routes = [
   {
@@ -141,6 +142,12 @@ const routes = [
         name: 'AdminMayoristas',
         component: AdminMayoristas,
         meta: { title: 'Mayoristas B2B' }
+      },
+      {
+        path: 'resenas',
+        name: 'AdminResenas',
+        component: AdminResenas,
+        meta: { title: 'Reseñas' }
       }
     ]
   }

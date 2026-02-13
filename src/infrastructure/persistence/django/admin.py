@@ -2,7 +2,7 @@
 Admin configuration for Cliente model
 """
 from django.contrib import admin
-from .models import ClienteModel, CategoriaModel
+from .models import ClienteModel, CategoriaModel, ResenaProductoModel
 
 
 @admin.register(CategoriaModel)
@@ -54,6 +54,25 @@ class ClienteAdmin(admin.ModelAdmin):
         }),
         ('Estado', {
             'fields': ('activo',)
+        }),
+        ('Metadatos', {
+            'fields': ('id', 'fecha_creacion', 'fecha_modificacion'),
+            'classes': ('collapse',)
+        }),
+    )
+
+
+@admin.register(ResenaProductoModel)
+class ResenaProductoAdmin(admin.ModelAdmin):
+    list_display = ('producto', 'cliente', 'rating', 'estado', 'fecha_creacion')
+    list_filter = ('estado', 'rating', 'fecha_creacion')
+    search_fields = ('producto__nombre', 'cliente__email', 'cliente__nombre', 'cliente__apellido')
+    readonly_fields = ('id', 'fecha_creacion', 'fecha_modificacion')
+    ordering = ('-fecha_creacion',)
+
+    fieldsets = (
+        ('Reseña', {
+            'fields': ('producto', 'cliente', 'orden', 'rating', 'estado')
         }),
         ('Metadatos', {
             'fields': ('id', 'fecha_creacion', 'fecha_modificacion'),

@@ -448,6 +448,43 @@ class LineaOrdenModel(models.Model):
         return f"{self.cantidad}x {self.producto} en Orden {self.orden_id}"
 
 
+class ResenaProductoModel(models.Model):
+    """
+    Reseñas de productos basadas en compras reales (solo rating).
+    """
+    ESTADO_CHOICES = [
+        ('pendiente', 'Pendiente'),
+        ('aprobada', 'Aprobada'),
+        ('rechazada', 'Rechazada'),
+    ]
+
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    producto = models.ForeignKey(ProductoModel, on_delete=models.CASCADE, related_name='resenas', db_index=True)
+    cliente = models.ForeignKey(ClienteModel, on_delete=models.CASCADE, related_name='resenas', db_index=True)
+    orden = models.ForeignKey(OrdenModel, on_delete=models.SET_NULL, null=True, blank=True, related_name='resenas', db_index=True)
+    rating = models.PositiveSmallIntegerField()
+    estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente', db_index=True)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'resenas_producto'
+        verbose_name = 'Reseña de producto'
+        verbose_name_plural = 'Reseñas de producto'
+        ordering = ['-fecha_creacion']
+        indexes = [
+            models.Index(fields=['producto', 'estado']),
+            models.Index(fields=['cliente', 'producto']),
+            models.Index(fields=['-fecha_creacion', 'estado']),
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=['producto', 'cliente'], name='unique_resena_por_cliente_producto')
+        ]
+
+    def __str__(self) -> str:
+        return f"Reseña {self.rating}★ - {self.producto} - {self.cliente}"
+
+
 class RegistroAuditoriaModel(models.Model):
     """
     Modelo ORM para Registro de Auditoría.

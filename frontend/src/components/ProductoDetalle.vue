@@ -540,6 +540,68 @@
               </transition>
             </div>
           </div>
+
+          <!-- Calificaciones de clientes -->
+          <div class="mt-8 border-t border-text-dark/10 pt-6">
+            <h3 class="text-sm font-medium text-text-dark uppercase tracking-[0.1em] mb-4">Calificaciones</h3>
+            <div class="flex items-center gap-3 mb-3">
+              <div class="flex items-center gap-1">
+                <svg v-for="i in 5" :key="i" class="w-4 h-4" :class="i <= promedioRedondeado ? 'text-gold-400' : 'text-gray-200'" fill="currentColor" viewBox="0 0 20 20">
+                  <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                </svg>
+              </div>
+              <span class="text-sm text-text-medium">{{ promedioFormateado }} / 5 · {{ resumenResenas.total }} calificaciones</span>
+            </div>
+
+            <div v-if="isLoggedIn" class="border border-text-dark/10 bg-white p-4 rounded-sm">
+              <p class="text-xs text-text-light mb-2">Tu calificación</p>
+              <div class="flex items-center gap-2 flex-wrap">
+                <button
+                  v-for="i in 5"
+                  :key="i"
+                  type="button"
+                  class="w-8 h-8 rounded-full border border-text-dark/10 flex items-center justify-center transition-colors"
+                  :class="i <= miRating ? 'bg-text-dark text-white' : 'bg-white text-text-dark hover:bg-text-dark/5'"
+                  @click="miRating = i"
+                >
+                  <span class="text-xs font-semibold">{{ i }}</span>
+                </button>
+                <button
+                  type="button"
+                  class="ml-auto px-4 py-2 text-xs uppercase tracking-wider bg-text-dark text-white hover:bg-black transition-colors disabled:opacity-50"
+                  :disabled="!miRating || enviandoResena"
+                  @click="enviarResena"
+                >
+                  {{ enviandoResena ? 'Enviando...' : 'Enviar' }}
+                </button>
+              </div>
+              <p v-if="resenaMensaje" class="text-xs text-emerald-600 mt-2">{{ resenaMensaje }}</p>
+              <p v-if="resenaError" class="text-xs text-red-600 mt-2">{{ resenaError }}</p>
+              <p class="text-[11px] text-text-light mt-2">Solo clientes con compra pueden calificar. Requiere aprobación.</p>
+            </div>
+            <div v-else class="text-xs text-text-light">
+              Inicia sesión para calificar este producto.
+            </div>
+
+            <div class="mt-4">
+              <div v-if="resenasLoading" class="space-y-3">
+                <div v-for="i in 3" :key="i" class="h-10 bg-nude-50 rounded"></div>
+              </div>
+              <div v-else-if="resenasProducto.length" class="space-y-3">
+                <div v-for="resena in resenasProducto" :key="resena.id" class="flex items-center justify-between text-sm text-text-medium">
+                  <span class="font-medium text-text-dark">{{ resena.cliente }}</span>
+                  <div class="flex items-center gap-1">
+                    <svg v-for="i in 5" :key="i" class="w-3.5 h-3.5" :class="i <= resena.rating ? 'text-gold-400' : 'text-gray-200'" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                    </svg>
+                  </div>
+                </div>
+              </div>
+              <div v-else class="text-xs text-text-light">
+                Aún no hay calificaciones aprobadas.
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -734,6 +796,7 @@
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { productosService, carritoService, authService } from '@/services/productos'
+import { resenasService } from '@/services/resenas'
 import { getImageUrl } from '@/services/api'
 
 const route = useRoute()
@@ -780,6 +843,15 @@ const showCartDrawer = ref(false)
 const cartCount = ref(0)
 const carritoItems = ref([])
 const isLoggedIn = ref(authService.isAuthenticated())
+
+// Reseñas
+const resenasProducto = ref([])
+const resenasLoading = ref(false)
+const resumenResenas = ref({ promedio: 0, total: 0 })
+const miRating = ref(0)
+const enviandoResena = ref(false)
+const resenaMensaje = ref('')
+const resenaError = ref('')
 
 // Accordions
 const accordionOpen = ref({
@@ -834,6 +906,7 @@ const handleImageError = (e) => {
 
 const handleUserLoggedIn = async () => {
   // Simplemente recargar desde localStorage cuando el usuario inicia sesión
+  isLoggedIn.value = true
   loadCartCount()
   carritoItems.value = loadCartFromLocal()
 }
@@ -884,6 +957,16 @@ const cartSubtotal = computed(() => {
   }, 0)
 })
 
+const promedioRedondeado = computed(() => {
+  return Math.round(Number(resumenResenas.value.promedio || 0))
+})
+
+const promedioFormateado = computed(() => {
+  const total = Number(resumenResenas.value.total || 0)
+  const promedio = Number(resumenResenas.value.promedio || 0)
+  return total > 0 ? promedio.toFixed(1) : '0.0'
+})
+
 // API Functions
 const cargarProducto = async () => {
   loading.value = true
@@ -912,6 +995,9 @@ const cargarProducto = async () => {
     if (data.color) colorSeleccionado.value = data.color
     if (data.largo) largoSeleccionado.value = data.largo
     if (data.calidad) calidadSeleccionada.value = data.calidad
+
+    await cargarResumenResenas()
+    await cargarResenasProducto()
     
     // Load related products
     await cargarProductosRelacionados(data.categoria)
@@ -920,6 +1006,45 @@ const cargarProducto = async () => {
     error.value = 'No pudimos cargar este producto'
   } finally {
     loading.value = false
+  }
+}
+
+const cargarResumenResenas = async () => {
+  if (!producto.value?.id) return
+  try {
+    resumenResenas.value = await resenasService.getResumenProducto(producto.value.id)
+  } catch (err) {
+    resumenResenas.value = { promedio: 0, total: 0 }
+  }
+}
+
+const cargarResenasProducto = async () => {
+  if (!producto.value?.id) return
+  resenasLoading.value = true
+  try {
+    resenasProducto.value = await resenasService.getResenasProducto(producto.value.id, { limit: 6 })
+  } catch (err) {
+    resenasProducto.value = []
+  } finally {
+    resenasLoading.value = false
+  }
+}
+
+const enviarResena = async () => {
+  if (!producto.value?.id || !miRating.value) return
+  resenaMensaje.value = ''
+  resenaError.value = ''
+  enviandoResena.value = true
+  try {
+    await resenasService.crearResena(producto.value.id, miRating.value)
+    resenaMensaje.value = 'Tu calificación quedó pendiente de aprobación.'
+    miRating.value = 0
+    await cargarResumenResenas()
+    await cargarResenasProducto()
+  } catch (err) {
+    resenaError.value = err?.response?.data?.detail || 'No se pudo enviar la calificación'
+  } finally {
+    enviandoResena.value = false
   }
 }
 
