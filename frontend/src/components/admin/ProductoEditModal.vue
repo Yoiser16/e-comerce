@@ -63,7 +63,7 @@
                         type="text"
                         required
                         class="w-full px-4 py-3 bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white transition-all text-sm"
-                        placeholder="Ej: Extensiones Clip-in Premium 20 pulgadas"
+                        placeholder="Ej: Extensiones Premium 20 pulgadas"
                       >
                     </div>
 
@@ -202,7 +202,7 @@
                           v-if="enabledAttrs.metodo"
                           v-model="form.metodo"
                           type="text"
-                          placeholder="Clip-in, Tape..."
+                          placeholder="Tape, cosido, halo..."
                           class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-sm focus:outline-none focus:border-text-dark/30"
                         >
                       </div>

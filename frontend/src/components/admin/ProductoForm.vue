@@ -186,7 +186,7 @@
               class="w-full px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl focus:outline-none focus:border-brand-500"
             >
               <option value="">Seleccionar...</option>
-              <option value="clip_in">Clip-In</option>
+              <option value="clip_in">Aplicación rápida</option>
               <option value="tape_in">Tape-In</option>
               <option value="keratin_bond">Keratin Bond</option>
               <option value="micro_link">Micro Link</option>

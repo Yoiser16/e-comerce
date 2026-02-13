@@ -123,7 +123,7 @@ Color: Negro
 Largo: 24 pulgadas
 Origen: Brasil
 Calidad: Premium
-Método: Clip-in
+Método: Aplicación rápida
 Imagen: https://images.unsplash.com/photo-1522337360788-8b13dee7a37e?w=400
 ```
 
