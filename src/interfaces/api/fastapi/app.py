@@ -68,16 +68,21 @@ def crear_app(config: AppConfig) -> FastAPI:
     app.add_middleware(
         CORSMiddleware,
         allow_origins=[
+            # Desarrollo
             "http://localhost:5173",
             "http://127.0.0.1:5173",
             "http://localhost:3000",
             "http://127.0.0.1:3000",
-            # B2B subdomain
+            # B2B subdomain (desarrollo)
             "http://pro.localhost:5173",
             "http://pro.localhost:3000",
             # Red local (desarrollo)
             "http://192.168.0.11:5173",
             "http://192.168.0.11:3000",
+            # Producción
+            "https://demostracion.store",
+            "https://www.demostracion.store",
+            "https://pro.demostracion.store",
         ],
         allow_credentials=True,
         allow_methods=["*"],

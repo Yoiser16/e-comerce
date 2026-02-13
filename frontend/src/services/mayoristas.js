@@ -3,8 +3,8 @@
  * Conecta con el backend FastAPI para obtener productos, órdenes, etc.
  */
 
-// URL del backend - en desarrollo apunta a localhost:8000
-const BACKEND_URL = 'http://localhost:8000'
+// URL del backend - usa variable de entorno en producción
+const BACKEND_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace('/api/v1', '')
 const API_BASE = `${BACKEND_URL}/api/v1`
 
 /**
