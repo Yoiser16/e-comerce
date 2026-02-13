@@ -24,6 +24,7 @@ from .auth_router import router as auth_router
 from .mayoristas_router import router as mayoristas_router
 from .wompi_router import router as wompi_router
 from .notificaciones_router import router as notificaciones_router
+from .resenas_router import router as resenas_router
 from .exception_handlers import exception_handler_dominio
 from domain.exceptions.dominio import ExcepcionDominio
 from infrastructure.config.app_config import AppConfig
@@ -112,6 +113,7 @@ def crear_app(config: AppConfig) -> FastAPI:
     app.include_router(mayoristas_router) # Admin mayoristas B2B
     app.include_router(wompi_router)       # Wompi pasarela de pagos
     app.include_router(notificaciones_router) # Notificaciones in-app
+    app.include_router(resenas_router) # Reseñas de productos
     
     # Servir archivos estáticos
     app.mount("/static", StaticFiles(directory="static"), name="static")

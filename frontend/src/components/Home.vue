@@ -449,7 +449,7 @@
 
           <!-- Subtitle -->
           <p class="text-base sm:text-lg lg:text-xl text-gray-100 leading-relaxed mb-8 sm:mb-12 max-w-xl font-light animate-fade-in-up delay-200 antialiased">
-            Elevamos tu negocio con extensiones 100% naturales, pelucas premium y cosméticos de clase mundial.
+            Elevamos tu negocio con extensiones 100% naturales, pelucas premium y accesorios de clase mundial.
           </p>
 
           <!-- CTAs - Más compactos en móvil -->
@@ -502,7 +502,7 @@
               </h4>
               <!-- Subtitle -->
               <p class="text-xs sm:text-sm text-[#8B7355] font-light">
-                Gratis en compras +$2,999
+                Envío gratis desde $350.000
               </p>
             </div>
           </div>
@@ -517,10 +517,10 @@
                 </svg>
               </div>
               <h4 class="text-xs sm:text-sm font-semibold tracking-[0.15em] uppercase text-[#1a1a1a] mb-1">
-                Calidad Remy
+                Calidad Premium
               </h4>
               <p class="text-xs sm:text-sm text-[#8B7355] font-light">
-                100% Cabello Humano
+                Productos seleccionados y garantizados
               </p>
             </div>
           </div>
@@ -984,134 +984,72 @@
     </section>
 
     <!-- ========================================
-         MARCAS CON LAS QUE TRABAJAMOS
-         ======================================== -->
-    <section class="py-20 lg:py-28 bg-gradient-to-b from-white to-nude-50">
-      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-        <div class="text-center mb-16">
-          <h2 class="font-luxury text-3xl sm:text-4xl lg:text-5xl text-text-dark mb-4">
-            Marcas <em class="not-italic text-brand-600">top</em> de nuestra tienda
-          </h2>
-          <p class="text-text-dark text-base sm:text-lg max-w-2xl mx-auto font-medium">
-            Trabajamos con las mejores marcas de extensiones y productos de cabello natural
-          </p>
-        </div>
-
-        <!-- Logos Grid -->
-        <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6 lg:gap-8 items-center">
-          <!-- Placeholder para logos - El usuario agregará las imágenes a /public -->
-          <div class="flex items-center justify-center p-8 bg-white rounded-2xl hover:shadow-luxury transition-all duration-300 border border-nude-200 hover:border-brand-300 hover:-translate-y-1">
-            <div class="text-center">
-              <p class="text-sm sm:text-base text-text-dark uppercase tracking-wide font-bold">kanekalon</p>
-            </div>
-          </div>
-          <div class="flex items-center justify-center p-8 bg-white rounded-2xl hover:shadow-luxury transition-all duration-300 border border-nude-200 hover:border-brand-300 hover:-translate-y-1">
-            <div class="text-center">
-              <p class="text-sm sm:text-base text-text-dark uppercase tracking-wide font-bold">Cabello Humano</p>
-            </div>
-          </div>
-          <div class="flex items-center justify-center p-8 bg-white rounded-2xl hover:shadow-luxury transition-all duration-300 border border-nude-200 hover:border-brand-300 hover:-translate-y-1">
-            <div class="text-center">
-              <p class="text-sm sm:text-base text-text-dark uppercase tracking-wide font-bold">Virgin Hair</p>
-            </div>
-          </div>
-          <div class="flex items-center justify-center p-8 bg-white rounded-2xl hover:shadow-luxury transition-all duration-300 border border-nude-200 hover:border-brand-300 hover:-translate-y-1">
-            <div class="text-center">
-              <p class="text-sm sm:text-base text-text-dark uppercase tracking-wide font-bold">Remy Hair</p>
-            </div>
-          </div>
-          <div class="flex items-center justify-center p-8 bg-white rounded-2xl hover:shadow-luxury transition-all duration-300 border border-nude-200 hover:border-brand-300 hover:-translate-y-1">
-            <div class="text-center">
-              <p class="text-sm sm:text-base text-text-dark uppercase tracking-wide font-bold">Brazilian Hair</p>
-            </div>
-          </div>
-          <div class="flex items-center justify-center p-8 bg-white rounded-2xl hover:shadow-luxury transition-all duration-300 border border-nude-200 hover:border-brand-300 hover:-translate-y-1">
-            <div class="text-center">
-              <p class="text-sm sm:text-base text-text-dark uppercase tracking-wide font-bold">Premium Extensions</p>
-            </div>
-          </div>
-        </div>
-      </div>
-    </section>
-
-    <!-- ========================================
-         OFERTAS IRRESISTIBLES - Editorial Premium Design
+         GUÍA RÁPIDA - Elección Premium
          ======================================== -->
     <section class="relative bg-gradient-to-br from-[#FDFBFA] via-[#FAF7F5] to-[#FDFBFA] overflow-hidden py-20 lg:py-28">
-      <!-- Líneas decorativas sutiles -->
       <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4B9A9]/30 to-transparent"></div>
       <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4B9A9]/30 to-transparent"></div>
 
       <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
         <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          
-          <!-- Imagen Principal - Más cerca del texto -->
-          <div class="relative order-2 lg:order-1">
-            <div class="relative">
-              <img 
-                src="/promocion.webp" 
-                alt="Promociones especiales" 
-                class="w-full h-auto rounded-2xl shadow-xl"
-              />
-              <!-- Decorative frame -->
-              <div class="absolute -inset-3 border border-[#D4B9A9]/20 rounded-3xl pointer-events-none"></div>
+          <div class="order-2 lg:order-1">
+            <div class="grid grid-cols-2 gap-4">
+              <div class="bg-white rounded-2xl p-5 border border-nude-200 shadow-soft hover:shadow-luxury transition-all">
+                <p class="text-xs uppercase tracking-[0.2em] text-text-light mb-2">Objetivo</p>
+                <p class="text-base font-semibold text-text-dark">Volumen inmediato</p>
+                <p class="text-xs text-text-medium mt-2">Extensiones listas para usar.</p>
+              </div>
+              <div class="bg-white rounded-2xl p-5 border border-nude-200 shadow-soft hover:shadow-luxury transition-all">
+                <p class="text-xs uppercase tracking-[0.2em] text-text-light mb-2">Estilo</p>
+                <p class="text-base font-semibold text-text-dark">Look natural</p>
+                <p class="text-xs text-text-medium mt-2">Frontales y closures con acabado invisible.</p>
+              </div>
+              <div class="bg-white rounded-2xl p-5 border border-nude-200 shadow-soft hover:shadow-luxury transition-all">
+                <p class="text-xs uppercase tracking-[0.2em] text-text-light mb-2">Textura</p>
+                <p class="text-base font-semibold text-text-dark">Rizo o liso</p>
+                <p class="text-xs text-text-medium mt-2">Encuentra la textura perfecta para ti.</p>
+              </div>
+              <div class="bg-white rounded-2xl p-5 border border-nude-200 shadow-soft hover:shadow-luxury transition-all">
+                <p class="text-xs uppercase tracking-[0.2em] text-text-light mb-2">Color</p>
+                <p class="text-base font-semibold text-text-dark">Tonos favoritos</p>
+                <p class="text-xs text-text-medium mt-2">Guias de color para un match exacto.</p>
+              </div>
             </div>
           </div>
 
-          <!-- Contenido - Diseño editorial integrado -->
           <div class="order-1 lg:order-2 lg:pl-4">
-            
-            <!-- Badge flotante minimalista con borde dorado -->
             <div class="inline-flex items-center gap-2 border border-[#C9A962]/50 rounded-sm px-4 py-1.5 mb-8">
               <span class="w-1.5 h-1.5 bg-[#C9A962] rounded-full"></span>
-              <span class="text-[10px] tracking-[0.25em] uppercase text-[#8B7355] font-medium">EDICIÓN LIMITADA</span>
+              <span class="text-[10px] tracking-[0.25em] uppercase text-[#8B7355] font-medium">GUIA RAPIDA</span>
             </div>
 
-            <!-- Título Principal - Cerca de la imagen -->
             <h2 class="font-luxury text-4xl sm:text-5xl lg:text-6xl text-text-dark leading-[1.1] mb-5">
-              ¡<span class="text-brand-600">OFERTAS</span><br>
-              <span class="font-luxury italic font-normal">irresistibles</span>!
+              Elige tu <span class="text-brand-600">look</span><br>
+              <span class="font-luxury italic font-normal">en minutos</span>
             </h2>
 
-            <!-- Descripción -->
             <p class="text-text-medium text-base sm:text-lg mb-8 leading-relaxed max-w-md">
-              Disfruta de los mejores precios en cosméticos y productos de belleza por tiempo limitado, ¡aprovecha!
+              Responde en segundos y descubre la pieza ideal segun tu objetivo, textura y tono.
             </p>
 
-            <!-- BENEFICIOS INTEGRADOS - Lista vertical con checkmarks elegantes -->
-            <ul class="space-y-3 mb-10">
-              <li class="flex items-center gap-3">
-                <svg class="w-4 h-4 text-[#C9A962] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+            <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+              <router-link
+                to="/catalogo"
+                class="inline-flex items-center justify-center gap-3 bg-text-dark hover:bg-black text-white font-medium text-sm tracking-wide px-8 py-4 rounded-sm transition-all hover:shadow-lg touch-target"
+              >
+                <span>IR A LA GUIA</span>
+                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
                 </svg>
-                <span class="text-sm text-text-dark/80">Hasta <span class="font-semibold text-text-dark">40% de descuento</span></span>
-              </li>
-              <li class="flex items-center gap-3">
-                <svg class="w-4 h-4 text-[#C9A962] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25m0 0V4.5m0 0H8.25m6 0V4.5m0 0H8.25" />
-                </svg>
-                <span class="text-sm text-text-dark/80">Envío <span class="font-semibold text-text-dark">gratis</span> en compras +$999</span>
-              </li>
-              <li class="flex items-center gap-3">
-                <svg class="w-4 h-4 text-[#C9A962] flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-                </svg>
-                <span class="text-sm text-text-dark/80">Garantía de <span class="font-semibold text-text-dark">30 días</span></span>
-              </li>
-            </ul>
-
-            <!-- CTA Button - Negro sólido elegante -->
-            <a 
-              href="#productos"
-              class="inline-flex items-center justify-center gap-3 bg-text-dark hover:bg-black text-white font-medium text-sm tracking-wide px-8 py-4 rounded-sm transition-all hover:shadow-lg touch-target"
-            >
-              <span>VER COLECCIÓN</span>
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-              </svg>
-            </a>
+              </router-link>
+              <router-link
+                to="/catalogo"
+                class="inline-flex items-center justify-center gap-3 bg-white hover:bg-nude-50 border border-nude-300 text-text-dark font-medium text-sm tracking-wide px-8 py-4 rounded-sm transition-all"
+              >
+                Ver todo el catalogo
+              </router-link>
+            </div>
           </div>
-
         </div>
       </div>
     </section>
@@ -1125,83 +1063,52 @@
         <div class="text-center mb-14">
           <span class="inline-block text-brand-600 font-medium text-sm tracking-widest uppercase mb-4">Testimonios</span>
           <h2 class="font-luxury text-3xl sm:text-4xl lg:text-5xl text-text-dark mb-4">
-            Lo que dicen nuestras <em class="not-italic text-brand-600">clientas</em>
+            Lo que opinan quienes compran en <em class="not-italic text-brand-600">Kharis</em>
           </h2>
           <p class="text-text-medium max-w-xl mx-auto">
-            Miles de profesionales de la belleza confían en nosotros
+            Opiniones verificadas de compras reales
           </p>
         </div>
 
         <!-- Testimonials Grid -->
-        <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
-          <!-- Testimonial 1 -->
-          <div class="bg-white rounded-3xl p-8 shadow-soft hover-lift">
-            <div class="flex items-center gap-1 mb-4">
-              <svg v-for="i in 5" :key="i" class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            </div>
-            <p class="text-text-medium mb-6 leading-relaxed">
-              "Las extensiones son de una calidad increíble. Mis clientas siempre quedan encantadas con el resultado. El cabello se siente natural y dura muchísimo."
-            </p>
+        <div v-if="resenasLoading" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div v-for="i in 3" :key="i" class="bg-white rounded-3xl p-8 shadow-soft">
+            <div class="h-4 w-28 bg-nude-100 rounded mb-4"></div>
+            <div class="h-14 w-full bg-nude-50 rounded mb-6"></div>
             <div class="flex items-center gap-4">
-              <img 
-                src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&h=100&fit=crop&q=80" 
-                alt="María García"
-                class="w-12 h-12 rounded-full object-cover"
-              >
-              <div>
-                <p class="font-semibold text-text-dark">María García</p>
-                <p class="text-sm text-text-light">Estilista, CDMX</p>
+              <div class="w-12 h-12 rounded-full bg-nude-100"></div>
+              <div class="space-y-2">
+                <div class="h-3 w-28 bg-nude-100 rounded"></div>
+                <div class="h-3 w-36 bg-nude-50 rounded"></div>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Testimonial 2 -->
-          <div class="bg-white rounded-3xl p-8 shadow-soft hover-lift">
+        <div v-else-if="resenasDestacadas.length" class="grid md:grid-cols-2 lg:grid-cols-3 gap-6 lg:gap-8">
+          <div v-for="resena in resenasDestacadas" :key="resena.id" class="bg-white rounded-3xl p-8 shadow-soft hover-lift">
             <div class="flex items-center gap-1 mb-4">
-              <svg v-for="i in 5" :key="i" class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20">
+              <svg v-for="i in 5" :key="i" class="w-5 h-5" :class="i <= resena.rating ? 'text-gold-400' : 'text-gray-200'" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
               </svg>
             </div>
             <p class="text-text-medium mb-6 leading-relaxed">
-              "El programa de mayoristas me ha ayudado a crecer mi negocio. Los precios son excelentes y el servicio al cliente es de primera. ¡Los recomiendo 100%!"
+              Calificación verificada de una compra real.
             </p>
             <div class="flex items-center gap-4">
-              <img 
-                src="https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=100&h=100&fit=crop&q=80" 
-                alt="Laura Mendoza"
-                class="w-12 h-12 rounded-full object-cover"
-              >
+              <div class="w-12 h-12 rounded-full bg-blush-100 text-brand-600 font-semibold flex items-center justify-center">
+                {{ getInitials(resena.cliente) }}
+              </div>
               <div>
-                <p class="font-semibold text-text-dark">Laura Mendoza</p>
-                <p class="text-sm text-text-light">Dueña de salón, Monterrey</p>
+                <p class="font-semibold text-text-dark">{{ resena.cliente }}</p>
+                <p class="text-sm text-text-light">Producto: {{ resena.producto_nombre }}</p>
               </div>
             </div>
           </div>
+        </div>
 
-          <!-- Testimonial 3 -->
-          <div class="bg-white rounded-3xl p-8 shadow-soft hover-lift md:col-span-2 lg:col-span-1">
-            <div class="flex items-center gap-1 mb-4">
-              <svg v-for="i in 5" :key="i" class="w-5 h-5 text-gold-400" fill="currentColor" viewBox="0 0 20 20">
-                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
-              </svg>
-            </div>
-            <p class="text-text-medium mb-6 leading-relaxed">
-              "Las pelucas lacefront son simplemente perfectas. El acabado es tan natural que nadie nota la diferencia. Mis clientas están felices con los resultados."
-            </p>
-            <div class="flex items-center gap-4">
-              <img 
-                src="https://images.unsplash.com/photo-1489424731084-a5d8b219a5bb?w=100&h=100&fit=crop&q=80" 
-                alt="Carmen Rodríguez"
-                class="w-12 h-12 rounded-full object-cover"
-              >
-              <div>
-                <p class="font-semibold text-text-dark">Carmen Rodríguez</p>
-                <p class="text-sm text-text-light">Especialista en pelucas, Guadalajara</p>
-              </div>
-            </div>
-          </div>
+        <div v-else class="text-center text-text-medium">
+          Aún no hay calificaciones aprobadas. Sé la primera persona en calificar.
         </div>
 
         <!-- Before/After Gallery Hint -->
@@ -1213,7 +1120,7 @@
               <img src="https://images.unsplash.com/photo-1524504388940-b1c1722653e1?w=60&h=60&fit=crop" class="w-8 h-8 rounded-full border-2 border-white object-cover" alt="">
             </div>
             <p class="text-sm text-text-medium">
-              <span class="font-semibold text-brand-600">+500 transformaciones</span> documentadas
+              <span class="font-semibold text-brand-600">Especialistas</span> en extensiones, pelucas y frontales premium
             </p>
           </div>
         </div>
@@ -1240,7 +1147,7 @@
                 </div>
               </div>
               <p class="text-white/60 text-sm mb-6 max-w-xs">
-                Tu socio experto en belleza profesional. Extensiones, pelucas y cosméticos de la más alta calidad.
+                Tu socio experto en belleza profesional. Extensiones, pelucas y accesorios de la más alta calidad.
               </p>
               <div class="flex gap-3">
                 <a href="#" class="w-10 h-10 bg-white/10 rounded-xl flex items-center justify-center hover:bg-brand-600 transition-colors">
@@ -1259,9 +1166,9 @@
             <div>
               <h3 class="font-semibold mb-6 text-white/90">Productos</h3>
               <ul class="space-y-3">
-                <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Extensiones Clip-in</a></li>
+                <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Extensiones premium</a></li>
                 <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Extensiones Tape</a></li>
-                <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Pelucas Lacefront</a></li>
+                <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Pelucas de encaje frontal</a></li>
                 <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Accesorios</a></li>
                 <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Novedades</a></li>
               </ul>
@@ -1684,6 +1591,7 @@
 import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import { productosService, carritoService, authService, favoritosService } from '../services/productos'
+import { resenasService } from '../services/resenas'
 import { categoriasService } from '../services/categorias'
 import { getImageUrl } from '../services/api'
 
@@ -1694,6 +1602,8 @@ export default {
     const route = useRoute()
     const productos = ref([])
     const categorias = ref([])
+    const resenasDestacadas = ref([])
+    const resenasLoading = ref(true)
     const loading = ref(true)
     const error = ref(null)
     const cartCount = ref(0)
@@ -1731,6 +1641,24 @@ export default {
       toastTimeout = setTimeout(() => {
         toast.value.show = false
       }, 4000) // 4 segundos para el toast con producto
+    }
+
+    const getInitials = (fullName) => {
+      if (!fullName) return 'C'
+      const parts = String(fullName).trim().split(' ').filter(Boolean)
+      if (parts.length === 1) return parts[0][0]?.toUpperCase() || 'C'
+      return `${parts[0][0]}${parts[parts.length - 1][0]}`.toUpperCase()
+    }
+
+    const cargarResenasDestacadas = async () => {
+      resenasLoading.value = true
+      try {
+        resenasDestacadas.value = await resenasService.getDestacadas(6)
+      } catch (e) {
+        resenasDestacadas.value = []
+      } finally {
+        resenasLoading.value = false
+      }
     }
     
     // Toast especial para carrito con producto
@@ -2147,7 +2075,63 @@ export default {
     const cargarCategorias = async () => {
       try {
         const data = await categoriasService.listarHome()
-        categorias.value = data.categorias || data || []
+        const categoriasData = data.categorias || data || []
+        categorias.value = categoriasData.map((categoria) => {
+          if (!categoria) return categoria
+          const nombreOriginal = String(categoria.nombre || '')
+          const nombreNormalizado = nombreOriginal.replace(/\s+/g, ' ').trim().toLowerCase()
+          const descripcion = String(categoria.descripcion || '')
+          const descripcionCorta = String(categoria.descripcion_corta || '')
+          const descNormalizada = descripcion.replace(/\s+/g, ' ').trim().toLowerCase()
+          const descCortaNormalizada = descripcionCorta.replace(/\s+/g, ' ').trim().toLowerCase()
+          if (nombreNormalizado === 'extensiones') {
+            const nuevoTexto = 'Todos los largos y tonos, con calidad verificada y acabado natural impecable.'
+            return {
+              ...categoria,
+              descripcion: nuevoTexto,
+              descripcion_corta: nuevoTexto
+            }
+          }
+          if (nombreNormalizado.includes('pelucas lacefront') || nombreNormalizado.includes('full lace')) {
+            return {
+              ...categoria,
+              nombre: 'Pelucas de encaje frontal y completo'
+            }
+          }
+          if (nombreNormalizado.includes('accesorios') && (nombreNormalizado.includes('cuidado') || nombreNormalizado.includes('styling'))) {
+            return {
+              ...categoria,
+              nombre: 'Accesorios de cuidado y peinado'
+            }
+          }
+          if (descNormalizada.includes('lacefront') || descNormalizada.includes('full lace')) {
+            return {
+              ...categoria,
+              descripcion: 'Encaje frontal y completo con acabado natural.',
+              descripcion_corta: 'Encaje frontal y completo.'
+            }
+          }
+          if (descCortaNormalizada.includes('lacefront') || descCortaNormalizada.includes('full lace')) {
+            return {
+              ...categoria,
+              descripcion_corta: 'Encaje frontal y completo.'
+            }
+          }
+          if (descNormalizada.includes('cuidado') && descNormalizada.includes('styling')) {
+            return {
+              ...categoria,
+              descripcion: 'Cuidado y peinado para un acabado profesional.',
+              descripcion_corta: 'Cuidado y peinado.'
+            }
+          }
+          if (descCortaNormalizada.includes('cuidado') && descCortaNormalizada.includes('styling')) {
+            return {
+              ...categoria,
+              descripcion_corta: 'Cuidado y peinado.'
+            }
+          }
+          return categoria
+        })
       } catch (err) {
         console.error('Error cargando categorías:', err)
         categorias.value = []
@@ -2423,6 +2407,7 @@ export default {
     onMounted(() => {
       const categoriasPromise = cargarCategorias()
       const productosPromise = cargarProductos()
+      cargarResenasDestacadas()
       cargarResumenCarrito()
       window.addEventListener('scroll', handleScroll)
       window.addEventListener('user-logged-in', handleUserLoggedIn)
@@ -2458,6 +2443,8 @@ export default {
     return {
       productos,
       categorias,
+      resenasDestacadas,
+      resenasLoading,
       loading,
       error,
       cartCount,
@@ -2498,6 +2485,7 @@ export default {
       toast,
       showToast,
       showCartToast,
+      getInitials,
       // Cart Drawer
       showCartDrawer,
       cartItems,

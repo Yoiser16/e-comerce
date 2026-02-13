@@ -389,7 +389,7 @@
             </div>
             <div class="p-4 sm:p-5">
               <h3 class="font-bold text-gray-900 text-base sm:text-lg mb-1">Extensiones Premium</h3>
-              <p class="text-gray-500 text-sm mb-3">Clip-in, tape & más</p>
+              <p class="text-gray-500 text-sm mb-3">Técnicas profesionales y más</p>
               <span class="text-[#2874A6] text-sm font-medium ">Ver más</span>
             </div>
           </router-link>
