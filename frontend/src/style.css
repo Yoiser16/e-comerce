@@ -365,6 +365,39 @@ body {
   background: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.1) 50%, transparent 100%);
 }
 
+/* ========================================
+   SMART GRID - Categorías Móvil Optimizado
+   ======================================== */
+
+/* Overlay mejorado para móvil - más contraste para legibilidad */
+.bento-overlay-mobile {
+  background: linear-gradient(
+    0deg, 
+    rgba(0, 0, 0, 0.75) 0%, 
+    rgba(0, 0, 0, 0.4) 40%, 
+    rgba(0, 0, 0, 0.1) 70%,
+    transparent 100%
+  );
+}
+
+@media (min-width: 640px) {
+  .bento-overlay-mobile {
+    background: linear-gradient(0deg, rgba(0, 0, 0, 0.6) 0%, rgba(0, 0, 0, 0.1) 50%, transparent 100%);
+  }
+}
+
+/* Smart Grid: Última categoría impar ocupa full-width en móvil */
+@media (max-width: 639px) {
+  .category-smart-grid .category-card-item:last-child:nth-child(odd):not(:first-child) {
+    grid-column: span 2;
+  }
+  
+  /* Ajuste de altura para la última categoría cuando es full-width */
+  .category-smart-grid .category-card-item:last-child:nth-child(odd):not(:first-child) .bento-item {
+    height: 9rem; /* h-36 */
+  }
+}
+
 /* Carrusel de testimonios */
 .testimonial-card {
   background: white;
@@ -606,4 +639,127 @@ body::after {
   box-shadow:
     0 16px 40px -8px rgba(216, 27, 96, 0.45),
     0 6px 20px -4px rgba(216, 27, 96, 0.35);
+}
+
+/* ========================================
+   HERO MÓVIL PREMIUM - High-End Beauty E-commerce
+   ======================================== */
+
+/* Animaciones escalonadas mejoradas para móvil */
+@keyframes heroFadeInUp {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 30px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+}
+
+@keyframes heroFadeInScale {
+  0% {
+    opacity: 0;
+    transform: scale(0.95) translate3d(0, 20px, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1) translate3d(0, 0, 0);
+  }
+}
+
+/* Clases de animación premium */
+.hero-animate-title {
+  animation: heroFadeInUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.1s;
+  opacity: 0;
+}
+
+.hero-animate-subtitle {
+  animation: heroFadeInUp 0.9s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.3s;
+  opacity: 0;
+}
+
+.hero-animate-cta {
+  animation: heroFadeInScale 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.5s;
+  opacity: 0;
+}
+
+.hero-animate-cta-secondary {
+  animation: heroFadeInScale 0.8s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+  animation-delay: 0.65s;
+  opacity: 0;
+}
+
+/* Botones móvil con micro-interacciones */
+@media (max-width: 639px) {
+  /* Efecto táctil en botones */
+  .btn-hero-mobile {
+    transition: transform 0.15s cubic-bezier(0.4, 0, 0.2, 1), 
+                box-shadow 0.2s ease,
+                background-color 0.2s ease;
+    will-change: transform;
+  }
+  
+  .btn-hero-mobile:active {
+    transform: scale(0.97);
+  }
+  
+  /* Botón primario con glow sutil */
+  .btn-hero-primary {
+    background: linear-gradient(135deg, #ffffff 0%, #f8f8f8 100%);
+    box-shadow: 
+      0 4px 20px rgba(255, 255, 255, 0.35),
+      0 2px 8px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.8);
+  }
+  
+  .btn-hero-primary:active {
+    box-shadow: 
+      0 2px 10px rgba(255, 255, 255, 0.2),
+      0 1px 4px rgba(0, 0, 0, 0.1);
+  }
+  
+  /* Botón secundario glassmorphism */
+  .btn-hero-secondary {
+    background: rgba(255, 255, 255, 0.12);
+    border: 1px solid rgba(255, 255, 255, 0.35);
+    box-shadow: 
+      0 4px 24px rgba(0, 0, 0, 0.15),
+      inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  }
+  
+  .btn-hero-secondary:active {
+    background: rgba(255, 255, 255, 0.18);
+  }
+  
+  /* Navegación móvil con drop-shadow para contraste */
+  .header-luxury .nav-icon-mobile {
+    filter: drop-shadow(0 1px 2px rgba(0, 0, 0, 0.3));
+  }
+  
+  /* Imagen hero con mejor posicionamiento para móvil */
+  .hero-image-mobile {
+    object-position: center 20% !important;
+  }
+}
+
+/* Overlay gradient cinematográfico para móvil */
+.hero-overlay-mobile {
+  background: linear-gradient(
+    to top,
+    rgba(0, 0, 0, 0.85) 0%,
+    rgba(0, 0, 0, 0.6) 25%,
+    rgba(0, 0, 0, 0.3) 50%,
+    rgba(0, 0, 0, 0.15) 75%,
+    transparent 100%
+  );
+}
+
+@media (min-width: 640px) {
+  .hero-overlay-mobile {
+    background: transparent;
+  }
 }

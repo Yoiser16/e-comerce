@@ -131,7 +131,7 @@
                 isScrolled ? 'hover:bg-black/5' : 'hover:bg-white/10'
               ]"
             >
-              <svg :class="['w-4 h-4', isScrolled ? 'text-text-dark' : 'text-white']" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg :class="['w-4 h-4', isScrolled ? 'text-text-dark' : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]']" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
             </button>
@@ -148,11 +148,11 @@
                 ]"
               >
                 <!-- Si está logueado, mostrar inicial con estilo sutil -->
-                <span v-if="isLoggedIn" class="text-xs font-medium" :class="isScrolled ? 'text-text-dark' : 'text-white'">
+                <span v-if="isLoggedIn" class="text-xs font-medium" :class="isScrolled ? 'text-text-dark' : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]'">
                   {{ userInitial }}
                 </span>
                 <!-- Si no está logueado, mostrar icono -->
-                <svg v-else class="w-4 h-4" :class="isScrolled ? 'text-text-dark' : 'text-white'" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <svg v-else class="w-4 h-4" :class="isScrolled ? 'text-text-dark' : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]'" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
                 </svg>
               </button>
@@ -264,7 +264,7 @@
               ]"
               @click="openCartDrawer"
             >
-              <svg :class="['w-4 h-4', isScrolled ? 'text-text-dark' : 'text-white']" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg :class="['w-4 h-4', isScrolled ? 'text-text-dark' : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]']" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
               </svg>
               <span 
@@ -286,7 +286,7 @@
                 isScrolled ? 'hover:bg-black/5' : 'hover:bg-white/10'
               ]"
             >
-              <svg :class="['w-4 h-4', isScrolled ? 'text-text-dark' : 'text-white']" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg :class="['w-4 h-4', isScrolled ? 'text-text-dark' : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]']" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path v-if="!mobileMenuOpen" stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
                 <path v-else stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
@@ -394,7 +394,7 @@
     <!-- ========================================
          HERO SECTION - Full Screen High Impact
          ======================================== -->
-    <section class="relative min-h-screen flex items-center overflow-hidden">
+    <section class="relative min-h-[100svh] sm:min-h-screen flex items-center overflow-hidden">
       
       <!-- ===== BACKGROUND CAROUSEL ===== -->
       <div class="absolute inset-0 z-0">
@@ -406,15 +406,19 @@
             v-show="currentSlide === index"
             :src="slide.image" 
             :alt="slide.alt" 
-            class="absolute inset-0 w-full h-full object-cover object-top"
+            class="absolute inset-0 w-full h-full object-cover object-top sm:object-top hero-image-mobile"
           />
         </transition-group>
-        <!-- Gradients for readability -->
-        <div class="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10"></div>
-        <div class="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 z-10"></div>
+        <!-- Gradients for readability - Desktop -->
+        <div class="hidden sm:block absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10"></div>
+        <div class="hidden sm:block absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 z-10"></div>
         
-        <!-- Carousel Indicators -->
-        <div class="absolute bottom-8 left-1/2 -translate-x-1/2 z-20 flex items-center gap-2">
+        <!-- Overlay cinematográfico premium - Móvil -->
+        <div class="sm:hidden absolute inset-0 hero-overlay-mobile z-10"></div>
+        <div class="sm:hidden absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent z-10"></div>
+        
+        <!-- Carousel Indicators - Ocultos en móvil para diseño limpio -->
+        <div class="hidden sm:flex absolute bottom-8 left-1/2 -translate-x-1/2 z-20 items-center gap-2">
           <button 
             v-for="(slide, index) in heroSlides" 
             :key="index"
@@ -429,86 +433,112 @@
         </div>
       </div>
 
-      <!-- ===== CONTENT ===== -->
-      <div class="relative z-10 w-full max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-20">
-        <div class="max-w-3xl text-left">
+      <!-- ===== CONTENT - Layout reorganizado para móvil ===== -->
+      <div class="relative z-10 w-full h-full min-h-[100svh] sm:min-h-screen flex flex-col justify-between sm:justify-center max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-20 sm:pt-20 pb-20 sm:pb-0">
+        
+        <!-- Bloque de textos - Arriba en móvil -->
+        <div class="max-w-3xl text-left sm:mb-0">
           
-          <!-- Badge -->
-          <div class="inline-flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-5 py-2.5 mb-8 animate-fade-in-up">
+          <!-- Badge - Oculto en móvil para diseño más limpio -->
+          <div class="hidden sm:inline-flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-5 py-2.5 mb-8 animate-fade-in-up">
             <span class="w-2 h-2 bg-gold-400 rounded-full animate-pulse"></span>
             <span class="text-sm font-medium text-white tracking-wide uppercase">Distribuidora Mayorista desde 2023</span>
           </div>
 
-          <!-- Title -->
-          <h1 class="font-luxury text-white leading-[1.1] mb-8 drop-shadow-2xl animate-fade-in-up delay-100">
-            <span class="block text-2xl sm:text-3xl lg:text-4xl font-normal mb-2">Tu Socio Experto en</span>
-            <span class="block text-5xl sm:text-6xl lg:text-7xl xl:text-8xl text-transparent bg-clip-text bg-gradient-to-r from-white via-gold-200 to-gold-400 font-bold italic">
+          <!-- Title - Con animación premium escalonada -->
+          <h1 class="font-luxury text-white leading-[1.05] mb-4 sm:mb-8 drop-shadow-2xl hero-animate-title sm:animate-fade-in-up sm:delay-100">
+            <span class="block text-lg sm:text-3xl lg:text-4xl font-light tracking-wide mb-1 sm:mb-2">Tu Socio Experto en</span>
+            <span class="block text-[2.5rem] sm:text-6xl lg:text-7xl xl:text-8xl text-transparent bg-clip-text bg-gradient-to-r from-white via-gold-200 to-gold-400 font-bold italic leading-[1.1]">
               Belleza Profesional
             </span>
           </h1>
 
-          <!-- Subtitle -->
-          <p class="text-base sm:text-lg lg:text-xl text-gray-100 leading-relaxed mb-8 sm:mb-12 max-w-xl font-light animate-fade-in-up delay-200 antialiased">
-            Elevamos tu negocio con extensiones 100% naturales, pelucas premium y accesorios de clase mundial.
+          <!-- Subtitle - Con animación escalonada -->
+          <p class="text-[15px] sm:text-lg lg:text-xl text-white/90 leading-relaxed max-w-xs sm:max-w-xl font-light hero-animate-subtitle sm:animate-fade-in-up sm:delay-200 tracking-wide">
+            Extensiones 100% naturales, pelucas premium y accesorios de clase mundial.
           </p>
-
-          <!-- CTAs - Más compactos en móvil -->
-          <div class="flex flex-col sm:flex-row gap-3 sm:gap-5 mb-12 sm:mb-16 animate-fade-in-up delay-300">
+          
+          <!-- CTAs Desktop - Se muestran aquí en desktop -->
+          <div class="hidden sm:flex flex-row gap-5 mt-12 mb-16 animate-fade-in-up delay-300">
             <router-link 
               to="/catalogo" 
-              class="inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 bg-white text-gray-900 font-semibold text-sm sm:text-base rounded-full shadow-lg hover:shadow-xl hover:bg-gray-100 transition-all duration-300 touch-target"
+              class="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 font-semibold text-base rounded-full shadow-lg hover:shadow-xl hover:bg-gray-100 transition-all duration-300 touch-target"
             >
               Ver Catálogo
-              <svg class="w-4 h-4 sm:w-5 sm:h-5 ml-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
               </svg>
             </router-link>
             
             <a 
               href="#mayoreo" 
-              class="inline-flex items-center justify-center px-6 py-3 sm:px-8 sm:py-4 bg-transparent border border-white/50 text-white font-medium text-sm sm:text-base rounded-full hover:bg-white hover:text-gray-900 transition-all duration-300 backdrop-blur-sm touch-target"
+              class="inline-flex items-center justify-center px-8 py-4 bg-transparent border border-white/50 text-white font-medium text-base rounded-full hover:bg-white hover:text-gray-900 transition-all duration-300 backdrop-blur-sm touch-target"
             >
-              <svg class="w-4 h-4 sm:w-5 sm:h-5 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                  <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
               </svg>
               Portal Mayorista
             </a>
           </div>
         </div>
+
+        <!-- CTAs Móvil - Con micro-interacciones y animaciones premium -->
+        <div class="sm:hidden w-full flex flex-col gap-3.5 mt-auto px-1">
+          <router-link 
+            to="/catalogo" 
+            class="hero-animate-cta btn-hero-mobile btn-hero-primary w-full inline-flex items-center justify-center px-6 py-4 text-gray-900 font-semibold text-[15px] rounded-full touch-target"
+          >
+            Ver Catálogo
+            <svg class="w-5 h-5 ml-2.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+            </svg>
+          </router-link>
+          
+          <a 
+            href="#mayoreo" 
+            class="hero-animate-cta-secondary btn-hero-mobile btn-hero-secondary w-full inline-flex items-center justify-center px-6 py-4 text-white font-medium text-[15px] rounded-full touch-target"
+          >
+            <svg class="w-5 h-5 mr-2.5 opacity-90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+               <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
+            </svg>
+            Portal Mayorista
+          </a>
+        </div>
       </div>
     </section>
 
     <!-- ========================================
-         TRUST BAR - Premium Editorial Ribbon
+         TRUST BAR - Premium Editorial Ribbon (3 en móvil, 4 en desktop)
          ======================================== -->
-    <section class="trust-ribbon-premium relative overflow-hidden">
+    <section class="trust-ribbon-premium relative overflow-hidden py-5 sm:py-0">
       
-      <div class="relative max-w-6xl mx-auto px-4">
-        <div class="flex flex-wrap lg:flex-nowrap items-stretch justify-center gap-8">
+      <div class="relative max-w-6xl mx-auto px-3 sm:px-4">
+        <!-- Grid 3 columnas en móvil, flex en desktop -->
+        <div class="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap lg:flex-nowrap sm:items-stretch sm:justify-center sm:gap-8">
           
           <!-- Item 1: Envíos VIP -->
-          <div class="trust-item-premium group py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative">
+          <div class="trust-item-premium group py-3 sm:py-7 lg:py-9 px-1 sm:px-3 lg:px-8 flex flex-col items-center text-center relative">
             
             <div class="relative z-10 flex flex-col items-center">
-              <!-- Icon container with subtle ring -->
-              <div class="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-lg flex items-center justify-center mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
-                <svg class="w-7 h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+              <!-- Icon container - Compacto en móvil -->
+              <div class="w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-md sm:shadow-lg flex items-center justify-center mb-1.5 sm:mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                <svg class="w-5 h-5 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
                 </svg>
               </div>
-              <!-- Title -->
-              <h4 class="text-xs sm:text-sm font-semibold tracking-[0.15em] uppercase text-[#1a1a1a] mb-1">
-                Envíos VIP
+              <!-- Title - Compacto en móvil -->
+              <h4 class="text-[10px] sm:text-xs lg:text-sm font-semibold tracking-[0.05em] sm:tracking-[0.15em] uppercase text-[#1a1a1a] mb-0.5 sm:mb-1 leading-tight">
+                Envío Gratis
               </h4>
-              <!-- Subtitle -->
-              <p class="text-xs sm:text-sm text-[#8B7355] font-light">
-                Envío gratis desde $350.000
+              <!-- Subtitle - Oculto en móvil para diseño limpio -->
+              <p class="hidden sm:block text-xs lg:text-sm text-[#8B7355] font-light leading-tight">
+                Desde $350.000
               </p>
             </div>
           </div>
 
-          <!-- Item 2: Calidad Remy -->
-          <div class="trust-item-premium group py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative">
+          <!-- Item 2: Calidad Premium - Solo visible en desktop -->
+          <div class="hidden sm:flex trust-item-premium group py-7 lg:py-9 px-3 lg:px-8 flex-col items-center text-center relative">
             
             <div class="relative z-10 flex flex-col items-center">
               <div class="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-lg flex items-center justify-center mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
@@ -516,47 +546,47 @@
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
                 </svg>
               </div>
-              <h4 class="text-xs sm:text-sm font-semibold tracking-[0.15em] uppercase text-[#1a1a1a] mb-1">
+              <h4 class="text-xs lg:text-sm font-semibold tracking-[0.15em] uppercase text-[#1a1a1a] mb-1">
                 Calidad Premium
               </h4>
-              <p class="text-xs sm:text-sm text-[#8B7355] font-light">
-                Productos seleccionados y garantizados
+              <p class="text-xs lg:text-sm text-[#8B7355] font-light leading-tight">
+                Productos garantizados
               </p>
             </div>
           </div>
 
-          <!-- Item 3: Compra Segura -->
-          <div class="trust-item-premium group py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative">
+          <!-- Item 3: Pago Seguro -->
+          <div class="trust-item-premium group py-3 sm:py-7 lg:py-9 px-1 sm:px-3 lg:px-8 flex flex-col items-center text-center relative">
             
             <div class="relative z-10 flex flex-col items-center">
-              <div class="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-lg flex items-center justify-center mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
-                <svg class="w-7 h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+              <div class="w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-md sm:shadow-lg flex items-center justify-center mb-1.5 sm:mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                <svg class="w-5 h-5 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                 </svg>
               </div>
-              <h4 class="text-xs sm:text-sm font-semibold tracking-[0.15em] uppercase text-[#1a1a1a] mb-1">
+              <h4 class="text-[10px] sm:text-xs lg:text-sm font-semibold tracking-[0.05em] sm:tracking-[0.15em] uppercase text-[#1a1a1a] mb-0.5 sm:mb-1 leading-tight">
                 Pago Seguro
               </h4>
-              <p class="text-xs sm:text-sm text-[#8B7355] font-light">
-                Encriptación SSL 256-bit
+              <p class="hidden sm:block text-xs lg:text-sm text-[#8B7355] font-light leading-tight">
+                SSL 256-bit
               </p>
             </div>
           </div>
 
-          <!-- Item 4: Asesoría Experta -->
-          <div class="trust-item-premium group py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative">
+          <!-- Item 4: Asesoría VIP -->
+          <div class="trust-item-premium group py-3 sm:py-7 lg:py-9 px-1 sm:px-3 lg:px-8 flex flex-col items-center text-center relative">
             
             <div class="relative z-10 flex flex-col items-center">
-              <div class="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-lg flex items-center justify-center mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
-                <svg class="w-7 h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+              <div class="w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-md sm:shadow-lg flex items-center justify-center mb-1.5 sm:mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                <svg class="w-5 h-5 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
                 </svg>
               </div>
-              <h4 class="text-xs sm:text-sm font-semibold tracking-[0.15em] uppercase text-[#1a1a1a] mb-1">
+              <h4 class="text-[10px] sm:text-xs lg:text-sm font-semibold tracking-[0.05em] sm:tracking-[0.15em] uppercase text-[#1a1a1a] mb-0.5 sm:mb-1 leading-tight">
                 Asesoría VIP
               </h4>
-              <p class="text-xs sm:text-sm text-[#8B7355] font-light">
-                Atención Personalizada
+              <p class="hidden sm:block text-xs lg:text-sm text-[#8B7355] font-light leading-tight">
+                Personalizada
               </p>
             </div>
           </div>
@@ -566,28 +596,28 @@
     </section>
 
     <!-- ========================================
-         CATEGORÍAS - Bento Box Grid
+         CATEGORÍAS - Bento Box Grid (Smart Mobile Grid)
          ======================================== -->
-    <section id="categorias" class="py-20 lg:py-28 bg-[#FAFAFA]">
-      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-        <!-- Section Header -->
-        <div class="text-center mb-14">
-          <span class="inline-block text-brand-600 font-medium text-sm tracking-widest uppercase mb-4">Nuestro Catálogo</span>
-          <h2 class="font-luxury text-3xl sm:text-4xl lg:text-5xl text-text-dark mb-4">
+    <section id="categorias" class="py-5 sm:py-12 lg:py-28 bg-[#FAFAFA]">
+      <div class="max-w-7xl mx-auto px-3 sm:px-8 lg:px-12">
+        <!-- Section Header - Ultra compacto en móvil -->
+        <div class="text-center mb-3 sm:mb-10 lg:mb-14">
+          <span class="inline-block text-brand-600 font-medium text-xs sm:text-sm tracking-widest uppercase mb-2 sm:mb-4">Nuestro Catálogo</span>
+          <h2 class="font-luxury text-xl sm:text-4xl lg:text-5xl text-text-dark mb-0 sm:mb-4">
             Categorías <em class="not-italic text-brand-600">Exclusivas</em>
           </h2>
-          <p class="text-text-medium max-w-xl mx-auto">
+          <p class="hidden sm:block text-text-medium max-w-xl mx-auto text-sm lg:text-base">
             Productos seleccionados para profesionales de la belleza que buscan calidad excepcional
           </p>
         </div>
 
-        <!-- Bento Grid - Adaptativo Inteligente -->
-        <div class="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 lg:gap-6">
+        <!-- Bento Grid - Smart Grid con última impar full-width -->
+        <div class="category-smart-grid grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-5 lg:gap-6">
           <div 
             v-for="(categoria, index) in categorias" 
             :key="categoria.id"
             :class="[
-              'group cursor-pointer',
+              'group cursor-pointer category-card-item',
               // En móvil, solo categoría destacada (P1) ocupa 2 columnas
               categoria.prioridad === 1 && index === 0 ? 'col-span-2' : '',
               // Lógica adaptativa para tablet y desktop
@@ -604,9 +634,9 @@
           >
             <div 
               :class="[
-                'relative bento-item shadow-soft hover-lift overflow-hidden rounded-2xl sm:rounded-3xl',
-                // Altura adaptativa móvil primero
-                categoria.prioridad === 1 && index === 0 ? 'h-56 sm:h-80 lg:h-96' : 'h-40 sm:h-64 lg:h-80',
+                'relative bento-item shadow-soft hover-lift overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-3xl',
+                // Altura adaptativa móvil primero - más compacto
+                categoria.prioridad === 1 && index === 0 ? 'h-44 sm:h-80 lg:h-96' : 'h-32 sm:h-64 lg:h-80',
                 // Lógica para otros tamaños
                 categorias.length === 1 ? 'sm:h-96 lg:h-[500px]' :
                 categorias.length === 2 ? 'sm:h-80 lg:h-96' :
@@ -619,39 +649,37 @@
                 :alt="categoria.nombre" 
                 class="absolute inset-0 w-full h-full object-cover img-zoom"
               >
-              <div class="absolute inset-0 bento-overlay"></div>
+              <!-- Overlay mejorado para legibilidad móvil -->
+              <div class="absolute inset-0 bento-overlay-mobile sm:bento-overlay"></div>
               <div 
                 :class="[
                   'absolute bottom-0 left-0 right-0',
-                  // Padding adaptativo - más compacto en móvil
-                  categoria.prioridad === 1 && index === 0 ? 'p-4 sm:p-6 lg:p-8' : 'p-3 sm:p-5 lg:p-6'
+                  // Padding adaptativo - ultra compacto en móvil
+                  categoria.prioridad === 1 && index === 0 ? 'p-3 sm:p-6 lg:p-8' : 'p-2.5 sm:p-5 lg:p-6'
                 ]"
               >
                 <!-- Badge "MÁS VENDIDO" solo para la primera P1 -->
                 <span 
                   v-if="categoria.prioridad === 1 && categoria.orden === 1" 
-                  class="inline-block bg-gold-400 text-white text-[10px] sm:text-xs font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full mb-2 sm:mb-3"
+                  class="inline-block bg-gold-400 text-white text-[9px] sm:text-xs font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full mb-1.5 sm:mb-3"
                 >
                   MÁS VENDIDO
                 </span>
                 
-                <!-- Título adaptativo -->
+                <!-- Título adaptativo - más compacto móvil -->
                 <h3 
                   :class="[
-                    'font-luxury text-white mb-1 sm:mb-2',
-                    categoria.prioridad === 1 && index === 0 ? 'text-lg sm:text-2xl lg:text-3xl' : 'text-sm sm:text-xl lg:text-2xl'
+                    'font-luxury text-white leading-tight',
+                    categoria.prioridad === 1 && index === 0 ? 'text-base sm:text-2xl lg:text-3xl mb-1 sm:mb-2' : 'text-[13px] sm:text-xl lg:text-2xl'
                   ]"
                 >
                   {{ categoria.nombre }}
                 </h3>
                 
-                <!-- Descripción - oculta en tarjetas pequeñas en móvil -->
+                <!-- Descripción - OCULTA en móvil para todas las tarjetas -->
                 <p 
                   v-if="categoria.prioridad === 1 && index === 0"
-                  :class="[
-                    'text-white/80 mb-2 sm:mb-4',
-                    'text-xs sm:text-base max-w-md'
-                  ]"
+                  class="hidden sm:block text-white/80 mb-2 sm:mb-4 text-sm sm:text-base max-w-md"
                 >
                   {{ categoria.descripcion }}
                 </p>
@@ -662,16 +690,16 @@
                   {{ categoria.descripcion_corta || categoria.descripcion }}
                 </p>
                 
-                <!-- CTA -->
+                <!-- CTA - minimalista en móvil -->
                 <span 
                   :class="[
-                    'inline-flex items-center gap-1.5 sm:gap-2 text-white font-medium transition-all',
-                    categoria.prioridad === 1 && index === 0 ? 'text-xs sm:text-base group-hover:gap-4' : 'text-[11px] sm:text-sm group-hover:gap-3'
+                    'inline-flex items-center gap-1 sm:gap-2 text-white font-medium transition-all mt-1 sm:mt-0',
+                    categoria.prioridad === 1 && index === 0 ? 'text-[11px] sm:text-base group-hover:gap-4' : 'text-[10px] sm:text-sm group-hover:gap-3'
                   ]"
                 >
                   {{ categoria.prioridad === 1 && index === 0 ? 'Explorar colección' : 'Ver más' }}
                   <svg 
-                    :class="categoria.prioridad === 1 && index === 0 ? 'w-4 h-4 sm:w-5 sm:h-5' : 'w-3 h-3 sm:w-4 sm:h-4'" 
+                    :class="categoria.prioridad === 1 && index === 0 ? 'w-3.5 h-3.5 sm:w-5 sm:h-5' : 'w-3 h-3 sm:w-4 sm:h-4'" 
                     fill="none" 
                     stroke="currentColor" 
                     stroke-width="2" 
@@ -690,17 +718,17 @@
     <!-- ========================================
          PRODUCTOS DESTACADOS
          ======================================== -->
-    <section id="productos" class="py-20 lg:py-28 bg-gradient-to-b from-nude-100/50 to-[#FAFAFA]">
-      <div class="max-w-screen-xl mx-auto px-5 sm:px-8 lg:px-10">
-        <!-- Section Header -->
-        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-6 mb-14">
-          <div>
-            <span class="inline-block text-brand-600 font-medium text-sm tracking-widest uppercase mb-4">Selección Premium</span>
-            <h2 class="font-luxury text-3xl sm:text-4xl lg:text-5xl text-text-dark">
+    <section id="productos" class="py-10 sm:py-20 lg:py-28 bg-gradient-to-b from-nude-100/50 to-[#FAFAFA]">
+      <div class="max-w-screen-xl mx-auto px-3 sm:px-8 lg:px-10">
+        <!-- Section Header - Compacto en móvil -->
+        <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-3 sm:gap-6 mb-5 sm:mb-14">
+          <div class="text-center sm:text-left">
+            <span class="hidden sm:inline-block text-brand-600 font-medium text-sm tracking-widest uppercase mb-4">Selección Premium</span>
+            <h2 class="font-luxury text-2xl sm:text-4xl lg:text-5xl text-text-dark">
               Productos <em class="not-italic text-brand-600">Destacados</em>
             </h2>
           </div>
-          <router-link to="/catalogo" class="inline-flex items-center gap-2 text-text-medium hover:text-brand-600 font-medium transition-colors group">
+          <router-link to="/catalogo" class="hidden sm:inline-flex items-center gap-2 text-text-medium hover:text-brand-600 font-medium transition-colors group">
             Ver todo el catálogo
             <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
@@ -719,34 +747,34 @@
         </div>
 
         <!-- Products Grid -->
-        <div v-else-if="productos.length > 0" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
+        <div v-else-if="productos.length > 0" class="product-grid-mobile grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-[10px] sm:gap-6 lg:gap-8">
           <div
             v-for="producto in productos"
             :key="producto.id"
             :data-producto-id="producto.id"
             :data-producto-nombre="producto.nombre"
             @click="irADetalle(producto.id)"
-            class="group cursor-pointer"
+            class="group cursor-pointer product-card-mobile"
           >
-            <div class="relative bg-white rounded-2xl sm:rounded-3xl overflow-hidden shadow-soft hover-lift mb-3 sm:mb-5">
-              <!-- Badge -->
+            <div class="relative bg-white rounded-xl sm:rounded-3xl overflow-hidden shadow-soft sm:hover-lift mb-2 sm:mb-5">
+              <!-- Badge - Sutil en móvil, oculto si no es necesario -->
               <div class="absolute top-2 sm:top-4 left-2 sm:left-4 z-10">
-                <span class="bg-white/90 backdrop-blur-sm text-text-dark text-[10px] sm:text-xs font-medium px-2 sm:px-3 py-1 sm:py-1.5 rounded-full shadow-sm">
+                <span class="product-badge-mobile bg-white/90 sm:bg-white/90 sm:backdrop-blur-sm text-text-dark text-[9px] sm:text-xs font-medium px-1.5 sm:px-3 py-0.5 sm:py-1.5 rounded-full shadow-sm">
                   {{ producto.categoria || 'Premium' }}
                 </span>
               </div>
               
-              <!-- Wishlist Button -->
+              <!-- Wishlist Button - SOLO en desktop sobre la imagen -->
               <button 
                 @click.stop="toggleFavorito(producto)"
-                class="absolute top-2 sm:top-4 right-2 sm:right-4 z-10 w-8 h-8 sm:w-10 sm:h-10 bg-white/90 backdrop-blur-sm rounded-full flex items-center justify-center shadow-sm hover:bg-brand-50 transition-colors touch-target"
+                class="product-fav-image hidden sm:flex absolute top-4 right-4 z-10 w-10 h-10 bg-white/90 backdrop-blur-sm rounded-full items-center justify-center shadow-sm hover:bg-brand-50 transition-colors touch-target"
               >
-                <svg class="w-4 h-4 sm:w-5 sm:h-5 text-text-light hover:text-brand-600 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <svg class="w-5 h-5 text-text-light hover:text-brand-600 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                 </svg>
               </button>
 
-              <!-- Image / Video -->
+              <!-- Image / Video - Toque directo navega al detalle -->
               <div class="aspect-[3/4] overflow-hidden bg-nude-100">
                 <video
                   v-if="isVideo(getProductoMediaUrl(producto))"
@@ -762,30 +790,44 @@
                   v-else-if="getProductoMediaUrl(producto)"
                   :src="getProductoMediaUrl(producto)"
                   :alt="producto.nombre"
-                  class="w-full h-full object-cover img-zoom"
+                  class="w-full h-full object-cover sm:img-zoom"
                   @error="handleImageError"
                 >
                 <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-nude-100 to-nude-200">
-                  <svg class="w-24 h-24 text-nude-400" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                  <svg class="w-16 h-16 sm:w-24 sm:h-24 text-nude-400" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
                   </svg>
                 </div>
               </div>
 
-              <!-- Quick Add -->
+              <!-- Quick Add - OCULTO en móvil, solo visible en hover desktop -->
               <button
                 @click.stop="agregarAlCarrito(producto)"
-                class="absolute bottom-4 left-4 right-4 bg-brand-600 text-white font-semibold py-3 px-6 rounded-2xl opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:bg-brand-700 touch-target"
+                class="product-quick-add-desktop absolute bottom-4 left-4 right-4 bg-brand-600 text-white font-semibold py-3 px-6 rounded-2xl opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:bg-brand-700 touch-target"
               >
                 Agregar al carrito
               </button>
             </div>
 
-            <!-- Product Info -->
-            <div class="px-2 sm:px-1">
-              <p class="text-[10px] sm:text-xs text-text-light uppercase tracking-wider mb-0.5 sm:mb-1">{{ producto.categoria || producto.metodo || 'Extensiones' }}</p>
-              <h3 class="font-medium text-xs sm:text-base text-text-dark mb-1 sm:mb-2 line-clamp-2 group-hover:text-brand-600 transition-colors">{{ producto.nombre }}</h3>
-              <p class="text-sm sm:text-lg font-semibold text-brand-600">${{ formatPrice(producto.precio_monto || producto.precio) }} <span class="text-[10px] sm:text-xs text-text-light font-normal">{{ producto.precio_moneda || 'COP' }}</span></p>
+            <!-- Product Info - Jerarquía tipográfica mejorada -->
+            <div class="px-1 sm:px-1">
+              <p class="text-[9px] sm:text-xs text-text-light uppercase tracking-wider mb-0 sm:mb-1 leading-tight">{{ producto.categoria || producto.metodo || 'Extensiones' }}</p>
+              <h3 class="font-medium text-[13px] leading-[1.3] sm:text-base text-text-dark mb-1.5 sm:mb-2 line-clamp-2 group-hover:text-brand-600 transition-colors">{{ producto.nombre }}</h3>
+              
+              <!-- Fila inferior: Precio (izq) + Corazón (der) -->
+              <div class="flex items-center justify-between">
+                <p class="text-[15px] sm:text-lg font-bold text-text-dark sm:text-brand-600 leading-tight">${{ formatPrice(producto.precio_monto || producto.precio) }} <span class="text-[9px] sm:text-xs text-text-light font-normal">{{ producto.precio_moneda || 'COP' }}</span></p>
+                
+                <!-- Corazón móvil - sutil, sin fondo -->
+                <button 
+                  @click.stop="toggleFavorito(producto)"
+                  class="product-fav-inline sm:hidden flex items-center justify-center w-6 h-6 flex-shrink-0 ml-2 transition-colors"
+                >
+                  <svg class="w-[18px] h-[18px] text-text-light/40 hover:text-brand-600 active:text-brand-600 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
+                  </svg>
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -812,13 +854,23 @@
           </div>
           <p class="text-text-medium">No hay productos disponibles en este momento</p>
         </div>
+
+        <!-- CTA Ver catálogo - Visible solo en móvil debajo del grid -->
+        <div v-if="productos.length > 0" class="flex sm:hidden justify-center mt-6">
+          <router-link to="/catalogo" class="inline-flex items-center gap-2 text-sm text-brand-600 font-medium border border-brand-200 px-5 py-2.5 rounded-full hover:bg-brand-50 transition-all">
+            Ver todo el catálogo
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+            </svg>
+          </router-link>
+        </div>
       </div>
     </section>
 
     <!-- ========================================
          VIDEO KANEKALON - Sección Inmersiva Optimizada
          ======================================== -->
-    <section class="relative bg-black overflow-hidden">
+    <section class="relative bg-black overflow-hidden video-hero-section">
       <!-- Video Background con altura mínima para móvil -->
       <div class="relative w-full min-h-[50vh] sm:min-h-[60vh] lg:min-h-0">
         <video 
@@ -835,27 +887,29 @@
           Tu navegador no soporta videos HTML5.
         </video>
         
-        <!-- Overlay con gradiente optimizado para legibilidad -->
-        <div class="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-black/40"></div>
+        <!-- Overlay - Gradiente cinemático: limpio arriba, oscuro abajo -->
+        <div class="absolute inset-0 video-hero-overlay"></div>
         
-        <!-- Contenido sobre el video - Mejor posicionado en móvil -->
-        <div class="absolute inset-0 flex items-center lg:items-end justify-center pb-8 sm:pb-12 lg:pb-20">
-          <div class="text-center px-5 sm:px-6">
-            <div class="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-4 py-1.5 sm:px-5 sm:py-2 mb-4 sm:mb-6">
-              <span class="text-white/90 text-xs sm:text-sm font-medium uppercase tracking-wider">Calidad Premium</span>
+        <!-- Contenido sobre el video - Bottom-aligned en móvil -->
+        <div class="absolute inset-0 flex items-end sm:items-center lg:items-end justify-center video-hero-content">
+          <div class="text-center sm:text-center px-5 sm:px-6 pb-14 sm:pb-12 lg:pb-20 w-full max-w-2xl mx-auto">
+            <!-- Badge - Oculto en móvil -->
+            <div class="video-hero-badge hidden sm:inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm border border-white/20 rounded-full px-5 py-2 mb-6">
+              <span class="text-white/90 text-sm font-medium uppercase tracking-wider">Calidad Premium</span>
             </div>
-            <h2 class="font-luxury text-2xl sm:text-3xl lg:text-5xl text-white mb-3 sm:mb-4 drop-shadow-2xl">
+            <h2 class="font-luxury text-[26px] leading-tight sm:text-3xl lg:text-5xl text-white mb-2 sm:mb-4 drop-shadow-2xl">
               Extensiones 100% <span class="text-brand-400">Naturales</span>
             </h2>
-            <p class="text-white/80 text-sm sm:text-base lg:text-lg max-w-md sm:max-w-xl lg:max-w-2xl mx-auto mb-6 sm:mb-8 leading-relaxed">
+            <!-- Párrafo descriptivo - Oculto en móvil, visible en tablet+ -->
+            <p class="hidden sm:block text-white/80 text-base lg:text-lg max-w-xl lg:max-w-2xl mx-auto mb-8 leading-relaxed">
               Tecnología de fibras de la más alta calidad. Transforma tu look con elegancia y sofisticación profesional.
             </p>
             <router-link 
               to="/catalogo"
-              class="inline-flex items-center gap-2 bg-white hover:bg-nude-100 text-text-dark font-medium text-sm sm:text-base px-5 py-2.5 sm:px-7 sm:py-3.5 rounded-full transition-all shadow-lg hover:shadow-xl"
+              class="inline-flex items-center gap-2 bg-white hover:bg-nude-100 text-text-dark font-medium text-xs sm:text-base px-4 py-2 sm:px-7 sm:py-3.5 rounded-full transition-all shadow-lg hover:shadow-xl"
             >
               Ver Catálogo Completo
-              <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg class="w-3.5 h-3.5 sm:w-5 sm:h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
             </router-link>
@@ -1228,13 +1282,13 @@
     <!-- ========================================
          FLOATING SOCIAL BUTTONS (Right Side) - Compactos en móvil
          ======================================== -->
-    <!-- Instagram Button -->
+    <!-- Instagram Button - Solo visible en tablet/desktop para enfoque en conversión móvil -->
     <a 
       href="https://www.instagram.com/kharisdistribuidora/"
       target="_blank"
-      class="fixed bottom-24 sm:bottom-28 right-4 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 text-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all duration-300 z-40 group touch-target"
+      class="hidden sm:flex fixed bottom-28 right-6 w-14 h-14 lg:w-16 lg:h-16 bg-gradient-to-br from-purple-500 via-pink-500 to-orange-400 text-white rounded-full items-center justify-center shadow-xl hover:scale-110 transition-all duration-300 z-40 group touch-target"
     >
-      <svg class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8" fill="currentColor" viewBox="0 0 24 24">
+      <svg class="w-6 h-6 lg:w-8 lg:h-8" fill="currentColor" viewBox="0 0 24 24">
         <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zm0-2.163c-3.259 0-3.667.014-4.947.072-4.358.2-6.78 2.618-6.98 6.98-.059 1.281-.073 1.689-.073 4.948 0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98 1.281.058 1.689.072 4.948.072 3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98-1.281-.059-1.69-.073-4.949-.073zm0 5.838c-3.403 0-6.162 2.759-6.162 6.162s2.759 6.163 6.162 6.163 6.162-2.759 6.162-6.163c0-3.403-2.759-6.162-6.162-6.162zm0 10.162c-2.209 0-4-1.79-4-4 0-2.209 1.791-4 4-4s4 1.791 4 4c0 2.21-1.791 4-4 4zm6.406-11.845c-.796 0-1.441.645-1.441 1.44s.645 1.44 1.441 1.44c.795 0 1.439-.645 1.439-1.44s-.644-1.44-1.439-1.44z"/>
       </svg>
       <!-- Tooltip - Solo desktop -->
@@ -1243,8 +1297,9 @@
       </span>
     </a>
 
-    <!-- WhatsApp Button -->
+    <!-- WhatsApp Button - En móvil aparece solo con scroll para no estorbar en hero -->
     <a 
+      v-show="isScrolled || windowWidth >= 640"
       href="https://wa.me/4796657763?text=Hola,%20me%20interesa%20información%20sobre%20sus%20productos"
       target="_blank"
       class="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-green-500 text-white rounded-full flex items-center justify-center shadow-xl hover:bg-green-600 hover:scale-110 transition-all duration-300 z-40 group touch-target"
@@ -1614,6 +1669,7 @@ export default {
     const error = ref(null)
     const cartCount = ref(0)
     const isScrolled = ref(false)
+    const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
     const mobileMenuOpen = ref(false)
     const mobileSearchOpen = ref(false)
     const searchQuery = ref('')
@@ -1966,7 +2022,7 @@ export default {
     }
 
     const startSlideshow = () => {
-      slideInterval = setInterval(nextSlide, 4000) // Cambio cada 4 segundos
+      slideInterval = setInterval(nextSlide, 6000) // Cambio cada 6 segundos - más lento para mejor UX móvil
     }
 
     const resetSlideInterval = () => {
@@ -2093,7 +2149,13 @@ export default {
     }
 
     const handleScroll = () => {
-      isScrolled.value = window.scrollY > 30
+      // En móvil el cambio ocurre más abajo (100px) para transición más suave
+      const threshold = windowWidth.value < 640 ? 100 : 30
+      isScrolled.value = window.scrollY > threshold
+    }
+
+    const handleResize = () => {
+      windowWidth.value = window.innerWidth
     }
 
     const scrollToTop = () => {
@@ -2453,10 +2515,12 @@ export default {
       cargarResenasDestacadas()
       cargarResumenCarrito()
       window.addEventListener('scroll', handleScroll)
+      window.addEventListener('resize', handleResize)
       window.addEventListener('user-logged-in', handleUserLoggedIn)
       document.addEventListener('click', handleClickOutside)
       document.addEventListener('click', handleClickOutsideSearch)
       handleScroll()
+      handleResize()
       startSlideshow()
       
       // Manejar scroll al hash cuando venimos de otra página
@@ -2477,6 +2541,7 @@ export default {
 
     onUnmounted(() => {
       window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleResize)
       window.removeEventListener('user-logged-in', handleUserLoggedIn)
       document.removeEventListener('click', handleClickOutside)
       document.removeEventListener('click', handleClickOutsideSearch)
@@ -2492,6 +2557,7 @@ export default {
       error,
       cartCount,
       isScrolled,
+      windowWidth,
       mobileMenuOpen,
       mobileSearchOpen,
       searchQuery,
@@ -2559,6 +2625,97 @@ export default {
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
+}
+
+/* ==========================================
+   PRODUCTOS DESTACADOS - MOBILE OPTIMIZADO
+   ========================================== */
+
+/* Ocultar botón "Agregar al carrito" y corazón sobre imagen en móvil */
+@media (max-width: 767px) {
+  .product-quick-add-desktop {
+    display: none !important;
+  }
+
+  /* Corazón sobre imagen: oculto en móvil (se reubica abajo) */
+  .product-fav-image {
+    display: none !important;
+  }
+
+  /* Badge más sutil en móvil */
+  .product-badge-mobile {
+    font-size: 9px;
+    padding: 2px 6px;
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: none;
+    letter-spacing: 0.02em;
+  }
+
+  /* Corazón inline (junto al precio) */
+  .product-fav-inline {
+    background: none;
+    border: none;
+    padding: 0;
+  }
+  .product-fav-inline:active svg {
+    color: #D81B60;
+    fill: #D81B60;
+    transform: scale(1.15);
+  }
+
+  /* Desactivar img-zoom en móvil (evitar hover fantasma) */
+  .product-card-mobile .img-zoom {
+    transform: none !important;
+    transition: none !important;
+  }
+
+  /* Quitar hover-lift en móvil */
+  .product-card-mobile .hover-lift {
+    transform: none !important;
+    transition: none !important;
+  }
+}
+
+/* Desktop: mantener Quick Add con hover, ocultar corazón inline */
+@media (min-width: 768px) {
+  .product-quick-add-desktop {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .product-fav-inline {
+    display: none !important;
+  }
+}
+
+/* ==========================================
+   VIDEO HERO - CINEMÁTICO MÓVIL
+   ========================================== */
+
+/* Móvil: gradiente cinemático - limpio arriba, texto legible abajo */
+@media (max-width: 767px) {
+  .video-hero-overlay {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.85) 0%,
+      rgba(0, 0, 0, 0.4) 35%,
+      rgba(0, 0, 0, 0.05) 55%,
+      transparent 70%
+    ) !important;
+  }
+}
+
+/* Tablet/Desktop: overlay original más distribuido */
+@media (min-width: 768px) {
+  .video-hero-overlay {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.75) 0%,
+      rgba(0, 0, 0, 0.2) 40%,
+      rgba(0, 0, 0, 0.35) 100%
+    );
+  }
 }
 
 /* Hero Crossfade Transition - Suave y elegante */
