@@ -1886,6 +1886,12 @@ const toggleUserMenu = () => {
 const handleMenuAction = (action) => {
   showUserMenu.value = false
   
+  // Favoritos no requiere login
+  if (action === 'favoritos') {
+    router.push('/favoritos')
+    return
+  }
+  
   if (!isLoggedIn.value) {
     router.push('/login')
     return
@@ -1894,9 +1900,6 @@ const handleMenuAction = (action) => {
   switch(action) {
     case 'pedidos':
       router.push('/mi-cuenta?tab=compras')
-      break
-    case 'favoritos':
-      router.push('/mi-cuenta')
       break
     case 'login':
       router.push('/login')

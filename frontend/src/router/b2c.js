@@ -10,6 +10,7 @@ import Login from '../components/Login.vue'
 // Cliente imports (lazy loaded)
 const Catalogo = () => import('../components/Catalogo.vue')
 const ProductoDetalle = () => import('../components/ProductoDetalle.vue')
+const Favoritos = () => import('../components/Favoritos.vue')
 const MiCuenta = () => import('../components/MiCuenta.vue')
 const Checkout = () => import('../components/Checkout.vue')
 const PagoExitoso = () => import('../components/PagoExitoso.vue')
@@ -49,6 +50,12 @@ const routes = [
     path: '/producto/:id',
     name: 'ProductoDetalle',
     component: ProductoDetalle
+  },
+  {
+    path: '/favoritos',
+    name: 'Favoritos',
+    component: Favoritos,
+    meta: { title: 'Mis Favoritos | Kharis' }
   },
   {
     path: '/mi-cuenta',

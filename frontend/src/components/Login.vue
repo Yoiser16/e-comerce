@@ -1,55 +1,66 @@
 <template>
-  <!-- ===== MODAL OVERLAY LOGIN ===== -->
-  <div class="fixed inset-0 z-[100]">
+  <!-- ===== LOGIN OVERLAY ===== -->
+  <!-- Móvil: Full-Screen | Desktop: Modal centrado -->
+  <div class="login-overlay fixed inset-0 z-[9999]">
     
-    <!-- Backdrop: Simple overlay sin blur -->
+    <!-- Backdrop: Solo visible en desktop -->
     <div 
-      class="absolute inset-0 bg-black/70"
+      class="absolute inset-0 bg-black/60 hidden md:block"
       @click="closeModal"
     ></div>
 
-    <!-- Modal Container -->
-    <div class="absolute inset-0 flex items-center justify-center p-4">
+    <!-- Contenedor principal -->
+    <div class="absolute inset-0 flex items-start md:items-center md:justify-center md:p-4">
       
-      <!-- Modal Box -->
+      <!-- Login Box: Full-screen en móvil, modal en desktop -->
       <div 
-        class="relative bg-white rounded-2xl shadow-2xl w-full max-w-md overflow-hidden animate-modal-enter"
+        class="login-box relative bg-white w-full h-full md:h-auto md:max-h-[90vh] md:w-full md:max-w-md md:rounded-2xl md:shadow-2xl overflow-y-auto"
         @click.stop
       >
         
-        <!-- Botón Cerrar -->
-        <button 
-          @click="closeModal"
-          class="absolute top-5 right-5 w-10 h-10 flex items-center justify-center rounded-full hover:bg-nude-100 transition-colors z-10"
-        >
-          <svg class="w-5 h-5 text-text-light" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        </button>
+        <!-- Header: Botón cerrar -->
+        <div class="sticky top-0 z-10 bg-white/95 flex items-center justify-between px-5 py-4 md:absolute md:top-0 md:right-0 md:left-auto md:bg-transparent md:p-5">
+          <button 
+            @click="closeModal"
+            class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-nude-100 active:bg-nude-200 transition-colors"
+            aria-label="Cerrar"
+          >
+            <!-- Flecha atrás en móvil -->
+            <svg class="w-5 h-5 text-text-dark md:hidden" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+            </svg>
+            <!-- X en desktop -->
+            <svg class="w-5 h-5 text-text-light hidden md:block" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+          <!-- Spacer para mantener el botón a la izquierda en móvil -->
+          <div class="md:hidden"></div>
+        </div>
 
-        <!-- Contenido del Modal -->
-        <div class="p-8 sm:p-10">
+        <!-- Contenido del Login -->
+        <div class="px-6 pb-10 pt-4 md:p-8 md:pt-10 lg:p-10">
           
           <!-- Logo -->
-          <div class="flex justify-center mb-8">
+          <div class="flex justify-center mb-10 md:mb-8">
             <router-link to="/" class="flex items-center gap-3">
               <img 
                 src="/logo-kharis.png" 
                 alt="Kharis Distribuidora" 
-                class="h-20 w-auto object-contain"
+                class="h-24 md:h-20 w-auto object-contain"
               />
             </router-link>
           </div>
 
           <!-- Título elegante y minimalista -->
-          <h2 class="text-center font-luxury text-2xl sm:text-3xl text-text-dark mb-3">
+          <h2 class="text-center font-luxury text-[26px] md:text-3xl text-text-dark mb-3 leading-tight">
             ¿Cómo quieres <em class="not-italic text-brand-600">iniciar sesión</em>?
           </h2>
-          <p class="text-center text-sm text-text-light mb-8">
+          <p class="text-center text-sm text-text-light mb-10 md:mb-8">
             Elige tu método preferido para continuar
           </p>
 
-          <!-- Opciones de Login - Estilo minimalista -->
+          <!-- Opciones de Login -->
           <div class="space-y-3">
             
             <!-- Google Sign-In -->
@@ -62,7 +73,7 @@
             <button 
               type="button"
               @click="showEmailForm = !showEmailForm"
-              class="w-full flex items-center justify-center gap-3 py-4 px-6 bg-white border-2 border-text-dark/10 rounded-lg hover:border-brand-500 hover:bg-nude-50/30 transition-all duration-300 group"
+              class="w-full flex items-center justify-center gap-3 py-4 px-6 bg-white border-2 border-text-dark/10 rounded-xl hover:border-brand-500 hover:bg-nude-50/30 active:scale-[0.98] transition-all duration-200 group"
             >
               <svg class="w-5 h-5 text-text-medium group-hover:text-brand-600 transition-colors" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
@@ -272,7 +283,7 @@
           </transition>
 
           <!-- Divider -->
-          <div class="my-8 border-t border-nude-200"></div>
+          <div class="my-10 md:my-8 border-t border-nude-200"></div>
 
           <!-- Toggle Login/Register -->
           <p v-if="forgotStep === 0" class="text-center text-sm text-text-medium">
@@ -299,7 +310,7 @@
 </template>
 
 <script>
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useRouter } from 'vue-router'
 import apiClient from '../services/api'
 
@@ -333,6 +344,22 @@ export default {
       newPassword: ''
     })
 
+    // ===== Bloquear scroll del body cuando el login está abierto =====
+    const lockBodyScroll = () => {
+      document.body.style.overflow = 'hidden'
+      document.body.style.position = 'fixed'
+      document.body.style.width = '100%'
+      document.body.style.top = `-${window.scrollY}px`
+    }
+    const unlockBodyScroll = () => {
+      const scrollY = document.body.style.top
+      document.body.style.overflow = ''
+      document.body.style.position = ''
+      document.body.style.width = ''
+      document.body.style.top = ''
+      window.scrollTo(0, parseInt(scrollY || '0') * -1)
+    }
+
     const loadGoogleScript = () => new Promise((resolve, reject) => {
       if (window.google?.accounts?.id) {
         resolve(true)
@@ -348,12 +375,22 @@ export default {
     })
 
     onMounted(() => {
+      // Bloquear scroll del body
+      lockBodyScroll()
+      
       handleGoogleLogin().catch(() => {
         console.log('Google Sign-In no disponible')
       })
     })
 
+    // Desbloquear scroll al desmontar
+    onUnmounted(() => {
+      unlockBodyScroll()
+    })
+
     const closeModal = () => {
+      // Desbloquear scroll antes de navegar
+      unlockBodyScroll()
       // Usar replace para evitar agregar a historial y reducir delay
       const currentPath = router.currentRoute.value.path
       if (currentPath === '/login') {
@@ -677,19 +714,59 @@ export default {
 </script>
 
 <style scoped>
-/* Modal entrance animation */
-@keyframes modalEnter {
+/* ===== Animaciones de entrada ===== */
+
+/* Móvil: Slide-up desde abajo (app-like) */
+.login-box {
+  animation: loginSlideUp 0.35s cubic-bezier(0.32, 0.72, 0, 1) forwards;
+}
+
+@keyframes loginSlideUp {
   from {
     opacity: 0;
-    transform: scale(0.95) translateY(10px);
+    transform: translateY(100%);
   }
   to {
     opacity: 1;
-    transform: scale(1) translateY(0);
+    transform: translateY(0);
   }
 }
 
-.animate-modal-enter {
-  animation: modalEnter 0.3s ease-out forwards;
+/* Desktop: Scale + fade (modal clásico) */
+@media (min-width: 768px) {
+  .login-box {
+    animation: loginModalEnter 0.3s ease-out forwards;
+  }
+  
+  @keyframes loginModalEnter {
+    from {
+      opacity: 0;
+      transform: scale(0.95) translateY(10px);
+    }
+    to {
+      opacity: 1;
+      transform: scale(1) translateY(0);
+    }
+  }
+}
+
+/* ===== Scrollbar elegante para el contenido ===== */
+.login-box::-webkit-scrollbar {
+  width: 3px;
+}
+.login-box::-webkit-scrollbar-track {
+  background: transparent;
+}
+.login-box::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.1);
+  border-radius: 3px;
+}
+
+/* ===== Safe area para dispositivos con notch ===== */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .login-box {
+    padding-top: env(safe-area-inset-top);
+    padding-bottom: env(safe-area-inset-bottom);
+  }
 }
 </style>
