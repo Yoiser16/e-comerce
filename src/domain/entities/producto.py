@@ -1,7 +1,7 @@
 """
 Entidad Producto
 """
-from typing import Optional
+from typing import Optional, List
 from uuid import UUID
 from datetime import datetime
 from decimal import Decimal
@@ -9,6 +9,7 @@ from decimal import Decimal
 from .base import EntidadBase
 from ..value_objects.dinero import Dinero
 from ..value_objects.codigo_producto import CodigoProducto
+from .producto_variante import ProductoVariante
 
 
 class Producto(EntidadBase):
@@ -45,7 +46,8 @@ class Producto(EntidadBase):
         calidad: Optional[str] = None,
         destacado: bool = False,
         disponible_b2b: bool = True,
-        porcentaje_descuento_b2b: Optional[int] = None
+        porcentaje_descuento_b2b: Optional[int] = None,
+        variantes: Optional[List[ProductoVariante]] = None
     ):
         super().__init__(id, fecha_creacion, fecha_modificacion, activo)
         self._codigo = codigo
@@ -65,6 +67,7 @@ class Producto(EntidadBase):
         self._destacado = destacado
         self._disponible_b2b = disponible_b2b
         self._porcentaje_descuento_b2b = porcentaje_descuento_b2b
+        self._variantes = variantes or []
     
     @property
     def categoria(self) -> Optional[str]:
@@ -133,6 +136,15 @@ class Producto(EntidadBase):
     @porcentaje_descuento_b2b.setter
     def porcentaje_descuento_b2b(self, valor: Optional[int]) -> None:
         self._porcentaje_descuento_b2b = valor
+        self.marcar_modificado()
+
+    @property
+    def variantes(self) -> List[ProductoVariante]:
+        return list(self._variantes)
+
+    @variantes.setter
+    def variantes(self, valor: List[ProductoVariante]) -> None:
+        self._variantes = valor or []
         self.marcar_modificado()
     
     @property

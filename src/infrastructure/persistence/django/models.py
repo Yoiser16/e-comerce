@@ -259,6 +259,44 @@ class ProductoModel(models.Model):
         return self.activo and self.stock_actual > 0
 
 
+class ProductoVarianteModel(models.Model):
+    """
+    Variante de producto por color y largo con precio y stock propios.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    producto = models.ForeignKey(ProductoModel, on_delete=models.CASCADE, related_name='variantes')
+    sku = models.CharField(max_length=80, unique=True, db_index=True)
+    color = models.CharField(max_length=50, choices=ProductoModel.COLOR_CHOICES, null=True, blank=True, db_index=True)
+    largo = models.CharField(max_length=50, choices=ProductoModel.LARGO_CHOICES, null=True, blank=True, db_index=True)
+    precio_monto = models.DecimalField(max_digits=10, decimal_places=2)
+    precio_moneda = models.CharField(max_length=3, default='COP')
+    stock_actual = models.IntegerField(default=0)
+    stock_minimo = models.IntegerField(default=0)
+    imagen_url = models.URLField(max_length=500, null=True, blank=True)
+    activo = models.BooleanField(default=True)
+    orden = models.IntegerField(default=0)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'productos_variantes'
+        verbose_name = 'Variante de Producto'
+        verbose_name_plural = 'Variantes de Producto'
+        ordering = ['orden', '-fecha_creacion']
+        indexes = [
+            models.Index(fields=['producto', 'activo']),
+            models.Index(fields=['producto', 'color']),
+            models.Index(fields=['producto', 'largo']),
+            models.Index(fields=['activo', 'stock_actual']),
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=['producto', 'color', 'largo'], name='unique_variante_por_color_largo')
+        ]
+
+    def __str__(self) -> str:
+        return f"Variante {self.sku} - {self.producto}"
+
+
 class ImagenProductoModel(models.Model):
     """
     Modelo para imágenes adicionales de productos.
@@ -426,11 +464,15 @@ class LineaOrdenModel(models.Model):
     id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
     orden = models.ForeignKey(OrdenModel, on_delete=models.CASCADE, related_name='lineas', db_index=True)
     producto = models.ForeignKey(ProductoModel, on_delete=models.PROTECT, related_name='lineas_orden', db_index=True)
+    variante_id = models.UUIDField(null=True, blank=True, db_index=True)
     cantidad = models.IntegerField()
     precio_unitario_monto = models.DecimalField(max_digits=10, decimal_places=2)
     precio_unitario_moneda = models.CharField(max_length=3)
     subtotal_monto = models.DecimalField(max_digits=12, decimal_places=2)
     subtotal_moneda = models.CharField(max_length=3)
+    variante_sku = models.CharField(max_length=80, blank=True, default='')
+    color_snapshot = models.CharField(max_length=50, blank=True, default='')
+    largo_snapshot = models.CharField(max_length=50, blank=True, default='')
 
     class Meta:
         db_table = 'lineas_orden'
@@ -666,12 +708,16 @@ class ItemCarritoModel(models.Model):
     
     # Referencia al producto
     producto_id = models.UUIDField(db_index=True)
+    variante_id = models.UUIDField(null=True, blank=True, db_index=True)
     
     # Snapshots (nunca se actualizan desde catálogo automáticamente)
     sku_snapshot = models.CharField(max_length=50)
     nombre_snapshot = models.CharField(max_length=200)
     precio_unitario_monto = models.DecimalField(max_digits=10, decimal_places=2)
     precio_unitario_moneda = models.CharField(max_length=3, default='USD')
+    variante_sku = models.CharField(max_length=80, blank=True, default='')
+    color_snapshot = models.CharField(max_length=50, blank=True, default='')
+    largo_snapshot = models.CharField(max_length=50, blank=True, default='')
     
     # Cantidad
     cantidad = models.PositiveIntegerField(default=1)
@@ -692,8 +738,8 @@ class ItemCarritoModel(models.Model):
         constraints = [
             # No duplicar productos en el mismo carrito
             models.UniqueConstraint(
-                fields=['carrito', 'producto_id'],
-                name='unique_producto_por_carrito'
+                fields=['carrito', 'variante_id'],
+                name='unique_variante_por_carrito'
             ),
         ]
     

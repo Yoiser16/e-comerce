@@ -143,7 +143,7 @@ class CarritoRepositoryDjango(CarritoRepository):
         """
         Bloquea un carrito para checkout usando SELECT FOR UPDATE y reserva stock temporalmente.
         """
-        from infrastructure.persistence.django.models import ProductoModel, ItemCarritoModel
+        from infrastructure.persistence.django.models import ProductoModel, ItemCarritoModel, ProductoVarianteModel
         try:
             modelo = CarritoModel.objects.select_for_update(nowait=True).get(
                 id=carrito_id,
@@ -154,13 +154,21 @@ class CarritoRepositoryDjango(CarritoRepository):
                 raise ConcurrenciaConflicto(
                     f"El carrito fue modificado. Versión esperada: {version}, actual: {modelo.version}"
                 )
-            # Reservar stock de cada producto
+            # Reservar stock de cada producto/variante
             for item in ItemCarritoModel.objects.filter(carrito_id=carrito_id):
-                producto = ProductoModel.objects.select_for_update().get(id=item.producto_id)
-                if producto.stock_actual < item.cantidad:
-                    raise ConcurrenciaConflicto(f"Stock insuficiente para {producto.nombre}")
-                producto.stock_actual -= item.cantidad
-                producto.save(update_fields=["stock_actual"])
+                if item.variante_id:
+                    variante = ProductoVarianteModel.objects.select_for_update().get(id=item.variante_id)
+                    if variante.stock_actual < item.cantidad:
+                        raise ConcurrenciaConflicto(f"Stock insuficiente para variante {variante.sku}")
+                    variante.stock_actual -= item.cantidad
+                    variante.save(update_fields=["stock_actual"])
+                    ProductoModel.objects.filter(id=item.producto_id).update(stock_actual=F('stock_actual') - item.cantidad)
+                else:
+                    producto = ProductoModel.objects.select_for_update().get(id=item.producto_id)
+                    if producto.stock_actual < item.cantidad:
+                        raise ConcurrenciaConflicto(f"Stock insuficiente para {producto.nombre}")
+                    producto.stock_actual -= item.cantidad
+                    producto.save(update_fields=["stock_actual"])
             # Bloquear carrito
             modelo.estado = 'BLOQUEADO'
             modelo.fecha_bloqueo = datetime.now()
@@ -176,12 +184,18 @@ class CarritoRepositoryDjango(CarritoRepository):
         """
         Libera el stock reservado de un carrito expirado.
         """
-        from infrastructure.persistence.django.models import ProductoModel, ItemCarritoModel
+        from infrastructure.persistence.django.models import ProductoModel, ItemCarritoModel, ProductoVarianteModel
         items = ItemCarritoModel.objects.filter(carrito_id=carrito_id)
         for item in items:
-            producto = ProductoModel.objects.select_for_update().get(id=item.producto_id)
-            producto.stock_actual += item.cantidad
-            producto.save(update_fields=["stock_actual"])
+            if item.variante_id:
+                variante = ProductoVarianteModel.objects.select_for_update().get(id=item.variante_id)
+                variante.stock_actual += item.cantidad
+                variante.save(update_fields=["stock_actual"])
+                ProductoModel.objects.filter(id=item.producto_id).update(stock_actual=F('stock_actual') + item.cantidad)
+            else:
+                producto = ProductoModel.objects.select_for_update().get(id=item.producto_id)
+                producto.stock_actual += item.cantidad
+                producto.save(update_fields=["stock_actual"])
     
     def obtener_carritos_expirados(self, fecha_limite: datetime) -> List[Carrito]:
         """Obtiene carritos que deberían expirar."""
@@ -263,44 +277,64 @@ class CarritoRepositoryDjango(CarritoRepository):
     
     def _item_modelo_a_vo(self, modelo: ItemCarritoModel) -> ItemCarrito:
         """Convierte un modelo de item ORM a un Value Object."""
+        variante_id = modelo.variante_id or modelo.producto_id
         return ItemCarrito(
             producto_id=modelo.producto_id,
+            variante_id=variante_id,
             sku=modelo.sku_snapshot,
             nombre_snapshot=modelo.nombre_snapshot,
             precio_unitario_snapshot=Dinero(
                 monto=modelo.precio_unitario_monto,
                 moneda=modelo.precio_unitario_moneda
             ),
-            cantidad=modelo.cantidad
+            cantidad=modelo.cantidad,
+            variante_sku=modelo.variante_sku,
+            color_snapshot=modelo.color_snapshot,
+            largo_snapshot=modelo.largo_snapshot
         )
     
     def _sincronizar_items(self, carrito: Carrito) -> None:
         """Sincroniza los items del carrito con la base de datos."""
-        items_actuales = {item.producto_id: item for item in carrito.items}
+        def _key(item: ItemCarrito) -> UUID:
+            return item.variante_id or item.producto_id
+
+        def _key_db(item: ItemCarritoModel) -> UUID:
+            return item.variante_id or item.producto_id
+
+        items_actuales = { _key(item): item for item in carrito.items }
         items_db = {
-            im.producto_id: im 
+            _key_db(im): im
             for im in ItemCarritoModel.objects.filter(carrito_id=carrito.id)
         }
         
         # Eliminar items que ya no están
-        productos_a_eliminar = set(items_db.keys()) - set(items_actuales.keys())
-        if productos_a_eliminar:
+        items_a_eliminar = set(items_db.keys()) - set(items_actuales.keys())
+        for item_key in items_a_eliminar:
             ItemCarritoModel.objects.filter(
                 carrito_id=carrito.id,
-                producto_id__in=productos_a_eliminar
+                variante_id=item_key
+            ).delete()
+            ItemCarritoModel.objects.filter(
+                carrito_id=carrito.id,
+                variante_id__isnull=True,
+                producto_id=item_key
             ).delete()
         
         # Actualizar o crear items
-        for producto_id, item in items_actuales.items():
-            if producto_id in items_db:
+        for item_key, item in items_actuales.items():
+            if item_key in items_db:
                 # Actualizar
-                ItemCarritoModel.objects.filter(
-                    carrito_id=carrito.id,
-                    producto_id=producto_id
-                ).update(
-                    cantidad=item.cantidad,
+                ItemCarritoModel.objects.filter(id=items_db[item_key].id).update(
+                    producto_id=item.producto_id,
+                    variante_id=item.variante_id,
+                    sku_snapshot=item.sku,
+                    nombre_snapshot=item.nombre_snapshot,
                     precio_unitario_monto=item.precio_unitario_snapshot.monto,
                     precio_unitario_moneda=item.precio_unitario_snapshot.moneda,
+                    variante_sku=item.variante_sku,
+                    color_snapshot=item.color_snapshot,
+                    largo_snapshot=item.largo_snapshot,
+                    cantidad=item.cantidad,
                     subtotal_monto=item.subtotal.monto,
                     subtotal_moneda=item.subtotal.moneda,
                 )
@@ -313,10 +347,14 @@ class CarritoRepositoryDjango(CarritoRepository):
         ItemCarritoModel.objects.create(
             carrito_id=carrito_id,
             producto_id=item.producto_id,
+            variante_id=item.variante_id,
             sku_snapshot=item.sku,
             nombre_snapshot=item.nombre_snapshot,
             precio_unitario_monto=item.precio_unitario_snapshot.monto,
             precio_unitario_moneda=item.precio_unitario_snapshot.moneda,
+            variante_sku=item.variante_sku,
+            color_snapshot=item.color_snapshot,
+            largo_snapshot=item.largo_snapshot,
             cantidad=item.cantidad,
             subtotal_monto=item.subtotal.monto,
             subtotal_moneda=item.subtotal.moneda,

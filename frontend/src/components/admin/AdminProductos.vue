@@ -248,19 +248,14 @@
               <!-- Stock - INDICADORES VISUALES DE SALUD -->
               <td class="px-6 py-4">
                 <div class="flex items-center gap-2">
-                  <!-- Stock Alto (>20): Verde -->
-                  <template v-if="producto.stock_actual > 20">
+                  <template v-if="getTotalStock(producto) > 20">
                     <div class="w-2 h-2 bg-green-500 rounded-full"></div>
-                    <span class="text-green-700 font-medium text-sm tabular-nums">{{ producto.stock_actual }}</span>
+                    <span class="text-green-700 font-medium text-sm tabular-nums">{{ getTotalStock(producto) }}</span>
                   </template>
-                  
-                  <!-- Stock Bajo (1-20): Naranja -->
-                  <template v-else-if="producto.stock_actual > 0 && producto.stock_actual <= 20">
+                  <template v-else-if="getTotalStock(producto) > 0 && getTotalStock(producto) <= 20">
                     <div class="w-2 h-2 bg-orange-500 rounded-full"></div>
-                    <span class="text-orange-700 font-medium text-sm tabular-nums">{{ producto.stock_actual }}</span>
+                    <span class="text-orange-700 font-medium text-sm tabular-nums">{{ getTotalStock(producto) }}</span>
                   </template>
-                  
-                  <!-- Sin Stock (0): Rojo -->
                   <template v-else>
                     <span class="px-2.5 py-1 bg-red-50 text-red-700 text-xs font-medium rounded-md">Sin Stock</span>
                   </template>
@@ -706,13 +701,13 @@ export default {
         })
       }
 
-      // Stock filter
+      // Stock filter (base + variantes)
       if (filterStock.value === 'available') {
-        result = result.filter(p => p.stock_actual > p.stock_minimo)
+        result = result.filter(p => getTotalStock(p) > getTotalStockMin(p))
       } else if (filterStock.value === 'low') {
-        result = result.filter(p => p.stock_actual > 0 && p.stock_actual <= p.stock_minimo)
+        result = result.filter(p => getTotalStock(p) > 0 && getTotalStock(p) <= getTotalStockMin(p))
       } else if (filterStock.value === 'out') {
-        result = result.filter(p => p.stock_actual === 0)
+        result = result.filter(p => getTotalStock(p) === 0)
       }
 
       return result
@@ -741,6 +736,24 @@ export default {
 
     const formatNumber = (num) => {
       return new Intl.NumberFormat('es-CO').format(num)
+    }
+
+    const getTotalStock = (producto) => {
+      const base = Number(producto?.stock_actual ?? 0)
+      const variantes = Array.isArray(producto?.variantes)
+        ? producto.variantes.filter((v) => v?.color || v?.largo)
+        : []
+      const variantesStock = variantes.reduce((sum, v) => sum + Number(v?.stock_actual ?? 0), 0)
+      return base + variantesStock
+    }
+
+    const getTotalStockMin = (producto) => {
+      const base = Number(producto?.stock_minimo ?? 0)
+      const variantes = Array.isArray(producto?.variantes)
+        ? producto.variantes.filter((v) => v?.color || v?.largo)
+        : []
+      const variantesMin = variantes.reduce((sum, v) => sum + Number(v?.stock_minimo ?? 0), 0)
+      return base + variantesMin
     }
 
     const getStockClass = (stock, stockMinimo) => {
@@ -1125,6 +1138,8 @@ export default {
       productosActivos,
       productosInactivos,
       formatNumber,
+      getTotalStock,
+      getTotalStockMin,
       getStockClass,
       getCategoryLabel,
       handleImageError,

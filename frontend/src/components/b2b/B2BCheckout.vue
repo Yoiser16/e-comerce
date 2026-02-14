@@ -958,6 +958,10 @@ export default {
         // 1. Validar stock antes de proceder
         const stockItems = cartItems.value.map(item => ({
           producto_id: item.id || item.producto_id,
+          variante_id: item.variante_id || null,
+          variante_sku: item.variante_sku || '',
+          color: item.color || '',
+          largo: item.largo || '',
           cantidad: item.cantidad || item.quantity || 1,
           precio_unitario: item.precio || item.wholesalePrice || 0,
           nombre: item.nombre || item.name
@@ -1015,7 +1019,12 @@ export default {
             const name = item.nombre || item.name
             const qty = item.cantidad || item.quantity
             const price = item.precio || item.wholesalePrice
-            return `• ${name} x${qty} = $${formatPrice(price * qty)}`
+            const detalles = [
+              item.color ? `Color: ${item.color}` : '',
+              item.largo ? `Largo: ${item.largo}` : ''
+            ].filter(Boolean).join(' · ')
+            const sufijo = detalles ? ` (${detalles})` : ''
+            return `• ${name}${sufijo} x${qty} = $${formatPrice(price * qty)}`
           }).join('%0A')
 
           const direccionCompleta = [
@@ -1060,6 +1069,10 @@ export default {
             reference,
             items: cartItems.value.map(item => ({
               id: item.id || item.producto_id,
+              variante_id: item.variante_id || null,
+              variante_sku: item.variante_sku || '',
+              color: item.color || '',
+              largo: item.largo || '',
               nombre: item.nombre || item.name,
               cantidad: item.cantidad || item.quantity || 1,
               precio: item.precio || item.wholesalePrice || 0

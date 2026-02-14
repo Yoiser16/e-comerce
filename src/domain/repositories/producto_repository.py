@@ -129,3 +129,13 @@ class ProductoRepository(RepositorioBase[Producto]):
     def eliminar_permanentemente(self, id: Any) -> None:
         """Elimina permanentemente un producto de la base de datos (hard delete)"""
         pass
+
+    @abstractmethod
+    def obtener_variante_por_id(self, variante_id: Any) -> Optional[dict]:
+        """Obtiene una variante por ID"""
+        pass
+
+    @abstractmethod
+    def listar_variantes_producto(self, producto_id: Any) -> List[dict]:
+        """Lista variantes de un producto"""
+        pass

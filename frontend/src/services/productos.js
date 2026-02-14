@@ -116,6 +116,9 @@ export const authService = {
 }
 
 export const carritoService = {
+  _getCarritoId() {
+    return localStorage.getItem('kharis_cart_id')
+  },
   // Obtener carrito
   async getCarrito() {
     const response = await apiClient.get('/carrito')
@@ -123,31 +126,50 @@ export const carritoService = {
   },
 
   // Agregar producto
-  async agregarProducto(productoId, cantidad = 1) {
+  async agregarProducto(productoId, varianteId, cantidad = 1) {
+    if (!varianteId) {
+      throw new Error('variante_id es requerido para agregar al carrito')
+    }
     const response = await apiClient.post('/carrito/items', {
       producto_id: productoId,
+      variante_id: varianteId,
       cantidad
     })
     return response.data
   },
 
   // Actualizar cantidad
-  async actualizarCantidad(productoId, cantidad) {
-    const response = await apiClient.patch(`/carrito/items/${productoId}`, {
-      cantidad
+  async actualizarCantidad(productoId, varianteId, cantidad, carritoId = null) {
+    if (!varianteId) {
+      throw new Error('variante_id es requerido para actualizar el carrito')
+    }
+    const response = await apiClient.patch(`/carrito/items/${productoId}`, null, {
+      params: {
+        carrito_id: carritoId || this._getCarritoId(),
+        variante_id: varianteId,
+        nueva_cantidad: cantidad
+      }
     })
     return response.data
   },
 
   // Quitar producto
-  async quitarProducto(productoId) {
-    const response = await apiClient.delete(`/carrito/items/${productoId}`)
+  async quitarProducto(productoId, varianteId, carritoId = null) {
+    if (!varianteId) {
+      throw new Error('variante_id es requerido para quitar del carrito')
+    }
+    const response = await apiClient.delete(`/carrito/items/${productoId}`, {
+      params: {
+        carrito_id: carritoId || this._getCarritoId(),
+        variante_id: varianteId
+      }
+    })
     return response.data
   },
 
   // Alias para eliminar producto (mismo que quitar)
-  async eliminarProducto(productoId) {
-    return this.quitarProducto(productoId)
+  async eliminarProducto(productoId, varianteId, carritoId = null) {
+    return this.quitarProducto(productoId, varianteId, carritoId)
   },
 
   // Resumen del carrito (para el badge)

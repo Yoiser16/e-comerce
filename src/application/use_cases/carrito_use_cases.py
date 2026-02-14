@@ -127,28 +127,36 @@ class AgregarProductoAlCarritoUseCase(CasoUsoBase[AgregarProductoAlCarritoActivo
         if not carrito:
             carrito = Carrito(usuario_id=request.usuario_id)
         
-        # Obtener producto
+        # Obtener producto y variante
         producto = self._producto_repo.obtener_por_id(request.producto_id)
         if not producto:
             raise EntidadNoEncontrada(f"Producto {request.producto_id} no encontrado")
+
+        variante = self._producto_repo.obtener_variante_por_id(request.variante_id)
+        if not variante or str(variante['producto_id']) != str(request.producto_id):
+            raise EntidadNoEncontrada("Variante no encontrada para este producto")
         
         # Validar disponibilidad
         if not producto.disponible:
             raise ReglaNegocioViolada(f"El producto '{producto.nombre}' no está disponible")
         
         # Validar stock suficiente
-        if producto.stock_actual < request.cantidad:
+        if variante['stock_actual'] < request.cantidad:
             raise ReglaNegocioViolada(
-                f"Stock insuficiente. Disponible: {producto.stock_actual}, Solicitado: {request.cantidad}"
+                f"Stock insuficiente. Disponible: {variante['stock_actual']}, Solicitado: {request.cantidad}"
             )
         
         # Crear item con snapshot del producto
         item = ItemCarrito(
             producto_id=producto.id,
+            variante_id=request.variante_id,
             sku=producto.codigo.valor,
             nombre_snapshot=producto.nombre,
-            precio_unitario_snapshot=producto.precio,
-            cantidad=request.cantidad
+            precio_unitario_snapshot=Dinero(variante['precio_monto'], variante['precio_moneda']),
+            cantidad=request.cantidad,
+            variante_sku=variante.get('sku') or '',
+            color_snapshot=variante.get('color') or '',
+            largo_snapshot=variante.get('largo') or ''
         )
         
         # Agregar al carrito
@@ -186,7 +194,7 @@ class QuitarProductoDelCarritoUseCase(CasoUsoBase[QuitarProductoDTO, OperacionCa
             raise ReglaNegocioViolada("No tienes permiso para modificar este carrito")
         
         # Quitar producto
-        item_eliminado = carrito.quitar_producto(request.producto_id)
+        item_eliminado = carrito.quitar_producto(request.variante_id)
         
         # Guardar
         carrito_guardado = self._repo.guardar(carrito)
@@ -228,14 +236,14 @@ class ActualizarCantidadProductoUseCase(CasoUsoBase[ActualizarCantidadDTO, Opera
             raise ReglaNegocioViolada("No tienes permiso para modificar este carrito")
         
         # Validar stock disponible
-        producto = self._producto_repo.obtener_por_id(request.producto_id)
-        if producto and producto.stock_actual < request.nueva_cantidad:
+        variante = self._producto_repo.obtener_variante_por_id(request.variante_id)
+        if variante and variante['stock_actual'] < request.nueva_cantidad:
             raise ReglaNegocioViolada(
-                f"Stock insuficiente. Disponible: {producto.stock_actual}"
+                f"Stock insuficiente. Disponible: {variante['stock_actual']}"
             )
         
         # Actualizar cantidad
-        carrito.actualizar_cantidad(request.producto_id, request.nueva_cantidad)
+        carrito.actualizar_cantidad(request.variante_id, request.nueva_cantidad)
         
         # Guardar
         carrito_guardado = self._carrito_repo.guardar(carrito)
@@ -274,14 +282,20 @@ class RecalcularCarritoUseCase(CasoUsoBase[UUID, CarritoDTO]):
         if carrito.usuario_id != usuario_id:
             raise ReglaNegocioViolada("No tienes permiso para acceder a este carrito")
         
-        # Sincronizar precios con catálogo
+        # Sincronizar precios con catálogo (por variante)
         cambios_precio = []
         for item in carrito.items:
-            producto = self._producto_repo.obtener_por_id(item.producto_id)
-            if producto and producto.precio.monto != item.precio_unitario_snapshot.monto:
+            variante = self._producto_repo.obtener_variante_por_id(item.variante_id)
+            if not variante:
+                continue
+            precio_actual = Dinero(variante['precio_monto'], variante['precio_moneda'])
+            if (
+                precio_actual.monto != item.precio_unitario_snapshot.monto
+                or precio_actual.moneda != item.precio_unitario_snapshot.moneda
+            ):
                 diferencia = carrito.actualizar_precio_producto(
-                    item.producto_id,
-                    producto.precio
+                    item.variante_id,
+                    precio_actual
                 )
                 cambios_precio.append((item.nombre_snapshot, diferencia))
         

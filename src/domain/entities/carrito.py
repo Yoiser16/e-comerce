@@ -203,7 +203,7 @@ class Carrito(EntidadBase):
         
         Reglas:
         - Solo en estados que permiten modificación
-        - No permite duplicados (por producto_id)
+        - No permite duplicados (por variante_id)
         - Cantidad debe ser > 0 (validado en ItemCarrito)
         
         Args:
@@ -214,19 +214,19 @@ class Carrito(EntidadBase):
             ReglaNegocioViolada: Si el producto ya existe en el carrito
         """
         self._validar_permite_modificaciones()
-        self._validar_producto_no_duplicado(item.producto_id)
+        self._validar_producto_no_duplicado(item.variante_id)
         
         self._items.append(item)
         self._activar_si_creado()
         self._incrementar_version()
         self.marcar_modificado()
     
-    def quitar_producto(self, producto_id: UUID) -> ItemCarrito:
+    def quitar_producto(self, variante_id: UUID) -> ItemCarrito:
         """
         Elimina un producto del carrito.
         
         Args:
-            producto_id: ID del producto a eliminar
+            variante_id: ID de la variante a eliminar
             
         Returns:
             ItemCarrito eliminado
@@ -237,10 +237,10 @@ class Carrito(EntidadBase):
         """
         self._validar_permite_modificaciones()
         
-        item_a_eliminar = self._buscar_item(producto_id)
+        item_a_eliminar = self._buscar_item(variante_id)
         if not item_a_eliminar:
             raise ReglaNegocioViolada(
-                f"El producto {producto_id} no existe en el carrito"
+                f"La variante {variante_id} no existe en el carrito"
             )
         
         self._items.remove(item_a_eliminar)
@@ -249,12 +249,12 @@ class Carrito(EntidadBase):
         
         return item_a_eliminar
     
-    def actualizar_cantidad(self, producto_id: UUID, nueva_cantidad: int) -> None:
+    def actualizar_cantidad(self, variante_id: UUID, nueva_cantidad: int) -> None:
         """
         Actualiza la cantidad de un producto en el carrito.
         
         Args:
-            producto_id: ID del producto
+            variante_id: ID de la variante
             nueva_cantidad: Nueva cantidad (debe ser > 0)
             
         Raises:
@@ -269,10 +269,10 @@ class Carrito(EntidadBase):
                 f"La cantidad debe ser mayor a 0. Recibido: {nueva_cantidad}"
             )
         
-        item_existente = self._buscar_item(producto_id)
+        item_existente = self._buscar_item(variante_id)
         if not item_existente:
             raise ReglaNegocioViolada(
-                f"El producto {producto_id} no existe en el carrito"
+                f"La variante {variante_id} no existe en el carrito"
             )
         
         # Crear nuevo item con cantidad actualizada (inmutabilidad)
@@ -285,7 +285,7 @@ class Carrito(EntidadBase):
         self._incrementar_version()
         self.marcar_modificado()
     
-    def actualizar_precio_producto(self, producto_id: UUID, nuevo_precio: Dinero) -> Decimal:
+    def actualizar_precio_producto(self, variante_id: UUID, nuevo_precio: Dinero) -> Decimal:
         """
         Actualiza el precio de un producto (por sincronización con catálogo).
         
@@ -294,10 +294,10 @@ class Carrito(EntidadBase):
         """
         self._validar_permite_modificaciones()
         
-        item_existente = self._buscar_item(producto_id)
+        item_existente = self._buscar_item(variante_id)
         if not item_existente:
             raise ReglaNegocioViolada(
-                f"El producto {producto_id} no existe en el carrito"
+                f"La variante {variante_id} no existe en el carrito"
             )
         
         precio_anterior = item_existente.precio_unitario_snapshot.monto
@@ -413,25 +413,25 @@ class Carrito(EntidadBase):
             )
     
     def _validar_no_duplicados(self) -> None:
-        """Valida que no haya productos duplicados"""
-        productos_ids = [item.producto_id for item in self._items]
-        if len(productos_ids) != len(set(productos_ids)):
+        """Valida que no haya variantes duplicadas"""
+        variantes_ids = [item.variante_id for item in self._items]
+        if len(variantes_ids) != len(set(variantes_ids)):
             raise ReglaNegocioViolada(
-                "No se permiten productos duplicados en el carrito"
+                "No se permiten variantes duplicadas en el carrito"
             )
     
-    def _validar_producto_no_duplicado(self, producto_id: UUID) -> None:
-        """Valida que un producto no exista ya en el carrito"""
-        if self._buscar_item(producto_id):
+    def _validar_producto_no_duplicado(self, variante_id: UUID) -> None:
+        """Valida que una variante no exista ya en el carrito"""
+        if self._buscar_item(variante_id):
             raise ReglaNegocioViolada(
-                f"El producto {producto_id} ya existe en el carrito. "
+                f"La variante {variante_id} ya existe en el carrito. "
                 "Use actualizar_cantidad para modificar."
             )
     
-    def _buscar_item(self, producto_id: UUID) -> Optional[ItemCarrito]:
-        """Busca un item por producto_id"""
+    def _buscar_item(self, variante_id: UUID) -> Optional[ItemCarrito]:
+        """Busca un item por variante_id"""
         for item in self._items:
-            if item.producto_id == producto_id:
+            if item.variante_id == variante_id:
                 return item
         return None
     

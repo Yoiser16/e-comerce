@@ -47,7 +47,8 @@ class CrearProductoUseCase(CasoUsoBase[CrearProductoDTO, ProductoDTO]):
             'calidad': request.calidad,
             'destacado': request.destacado,
             'disponible_b2b': request.disponible_b2b,
-            'porcentaje_descuento_b2b': request.porcentaje_descuento_b2b
+            'porcentaje_descuento_b2b': request.porcentaje_descuento_b2b,
+            'variantes': request.variantes
         }
         
         guardado = self._repo.guardar(
@@ -146,6 +147,8 @@ class ActualizarProductoUseCase(CasoUsoBase[ActualizarProductoDTO, ProductoDTO])
             atributos_adicionales['disponible_b2b'] = request.disponible_b2b
         if request.porcentaje_descuento_b2b is not None:
             atributos_adicionales['porcentaje_descuento_b2b'] = request.porcentaje_descuento_b2b
+        if request.variantes is not None:
+            atributos_adicionales['variantes'] = request.variantes
         
         # Guardar y pasar la categoría y atributos adicionales al repositorio
         guardado = self._repo.guardar(

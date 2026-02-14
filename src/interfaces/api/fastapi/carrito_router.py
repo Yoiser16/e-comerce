@@ -67,6 +67,7 @@ router = APIRouter(prefix="/api/v1/carrito", tags=["carrito"])
 class AgregarProductoRequest(BaseModel):
     """Request body para agregar producto al carrito"""
     producto_id: UUID
+    variante_id: UUID
     cantidad: int = 1
 
 
@@ -159,6 +160,7 @@ def agregar_producto_al_carrito(
         datos = AgregarProductoAlCarritoActivoDTO(
             usuario_id=usuario_id,
             producto_id=request.producto_id,
+            variante_id=request.variante_id,
             cantidad=request.cantidad
         )
         
@@ -178,6 +180,7 @@ def agregar_producto_al_carrito(
 def quitar_producto_del_carrito(
     producto_id: UUID,
     carrito_id: UUID,
+    variante_id: UUID,
     usuario_id: UUID = Depends(get_current_user_id),
     repo: CarritoRepository = Depends(get_carrito_repository)
 ):
@@ -185,7 +188,11 @@ def quitar_producto_del_carrito(
     Quita un producto del carrito.
     """
     try:
-        request = QuitarProductoDTO(carrito_id=carrito_id, producto_id=producto_id)
+        request = QuitarProductoDTO(
+            carrito_id=carrito_id,
+            producto_id=producto_id,
+            variante_id=variante_id
+        )
         use_case = QuitarProductoDelCarritoUseCase(repo)
         return use_case.ejecutar(request, usuario_id)
     except EntidadNoEncontrada as e:
@@ -200,6 +207,7 @@ def quitar_producto_del_carrito(
 def actualizar_cantidad_producto(
     producto_id: UUID,
     carrito_id: UUID,
+    variante_id: UUID,
     nueva_cantidad: int,
     usuario_id: UUID = Depends(get_current_user_id),
     carrito_repo: CarritoRepository = Depends(get_carrito_repository),
@@ -215,6 +223,7 @@ def actualizar_cantidad_producto(
         request = ActualizarCantidadDTO(
             carrito_id=carrito_id,
             producto_id=producto_id,
+            variante_id=variante_id,
             nueva_cantidad=nueva_cantidad
         )
         use_case = ActualizarCantidadProductoUseCase(carrito_repo, producto_repo)

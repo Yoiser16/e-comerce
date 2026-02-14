@@ -1267,6 +1267,11 @@
                 </div>
                 <div class="flex-1">
                   <h3 class="text-sm font-medium text-text-dark line-clamp-2">{{ item.nombre }}</h3>
+                  <p v-if="item.color || item.largo" class="text-[11px] text-text-light mt-1">
+                    <span v-if="item.color">Color: {{ formatColorLabel(item.color) }}</span>
+                    <span v-if="item.color && item.largo"> · </span>
+                    <span v-if="item.largo">Largo: {{ item.largo }}</span>
+                  </p>
                   <p class="text-xs text-text-medium mt-1">Cantidad: {{ item.cantidad }}</p>
                   <p class="text-sm font-semibold text-text-dark mt-2">{{ formatearPrecio((item.precio_unitario || item.precio_monto || 0) * item.cantidad) }}</p>
                 </div>
@@ -1342,6 +1347,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
 import { authService, carritoService as carritoServiceImport } from '../services/productos'
+import { formatColorLabel } from '@/utils/colorLabels'
 
 const router = useRouter()
 const route = useRoute()
@@ -1572,9 +1578,11 @@ const loadCartFromLocal = () => {
       const normalized = Array.isArray(rawItems) ? rawItems : []
       carritoItems.value = normalized.map((item) => {
         const productoId = item?.producto_id ?? item?.id
+        const varianteId = item?.variante_id ?? productoId
         return {
           ...item,
           producto_id: productoId,
+          variante_id: varianteId,
           id: productoId,
           precio_unitario: item?.precio_unitario ?? item?.precio_monto ?? item?.precio ?? 0
         }
@@ -1790,23 +1798,41 @@ const isInWishlist = (productId) => {
 }
 
 // Add to Cart
+const getDefaultVariante = (producto) => {
+  const variantes = Array.isArray(producto?.variantes) ? producto.variantes : []
+  return variantes.find(v => v.activo !== false && (v.stock_actual ?? 0) > 0) || variantes[0] || null
+}
+
 const addToCart = (producto) => {
   // Cargar carrito actual
   loadCartFromLocal()
+
+  const varianteSeleccionada = getDefaultVariante(producto)
+  if (!varianteSeleccionada) {
+    showToastMessage('Este producto no tiene variantes disponibles')
+    return
+  }
+  const precioUnitario = Number(
+    varianteSeleccionada.precio_monto ?? producto.precio_monto ?? producto.precio ?? 0
+  )
   
-  const existingIdx = carritoItems.value.findIndex(item => (item.producto_id ?? item.id) === producto.id)
+  const existingIdx = carritoItems.value.findIndex(item => (item.variante_id || item.producto_id || item.id) === varianteSeleccionada.id)
   
   if (existingIdx > -1) {
     carritoItems.value[existingIdx].cantidad += 1
   } else {
     carritoItems.value.push({
       producto_id: producto.id,
+      variante_id: varianteSeleccionada.id,
       id: producto.id,
       nombre: producto.nombre,
-      precio_monto: producto.precio_monto,
-      precio_unitario: producto.precio_monto,
+      variante_sku: varianteSeleccionada.sku || '',
+      color: varianteSeleccionada.color || '',
+      largo: varianteSeleccionada.largo || '',
+      precio_monto: precioUnitario,
+      precio_unitario: precioUnitario,
       cantidad: 1,
-      imagen_url: producto.imagen_principal
+      imagen_url: varianteSeleccionada.imagen_url || producto.imagen_principal
     })
   }
   

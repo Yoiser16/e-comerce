@@ -20,7 +20,7 @@ import random
 import django
 django.setup()
 
-from infrastructure.persistence.django.models import OrdenModel, LineaOrdenModel, ClienteModel, ProductoModel
+from infrastructure.persistence.django.models import OrdenModel, LineaOrdenModel, ClienteModel, ProductoModel, ProductoVarianteModel
 from infrastructure.notifications.email_service import send_order_status_email
 from interfaces.api.fastapi.dependencies import get_current_user_email
 
@@ -34,6 +34,10 @@ router = APIRouter(prefix="/api/v1/ordenes", tags=["ordenes"])
 
 class LineaOrdenInput(BaseModel):
     producto_id: Optional[str] = None
+    variante_id: Optional[str] = None
+    variante_sku: Optional[str] = None
+    color: Optional[str] = None
+    largo: Optional[str] = None
     cantidad: int
     precio_unitario: float
     nombre: Optional[str] = None
@@ -272,6 +276,38 @@ def _validar_stock_sync(items: List[LineaOrdenInput]) -> dict:
     todos_disponibles = True
     
     for item in items:
+        if item.variante_id:
+            try:
+                variante = ProductoVarianteModel.objects.select_related('producto').get(id=item.variante_id)
+                if item.producto_id and str(variante.producto_id) != str(item.producto_id):
+                    raise ProductoVarianteModel.DoesNotExist
+                disponible = variante.stock_actual >= item.cantidad
+                todos_disponibles = todos_disponibles and disponible
+
+                productos_info.append({
+                    'producto_id': str(variante.producto_id),
+                    'variante_id': str(variante.id),
+                    'nombre': variante.producto.nombre,
+                    'color': variante.color,
+                    'largo': variante.largo,
+                    'stock_solicitado': item.cantidad,
+                    'stock_disponible': variante.stock_actual,
+                    'disponible': disponible,
+                    'mensaje': 'Stock disponible' if disponible else f'Solo hay {variante.stock_actual} disponibles'
+                })
+            except ProductoVarianteModel.DoesNotExist:
+                productos_info.append({
+                    'producto_id': item.producto_id or '',
+                    'variante_id': item.variante_id,
+                    'nombre': item.nombre or 'Producto desconocido',
+                    'stock_solicitado': item.cantidad,
+                    'stock_disponible': 0,
+                    'disponible': False,
+                    'mensaje': 'Variante no encontrada'
+                })
+                todos_disponibles = False
+            continue
+
         if item.producto_id and item.producto_id != '00000000-0000-0000-0000-000000000000':
             try:
                 producto = ProductoModel.objects.get(id=item.producto_id)
@@ -312,6 +348,20 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
     with transaction.atomic():
         # 0. VALIDAR STOCK PRIMERO (con bloqueo pesimista)
         for item in data.items:
+            if item.variante_id:
+                try:
+                    variante = ProductoVarianteModel.objects.select_for_update().select_related('producto').get(id=item.variante_id)
+                    if item.producto_id and str(variante.producto_id) != str(item.producto_id):
+                        raise Exception("Variante no corresponde al producto solicitado")
+                    if variante.stock_actual < item.cantidad:
+                        raise Exception(
+                            f"Stock insuficiente para variante {variante.sku}. "
+                            f"Disponible: {variante.stock_actual}, Solicitado: {item.cantidad}"
+                        )
+                except ProductoVarianteModel.DoesNotExist:
+                    raise Exception(f"Variante no encontrada: {item.variante_id}")
+                continue
+
             if item.producto_id and item.producto_id != '00000000-0000-0000-0000-000000000000':
                 try:
                     producto = ProductoModel.objects.select_for_update().get(id=item.producto_id)
@@ -406,10 +456,20 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
     items_response = []
     for item in data.items:
         producto = None
+        variante = None
         producto_nombre = item.nombre or 'Producto'
         
+        if item.variante_id:
+            try:
+                variante = ProductoVarianteModel.objects.select_related('producto').get(id=item.variante_id)
+                producto = variante.producto
+                producto_nombre = producto.nombre
+            except (ProductoVarianteModel.DoesNotExist, Exception):
+                variante = None
+                producto = None
+
         # Intentar buscar el producto si hay producto_id válido
-        if item.producto_id and item.producto_id != '00000000-0000-0000-0000-000000000000':
+        if not producto and item.producto_id and item.producto_id != '00000000-0000-0000-0000-000000000000':
             try:
                 producto = ProductoModel.objects.get(id=item.producto_id)
                 producto_nombre = producto.nombre
@@ -424,27 +484,46 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
                 id=uuid4(),
                 orden=orden,
                 producto=producto,
+                variante_id=item.variante_id,
                 cantidad=item.cantidad,
                 precio_unitario_monto=Decimal(str(item.precio_unitario)),
                 precio_unitario_moneda='COP',
                 subtotal_monto=subtotal,
-                subtotal_moneda='COP'
+                subtotal_moneda='COP',
+                variante_sku=item.variante_sku or (variante.sku if variante else ''),
+                color_snapshot=item.color or (variante.color if variante else ''),
+                largo_snapshot=item.largo or (variante.largo if variante else '')
             )
 
             
             # DESCONTAR STOCK AQUÍ (orden PENDIENTE)
             # El stock se devuelve solo si se CANCELA la orden
-            stock_anterior = producto.stock_actual
-            producto.stock_actual -= item.cantidad
-            producto.save()
-            print(f'📦 Stock descontado: {producto.nombre} - {item.cantidad} unidades. Stock anterior: {stock_anterior}, Stock nuevo: {producto.stock_actual}')
+            if variante:
+                stock_anterior = variante.stock_actual
+                variante.stock_actual -= item.cantidad
+                variante.save()
+                producto.stock_actual -= item.cantidad
+                producto.save()
+                print(
+                    f'📦 Stock descontado: {producto.nombre} - {item.cantidad} unidades. '
+                    f'Variante {variante.sku} stock anterior: {stock_anterior}, stock nuevo: {variante.stock_actual}'
+                )
+            else:
+                stock_anterior = producto.stock_actual
+                producto.stock_actual -= item.cantidad
+                producto.save()
+                print(f'📦 Stock descontado: {producto.nombre} - {item.cantidad} unidades. Stock anterior: {stock_anterior}, Stock nuevo: {producto.stock_actual}')
         
         items_response.append({
             'producto_id': item.producto_id or 'sin-id',
+            'variante_id': item.variante_id,
             'nombre': producto_nombre,
             'cantidad': item.cantidad,
             'precio_unitario': item.precio_unitario,
-            'subtotal': float(subtotal)
+            'subtotal': float(subtotal),
+            'variante_sku': item.variante_sku or (variante.sku if variante else ''),
+            'color': item.color or (variante.color if variante else ''),
+            'largo': item.largo or (variante.largo if variante else '')
         })
     
     # Preparar datos de productos para el email (con imágenes)

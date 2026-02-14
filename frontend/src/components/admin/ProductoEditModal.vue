@@ -184,6 +184,156 @@
                     </div>
                   </div>
 
+                    <!-- ═══ BLOQUE: TIPO DE PRODUCTO ═══ -->
+                    <div class="space-y-4 bg-white border border-black/5 rounded-2xl p-5 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+                      <div>
+                        <h3 class="text-[11px] font-semibold text-text-medium uppercase tracking-[0.2em]">TIPO DE PRODUCTO</h3>
+                        <p class="text-xs text-text-light mt-1">Elige si vendes un producto simple o con variantes.</p>
+                      </div>
+                      <div class="flex flex-wrap gap-2">
+                        <button
+                          type="button"
+                          @click="modoProducto = 'simple'"
+                          :class="[
+                            'px-3 py-2 text-xs font-semibold rounded-lg border transition-colors',
+                            modoProducto === 'simple'
+                              ? 'bg-text-dark text-white border-text-dark'
+                              : 'bg-white text-text-dark border-text-dark/20 hover:border-text-dark/40'
+                          ]"
+                        >
+                          Producto simple
+                        </button>
+                        <button
+                          type="button"
+                          @click="modoProducto = 'variantes'"
+                          :class="[
+                            'px-3 py-2 text-xs font-semibold rounded-lg border transition-colors',
+                            modoProducto === 'variantes'
+                              ? 'bg-[#D81B60] text-white border-[#D81B60]'
+                              : 'bg-white text-text-dark border-text-dark/20 hover:border-text-dark/40'
+                          ]"
+                        >
+                          Con variantes
+                        </button>
+                      </div>
+                      <p v-if="modoProducto === 'simple'" class="text-xs text-text-light">Guardarás un solo precio y stock. Las variantes no se enviarán.</p>
+                      <p v-else class="text-xs text-text-light">Agrega variantes por color/largo si seleccionas esta opción.</p>
+                    </div>
+
+                    <!-- ═══ BLOQUE: VARIANTES ═══ -->
+                    <div v-if="modoProducto === 'variantes'" class="space-y-4 bg-white border border-black/5 rounded-2xl p-5 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+                      <div class="flex items-center justify-between">
+                        <div>
+                          <h3 class="text-[11px] font-semibold text-text-medium uppercase tracking-[0.2em]">VARIANTES</h3>
+                          <p class="text-xs text-text-light mt-1">Configura color, largo, precio y stock por variante.</p>
+                        </div>
+                        <button
+                          type="button"
+                          @click="addVariante"
+                          class="px-3 py-2 text-xs bg-text-dark text-white rounded-lg hover:bg-black transition-colors"
+                        >
+                          + Agregar Variante
+                        </button>
+                      </div>
+
+                      <div v-if="form.variantes.length" class="space-y-3">
+                        <div class="hidden md:grid md:grid-cols-12 text-[11px] uppercase tracking-[0.12em] text-text-light">
+                          <span class="md:col-span-2">Color</span>
+                          <span class="md:col-span-2">Largo</span>
+                          <span class="md:col-span-2">Precio</span>
+                          <span class="md:col-span-2">Stock</span>
+                          <span class="md:col-span-2">SKU</span>
+                          <span class="md:col-span-2 text-right">Activo</span>
+                        </div>
+
+                        <div
+                          v-for="(variante, index) in form.variantes"
+                          :key="index"
+                          class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center border border-black/5 rounded-xl p-3"
+                        >
+                          <div class="md:col-span-2">
+                            <label class="md:hidden text-xs text-text-light">Color</label>
+                            <select
+                              v-model="variante.color"
+                              class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-xs"
+                            >
+                              <option value="">Sin color</option>
+                              <option v-for="option in COLOR_OPTIONS" :key="option.value" :value="option.value">
+                                {{ option.label }}
+                              </option>
+                            </select>
+                          </div>
+
+                          <div class="md:col-span-2">
+                            <label class="md:hidden text-xs text-text-light">Largo</label>
+                            <select
+                              v-model="variante.largo"
+                              class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-xs"
+                            >
+                              <option value="">Sin largo</option>
+                              <option v-for="option in LARGO_OPTIONS" :key="option" :value="option">
+                                {{ option }}"
+                              </option>
+                            </select>
+                          </div>
+
+                          <div class="md:col-span-2">
+                            <label class="md:hidden text-xs text-text-light">Precio</label>
+                            <input
+                              v-model.number="variante.precio_monto"
+                              type="number"
+                              step="0.01"
+                              class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-xs"
+                            >
+                          </div>
+
+                          <div class="md:col-span-2 grid grid-cols-2 gap-2">
+                            <div>
+                              <label class="md:hidden text-xs text-text-light">Stock</label>
+                              <input
+                                v-model.number="variante.stock_actual"
+                                type="number"
+                                class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-xs"
+                              >
+                            </div>
+                            <div>
+                              <label class="md:hidden text-xs text-text-light">Min</label>
+                              <input
+                                v-model.number="variante.stock_minimo"
+                                type="number"
+                                class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-xs"
+                              >
+                            </div>
+                          </div>
+
+                          <div class="md:col-span-2">
+                            <label class="md:hidden text-xs text-text-light">SKU</label>
+                            <input
+                              v-model="variante.sku"
+                              type="text"
+                              class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-xs"
+                            >
+                          </div>
+
+                          <div class="md:col-span-2 flex items-center justify-between md:justify-end gap-3">
+                            <label class="flex items-center gap-2 text-xs text-text-dark">
+                              <input v-model="variante.activo" type="checkbox" class="w-4 h-4 text-[#D81B60] border-gray-300 rounded">
+                              Activo
+                            </label>
+                            <button
+                              type="button"
+                              @click="removeVariante(index)"
+                              class="text-xs text-red-600 hover:text-red-700"
+                            >
+                              Quitar
+                            </button>
+                          </div>
+                        </div>
+                      </div>
+
+                      <div v-else class="text-xs text-text-light">Agrega al menos una variante si manejas precios o stock por color/largo.</div>
+                    </div>
+
                   <!-- ═══ BLOQUE: ATRIBUTOS (Opcional) ═══ -->
                   <div class="space-y-4 bg-white border border-black/5 rounded-2xl p-5 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
                     <div class="flex items-center justify-between">
@@ -530,6 +680,34 @@ const newGalleryUrl = ref('')
 const galleryUploading = ref(false)
 const galleryFileInput = ref(null)
 
+const COLOR_OPTIONS = [
+  { value: 'negro_natural', label: 'Negro Natural' },
+  { value: 'negro_azabache', label: 'Negro Azabache' },
+  { value: 'castano_oscuro', label: 'Castaño Oscuro' },
+  { value: 'castano_medio', label: 'Castaño Medio' },
+  { value: 'castano_claro', label: 'Castaño Claro' },
+  { value: 'castano_chocolate', label: 'Castaño Chocolate' },
+  { value: 'rubio_oscuro', label: 'Rubio Oscuro' },
+  { value: 'rubio_medio', label: 'Rubio Medio' },
+  { value: 'rubio_claro', label: 'Rubio Claro' },
+  { value: 'rubio_platino', label: 'Rubio Platino' },
+  { value: 'rubio_cenizo', label: 'Rubio Cenizo' },
+  { value: 'rubio_miel', label: 'Rubio Miel' },
+  { value: 'pelirrojo', label: 'Pelirrojo' },
+  { value: 'cobrizo', label: 'Cobrizo' },
+  { value: 'borgona', label: 'Borgoña' },
+  { value: 'rosa', label: 'Rosa' },
+  { value: 'azul', label: 'Azul' },
+  { value: 'morado', label: 'Morado' },
+  { value: 'verde', label: 'Verde' },
+  { value: 'gris', label: 'Gris' },
+  { value: 'ombre', label: 'Ombré' },
+  { value: 'balayage', label: 'Balayage' },
+  { value: 'highlights', label: 'Highlights' }
+]
+
+const LARGO_OPTIONS = ['8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30', '32']
+
 const form = ref({
     cantidad_minima_mayorista: 1,
   codigo: '',
@@ -548,11 +726,14 @@ const form = ref({
   calidad: '',
   imagen_principal: '',
   imagenes: [],
+  variantes: [],
   activo: true,
   destacado: false,
   disponible_b2b: true,
   porcentaje_descuento_b2b: null
 })
+
+const modoProducto = ref('simple')
 
 // Checkboxes para habilitar atributos
 const enabledAttrs = ref({
@@ -583,11 +764,13 @@ const resetForm = () => {
     calidad: '',
     imagen_principal: '',
     imagenes: [],
+    variantes: [],
     activo: true,
     destacado: false,
     disponible_b2b: true,
     porcentaje_descuento_b2b: null
   }
+  modoProducto.value = 'simple'
   enabledAttrs.value = {
     metodo: false,
     color: false,
@@ -618,6 +801,83 @@ const addGalleryUrl = () => {
 
 const removeGalleryUrl = (url) => {
   galleryUrls.value = galleryUrls.value.filter((u) => u !== url)
+}
+
+const addVariante = () => {
+  form.value.variantes.push({
+    id: null,
+    sku: '',
+    color: '',
+    largo: '',
+    precio_monto: form.value.precio_monto || 0,
+    precio_moneda: form.value.precio_moneda || 'COP',
+    stock_actual: 0,
+    stock_minimo: 0,
+    imagen_url: '',
+    activo: true,
+    orden: form.value.variantes.length
+  })
+}
+
+const removeVariante = (index) => {
+  form.value.variantes.splice(index, 1)
+}
+
+const normalizeVariantes = () => {
+  return (form.value.variantes || [])
+    .filter((v) => v && (v.color || v.largo || v.precio_monto || v.stock_actual))
+    .map((v, idx) => ({
+      id: v.id || null,
+      sku: v.sku || '',
+      color: v.color || null,
+      largo: v.largo || null,
+      precio_monto: Number(v.precio_monto || 0),
+      precio_moneda: v.precio_moneda || form.value.precio_moneda || 'COP',
+      stock_actual: Number(v.stock_actual || 0),
+      stock_minimo: Number(v.stock_minimo || 0),
+      imagen_url: v.imagen_url || null,
+      activo: v.activo !== false,
+      orden: v.orden ?? idx
+    }))
+}
+
+const validarFormulario = () => {
+  if (!form.value.nombre || !form.value.nombre.trim()) {
+    return 'El nombre del producto es obligatorio'
+  }
+  if (!form.value.descripcion || !form.value.descripcion.trim()) {
+    return 'La descripción del producto es obligatoria'
+  }
+  if (Number(form.value.precio_monto || 0) <= 0) {
+    return 'El precio debe ser mayor a 0'
+  }
+  if (form.value.stock_actual === null || form.value.stock_actual === undefined || Number(form.value.stock_actual) < 0) {
+    return 'El stock actual es obligatorio'
+  }
+  if (!form.value.cantidad_minima_mayorista || Number(form.value.cantidad_minima_mayorista) < 1) {
+    return 'La cantidad mínima mayorista debe ser mayor a 0'
+  }
+
+  if (modoProducto.value === 'variantes') {
+    const variantesNormalizadas = normalizeVariantes()
+    if (variantesNormalizadas.length === 0) {
+      return 'Agrega al menos una variante'
+    }
+    for (let i = 0; i < variantesNormalizadas.length; i += 1) {
+      const variante = variantesNormalizadas[i]
+      if (!variante.color && !variante.largo) {
+        return `La variante ${i + 1} debe tener color o largo`
+      }
+      if (Number(variante.precio_monto || 0) <= 0) {
+        return `El precio de la variante ${i + 1} debe ser mayor a 0`
+      }
+      if (variante.stock_actual === null || variante.stock_actual === undefined || Number(variante.stock_actual) < 0) {
+        return `El stock de la variante ${i + 1} es obligatorio`
+      }
+    }
+  }
+
+  return null
 }
 
 const setAsPrincipal = (url) => {
@@ -693,7 +953,6 @@ const handleFileSelect = (event) => {
     return
   }
   
-  // Validate file type
   if (!file.type.startsWith('image/')) {
     error.value = 'Solo se permiten archivos de imagen'
     return
@@ -739,6 +998,9 @@ const loadProduct = async () => {
     
     const atributos = producto.atributos || {}
     
+    const variantesPayload = Array.isArray(producto.variantes) ? producto.variantes : []
+    const variantesVisuales = variantesPayload.filter((v) => v?.color || v?.largo)
+
     form.value = {
       codigo: producto.codigo,
       nombre: producto.nombre,
@@ -756,11 +1018,28 @@ const loadProduct = async () => {
       calidad: atributos.calidad || '',
       imagen_principal: producto.imagen_principal || '',
       imagenes: Array.isArray(producto.imagenes) ? producto.imagenes : [],
+      variantes: variantesVisuales.map((v) => ({
+        id: v.id || null,
+        sku: v.sku || '',
+        color: v.color || '',
+        largo: v.largo || '',
+        precio_monto: v.precio_monto ?? producto.precio?.monto ?? producto.precio_monto ?? 0,
+        precio_moneda: v.precio_moneda || producto.precio?.moneda || producto.precio_moneda || 'COP',
+        stock_actual: v.stock_actual ?? 0,
+        stock_minimo: v.stock_minimo ?? 0,
+        imagen_url: v.imagen_url || '',
+        activo: v.activo !== false,
+        orden: v.orden ?? 0
+      })),
       activo: producto.activo !== false,
       destacado: producto.destacado || false,
       disponible_b2b: producto.disponible_b2b !== false,
       porcentaje_descuento_b2b: producto.porcentaje_descuento_b2b ?? null
     }
+
+    modoProducto.value = variantesVisuales.length > 0
+      ? 'variantes'
+      : 'simple'
 
     // Construir galleryUrls incluyendo la imagen principal
     const imagenes = Array.isArray(producto.imagenes) ? [...producto.imagenes] : []
@@ -794,6 +1073,13 @@ const submitForm = async () => {
   error.value = null
   
   try {
+    const validationError = validarFormulario()
+    if (validationError) {
+      error.value = validationError
+      saving.value = false
+      return
+    }
+
     // Auto-generar código SKU si está vacío
     if (!form.value.codigo || form.value.codigo.trim() === '') {
       form.value.codigo = `SKU-${Date.now()}-${Math.floor(Math.random() * 1000)}`
@@ -848,7 +1134,8 @@ const submitForm = async () => {
       destacado: form.value.destacado,
       cantidad_minima_mayorista: form.value.cantidad_minima_mayorista ?? 1,
       disponible_b2b: !!form.value.disponible_b2b,
-      porcentaje_descuento_b2b: form.value.porcentaje_descuento_b2b ?? null
+      porcentaje_descuento_b2b: form.value.porcentaje_descuento_b2b ?? null,
+      variantes: modoProducto.value === 'variantes' ? normalizeVariantes() : []
     }
     
     if (isEditing.value) {

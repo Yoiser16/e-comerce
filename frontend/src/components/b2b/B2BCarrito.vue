@@ -48,7 +48,7 @@
           <!-- Items del carrito -->
           <div 
             v-for="item in cartItems" 
-            :key="item.id"
+            :key="item.variante_id || item.id"
             class="bg-white rounded-xl border border-gray-200 p-3 sm:p-4"
           >
             <div class="flex gap-3 sm:gap-4">
@@ -77,11 +77,16 @@
                 <div class="min-w-0 flex-1">
                   <p class="text-[10px] sm:text-xs text-gray-400 uppercase tracking-wide">{{ item.categoria || item.category }}</p>
                   <h3 class="font-medium text-gray-900 text-sm sm:text-base line-clamp-2">{{ item.nombre || item.name }}</h3>
+                  <p v-if="item.color || item.largo" class="text-[11px] text-gray-400 mt-1">
+                    <span v-if="item.color">Color: {{ formatColorLabel(item.color) }}</span>
+                    <span v-if="item.color && item.largo"> · </span>
+                    <span v-if="item.largo">Largo: {{ item.largo }}</span>
+                  </p>
                 </div>
                 
                 <!-- Botón eliminar -->
                 <button 
-                  @click="removeItem(item.id)"
+                  @click="removeItem(item.variante_id || item.id)"
                   class="p-1.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-lg transition-colors"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -102,7 +107,7 @@
               <!-- Control de cantidad compacto -->
               <div class="flex items-center border border-gray-200 rounded-lg overflow-hidden">
                 <button 
-                  @click="updateQuantity(item.id, (item.cantidad || item.quantity) - 1)"
+                  @click="updateQuantity(item.variante_id || item.id, (item.cantidad || item.quantity) - 1)"
                   :disabled="(item.cantidad || item.quantity) <= 10"
                   class="w-9 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
@@ -110,13 +115,13 @@
                 </button>
                 <input 
                   :value="item.cantidad || item.quantity"
-                  @change="updateQuantity(item.id, parseInt($event.target.value) || 10)"
+                  @change="updateQuantity(item.variante_id || item.id, parseInt($event.target.value) || 10)"
                   type="number"
                   :min="10"
                   class="w-12 h-9 text-center border-x border-gray-200 focus:outline-none text-sm font-bold"
                 />
                 <button 
-                  @click="updateQuantity(item.id, (item.cantidad || item.quantity) + 1)"
+                  @click="updateQuantity(item.variante_id || item.id, (item.cantidad || item.quantity) + 1)"
                   :disabled="(item.cantidad || item.quantity) >= (item.stock || 999)"
                   class="w-9 h-9 flex items-center justify-center text-gray-500 hover:bg-gray-50 disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
                 >
@@ -291,6 +296,7 @@
 import { ref, computed, onMounted, watch } from 'vue'
 import { getImageUrl } from '@/services/api'
 import { useRouter } from 'vue-router'
+import { formatColorLabel } from '@/utils/colorLabels'
 
 export default {
   name: 'B2BCarrito',
@@ -311,7 +317,11 @@ export default {
       if (cart) {
         try {
           const data = JSON.parse(cart)
-          cartItems.value = data.items || []
+          const items = Array.isArray(data.items) ? data.items : []
+          cartItems.value = items.map((item) => ({
+            ...item,
+            variante_id: item.variante_id || item.id
+          }))
         } catch {
           cartItems.value = []
         }
@@ -369,8 +379,8 @@ export default {
       return getImageUrl(raw) || '/placeholder.png'
     }
 
-    function updateQuantity(itemId, newQuantity) {
-      const item = cartItems.value.find(i => i.id === itemId)
+    function updateQuantity(itemKey, newQuantity) {
+      const item = cartItems.value.find(i => (i.variante_id || i.id) === itemKey)
       if (item) {
         const ORDEN_MINIMA = 10 // Compra mínima para mayoristas
         const minQty = Math.max(item.minOrder || 1, ORDEN_MINIMA)
@@ -393,8 +403,8 @@ export default {
       }
     }
 
-    function removeItem(itemId) {
-      cartItems.value = cartItems.value.filter(i => i.id !== itemId)
+    function removeItem(itemKey) {
+      cartItems.value = cartItems.value.filter(i => (i.variante_id || i.id) !== itemKey)
       saveCart()
     }
 
@@ -420,7 +430,7 @@ export default {
     return {
       cartItems, orderNotes,
       totalUnits, subtotal, totalDiscount, shippingCost, total, canCheckout,
-      formatPrice, handleImageError, updateQuantity, removeItem, limpiarCarrito, proceedToCheckout
+      formatPrice, formatColorLabel, handleImageError, updateQuantity, removeItem, limpiarCarrito, proceedToCheckout
       , isVideo, getCartMediaUrl
     }
   }

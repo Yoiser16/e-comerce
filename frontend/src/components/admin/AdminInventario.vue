@@ -373,16 +373,30 @@ export default {
         loading.value = true
         const data = await productosService.obtenerTodos({ limite: 1000 })
         
-        // Transformar productos a formato de inventario
-        productos.value = data.map(p => ({
-          id: p.id,
-          nombre: p.nombre,
-          sku: p.codigo || 'N/A',
-          stock: p.stock_actual || 0,
-          stockMinimo: p.stock_minimo || 5,
-          precio: parseFloat(p.precio_monto) || 0,
-          imagen: p.imagen_principal || ''
-        }))
+        // Transformar productos a formato de inventario (base + variantes)
+        productos.value = data.map(p => {
+          const variantes = Array.isArray(p.variantes)
+            ? p.variantes.filter((v) => v?.color || v?.largo)
+            : []
+          const baseStock = Number(p.stock_actual || 0)
+          const baseMin = Number(p.stock_minimo || 0)
+          const basePrecio = Number(p.precio_monto || 0)
+          const variantesStock = variantes.reduce((sum, v) => sum + Number(v?.stock_actual || 0), 0)
+          const variantesMin = variantes.reduce((sum, v) => sum + Number(v?.stock_minimo || 0), 0)
+          const variantesValor = variantes.reduce((sum, v) => {
+            return sum + (Number(v?.stock_actual || 0) * Number(v?.precio_monto || basePrecio || 0))
+          }, 0)
+          return {
+            id: p.id,
+            nombre: p.nombre,
+            sku: p.codigo || 'N/A',
+            stock: baseStock + variantesStock,
+            stockMinimo: baseMin + variantesMin,
+            precio: basePrecio,
+            valorTotal: (baseStock * basePrecio) + variantesValor,
+            imagen: p.imagen_principal || ''
+          }
+        })
         
         console.log(`✅ Inventario cargado: ${productos.value.length} productos`)
       } catch (error) {
@@ -402,7 +416,7 @@ export default {
     })
 
     const valorInventario = computed(() => {
-      return productos.value.reduce((total, p) => total + (p.stock * p.precio), 0)
+      return productos.value.reduce((total, p) => total + (p.valorTotal || 0), 0)
     })
 
     const porcentajeSaludable = computed(() => {

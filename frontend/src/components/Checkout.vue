@@ -639,6 +639,11 @@
                   
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium text-[#1A1A1A] line-clamp-2">{{ item.nombre || 'Producto' }}</p>
+                    <p v-if="item.color || item.largo" class="text-[11px] text-[#9CA3AF] mt-1">
+                      <span v-if="item.color">Color: {{ formatColorLabel(item.color) }}</span>
+                      <span v-if="item.color && item.largo"> · </span>
+                      <span v-if="item.largo">Largo: {{ item.largo }}</span>
+                    </p>
                     <p class="text-xs text-[#7A7A7A] mt-1">Cantidad: {{ item.cantidad || 1 }}</p>
                   </div>
                   
@@ -827,6 +832,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import apiClient, { getImageUrl } from '@/services/api'
+import { formatColorLabel } from '@/utils/colorLabels'
 
 // API de Colombia - Datos oficiales de departamentos y municipios
 const COLOMBIA_API = {
@@ -1377,7 +1383,14 @@ export default {
 
     // Función para construir el mensaje de WhatsApp de forma segura
     const buildWhatsAppMessage = () => {
-      const productos = cartItems.value.map(i => `• ${i.nombre || 'Producto'} x${i.cantidad || 1}`).join('\n')
+      const productos = cartItems.value.map((i) => {
+        const detalles = [
+          i.color ? `Color: ${i.color}` : '',
+          i.largo ? `Largo: ${i.largo}` : ''
+        ].filter(Boolean).join(' · ')
+        const sufijo = detalles ? ` (${detalles})` : ''
+        return `• ${i.nombre || 'Producto'}${sufijo} x${i.cantidad || 1}`
+      }).join('\n')
       const direccion = getWhatsAppAddress().replaceAll('%0A', '\n')
       
       const msg = `Hola, quiero finalizar mi pedido\n\n*CÓDIGO:* ${sessionStorage.getItem('temp_order_code') || 'KH-0000'}\n\n*PRODUCTOS:*\n${productos}\n\n*TOTAL:* $${formatPrice(getTotal())} COP\n\n${form.value.nombre} ${form.value.apellido}\n${form.value.telefono}\n\n*DIRECCIÓN:*\n${direccion}`
@@ -1601,6 +1614,10 @@ export default {
             body: JSON.stringify({
               items: cartItems.value.map(item => ({
                 producto_id: item.id || item.producto_id || '00000000-0000-0000-0000-000000000000',
+                variante_id: item.variante_id || null,
+                variante_sku: item.variante_sku || '',
+                color: item.color || '',
+                largo: item.largo || '',
                 cantidad: item.cantidad || 1,
                 precio_unitario: item.precio_unitario || item.precio || 0,
                 nombre: item.nombre || 'Producto'
@@ -1616,7 +1633,8 @@ export default {
             
             // Mostrar modal con productos con problemas + imagen del carrito
             const productosProblema = stockValidation.productos.filter(p => !p.disponible).map(p => {
-              const itemCarrito = cartItems.value.find(item => 
+              const itemCarrito = cartItems.value.find(item =>
+                (item.variante_id && item.variante_id === p.variante_id) ||
                 (item.id || item.producto_id) === p.producto_id
               )
               return {
@@ -1651,6 +1669,10 @@ export default {
             notas: form.value.apartamento || '',
             items: cartItems.value.map(item => ({
               producto_id: item.id || item.producto_id || '00000000-0000-0000-0000-000000000000',
+              variante_id: item.variante_id || null,
+              variante_sku: item.variante_sku || '',
+              color: item.color || '',
+              largo: item.largo || '',
               cantidad: item.cantidad || 1,
               precio_unitario: item.precio_unitario || item.precio || 0,
               nombre: item.nombre || 'Producto'
@@ -1888,7 +1910,16 @@ export default {
         const cached = localStorage.getItem('kharis_cart_cache')
         if (cached) {
           const data = JSON.parse(cached)
-          cartItems.value = data.items || []
+          const rawItems = data.items || []
+          cartItems.value = rawItems.map((item) => {
+            const productoId = item?.producto_id ?? item?.id
+            const varianteId = item?.variante_id ?? productoId
+            return {
+              ...item,
+              producto_id: productoId,
+              variante_id: varianteId
+            }
+          })
         }
         
         // Cargar datos del usuario si está logueado
@@ -1956,7 +1987,7 @@ export default {
       nextStep, prevStep, goToStep,
       onPaisChange, onDepartamentoChange,
       getFullAddress, getWhatsAppAddress, saveFormToStorage, formatPhoneNumber, formatDocumentNumber,
-      buildWhatsAppMessage, formatPrice, getItemPrice, getSubtotal, getTotal, processPayment,
+      buildWhatsAppMessage, formatPrice, formatColorLabel, getItemPrice, getSubtotal, getTotal, processPayment,
       getCartMediaUrl,
       clienteConDatosCompletos,
       initialLoading,

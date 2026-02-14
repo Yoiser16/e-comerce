@@ -247,7 +247,7 @@
 
           <!-- Price -->
           <div class="flex items-baseline gap-3">
-            <span class="text-2xl sm:text-3xl font-semibold text-text-dark">{{ formatearPrecio(producto.precio_monto) }}</span>
+            <span class="text-2xl sm:text-3xl font-semibold text-text-dark">{{ formatearPrecio(precioUnitarioSeleccionado) }}</span>
             <span class="text-sm text-text-light">IVA incluido</span>
           </div>
 
@@ -284,31 +284,31 @@
 
           <!-- VARIANTES: Color Swatches -->
           <div v-if="coloresDisponibles.length > 1" class="space-y-3">
-            <p class="text-xs uppercase tracking-[0.15em] text-text-light">Color: <span class="text-text-dark font-medium normal-case">{{ colorSeleccionado }}</span></p>
+            <p class="text-xs uppercase tracking-[0.15em] text-text-light">Color: <span class="text-text-dark font-medium normal-case">{{ colorSeleccionadoLabel }}</span></p>
             <div class="flex flex-wrap gap-2">
               <button
                 v-for="color in coloresDisponibles"
-                :key="color.nombre"
-                @click="colorSeleccionado = color.nombre"
+                :key="color.value"
+                @click="selectColor(color)"
                 :class="[
                   'w-8 h-8 rounded-full transition-all duration-200 relative',
-                  colorSeleccionado === color.nombre 
+                  colorSeleccionado === color.value 
                     ? 'ring-2 ring-text-dark ring-offset-2' 
                     : 'hover:ring-2 hover:ring-text-dark/30 hover:ring-offset-1'
                 ]"
                 :style="{ backgroundColor: color.hex }"
-                :title="color.nombre"
+                :title="color.label"
               >
                 <!-- Checkmark for selected -->
                 <svg 
-                  v-if="colorSeleccionado === color.nombre && isLightColor(color.hex)"
+                  v-if="colorSeleccionado === color.value && isLightColor(color.hex)"
                   class="w-4 h-4 absolute inset-0 m-auto text-text-dark"
                   fill="currentColor" viewBox="0 0 20 20"
                 >
                   <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
                 </svg>
                 <svg 
-                  v-else-if="colorSeleccionado === color.nombre"
+                  v-else-if="colorSeleccionado === color.value"
                   class="w-4 h-4 absolute inset-0 m-auto text-white"
                   fill="currentColor" viewBox="0 0 20 20"
                 >
@@ -324,16 +324,16 @@
             <div class="flex flex-wrap gap-2">
               <button
                 v-for="largo in largosDisponibles"
-                :key="largo"
-                @click="largoSeleccionado = largo"
+                :key="largo.value"
+                @click="selectLargo(largo)"
                 :class="[
                   'px-4 py-2.5 text-sm font-medium transition-all duration-200 border',
-                  largoSeleccionado === largo 
+                  largoSeleccionado === largo.value 
                     ? 'bg-text-dark text-white border-text-dark' 
                     : 'bg-white text-text-dark border-text-dark/20 hover:border-text-dark/50'
                 ]"
               >
-                {{ largo }}
+                {{ largo.label }}
               </button>
             </div>
           </div>
@@ -748,7 +748,7 @@
             <div v-else class="space-y-4">
               <div 
                 v-for="item in carritoItems" 
-                :key="item.producto_id"
+                :key="item.variante_id || item.producto_id"
                 class="flex gap-4 pb-4 border-b border-text-dark/5"
               >
                 <img 
@@ -759,6 +759,11 @@
                 >
                 <div class="flex-1 min-w-0">
                   <h4 class="text-sm font-medium text-text-dark line-clamp-2">{{ item.nombre }}</h4>
+                  <p v-if="item.color || item.largo" class="text-xs text-text-light mt-1">
+                    <span v-if="item.color">Color: {{ formatColorLabel(item.color) }}</span>
+                    <span v-if="item.color && item.largo"> · </span>
+                    <span v-if="item.largo">Largo: {{ item.largo }}</span>
+                  </p>
                   <p class="text-xs text-text-light mt-1">Cantidad: {{ item.cantidad }}</p>
                   <p class="text-sm font-semibold text-text-dark mt-2">{{ formatearPrecio((item.precio_unitario || item.precio_monto || 0) * item.cantidad) }}</p>
                 </div>
@@ -798,6 +803,7 @@ import { useRoute, useRouter } from 'vue-router'
 import { productosService, carritoService, authService } from '@/services/productos'
 import { resenasService } from '@/services/resenas'
 import { getImageUrl } from '@/services/api'
+import { formatColorLabel } from '@/utils/colorLabels'
 
 const route = useRoute()
 const router = useRouter()
@@ -826,15 +832,81 @@ const colorSeleccionado = ref('')
 const largoSeleccionado = ref('')
 const calidadSeleccionada = ref('')
 
-// Available Variants (simulated - in real app would come from API)
-const coloresDisponibles = ref([
-  { nombre: 'Negro', hex: '#1A1A1A' },
-  { nombre: 'Castaño Oscuro', hex: '#3D2314' },
-  { nombre: 'Castaño', hex: '#6B4423' },
-  { nombre: 'Rubio Oscuro', hex: '#A67B5B' }
-])
+const COLOR_HEX = {
+  negro_natural: '#1A1A1A',
+  negro_azabache: '#0f0f10',
+  castano_oscuro: '#3d2314',
+  castano_medio: '#6b4423',
+  castano_claro: '#8b6b47',
+  castano_chocolate: '#4d2a1f',
+  rubio_oscuro: '#a67b5b',
+  rubio_medio: '#c19a6b',
+  rubio_claro: '#e0c3a0',
+  rubio_platino: '#e5e4e2',
+  rubio_cenizo: '#b8a898',
+  rubio_miel: '#d6a66a',
+  pelirrojo: '#8b0000',
+  cobrizo: '#b87333',
+  borgona: '#722f37',
+  rosa: '#f3a8c2',
+  azul: '#3f6ea6',
+  morado: '#6b4ea1',
+  verde: '#3b7a57',
+  gris: '#9ca3af',
+  ombre: '#8c6f5a',
+  balayage: '#c6a36b',
+  highlights: '#e6cfa8'
+}
 
-const largosDisponibles = ref(['14"', '16"', '18"', '20"', '22"', '24"'])
+const formatLargoLabel = (largo) => (largo ? `${largo}"` : '')
+const BASE_VARIANTE_VALUE = '__base__'
+
+const variantesDisponibles = computed(() => {
+  const variantes = Array.isArray(producto.value?.variantes) ? producto.value.variantes : []
+  return variantes.filter(v => v && v.activo !== false)
+})
+
+const varianteBase = computed(() => {
+  return variantesDisponibles.value.find(v => !v.color && !v.largo) || null
+})
+
+const coloresDisponibles = computed(() => {
+  const map = new Map()
+  variantesDisponibles.value.forEach((v) => {
+    if (!v.color) return
+    if (!map.has(v.color)) {
+      map.set(v.color, {
+        value: v.color,
+        label: formatColorLabel(v.color),
+        hex: COLOR_HEX[v.color] || '#9ca3af'
+      })
+    }
+  })
+  const colores = Array.from(map.values())
+  if (varianteBase.value) {
+    colores.unshift({
+      value: BASE_VARIANTE_VALUE,
+      label: 'Estándar',
+      hex: '#F5EFE7'
+    })
+  }
+  return colores
+})
+
+const largosDisponibles = computed(() => {
+  const map = new Map()
+  variantesDisponibles.value.forEach((v) => {
+    if (!v.largo) return
+    if (!map.has(v.largo)) {
+      map.set(v.largo, {
+        value: v.largo,
+        label: formatLargoLabel(v.largo)
+      })
+    }
+  })
+  return Array.from(map.values())
+})
+
 const calidadesDisponibles = ref(['Densidad 150%', 'Densidad 180%', 'Densidad 200%'])
 
 // Cart State
@@ -927,7 +999,16 @@ const loadCartFromLocal = () => {
     const cached = localStorage.getItem(CART_STORAGE_KEY)
     if (cached) {
       const data = JSON.parse(cached)
-      return data.items || []
+      const rawItems = data.items || []
+      return rawItems.map((item) => {
+        const productoId = item?.producto_id ?? item?.id
+        const varianteId = item?.variante_id ?? productoId
+        return {
+          ...item,
+          producto_id: productoId,
+          variante_id: varianteId
+        }
+      })
     }
   } catch (e) {
     console.warn('No se pudo leer el carrito local:', e)
@@ -944,7 +1025,66 @@ const loadCartCount = () => {
 }
 
 // Computed
+const colorSeleccionadoLabel = computed(() => {
+  if (colorSeleccionado.value === BASE_VARIANTE_VALUE) return 'Estándar'
+  const color = coloresDisponibles.value.find(c => c.value === colorSeleccionado.value)
+  return color?.label || colorSeleccionado.value || ''
+})
+
+const selectColor = (color) => {
+  if (color.value === BASE_VARIANTE_VALUE) {
+    colorSeleccionado.value = BASE_VARIANTE_VALUE
+    largoSeleccionado.value = ''
+    return
+  }
+  colorSeleccionado.value = color.value
+}
+
+const selectLargo = (largo) => {
+  if (colorSeleccionado.value === BASE_VARIANTE_VALUE) {
+    colorSeleccionado.value = ''
+  }
+  largoSeleccionado.value = largo.value
+}
+
+const varianteSeleccionada = computed(() => {
+  const variantes = variantesDisponibles.value
+  if (!variantes.length) return null
+
+  if (colorSeleccionado.value === BASE_VARIANTE_VALUE) {
+    return varianteBase.value
+  }
+
+  const color = colorSeleccionado.value
+  const largo = largoSeleccionado.value
+
+  if (!color && !largo && varianteBase.value) {
+    return varianteBase.value
+  }
+
+  let match = null
+  if (color && largo) {
+    match = variantes.find(v => v.color === color && v.largo === largo)
+  }
+  if (!match && color) {
+    match = variantes.find(v => v.color === color)
+  }
+  if (!match && largo) {
+    match = variantes.find(v => v.largo === largo)
+  }
+  return match || variantes[0]
+})
+
+const precioUnitarioSeleccionado = computed(() => {
+  return Number(
+    varianteSeleccionada.value?.precio_monto ?? producto.value?.precio_monto ?? producto.value?.precio ?? 0
+  )
+})
+
 const stockDisponible = computed(() => {
+  if (varianteSeleccionada.value) {
+    return Number(varianteSeleccionada.value.stock_actual ?? 0)
+  }
   const p = producto.value
   if (!p) return 0
   return Number(p.stock_actual ?? p.stock ?? p.stock_minimo ?? 0)
@@ -991,9 +1131,22 @@ const cargarProducto = async () => {
     }
     miniaturas.value = galeria.slice(0, 6)
     
-    // Set initial variant selections from product data
-    if (data.color) colorSeleccionado.value = data.color
-    if (data.largo) largoSeleccionado.value = data.largo
+    // Set initial variant selections from variants or product data
+    const variantes = Array.isArray(data.variantes) ? data.variantes : []
+    if (variantes.length > 0) {
+      const base = variantes.find(v => !v.color && !v.largo && v.activo !== false)
+      const primera = base || variantes.find(v => v.activo !== false) || variantes[0]
+      if (base) {
+        colorSeleccionado.value = BASE_VARIANTE_VALUE
+        largoSeleccionado.value = ''
+      } else {
+        colorSeleccionado.value = primera?.color || ''
+        largoSeleccionado.value = primera?.largo || ''
+      }
+    } else {
+      if (data.color) colorSeleccionado.value = data.color
+      if (data.largo) largoSeleccionado.value = data.largo
+    }
     if (data.calidad) calidadSeleccionada.value = data.calidad
 
     await cargarResumenResenas()
@@ -1072,12 +1225,20 @@ const agregarAlCarrito = async () => {
     return
   }
 
+  if (!varianteSeleccionada.value) {
+    mensajeError.value = 'Selecciona una combinación de color y largo'
+    mensaje.value = ''
+    return
+  }
+
   try {
-    const precioUnitario = Number(producto.value.precio_monto || producto.value.precio || 0)
+    const precioUnitario = Number(
+      varianteSeleccionada.value.precio_monto ?? producto.value.precio_monto ?? producto.value.precio ?? 0
+    )
     
     // Usar SIEMPRE localStorage - el carrito es local
     const items = loadCartFromLocal()
-    const idx = items.findIndex((i) => i.producto_id === producto.value.id)
+    const idx = items.findIndex((i) => (i.variante_id || i.producto_id) === varianteSeleccionada.value.id)
     const cantidadEnCarrito = idx >= 0 ? items[idx].cantidad : 0
     const cantidadTotal = cantidadEnCarrito + cantidad.value
     
@@ -1093,8 +1254,12 @@ const agregarAlCarrito = async () => {
     } else {
       items.push({
         producto_id: producto.value.id,
+        variante_id: varianteSeleccionada.value.id,
+        variante_sku: varianteSeleccionada.value.sku || '',
+        color: varianteSeleccionada.value.color || '',
+        largo: varianteSeleccionada.value.largo || '',
         nombre: producto.value.nombre,
-        imagen_url: getImageUrl(producto.value.imagen_principal),
+        imagen_url: getImageUrl(varianteSeleccionada.value.imagen_url || producto.value.imagen_principal),
         precio_unitario: precioUnitario,
         cantidad: cantidad.value,
         subtotal: precioUnitario * cantidad.value,

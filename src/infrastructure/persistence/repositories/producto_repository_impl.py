@@ -9,10 +9,11 @@ from django.db.models import Q, Count, Min, Max, F
 
 from domain.repositories.producto_repository import ProductoRepository
 from domain.entities.producto import Producto
+from domain.entities.producto_variante import ProductoVariante
 from domain.value_objects.codigo_producto import CodigoProducto
 from domain.value_objects.dinero import Dinero
 from domain.value_objects.criterios_busqueda import CriteriosBusqueda
-from infrastructure.persistence.django.models import ProductoModel, ImagenProductoModel
+from infrastructure.persistence.django.models import ProductoModel, ImagenProductoModel, ProductoVarianteModel
 from infrastructure.auditing.servicio_auditoria import ServicioAuditoria
 from infrastructure.logging.logger_service import LoggerService
 from shared.enums.atributos_producto import OrdenProducto
@@ -61,7 +62,8 @@ class ProductoRepositoryImpl(ProductoRepository):
             calidad=model.calidad,
             destacado=model.destacado,
             disponible_b2b=model.disponible_b2b,
-            porcentaje_descuento_b2b=model.porcentaje_descuento_b2b
+            porcentaje_descuento_b2b=model.porcentaje_descuento_b2b,
+            variantes=self._map_variantes(model)
         )
 
         # Incluir TODAS las imágenes adicionales del modelo ImagenProductoModel
@@ -78,6 +80,30 @@ class ProductoRepositoryImpl(ProductoRepository):
             producto.imagenes = []
 
         return producto
+
+    def _map_variantes(self, model: ProductoModel) -> list:
+        if not hasattr(model, '_prefetched_objects_cache') or 'variantes' not in model._prefetched_objects_cache:
+            return []
+        variantes = []
+        for variante in model.variantes.all():
+            variantes.append(
+                ProductoVariante(
+                    id=variante.id,
+                    producto_id=variante.producto_id,
+                    sku=variante.sku,
+                    color=variante.color,
+                    largo=variante.largo,
+                    precio=Dinero(variante.precio_monto, variante.precio_moneda),
+                    stock_actual=variante.stock_actual,
+                    stock_minimo=variante.stock_minimo,
+                    imagen_url=variante.imagen_url,
+                    activo=variante.activo,
+                    orden=variante.orden,
+                    fecha_creacion=variante.fecha_creacion,
+                    fecha_modificacion=variante.fecha_modificacion
+                )
+            )
+        return variantes
     
     def _to_model(self, entity: Producto) -> ProductoModel:
         """
@@ -103,7 +129,7 @@ class ProductoRepositoryImpl(ProductoRepository):
     def obtener_por_id(self, id: UUID) -> Optional[Producto]:
         self._logger.info(f"Obteniendo producto por ID", producto_id=str(id))
         try:
-            model = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').get(id=id)
+            model = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes', 'variantes').get(id=id)
             return self._to_domain(model)
         except ProductoModel.DoesNotExist:
             return None
@@ -111,7 +137,7 @@ class ProductoRepositoryImpl(ProductoRepository):
     def obtener_por_codigo(self, codigo: CodigoProducto) -> Optional[Producto]:
         self._logger.info(f"Buscando producto por código", codigo=codigo.valor)
         try:
-            model = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').get(codigo=codigo.valor)
+            model = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes', 'variantes').get(codigo=codigo.valor)
             return self._to_domain(model)
         except ProductoModel.DoesNotExist:
             return None
@@ -133,8 +159,117 @@ class ProductoRepositoryImpl(ProductoRepository):
         
     def obtener_disponibles(self) -> List[Producto]:
         self._logger.info("Obteniendo productos disponibles")
-        models = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').filter(activo=True, stock_actual__gt=0)
+        from django.db.models import Q
+        models = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').filter(
+            activo=True
+        ).filter(
+            Q(stock_actual__gt=0) | Q(variantes__activo=True, variantes__stock_actual__gt=0)
+        ).distinct()
         return [self._to_domain(model) for model in models]
+
+    def obtener_variante_por_id(self, variante_id: UUID) -> Optional[dict]:
+        try:
+            variante = ProductoVarianteModel.objects.select_related('producto').get(id=variante_id, activo=True)
+        except ProductoVarianteModel.DoesNotExist:
+            return None
+        return {
+            'id': variante.id,
+            'producto_id': variante.producto_id,
+            'sku': variante.sku,
+            'color': variante.color,
+            'largo': variante.largo,
+            'precio_monto': variante.precio_monto,
+            'precio_moneda': variante.precio_moneda,
+            'stock_actual': variante.stock_actual,
+            'stock_minimo': variante.stock_minimo,
+            'imagen_url': variante.imagen_url,
+            'activo': variante.activo,
+            'orden': variante.orden
+        }
+
+    def listar_variantes_producto(self, producto_id: UUID) -> List[dict]:
+        variantes = ProductoVarianteModel.objects.filter(producto_id=producto_id, activo=True).order_by('orden', 'fecha_creacion')
+        return [
+            {
+                'id': v.id,
+                'producto_id': v.producto_id,
+                'sku': v.sku,
+                'color': v.color,
+                'largo': v.largo,
+                'precio_monto': v.precio_monto,
+                'precio_moneda': v.precio_moneda,
+                'stock_actual': v.stock_actual,
+                'stock_minimo': v.stock_minimo,
+                'imagen_url': v.imagen_url,
+                'activo': v.activo,
+                'orden': v.orden
+            }
+            for v in variantes
+        ]
+
+    def _sincronizar_variantes(self, producto_model: ProductoModel, variantes: list) -> None:
+        existentes = {str(v.id): v for v in ProductoVarianteModel.objects.filter(producto=producto_model)}
+        ids_recibidos = set()
+
+        variantes_payload = list(variantes or [])
+        if not variantes_payload:
+            return
+        base_existente = next((v for v in existentes.values() if not v.color and not v.largo), None)
+
+        def _payload_dict(data):
+            return data if isinstance(data, dict) else data.__dict__
+
+        def _es_base(payload):
+            return not payload.get('color') and not payload.get('largo')
+
+        tiene_base = any(_es_base(_payload_dict(v)) for v in variantes_payload)
+        if not tiene_base:
+            variantes_payload.insert(0, {
+                'id': base_existente.id if base_existente else None,
+                'sku': f"{producto_model.codigo}-BASE",
+                'color': None,
+                'largo': None,
+                'precio_monto': producto_model.monto_precio,
+                'precio_moneda': producto_model.moneda_precio,
+                'stock_actual': producto_model.stock_actual,
+                'stock_minimo': producto_model.stock_minimo,
+                'imagen_url': producto_model.imagen_principal,
+                'activo': True,
+                'orden': -1
+            })
+
+        for idx, data in enumerate(variantes_payload):
+            payload = _payload_dict(data)
+            variante_id = payload.get('id')
+            if variante_id:
+                ids_recibidos.add(str(variante_id))
+            sku = payload.get('sku') or f"{producto_model.codigo}-{payload.get('color') or 'std'}-{payload.get('largo') or 'std'}"
+            defaults = {
+                'sku': sku,
+                'color': payload.get('color'),
+                'largo': payload.get('largo'),
+                'precio_monto': payload.get('precio_monto') or producto_model.monto_precio,
+                'precio_moneda': payload.get('precio_moneda') or producto_model.moneda_precio,
+                'stock_actual': payload.get('stock_actual', 0),
+                'stock_minimo': payload.get('stock_minimo', 0),
+                'imagen_url': payload.get('imagen_url'),
+                'activo': payload.get('activo', True),
+                'orden': payload.get('orden', idx)
+            }
+
+            if variante_id and str(variante_id) in existentes:
+                ProductoVarianteModel.objects.filter(id=variante_id).update(**defaults)
+            else:
+                ProductoVarianteModel.objects.create(producto=producto_model, **defaults)
+
+        for var_id, var_model in existentes.items():
+            if var_id not in ids_recibidos:
+                ProductoVarianteModel.objects.filter(id=var_model.id).update(activo=False)
+
+        self._actualizar_precio_y_stock_producto(producto_model)
+
+    def _actualizar_precio_y_stock_producto(self, producto_model: ProductoModel) -> None:
+        return
     
     def obtener_con_bloqueo(self, id: UUID) -> Optional[Producto]:
         """
@@ -252,6 +387,9 @@ class ProductoRepositoryImpl(ProductoRepository):
             
             model.save()
 
+            if atributos_adicionales and 'variantes' in atributos_adicionales:
+                self._sincronizar_variantes(model, atributos_adicionales.get('variantes') or [])
+
             # Guardar imágenes adicionales si se proporcionan
             if atributos_adicionales and 'imagenes' in atributos_adicionales:
                 imagenes = atributos_adicionales.get('imagenes') or []
@@ -301,6 +439,7 @@ class ProductoRepositoryImpl(ProductoRepository):
                 mensaje=f"Producto {accion.lower()}do exitosamente"
             )
             
+            model = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes', 'variantes').get(id=model.id)
             return self._to_domain(model)
             
         except Exception as e:
@@ -385,7 +524,7 @@ class ProductoRepositoryImpl(ProductoRepository):
 
     def obtener_todos(self, limite: int = 100, offset: int = 0) -> List[Producto]:
         self._logger.info(f"Obteniendo todos los productos", limite=limite, offset=offset)
-        models = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').all()[offset:offset + limite]
+        models = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes', 'variantes').all()[offset:offset + limite]
         return [self._to_domain(model) for model in models]
 
     # ===== MÉTODOS DE BÚSQUEDA AVANZADA =====
@@ -403,7 +542,7 @@ class ProductoRepositoryImpl(ProductoRepository):
         if filtros.solo_disponibles:
             queryset = queryset.filter(activo=True)
         if filtros.solo_con_stock:
-            queryset = queryset.filter(stock_actual__gt=0)
+            queryset = queryset.filter(variantes__stock_actual__gt=0, variantes__activo=True)
         
         # Filtro de texto (búsqueda en nombre y descripción)
         if filtros.texto_busqueda:
@@ -416,13 +555,13 @@ class ProductoRepositoryImpl(ProductoRepository):
         
         # Filtros por atributos de cabello
         if filtros.colores:
-            queryset = queryset.filter(color__in=[c.value for c in filtros.colores])
+            queryset = queryset.filter(variantes__color__in=[c.value for c in filtros.colores], variantes__activo=True)
         
         if filtros.tipos:
             queryset = queryset.filter(tipo__in=[t.value for t in filtros.tipos])
         
         if filtros.largos:
-            queryset = queryset.filter(largo__in=[l.value for l in filtros.largos])
+            queryset = queryset.filter(variantes__largo__in=[l.value for l in filtros.largos], variantes__activo=True)
         
         if filtros.origenes:
             queryset = queryset.filter(origen__in=[o.value for o in filtros.origenes])
@@ -436,9 +575,9 @@ class ProductoRepositoryImpl(ProductoRepository):
         # Filtros de rango de precio
         if filtros.rango_precio and filtros.rango_precio.esta_definido:
             if filtros.rango_precio.minimo is not None:
-                queryset = queryset.filter(monto_precio__gte=filtros.rango_precio.minimo)
+                queryset = queryset.filter(variantes__precio_monto__gte=filtros.rango_precio.minimo, variantes__activo=True)
             if filtros.rango_precio.maximo is not None:
-                queryset = queryset.filter(monto_precio__lte=filtros.rango_precio.maximo)
+                queryset = queryset.filter(variantes__precio_monto__lte=filtros.rango_precio.maximo, variantes__activo=True)
         
         # Filtro de rango de largo
         if filtros.rango_largo and filtros.rango_largo.esta_definido:
@@ -447,21 +586,21 @@ class ProductoRepositoryImpl(ProductoRepository):
                 largos_validos = [
                     str(i) for i in range(filtros.rango_largo.minimo, 33)
                 ]
-                queryset = queryset.filter(largo__in=largos_validos)
+                queryset = queryset.filter(variantes__largo__in=largos_validos, variantes__activo=True)
             if filtros.rango_largo.maximo is not None:
                 largos_validos = [
                     str(i) for i in range(8, filtros.rango_largo.maximo + 1)
                 ]
-                queryset = queryset.filter(largo__in=largos_validos)
+                queryset = queryset.filter(variantes__largo__in=largos_validos, variantes__activo=True)
         
         # Contar total antes de paginar
-        total = queryset.count()
+        total = queryset.distinct().count()
         
         # Aplicar ordenamiento
         queryset = self._aplicar_ordenamiento(queryset, criterios.orden)
         
         # Aplicar paginación
-        queryset = queryset[criterios.offset:criterios.offset + criterios.limit]
+        queryset = queryset.distinct()[criterios.offset:criterios.offset + criterios.limit]
         
         productos = [self._to_domain(m) for m in queryset]
         
@@ -516,7 +655,18 @@ class ProductoRepositoryImpl(ProductoRepository):
         contadores = {}
         
         # Contadores por color
-        colores = queryset.exclude(color__isnull=True).values('color').annotate(
+        variantes_qs = ProductoVarianteModel.objects.select_related('producto')
+        if solo_disponibles:
+            variantes_qs = variantes_qs.filter(producto__activo=True)
+        if solo_con_stock:
+            variantes_qs = variantes_qs.filter(stock_actual__gt=0, activo=True)
+        if texto:
+            variantes_qs = variantes_qs.filter(
+                Q(producto__nombre__icontains=texto) |
+                Q(producto__descripcion__icontains=texto)
+            )
+
+        colores = variantes_qs.exclude(color__isnull=True).values('color').annotate(
             cantidad=Count('id')
         )
         contadores['colores'] = {c['color']: c['cantidad'] for c in colores}
@@ -528,7 +678,7 @@ class ProductoRepositoryImpl(ProductoRepository):
         contadores['tipos'] = {t['tipo']: t['cantidad'] for t in tipos}
         
         # Contadores por largo
-        largos = queryset.exclude(largo__isnull=True).values('largo').annotate(
+        largos = variantes_qs.exclude(largo__isnull=True).values('largo').annotate(
             cantidad=Count('id')
         )
         contadores['largos'] = {l['largo']: l['cantidad'] for l in largos}
@@ -552,9 +702,9 @@ class ProductoRepositoryImpl(ProductoRepository):
         contadores['calidades'] = {c['calidad']: c['cantidad'] for c in calidades}
         
         # Rango de precios
-        precios = queryset.aggregate(
-            min_precio=Min('monto_precio'),
-            max_precio=Max('monto_precio')
+        precios = variantes_qs.aggregate(
+            min_precio=Min('precio_monto'),
+            max_precio=Max('precio_monto')
         )
         contadores['precio'] = {
             'min': precios['min_precio'] or Decimal('0'),

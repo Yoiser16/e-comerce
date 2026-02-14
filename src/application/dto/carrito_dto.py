@@ -29,6 +29,7 @@ class AgregarProductoDTO:
     """DTO para agregar un producto al carrito"""
     carrito_id: UUID
     producto_id: UUID
+    variante_id: UUID
     cantidad: int
 
 
@@ -37,6 +38,7 @@ class AgregarProductoAlCarritoActivoDTO:
     """DTO para agregar producto al carrito activo del usuario"""
     usuario_id: UUID
     producto_id: UUID
+    variante_id: UUID
     cantidad: int
 
 
@@ -45,6 +47,7 @@ class QuitarProductoDTO:
     """DTO para quitar un producto del carrito"""
     carrito_id: UUID
     producto_id: UUID
+    variante_id: UUID
 
 
 @dataclass
@@ -52,6 +55,7 @@ class ActualizarCantidadDTO:
     """DTO para actualizar cantidad de un producto"""
     carrito_id: UUID
     producto_id: UUID
+    variante_id: UUID
     nueva_cantidad: int
 
 
@@ -85,24 +89,32 @@ class ConfirmarCarritoDTO:
 class ItemCarritoDTO:
     """DTO de salida para un item del carrito"""
     producto_id: UUID
+    variante_id: UUID
     sku: str
     nombre: str
     precio_unitario: Decimal
     cantidad: int
     subtotal: Decimal
     moneda: str
+    variante_sku: str = ""
+    color: str = ""
+    largo: str = ""
     
     @classmethod
     def desde_value_object(cls, item: ItemCarrito) -> 'ItemCarritoDTO':
         """Crea DTO desde Value Object"""
         return cls(
             producto_id=item.producto_id,
+            variante_id=item.variante_id,
             sku=item.sku,
             nombre=item.nombre_snapshot,
             precio_unitario=item.precio_unitario_snapshot.monto,
             cantidad=item.cantidad,
             subtotal=item.subtotal.monto,
-            moneda=item.precio_unitario_snapshot.moneda
+            moneda=item.precio_unitario_snapshot.moneda,
+            variante_sku=item.variante_sku,
+            color=item.color_snapshot,
+            largo=item.largo_snapshot
         )
 
 

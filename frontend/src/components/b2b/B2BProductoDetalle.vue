@@ -132,7 +132,7 @@
             <span>Nuevo</span>
             <span>|</span>
             <span>Mayorista</span>
-            <span v-if="producto.stock_actual <= 20" class="text-orange-600 font-medium">• Últimas {{ producto.stock_actual }} uds</span>
+            <span v-if="stockDisponible <= 20" class="text-orange-600 font-medium">• Últimas {{ stockDisponible }} uds</span>
           </div>
           
           <!-- Title -->
@@ -191,11 +191,11 @@
                 v-for="lote in [10, 20, 50, 100]" 
                 :key="lote"
                 @click="seleccionarLote(lote)"
-                :disabled="lote > producto.stock_actual"
+                :disabled="lote > stockDisponible"
                 class="py-2.5 text-sm font-medium rounded-lg border-2 transition-all"
                 :class="cantidad === lote 
                   ? 'bg-[#1A1A1A] text-white border-[#1A1A1A]' 
-                  : lote > producto.stock_actual 
+                  : lote > stockDisponible 
                     ? 'bg-gray-50 text-gray-300 border-gray-100 cursor-not-allowed' 
                     : 'bg-white text-gray-700 border-gray-200 hover:border-[#1A1A1A]'"
               >
@@ -219,7 +219,7 @@
                 <span class="w-12 text-center font-bold text-gray-900">{{ cantidad }}</span>
                 <button 
                   @click="incrementarLote"
-                  :disabled="cantidad + LOTE_MINIMO > producto.stock_actual"
+                  :disabled="cantidad + LOTE_MINIMO > stockDisponible"
                   class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-30"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -249,7 +249,7 @@
             <!-- Add to Cart Button -->
             <button 
               @click="agregarAlCarrito"
-              :disabled="producto.stock_actual < LOTE_MINIMO || agregando"
+              :disabled="stockDisponible < LOTE_MINIMO || agregando"
               class="w-full py-4 bg-[#1A1A1A] hover:bg-black text-white font-bold text-base rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
             >
               <svg v-if="!agregando" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -425,10 +425,10 @@
                       Mayorista
                     </span>
                     <span 
-                      v-if="producto.stock_actual <= 10 && producto.stock_actual > 0"
+                      v-if="stockDisponible <= 10 && stockDisponible > 0"
                       class="px-2.5 py-1 bg-orange-500 text-white text-[10px] font-bold rounded animate-pulse"
                     >
-                      Últimas {{ producto.stock_actual }} uds
+                      Últimas {{ stockDisponible }} uds
                     </span>
                   </div>
                   
@@ -532,7 +532,7 @@
 
             <div class="flex flex-wrap items-center gap-2 text-[10px] sm:text-[11px] uppercase tracking-[0.18em] text-[#7A7A7A]">
               <span class="px-3 py-1 rounded-full bg-[#FAF5F2] border border-[#C9A962]/30 text-[#8B7355]">
-                Stock {{ producto.stock_actual }} uds
+                Stock {{ stockDisponible }} uds
               </span>
               <span class="px-3 py-1 rounded-full bg-white border border-gray-200 text-[#5A5A5A]">
                 Lote minimo {{ LOTE_MINIMO }}
@@ -559,7 +559,7 @@
                   <svg class="w-4 h-4 text-[#007185] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/>
                   </svg>
-                  Color: {{ producto.color }}
+                  Color: {{ formatColorLabel(producto.color) }}
                 </li>
                 <li v-if="producto.largo" class="flex items-center gap-2.5 text-sm text-gray-700">
                   <svg class="w-4 h-4 text-[#007185] flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -746,7 +746,7 @@
                     </tr>
                     <tr class="border-b border-gray-100">
                       <td class="py-2 text-gray-500">Stock</td>
-                      <td class="py-2 font-semibold text-gray-900">{{ producto.stock_actual }} uds</td>
+                      <td class="py-2 font-semibold text-gray-900">{{ stockDisponible }} uds</td>
                     </tr>
                     <tr>
                       <td class="py-2 text-gray-500">Lote mínimo</td>
@@ -791,11 +791,11 @@
                       v-for="lote in [10, 20, 50, 100]" 
                       :key="lote"
                       @click="seleccionarLote(lote)"
-                      :disabled="lote > producto.stock_actual"
+                      :disabled="lote > stockDisponible"
                       class="px-3 py-1.5 text-sm font-medium rounded-md border transition-all"
                       :class="cantidad === lote 
                         ? 'bg-[#1A1A1A] text-white border-[#1A1A1A]' 
-                        : lote > producto.stock_actual 
+                        : lote > stockDisponible 
                           ? 'bg-gray-50 text-gray-300 border-gray-200 cursor-not-allowed' 
                           : 'bg-white text-gray-700 border-gray-300 hover:border-[#007185] hover:text-[#007185]'"
                     >
@@ -818,13 +818,13 @@
                       type="number" 
                       v-model.number="cantidad" 
                       :min="LOTE_MINIMO" 
-                      :max="producto.stock_actual"
+                      :max="stockDisponible"
                       :step="LOTE_MINIMO"
                       class="flex-1 text-center font-bold text-lg py-2 focus:outline-none bg-gray-50"
                     />
                     <button 
                       @click="incrementarLote"
-                      :disabled="cantidad + LOTE_MINIMO > producto.stock_actual"
+                      :disabled="cantidad + LOTE_MINIMO > stockDisponible"
                       class="w-11 h-11 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-30 border-l border-gray-200"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -833,7 +833,7 @@
                     </button>
                   </div>
                   <p class="text-[11px] text-gray-400 mt-2 text-center">
-                    Stock: {{ producto.stock_actual }} uds
+                    Stock: {{ stockDisponible }} uds
                   </p>
                 </div>
                 
@@ -855,7 +855,7 @@
                 <div class="p-4 sm:p-5 bg-white">
                   <button 
                     @click="agregarAlCarrito"
-                    :disabled="producto.stock_actual < LOTE_MINIMO || agregando"
+                    :disabled="stockDisponible < LOTE_MINIMO || agregando"
                     class="w-full py-3.5 bg-[#1A1A1A] hover:bg-black text-white font-bold text-base rounded-md flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <svg v-if="!agregando" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1009,6 +1009,7 @@ import { obtenerProducto as obtenerProductoB2B, obtenerProductos as obtenerProdu
 import { resenasService } from '@/services/resenas'
 import { B2BToast, useToast } from './ui'
 import { getImageUrl } from '@/services/api'
+import { formatColorLabel } from '@/utils/colorLabels'
 
 export default {
   name: 'B2BProductoDetalle',
@@ -1094,9 +1095,23 @@ export default {
       const p = producto.value
       return p.tipo || p.color || p.largo || p.origen || p.calidad || p.peso_gramos || p.metodo
     })
+
+    const variantesDisponibles = computed(() => {
+      const variantes = Array.isArray(producto.value?.variantes) ? producto.value.variantes : []
+      return variantes.filter(v => v && v.activo !== false)
+    })
+
+    const varianteSeleccionada = computed(() => {
+      if (!variantesDisponibles.value.length) return null
+      return variantesDisponibles.value.find(v => (v.stock_actual ?? 0) > 0) || variantesDisponibles.value[0]
+    })
+
+    const stockDisponible = computed(() => {
+      return varianteSeleccionada.value?.stock_actual ?? producto.value.stock_actual ?? 0
+    })
     
     const precioMayorista = computed(() => {
-      return producto.value.precio_mayorista || producto.value.monto_precio || 0
+      return varianteSeleccionada.value?.precio_monto || producto.value.precio_mayorista || producto.value.monto_precio || 0
     })
     
     const precioRetail = computed(() => {
@@ -1315,18 +1330,27 @@ export default {
       
       try {
         agregando.value = true
+
+        if (!varianteSeleccionada.value) {
+          toast.error('Selecciona una variante disponible antes de continuar', 3000)
+          return
+        }
         
         // Agregar al carrito del storage
         const cart = JSON.parse(localStorage.getItem('b2b_cart') || '{"items":[]}')
-        const existingIndex = cart.items.findIndex(i => i.id === producto.value.id)
+        const existingIndex = cart.items.findIndex(i => i.variante_id === varianteSeleccionada.value.id)
         
         if (existingIndex >= 0) {
           cart.items[existingIndex].cantidad += cantidad.value
         } else {
           cart.items.push({
             id: producto.value.id,
+            variante_id: varianteSeleccionada.value.id,
+            variante_sku: varianteSeleccionada.value.sku || '',
+            color: varianteSeleccionada.value.color || '',
+            largo: varianteSeleccionada.value.largo || '',
             nombre: producto.value.nombre,
-            imagen: producto.value.imagen_principal,
+            imagen: varianteSeleccionada.value.imagen_url || producto.value.imagen_principal,
             precio: precioMayorista.value,
             cantidad: cantidad.value
           })
@@ -1474,6 +1498,7 @@ export default {
       agregando,
       productosRelacionados,
       tieneCaracteristicas,
+      stockDisponible,
       resenasProducto,
       resenasLoading,
       resumenResenas,
@@ -1495,6 +1520,7 @@ export default {
       preciosPorVolumen,
       tieneEspecificaciones,
       whatsappUrl,
+      formatColorLabel,
       // Methods
       formatPrice,
       handleImageError,

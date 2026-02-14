@@ -34,10 +34,14 @@ class ItemCarrito(ValueObject):
     """
     
     producto_id: UUID
+    variante_id: UUID
     sku: str
     nombre_snapshot: str
     precio_unitario_snapshot: Dinero
     cantidad: int
+    variante_sku: str = ""
+    color_snapshot: str = ""
+    largo_snapshot: str = ""
     
     def __post_init__(self):
         """Validaciones de negocio al crear el item"""
@@ -86,10 +90,14 @@ class ItemCarrito(ValueObject):
         """
         return ItemCarrito(
             producto_id=self.producto_id,
+            variante_id=self.variante_id,
             sku=self.sku,
             nombre_snapshot=self.nombre_snapshot,
             precio_unitario_snapshot=self.precio_unitario_snapshot,
-            cantidad=nueva_cantidad
+            cantidad=nueva_cantidad,
+            variante_sku=self.variante_sku,
+            color_snapshot=self.color_snapshot,
+            largo_snapshot=self.largo_snapshot
         )
     
     def con_precio_actualizado(self, nuevo_precio: Dinero) -> 'ItemCarrito':
@@ -99,20 +107,24 @@ class ItemCarrito(ValueObject):
         """
         return ItemCarrito(
             producto_id=self.producto_id,
+            variante_id=self.variante_id,
             sku=self.sku,
             nombre_snapshot=self.nombre_snapshot,
             precio_unitario_snapshot=nuevo_precio,
-            cantidad=self.cantidad
+            cantidad=self.cantidad,
+            variante_sku=self.variante_sku,
+            color_snapshot=self.color_snapshot,
+            largo_snapshot=self.largo_snapshot
         )
     
     def __eq__(self, other: object) -> bool:
         """Dos items son iguales si tienen el mismo producto_id"""
         if not isinstance(other, ItemCarrito):
             return False
-        return self.producto_id == other.producto_id
+        return self.variante_id == other.variante_id
     
     def __hash__(self) -> int:
-        return hash(self.producto_id)
+        return hash(self.variante_id)
     
     def __str__(self) -> str:
         return f"{self.cantidad}x {self.nombre_snapshot} @ {self.precio_unitario_snapshot} = {self.subtotal}"

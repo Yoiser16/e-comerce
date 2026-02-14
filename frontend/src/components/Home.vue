@@ -1471,7 +1471,7 @@
           <div v-else class="py-4 space-y-4">
             <div 
               v-for="item in cartItems" 
-              :key="item.producto_id"
+              :key="item.variante_id || item.producto_id"
               class="flex gap-4 p-3 bg-white rounded-xl border border-nude-100 hover:border-nude-200 transition-colors"
             >
               <!-- Imagen del producto - Más grande y redondeada -->
@@ -1499,12 +1499,17 @@
                   <h3 class="text-sm font-medium text-text-dark leading-snug line-clamp-2 mb-1">
                     {{ item.nombre || 'Producto' }}
                   </h3>
+                  <p v-if="item.color || item.largo" class="text-xs text-text-light">
+                    <span v-if="item.color">Color: {{ formatColorLabel(item.color) }}</span>
+                    <span v-if="item.color && item.largo"> · </span>
+                    <span v-if="item.largo">Largo: {{ item.largo }}</span>
+                  </p>
                   
                   <!-- Selector de Cantidad - Estilo Píldora -->
                   <div class="flex items-center gap-2 mt-2">
                     <div class="inline-flex items-center border border-nude-200 rounded-full">
                       <button 
-                        @click="updateQuantity(item.producto_id, (item.cantidad || 1) - 1)"
+                        @click="updateQuantity(item.variante_id || item.producto_id, (item.cantidad || 1) - 1)"
                         class="w-7 h-7 flex items-center justify-center text-text-medium hover:text-text-dark transition-colors"
                         :disabled="(item.cantidad || 1) <= 1"
                       >
@@ -1514,7 +1519,7 @@
                       </button>
                       <span class="w-8 text-center text-sm font-medium text-text-dark">{{ item.cantidad || 1 }}</span>
                       <button 
-                        @click="updateQuantity(item.producto_id, (item.cantidad || 1) + 1)"
+                        @click="updateQuantity(item.variante_id || item.producto_id, (item.cantidad || 1) + 1)"
                         class="w-7 h-7 flex items-center justify-center text-text-medium hover:text-text-dark transition-colors"
                       >
                         <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
@@ -1533,7 +1538,7 @@
               
               <!-- Eliminar - Más visible -->
               <button 
-                @click.stop="removeFromCart(item.producto_id)"
+                @click.stop="removeFromCart(item.variante_id || item.producto_id)"
                 class="self-start mt-1 w-8 h-8 rounded-full flex items-center justify-center bg-red-50 hover:bg-red-100 transition-colors group"
                 title="Eliminar producto"
               >
@@ -1594,6 +1599,7 @@ import { productosService, carritoService, authService, favoritosService } from 
 import { resenasService } from '../services/resenas'
 import { categoriasService } from '../services/categorias'
 import { getImageUrl } from '../services/api'
+import { formatColorLabel } from '@/utils/colorLabels'
 
 export default {
   name: 'Home',
@@ -1705,9 +1711,18 @@ export default {
         const count = localStorage.getItem(CART_COUNT_KEY)
         if (cached) {
           const data = JSON.parse(cached)
-          const items = Array.isArray(data)
+          const rawItems = Array.isArray(data)
             ? data
             : (data?.items || [])
+          const items = rawItems.map((item) => {
+            const productoId = item?.producto_id ?? item?.id
+            const varianteId = item?.variante_id ?? productoId
+            return {
+              ...item,
+              producto_id: productoId,
+              variante_id: varianteId
+            }
+          })
 
           // Compatibilidad con formato antiguo (sin timestamp/total)
           const timestamp = typeof data?.timestamp === 'number' ? data.timestamp : Date.now()
@@ -1754,16 +1769,16 @@ export default {
     }
     
     // Actualizar cantidad de un producto
-    const updateQuantity = async (productoId, nuevaCantidad) => {
+    const updateQuantity = async (itemKey, nuevaCantidad) => {
       if (nuevaCantidad < 1) {
         // Si la cantidad es 0 o menos, eliminar el producto
-        await removeFromCart(productoId)
+        await removeFromCart(itemKey)
         return
       }
       
       try {
         // Actualizar localmente primero para feedback inmediato
-        const itemIndex = cartItems.value.findIndex(i => i.producto_id === productoId)
+        const itemIndex = cartItems.value.findIndex(i => (i.variante_id || i.producto_id) === itemKey)
         if (itemIndex >= 0) {
           cartItems.value[itemIndex].cantidad = nuevaCantidad
           // Recalcular subtotal local
@@ -1779,7 +1794,15 @@ export default {
         
         // Sincronizar con backend si está logueado
         if (isLoggedIn.value) {
-          await carritoService.actualizarCantidad(productoId, nuevaCantidad)
+          const item = cartItems.value.find(i => (i.variante_id || i.producto_id) === itemKey)
+          if (item) {
+            await carritoService.actualizarCantidad(
+              item.producto_id,
+              item.variante_id,
+              nuevaCantidad,
+              localStorage.getItem('kharis_cart_id')
+            )
+          }
         }
       } catch (err) {
         console.error('Error actualizando cantidad:', err)
@@ -1815,6 +1838,9 @@ export default {
           cartCount.value = data.items.reduce((sum, item) => sum + item.cantidad, 0)
           // Guardar en cache local
           saveCartToLocal(data.items, data.total_final || 0, cartCount.value)
+          if (data.id) {
+            localStorage.setItem('kharis_cart_id', data.id)
+          }
         } else if (data === null) {
           // Backend dice que no hay carrito - pero mantener cache si existe
         } else {
@@ -1837,10 +1863,10 @@ export default {
       }
     }
     
-    const removeFromCart = async (itemId) => {
+    const removeFromCart = async (itemKey) => {
       try {
         // Primero actualizar UI localmente para feedback inmediato
-        const itemIndex = cartItems.value.findIndex(i => i.producto_id === itemId)
+        const itemIndex = cartItems.value.findIndex(i => (i.variante_id || i.producto_id) === itemKey)
         if (itemIndex >= 0) {
           const itemCantidad = cartItems.value[itemIndex].cantidad || 1
           cartItems.value.splice(itemIndex, 1)
@@ -1866,7 +1892,12 @@ export default {
         // Sincronizar con backend si está logueado
         if (isLoggedIn.value) {
           try {
-            await carritoService.eliminarProducto(itemId)
+            const item = cartItems.value.find(i => (i.variante_id || i.producto_id) === itemKey)
+            await carritoService.eliminarProducto(
+              item?.producto_id,
+              item?.variante_id,
+              localStorage.getItem('kharis_cart_id')
+            )
           } catch (backendErr) {
             // Si falla el backend pero ya actualizamos localmente, no pasa nada grave
             console.warn('Error sync eliminar con backend:', backendErr)
@@ -2085,7 +2116,7 @@ export default {
           const descNormalizada = descripcion.replace(/\s+/g, ' ').trim().toLowerCase()
           const descCortaNormalizada = descripcionCorta.replace(/\s+/g, ' ').trim().toLowerCase()
           if (nombreNormalizado === 'extensiones') {
-            const nuevoTexto = 'Todos los largos y tonos, con calidad verificada y acabado natural impecable.'
+            const nuevoTexto = 'Largos y tonos para cada look, con calidad comprobada y caida natural.'
             return {
               ...categoria,
               descripcion: nuevoTexto,
@@ -2160,12 +2191,20 @@ export default {
 
     const agregarAlCarrito = async (producto) => {
       try {
-        // Obtener el precio correcto del producto
-        const precioProducto = Number(producto.precio_monto || producto.precio_final || producto.precio || 0)
+        const variantes = Array.isArray(producto?.variantes) ? producto.variantes : []
+        const varianteSeleccionada = variantes.find(v => v.activo !== false && (v.stock_actual ?? 0) > 0) || variantes[0]
+        if (!varianteSeleccionada) {
+          showToast('Este producto no tiene variantes disponibles', 'info')
+          return
+        }
+
+        const precioProducto = Number(
+          varianteSeleccionada.precio_monto ?? producto.precio_monto ?? producto.precio_final ?? producto.precio ?? 0
+        )
         
         // Actualizar carrito local inmediatamente (para todos los usuarios)
         const currentItems = [...cartItems.value]
-        const existingIndex = currentItems.findIndex(i => i.producto_id === producto.id)
+        const existingIndex = currentItems.findIndex(i => (i.variante_id || i.producto_id) === varianteSeleccionada.id)
         if (existingIndex >= 0) {
           currentItems[existingIndex].cantidad++
           currentItems[existingIndex].subtotal = currentItems[existingIndex].cantidad * currentItems[existingIndex].precio_unitario
@@ -2173,8 +2212,12 @@ export default {
           const imgUrl = producto.imagen_url || producto.imagen_principal || producto.imagen || producto.imagenes?.[0] || null
           currentItems.push({
             producto_id: producto.id,
+            variante_id: varianteSeleccionada.id,
+            variante_sku: varianteSeleccionada.sku || '',
+            color: varianteSeleccionada.color || '',
+            largo: varianteSeleccionada.largo || '',
             nombre: producto.nombre,
-            imagen_url: imgUrl ? getImageUrl(imgUrl) : null,
+            imagen_url: getImageUrl(varianteSeleccionada.imagen_url || imgUrl),
             precio_unitario: precioProducto,
             cantidad: 1,
             subtotal: precioProducto
@@ -2196,7 +2239,7 @@ export default {
         // Si está logueado, también sincronizar con el backend
         if (isLoggedIn.value) {
           try {
-            await carritoService.agregarProducto(producto.id, 1)
+            await carritoService.agregarProducto(producto.id, varianteSeleccionada.id, 1)
             // Sincronizar con backend en segundo plano
             cargarResumenCarrito().catch(e => console.warn('Error sync resumen:', e))
           } catch (backendErr) {
@@ -2466,6 +2509,7 @@ export default {
       handleSearch,
       scrollToTop,
       formatPrice,
+      formatColorLabel,
       getItemPrice,
       getCartSubtotal,
       cargarProductos,
