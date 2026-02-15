@@ -10,8 +10,70 @@
         isScrolled ? 'header-luxury-scrolled py-2' : 'header-luxury py-4'
       ]"
     >
-      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-        <div class="flex items-center justify-between">
+      <div class="max-w-7xl mx-auto px-4 sm:px-8 lg:px-12">
+        <!-- Mobile Header: Hamburger | Logo (center) | Search + Cart -->
+        <div class="flex lg:hidden items-center justify-between">
+          <!-- Left: Hamburger -->
+          <button 
+            @click="openMobileMenu"
+            class="w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target hover:bg-black/5"
+          >
+            <svg class="w-5 h-5 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+            </svg>
+          </button>
+
+          <!-- Center: Logo -->
+          <a href="#" class="absolute left-1/2 -translate-x-1/2 flex items-center group">
+            <img 
+              :src="isScrolled ? '/logo-kharis.png' : '/logo blanco.png'" 
+              alt="Kharis Distribuidora" 
+              class="h-10 sm:h-14 w-auto object-contain drop-shadow-[0_2px_8px_rgba(216,27,96,0.15)] logo-transition"
+              style="filter: contrast(1.1) saturate(1.15);"
+            />
+          </a>
+
+          <!-- Right: Search + User + Cart -->
+          <div class="flex items-center gap-0.5">
+            <button 
+              @click="openMobileSearch"
+              class="w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target hover:bg-black/5"
+            >
+              <svg class="w-4.5 h-4.5 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+            </button>
+            <!-- User / Login -->
+            <button 
+              @click="toggleUserMenu"
+              data-user-toggle
+              class="w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target"
+              :class="isLoggedIn ? 'border border-text-dark/20 hover:border-text-dark/40' : 'hover:bg-black/5'"
+            >
+              <span v-if="isLoggedIn" class="text-xs font-medium text-text-dark">{{ userInitial }}</span>
+              <svg v-else class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              </svg>
+            </button>
+            <button 
+              class="relative w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target hover:bg-black/5"
+              @click="openCartDrawer"
+            >
+              <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+              </svg>
+              <span 
+                v-if="cartCount > 0"
+                class="absolute -top-0.5 -right-0.5 w-4 h-4 text-[9px] font-medium rounded-full flex items-center justify-center bg-text-dark text-white"
+              >
+                {{ cartCount }}
+              </span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Desktop Header: Logo | Search | Nav | Icons -->
+        <div class="hidden lg:flex items-center justify-between">
           <!-- Logo -->
           <a href="#" class="flex items-center gap-3 group flex-shrink-0">
             <div class="relative">
@@ -29,7 +91,7 @@
           </a>
 
           <!-- Buscador Desktop -->
-          <div class="hidden lg:flex flex-1 max-w-xs mx-8">
+          <div class="flex flex-1 max-w-xs mx-8">
             <div class="relative w-full" ref="searchInputRef">
               <input 
                 type="text"
@@ -111,8 +173,8 @@
             </div>
           </div>
 
-          <!-- Navegación Desktop - Más legible -->
-          <nav class="hidden lg:flex items-center gap-7">
+          <!-- Navegación Desktop -->
+          <nav class="flex items-center gap-7">
             <router-link to="/catalogo" class="nav-link-luxury">CATÁLOGO</router-link>
             <a href="#categorias" class="nav-link-luxury">CATEGORÍAS</a>
             <a href="#productos" class="nav-link-luxury">PRODUCTOS</a>
@@ -121,20 +183,8 @@
             <a href="#contacto" class="nav-link-luxury">CONTACTO</a>
           </nav>
 
-          <!-- Acciones - Iconos compactos -->
-          <div class="flex items-center gap-0.5 sm:gap-1">
-            <!-- Buscador Mobile -->
-            <button 
-              @click="openMobileSearch"
-              :class="[
-                'lg:hidden w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target',
-                isScrolled ? 'hover:bg-black/5' : 'hover:bg-white/10'
-              ]"
-            >
-              <svg :class="['w-4.5 h-4.5', isScrolled ? 'text-text-dark' : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]']" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-              </svg>
-            </button>
+          <!-- Acciones Desktop - Iconos -->
+          <div class="flex items-center gap-1">
             
             <!-- Usuario con dropdown -->
             <div class="relative" ref="userMenuRef">
@@ -315,7 +365,7 @@
               </Teleport>
             </div>
             
-            <!-- Carrito -->
+            <!-- Carrito Desktop -->
             <button 
               :class="[
                 'relative w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target',
@@ -335,19 +385,6 @@
               >
                 {{ cartCount }}
               </span>
-            </button>
-
-            <!-- Menu Mobile (Hamburger) -->
-            <button 
-              @click="openMobileMenu"
-              :class="[
-                'lg:hidden w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target',
-                isScrolled ? 'hover:bg-black/5' : 'hover:bg-white/10'
-              ]"
-            >
-              <svg :class="['w-4.5 h-4.5', isScrolled ? 'text-text-dark' : 'text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]']" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
-              </svg>
             </button>
           </div>
         </div>
@@ -493,7 +530,7 @@
             leave-from-class="sidebar-leave-from"
             leave-to-class="sidebar-leave-to"
           >
-            <nav v-if="mobileMenuOpen" class="fixed top-0 right-0 z-[9997] w-[52%] max-w-[220px] h-full bg-white lg:hidden flex flex-col sidebar-mobile">
+            <nav v-if="mobileMenuOpen" class="fixed top-0 left-0 z-[9997] w-[52%] max-w-[220px] h-full bg-white lg:hidden flex flex-col sidebar-mobile">
               
               <!-- Header del Sidebar -->
               <div class="flex items-center justify-between px-4 py-3.5 border-b border-black/5">
@@ -610,14 +647,14 @@
     <!-- ========================================
          HERO SECTION - Full Screen High Impact
          ======================================== -->
-    <section class="relative min-h-[100svh] sm:min-h-screen flex items-center overflow-hidden">
+    <section class="relative mt-14 sm:mt-0 h-[75svh] min-h-[500px] sm:h-auto sm:min-h-screen flex items-center overflow-hidden">
       
       <!-- ===== BACKGROUND CAROUSEL ===== -->
       <div class="absolute inset-0 z-0">
         <!-- Carousel Images -->
-        <transition-group name="hero-crossfade" tag="div" class="absolute inset-0">
+        <transition-group name="hero-slide" tag="div" class="absolute inset-0">
           <img 
-            v-for="(slide, index) in heroSlides"
+            v-for="(slide, index) in activeHeroSlides"
             :key="index"
             v-show="currentSlide === index"
             :src="slide.image" 
@@ -629,14 +666,13 @@
         <div class="hidden sm:block absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10"></div>
         <div class="hidden sm:block absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-black/20 z-10"></div>
         
-        <!-- Overlay cinematográfico premium - Móvil -->
+        <!-- Overlay Retail Móvil - Solo gradiente inferior, imagen limpia arriba -->
         <div class="sm:hidden absolute inset-0 hero-overlay-mobile z-10"></div>
-        <div class="sm:hidden absolute inset-0 bg-gradient-to-r from-black/60 via-black/30 to-transparent z-10"></div>
         
         <!-- Carousel Indicators - Ocultos en móvil para diseño limpio -->
         <div class="hidden sm:flex absolute bottom-8 left-1/2 -translate-x-1/2 z-20 items-center gap-2">
           <button 
-            v-for="(slide, index) in heroSlides" 
+            v-for="(slide, index) in activeHeroSlides" 
             :key="index"
             @click="goToSlide(index)"
             :class="[
@@ -649,33 +685,33 @@
         </div>
       </div>
 
-      <!-- ===== CONTENT - Layout reorganizado para móvil ===== -->
-      <div class="relative z-10 w-full h-full min-h-[100svh] sm:min-h-screen flex flex-col justify-between sm:justify-center max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pt-20 sm:pt-20 pb-20 sm:pb-0">
+      <!-- ===== CONTENT ===== -->
+      <div class="relative z-10 w-full h-full sm:min-h-screen flex flex-col justify-end sm:justify-center max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pb-7 sm:pb-0 sm:pt-20">
         
-        <!-- Bloque de textos - Arriba en móvil -->
-        <div class="max-w-3xl text-left sm:mb-0">
+        <!-- Desktop content block (hidden on mobile) -->
+        <div class="hidden sm:block max-w-3xl text-left">
           
-          <!-- Badge - Oculto en móvil para diseño más limpio -->
-          <div class="hidden sm:inline-flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-5 py-2.5 mb-8 animate-fade-in-up">
+          <!-- Badge -->
+          <div class="inline-flex items-center gap-2.5 bg-white/10 backdrop-blur-md border border-white/20 rounded-full px-5 py-2.5 mb-8 animate-fade-in-up">
             <span class="w-2 h-2 bg-gold-400 rounded-full animate-pulse"></span>
             <span class="text-sm font-medium text-white tracking-wide uppercase">Distribuidora Mayorista desde 2023</span>
           </div>
 
-          <!-- Title - Con animación premium escalonada -->
-          <h1 class="font-luxury text-white leading-[1.05] mb-4 sm:mb-8 drop-shadow-2xl hero-animate-title sm:animate-fade-in-up sm:delay-100">
-            <span class="block text-lg sm:text-3xl lg:text-4xl font-light tracking-wide mb-1 sm:mb-2">Tu Socio Experto en</span>
-            <span class="block text-[2.5rem] sm:text-6xl lg:text-7xl xl:text-8xl text-transparent bg-clip-text bg-gradient-to-r from-white via-gold-200 to-gold-400 font-bold italic leading-[1.1]">
+          <!-- Title Desktop -->
+          <h1 class="font-luxury text-white leading-[1.05] mb-8 drop-shadow-2xl animate-fade-in-up delay-100">
+            <span class="block text-3xl lg:text-4xl font-light tracking-wide mb-2">Tu Socio Experto en</span>
+            <span class="block text-6xl lg:text-7xl xl:text-8xl text-transparent bg-clip-text bg-gradient-to-r from-white via-gold-200 to-gold-400 font-bold italic leading-[1.1]">
               Belleza Profesional
             </span>
           </h1>
 
-          <!-- Subtitle - Con animación escalonada -->
-          <p class="text-[15px] sm:text-lg lg:text-xl text-white/90 leading-relaxed max-w-xs sm:max-w-xl font-light hero-animate-subtitle sm:animate-fade-in-up sm:delay-200 tracking-wide">
+          <!-- Subtitle Desktop -->
+          <p class="text-lg lg:text-xl text-white/90 leading-relaxed max-w-xl font-light animate-fade-in-up delay-200 tracking-wide">
             Extensiones 100% naturales, pelucas premium y accesorios de clase mundial.
           </p>
           
-          <!-- CTAs Desktop - Se muestran aquí en desktop -->
-          <div class="hidden sm:flex flex-row gap-5 mt-12 mb-16 animate-fade-in-up delay-300">
+          <!-- CTAs Desktop -->
+          <div class="flex flex-row gap-5 mt-12 mb-16 animate-fade-in-up delay-300">
             <router-link 
               to="/catalogo" 
               class="inline-flex items-center justify-center px-8 py-4 bg-white text-gray-900 font-semibold text-base rounded-full shadow-lg hover:shadow-xl hover:bg-gray-100 transition-all duration-300 touch-target"
@@ -698,29 +734,34 @@
           </div>
         </div>
 
-        <!-- CTAs Móvil - Con micro-interacciones y animaciones premium -->
-        <div class="sm:hidden w-full flex flex-col gap-3.5 mt-auto px-1">
-          <router-link 
-            to="/catalogo" 
-            class="hero-animate-cta btn-hero-mobile btn-hero-primary w-full inline-flex items-center justify-center px-6 py-4 text-gray-900 font-semibold text-[15px] rounded-full touch-target"
-          >
-            Ver Catálogo
-            <svg class="w-5 h-5 ml-2.5 transition-transform group-hover:translate-x-1" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-            </svg>
-          </router-link>
+        <!-- Mobile content block - Bottom aligned, retail clean -->
+        <div class="sm:hidden text-left">
+          <!-- Title Móvil - Solo H1, grande y compacto -->
+          <h1 class="text-white leading-[1.1] mb-5 hero-animate-title">
+            <span class="block text-[2rem] font-bold tracking-tight">
+              Cabello 100%<br>Natural Premium
+            </span>
+          </h1>
           
-          <a 
-            href="#mayoreo" 
-            class="hero-animate-cta-secondary btn-hero-mobile btn-hero-secondary w-full inline-flex items-center justify-center px-6 py-4 text-white font-medium text-[15px] rounded-full touch-target"
-          >
-            <svg class="w-5 h-5 mr-2.5 opacity-90" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-               <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016a3.001 3.001 0 003.75.614m-16.5 0a3.004 3.004 0 01-.621-4.72L4.318 3.44A1.5 1.5 0 015.378 3h13.243a1.5 1.5 0 011.06.44l1.19 1.189a3 3 0 01-.621 4.72m-13.5 8.65h3.75a.75.75 0 00.75-.75V13.5a.75.75 0 00-.75-.75H6.75a.75.75 0 00-.75.75v3.75c0 .415.336.75.75.75z" />
-            </svg>
-            Portal Mayorista
-          </a>
+          <!-- CTAs Móvil - Side by side, compactos -->
+          <div class="flex flex-row gap-2.5 hero-animate-cta">
+            <router-link 
+              to="/catalogo" 
+              class="btn-hero-mobile btn-hero-primary flex-1 inline-flex items-center justify-center px-4 py-3 text-gray-900 font-semibold text-[13px] rounded-[4px] tracking-wide touch-target"
+            >
+              VER CATÁLOGO
+            </router-link>
+            
+            <a 
+              href="#mayoreo" 
+              class="btn-hero-mobile btn-hero-secondary flex-1 inline-flex items-center justify-center px-4 py-3 text-white font-medium text-[13px] rounded-[4px] tracking-wide touch-target"
+            >
+              MAYORISTA
+            </a>
+          </div>
         </div>
       </div>
+
     </section>
 
     <!-- ========================================
@@ -1528,12 +1569,12 @@
       </span>
     </a>
 
-    <!-- WhatsApp Button - En móvil aparece solo con scroll para no estorbar en hero -->
+    <!-- WhatsApp Button - Solo visible después del hero -->
     <a 
-      v-show="isScrolled || windowWidth >= 640"
+      v-show="showFloatingBtns || windowWidth >= 640"
       href="https://wa.me/4796657763?text=Hola,%20me%20interesa%20información%20sobre%20sus%20productos"
       target="_blank"
-      class="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-12 h-12 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-green-500 text-white rounded-full flex items-center justify-center shadow-xl hover:bg-green-600 hover:scale-110 transition-all duration-300 z-40 group touch-target"
+      class="fixed bottom-4 sm:bottom-6 right-4 sm:right-6 w-11 h-11 sm:w-14 sm:h-14 lg:w-16 lg:h-16 bg-green-500 text-white rounded-full flex items-center justify-center shadow-xl hover:bg-green-600 hover:scale-110 transition-all duration-300 z-40 group touch-target"
     >
       <svg class="w-5 h-5 sm:w-6 sm:h-6 lg:w-8 lg:h-8" fill="currentColor" viewBox="0 0 24 24">
         <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
@@ -1548,7 +1589,7 @@
          SCROLL TO TOP BUTTON (Left Side) - Compacto en móvil
          ======================================== -->
     <button 
-      v-show="isScrolled"
+      v-show="showFloatingBtns"
       @click="scrollToTop"
       class="fixed bottom-4 sm:bottom-6 left-4 sm:left-6 w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-brand-600 hover:bg-brand-700 text-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all duration-300 z-40 group touch-target"
     >
@@ -1900,6 +1941,7 @@ export default {
     const error = ref(null)
     const cartCount = ref(0)
     const isScrolled = ref(false)
+    const showFloatingBtns = ref(false)
     const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
     const mobileMenuOpen = ref(false)
     const mobileSearchOpen = ref(false)
@@ -2270,6 +2312,26 @@ export default {
         alt: 'Kanekalon - Fibras de cabello premium'
       },
       {
+        image: '/images/hero b2c/1.jpeg',
+        alt: 'Belleza profesional - Extensiones premium'
+      },
+      {
+        image: '/images/hero b2c/2.jpeg',
+        alt: 'Cabello natural de alta calidad'
+      },
+      {
+        image: '/images/hero b2c/3.jpeg',
+        alt: 'Estilo y elegancia profesional'
+      }
+    ])
+
+    // Slides desktop - imágenes horizontales originales
+    const heroSlidesDesktop = ref([
+      {
+        image: '/imghanekalom.jpg',
+        alt: 'Kanekalon - Fibras de cabello premium'
+      },
+      {
         image: '/img2.jpg',
         alt: 'Extensiones de cabello profesionales'
       },
@@ -2291,13 +2353,18 @@ export default {
       }
     ])
 
+    // Slides activos según viewport: móvil = verticales, desktop = horizontales
+    const activeHeroSlides = computed(() => {
+      return windowWidth.value < 640 ? heroSlides.value : heroSlidesDesktop.value
+    })
+
     const goToSlide = (index) => {
       currentSlide.value = index
       resetSlideInterval()
     }
 
     const nextSlide = () => {
-      currentSlide.value = (currentSlide.value + 1) % heroSlides.value.length
+      currentSlide.value = (currentSlide.value + 1) % activeHeroSlides.value.length
     }
 
     const startSlideshow = () => {
@@ -2428,13 +2495,28 @@ export default {
     }
 
     const handleScroll = () => {
-      // En móvil el cambio ocurre más abajo (100px) para transición más suave
-      const threshold = windowWidth.value < 640 ? 100 : 30
-      isScrolled.value = window.scrollY > threshold
+      // En móvil el header siempre es blanco (sólido), no transparente
+      if (windowWidth.value < 640) {
+        isScrolled.value = true
+      } else {
+        const threshold = 30
+        isScrolled.value = window.scrollY > threshold
+      }
+      // Botones flotantes: solo visibles después de pasar el hero (>500px)
+      showFloatingBtns.value = window.scrollY > 500
     }
 
     const handleResize = () => {
+      const prevWidth = windowWidth.value
       windowWidth.value = window.innerWidth
+      // Re-evaluar header al cambiar tamaño (mobile siempre blanco)
+      handleScroll()
+      // Reset slide si cambiamos entre mobile/desktop (diferente cantidad de slides)
+      const crossedBreakpoint = (prevWidth < 640 && windowWidth.value >= 640) || (prevWidth >= 640 && windowWidth.value < 640)
+      if (crossedBreakpoint) {
+        currentSlide.value = 0
+        resetSlideInterval()
+      }
     }
 
     const scrollToTop = () => {
@@ -2661,6 +2743,8 @@ export default {
     
     // Cerrar menú al hacer clic fuera
     const handleClickOutside = (event) => {
+      // Ignorar si el click viene del botón mobile de usuario
+      if (event.target.closest('[data-user-toggle]')) return
       if (userMenuRef.value && !userMenuRef.value.contains(event.target)) {
         showUserMenu.value = false
       }
@@ -2843,6 +2927,7 @@ export default {
       error,
       cartCount,
       isScrolled,
+      showFloatingBtns,
       windowWidth,
       mobileMenuOpen,
       openMobileMenu,
@@ -2858,6 +2943,8 @@ export default {
       suggestionsRef,
       currentSlide,
       heroSlides,
+      heroSlidesDesktop,
+      activeHeroSlides,
       goToSlide,
       handleSearch,
       getSuggestions,
@@ -3010,23 +3097,23 @@ export default {
   }
 }
 
-/* Hero Crossfade Transition - Suave y elegante */
-.hero-crossfade-enter-active {
-  transition: opacity 1.2s ease-in-out;
-}
-.hero-crossfade-leave-active {
-  transition: opacity 1.2s ease-in-out;
+/* Hero Slide Transition - Horizontal slide */
+.hero-slide-enter-active,
+.hero-slide-leave-active {
+  transition: transform 0.6s ease-in-out;
   position: absolute;
+  inset: 0;
+  will-change: transform;
 }
-.hero-crossfade-enter-from {
-  opacity: 0;
+.hero-slide-enter-from {
+  transform: translateX(100%);
 }
-.hero-crossfade-leave-to {
-  opacity: 0;
+.hero-slide-leave-to {
+  transform: translateX(-100%);
 }
-.hero-crossfade-enter-to,
-.hero-crossfade-leave-from {
-  opacity: 1;
+.hero-slide-enter-to,
+.hero-slide-leave-from {
+  transform: translateX(0);
 }
 
 /* ==========================================
@@ -3072,7 +3159,7 @@ export default {
    OFF-CANVAS SIDEBAR MÓVIL
    ========================================== */
 .sidebar-mobile {
-  box-shadow: -8px 0 30px rgba(0, 0, 0, 0.1);
+  box-shadow: 8px 0 30px rgba(0, 0, 0, 0.1);
 }
 
 /* Safe area para dispositivos con notch */
@@ -3082,7 +3169,7 @@ export default {
   }
 }
 
-/* Slide-in desde la derecha */
+/* Slide-in desde la izquierda */
 .sidebar-enter-active {
   transition: transform 0.3s cubic-bezier(0.32, 0.72, 0, 1);
 }
@@ -3090,7 +3177,7 @@ export default {
   transition: transform 0.25s ease-in;
 }
 .sidebar-enter-from {
-  transform: translateX(100%);
+  transform: translateX(-100%);
 }
 .sidebar-enter-to {
   transform: translateX(0);
@@ -3099,6 +3186,6 @@ export default {
   transform: translateX(0);
 }
 .sidebar-leave-to {
-  transform: translateX(100%);
+  transform: translateX(-100%);
 }
 </style>
