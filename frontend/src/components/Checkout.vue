@@ -831,7 +831,7 @@
 <script>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
-import apiClient, { getImageUrl } from '@/services/api'
+import apiClient, { getImageUrl, API_BASE_URL } from '@/services/api'
 import { formatColorLabel } from '@/utils/colorLabels'
 
 // API de Colombia - Datos oficiales de departamentos y municipios
@@ -1166,7 +1166,7 @@ export default {
         console.log('🔍 Buscando cliente con email:', userEmail)
         
         // Obtener todos los clientes y buscar el actual por email
-        const clientesResponse = await fetch('http://localhost:8000/api/v1/clientes/', {
+        const clientesResponse = await fetch(`${API_BASE_URL}/api/v1/clientes/`, {
           headers: { 'Authorization': `Bearer ${token}` }
         })
         
@@ -1235,7 +1235,7 @@ export default {
           
           // Intentar obtener todas las órdenes y filtrar por este cliente
           try {
-            const ordenesResponse = await fetch('http://localhost:8000/api/v1/ordenes', {
+            const ordenesResponse = await fetch(`${API_BASE_URL}/api/v1/ordenes`, {
               headers: { 'Authorization': `Bearer ${token}` }
             })
           
@@ -1256,7 +1256,7 @@ export default {
                 const ultimaOrdenId = ordenesCliente[0].id
                 console.log('🔍 Obteniendo detalle de orden:', ultimaOrdenId)
                 
-                const detalleResponse = await fetch(`http://localhost:8000/api/v1/ordenes/${ultimaOrdenId}`, {
+                const detalleResponse = await fetch(`${API_BASE_URL}/api/v1/ordenes/${ultimaOrdenId}`, {
                   headers: { 'Authorization': `Bearer ${token}` }
                 })
                 
@@ -1604,9 +1604,7 @@ export default {
         try {
           // 0. VALIDAR STOCK ANTES DE CREAR ORDEN
           console.log('🔍 Validando disponibilidad de stock...')
-          const stockValidationUrl = window.location.hostname === 'localhost' 
-            ? 'http://localhost:8000/api/v1/ordenes/validar-stock'
-            : '/api/v1/ordenes/validar-stock'
+          const stockValidationUrl = `${API_BASE_URL}/api/v1/ordenes/validar-stock`
           
           const stockCheckResponse = await fetch(stockValidationUrl, {
             method: 'POST',
@@ -1689,9 +1687,7 @@ export default {
           })
           
           // Usar URL completa para evitar problemas de proxy
-          const apiUrl = window.location.hostname === 'localhost' 
-            ? 'http://localhost:8000/api/v1/ordenes'
-            : '/api/v1/ordenes'
+          const apiUrl = `${API_BASE_URL}/api/v1/ordenes`
           
           const response = await fetch(apiUrl, {
             method: 'POST',
@@ -1715,7 +1711,7 @@ export default {
             if (token && userStr) {
               const user = JSON.parse(userStr)
               // Obtener el cliente por email
-              const clientesResponse = await fetch('http://localhost:8000/api/v1/clientes/', {
+              const clientesResponse = await fetch(`${API_BASE_URL}/api/v1/clientes/`, {
                 headers: { 'Authorization': `Bearer ${token}` }
               })
               if (clientesResponse.ok) {
@@ -1734,7 +1730,7 @@ export default {
                   console.log('📤 Actualizando dirección del cliente:', updateData)
                   
                   // PUT sin ID en la ruta - el ID va en el body
-                  const updateResponse = await fetch('http://localhost:8000/api/v1/clientes/', {
+                  const updateResponse = await fetch(`${API_BASE_URL}/api/v1/clientes/`, {
                     method: 'PUT',
                     headers: { 
                       'Content-Type': 'application/json',

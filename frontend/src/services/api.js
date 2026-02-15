@@ -17,8 +17,28 @@ const apiClient = axios.create({
  */
 export const getImageUrl = (url) => {
   if (!url) return null
-  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:')) {
+  
+  // Strip localhost/dev URLs - convert to relative path
+  if (url.includes('localhost') || url.includes('127.0.0.1')) {
+    try {
+      const parsed = new URL(url)
+      url = parsed.pathname // e.g. "/static/uploads/productos/xxx.png"
+    } catch {
+      url = url.replace(/https?:\/\/(localhost|127\.0\.0\.1)(:\d+)?/g, '')
+    }
+  }
+  
+  if (url.startsWith('https://') || url.startsWith('data:')) {
     return url
+  }
+  // For http:// on production (mixed content), convert to relative
+  if (url.startsWith('http://')) {
+    try {
+      const parsed = new URL(url)
+      url = parsed.pathname
+    } catch {
+      return url
+    }
   }
   const normalized = url.startsWith('/') ? url : `/${url}`
   return `${API_BASE_URL}${normalized}`
