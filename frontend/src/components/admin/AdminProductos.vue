@@ -382,27 +382,33 @@
     <div v-if="showB2BModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
       <div class="bg-[#FAFAFA] rounded-3xl max-w-2xl w-full p-6 sm:p-7 space-y-5 border border-black/5 shadow-[0_25px_70px_rgba(0,0,0,0.18)]">
         <div class="flex items-start justify-between gap-4">
-          <div>
+          <div class="flex-1">
             <h3 class="text-lg sm:text-xl font-luxury text-text-dark">Descuentos por volumen · Mayoristas</h3>
-            <p class="text-[11px] uppercase tracking-[0.12em] text-text-light mt-1">
-              Producto: <span class="font-medium text-text-dark">{{ b2bProduct?.nombre }}</span>
-              · Mínimo: <span class="font-medium text-text-dark">{{ getB2BTargetMin() }}</span>
+            <p class="text-sm text-text-medium mt-2">
+              {{ b2bProduct?.nombre }}
             </p>
-            <div v-if="b2bVariants.length" class="mt-2">
-              <label class="block text-[11px] font-semibold text-text-medium uppercase tracking-[0.14em]">Aplicar a</label>
+            
+            <div v-if="b2bVariants.length" class="mt-5 pt-5 border-t border-text-dark/5">
+              <p class="text-[10px] font-semibold uppercase tracking-[0.15em] text-text-light mb-2">Configurar descuentos para:</p>
               <select
                 v-model="b2bTargetKey"
                 @change="handleB2BTargetChange"
-                class="mt-1 w-full px-3 py-2.5 border border-text-dark/10 rounded-lg text-sm focus:outline-none focus:border-text-dark/30 bg-white"
+                class="w-full px-4 py-3 border border-text-dark/15 rounded-xl text-sm font-medium bg-white hover:border-text-dark/30 focus:outline-none focus:border-[#D81B60] focus:ring-2 focus:ring-[#D81B60]/10 transition-all duration-200"
               >
-                <option value="producto">Producto base</option>
-                <option v-for="variante in b2bVariants" :key="variante.id" :value="variante.id">
+                <option value="producto" class="font-semibold">Producto base (todas las variantes)</option>
+                <option v-for="variante in b2bVariants" :key="variante.id" :value="variante.id" class="font-medium">
                   {{ getVarianteLabel(variante) }}
                 </option>
               </select>
+              <p class="text-[10px] text-text-light mt-2">
+                Mínimo requerido: <span class="font-semibold text-text-dark">{{ getB2BTargetMin() }} unidades</span>
+              </p>
+            </div>
+            <div v-else class="mt-4 p-3 bg-blue-50 rounded-lg">
+              <p class="text-[11px] text-blue-900 font-medium">Este producto no tiene variantes.</p>
             </div>
           </div>
-          <button @click="closeB2BModal" class="text-text-light hover:text-text-dark">
+          <button @click="closeB2BModal" class="flex-shrink-0 text-text-light hover:text-text-dark transition-colors mt-1">
             <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
@@ -876,13 +882,18 @@ export default {
       return 'text-gray-900'
     }
 
+    const formatAttributeValue = (value) => {
+      if (!value) return ''
+      return value
+        .split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ')
+    }
+
     const getVarianteLabel = (variante) => {
       if (!variante) return 'Variante'
-      const parts = []
-      if (variante.color) parts.push(variante.color)
-      if (variante.largo) parts.push(`${variante.largo} pulg`)
-      const suffix = parts.length ? parts.join(' · ') : 'Sin atributos'
-      return `${suffix} (${variante.sku || 'SKU'})`
+      const colorLabel = variante.color ? formatAttributeValue(variante.color) : 'Sin color'
+      return colorLabel
     }
 
     const getB2BTargetMin = () => {
@@ -1034,7 +1045,8 @@ export default {
       try {
         const detalle = await productosService.getProducto(producto.id)
         const variantes = Array.isArray(detalle?.variantes) ? detalle.variantes : []
-        b2bVariants.value = variantes.filter(v => v && v.activo !== false)
+        // Excluir variantes sin atributos (la base se configura en "Producto base")
+        b2bVariants.value = variantes.filter(v => v && v.activo !== false && (v.color || v.largo))
         await loadB2BTiers()
       } catch (err) {
         b2bError.value = 'No se pudieron cargar los descuentos por volumen.'
