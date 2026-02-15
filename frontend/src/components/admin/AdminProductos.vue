@@ -921,7 +921,7 @@ export default {
               cantidad_minima: Number(t.cantidad_minima || minimo),
               descuento_porcentaje: Number(t.descuento_porcentaje || 0)
             }))
-          : [{ cantidad_minima: minimo, descuento_porcentaje: 0 }]
+          : []
       } catch (err) {
         b2bError.value = 'No se pudieron cargar los descuentos por volumen.'
         b2bTiers.value = []
@@ -1091,16 +1091,13 @@ export default {
         }))
         .filter(t => t.cantidad_minima > 0)
 
-      if (!payload.length) {
-        b2bError.value = 'Agrega al menos un tramo con cantidad mínima.'
-        return
-      }
-
-      const cantidades = payload.map(t => t.cantidad_minima)
-      const unique = new Set(cantidades)
-      if (unique.size !== cantidades.length) {
-        b2bError.value = 'No se permiten cantidades mínimas duplicadas.'
-        return
+      if (payload.length) {
+        const cantidades = payload.map(t => t.cantidad_minima)
+        const unique = new Set(cantidades)
+        if (unique.size !== cantidades.length) {
+          b2bError.value = 'No se permiten cantidades mínimas duplicadas.'
+          return
+        }
       }
 
       b2bLoading.value = true
