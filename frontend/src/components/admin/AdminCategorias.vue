@@ -405,8 +405,8 @@ import { ref, onMounted } from 'vue'
 import { categoriasService } from '../../services/categorias'
 import { getImageUrl } from '../../services/api'
 
-// Constants
-const API_BASE_URL = 'http://localhost:8000'
+// Use centralized API_BASE_URL
+import { API_BASE_URL } from '../../services/api'
 
 // Get token from localStorage
 const getAuthHeaders = () => {

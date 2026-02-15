@@ -659,7 +659,7 @@
 import { ref, watch, computed, onMounted } from 'vue'
 import { productosService } from '../../services/productos'
 import { categoriasService } from '../../services/categorias'
-import { getImageUrl } from '../../services/api'
+import { getImageUrl, API_BASE_URL } from '../../services/api'
 
 const props = defineProps({
   visible: Boolean,
@@ -926,7 +926,7 @@ const handleGalleryFilesSelect = async (event) => {
       const formData = new FormData()
       formData.append('file', file)
 
-      const uploadResponse = await fetch('http://localhost:8000/api/v1/upload/imagen', {
+      const uploadResponse = await fetch(`${API_BASE_URL}/api/v1/upload/imagen`, {
         method: 'POST',
         headers: {
           'Authorization': `Bearer ${localStorage.getItem('access_token')}`
@@ -1109,7 +1109,7 @@ const submitForm = async () => {
       
       try {
         // Subir imagen al servidor
-        const uploadResponse = await fetch('http://localhost:8000/api/v1/upload/imagen', {
+        const uploadResponse = await fetch(`${API_BASE_URL}/api/v1/upload/imagen`, {
           method: 'POST',
           headers: {
             'Authorization': `Bearer ${localStorage.getItem('access_token')}`

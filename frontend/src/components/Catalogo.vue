@@ -1346,6 +1346,7 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
+import { API_BASE_URL, getImageUrl } from '../services/api'
 import { authService, carritoService as carritoServiceImport } from '../services/productos'
 import { formatColorLabel } from '@/utils/colorLabels'
 
@@ -1519,7 +1520,7 @@ const precioSubtotal = computed(() => {
 // Métodos
 const cargarProductos = async () => {
   try {
-    const { data } = await axios.get('http://localhost:8000/api/v1/productos/')
+    const { data } = await axios.get(`${API_BASE_URL}/api/v1/productos/`)
     productos.value = data
     
     // Calcular rango de precios disponibles
@@ -1539,7 +1540,7 @@ const cargarProductos = async () => {
 
 const cargarCategorias = async () => {
   try {
-    const { data } = await axios.get('http://localhost:8000/api/v1/categorias/?solo_activas=true')
+    const { data } = await axios.get(`${API_BASE_URL}/api/v1/categorias/?solo_activas=true`)
     categorias.value = data
   } catch (error) {
     console.error('Error cargando categorías:', error)
@@ -1600,11 +1601,7 @@ const irACheckout = () => {
   router.push('/checkout')
 }
 
-const getImageUrl = (url) => {
-  if (!url) return ''
-  if (url.startsWith('http')) return url
-  return `http://localhost:8000${url}`
-}
+// getImageUrl is imported from '../services/api'
 
 const isVideo = (url) => {
   if (!url) return false

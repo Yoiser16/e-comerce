@@ -614,6 +614,7 @@
 import { ref, computed, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { productosService } from '../../services/productos'
+import { API_BASE_URL } from '../../services/api'
 
 export default {
   name: 'ProductoForm',
@@ -815,7 +816,7 @@ export default {
           const formData = new FormData()
           formData.append('file', file)
 
-          const uploadResponse = await fetch('http://localhost:8000/api/v1/upload/imagen', {
+          const uploadResponse = await fetch(`${API_BASE_URL}/api/v1/upload/imagen`, {
             method: 'POST',
             headers: {
               'Authorization': `Bearer ${localStorage.getItem('access_token')}`

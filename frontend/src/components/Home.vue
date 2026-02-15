@@ -23,36 +23,19 @@
             </svg>
           </button>
 
-          <!-- Center: Logo -->
-          <a href="#" class="absolute left-1/2 -translate-x-1/2 flex items-center group">
-            <img 
-              :src="isScrolled ? '/logo-kharis.png' : '/logo blanco.png'" 
-              alt="Kharis Distribuidora" 
-              class="h-10 sm:h-14 w-auto object-contain drop-shadow-[0_2px_8px_rgba(216,27,96,0.15)] logo-transition"
-              style="filter: contrast(1.1) saturate(1.15);"
-            />
+          <!-- Center: Logo Wordmark -->
+          <a href="#" class="absolute left-1/2 -translate-x-1/2 flex items-center">
+            <span class="text-[22px] font-semibold tracking-[0.18em] text-[#111] uppercase" style="font-family: 'Cormorant Garamond', 'Playfair Display', serif;">KHARIS</span>
           </a>
 
-          <!-- Right: Search + User + Cart -->
-          <div class="flex items-center gap-0.5">
+          <!-- Right: Search + Cart -->
+          <div class="flex items-center gap-1">
             <button 
               @click="openMobileSearch"
               class="w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target hover:bg-black/5"
             >
-              <svg class="w-4.5 h-4.5 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg class="w-[18px] h-[18px] text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-              </svg>
-            </button>
-            <!-- User / Login -->
-            <button 
-              @click="toggleUserMenu"
-              data-user-toggle
-              class="w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target"
-              :class="isLoggedIn ? 'border border-text-dark/20 hover:border-text-dark/40' : 'hover:bg-black/5'"
-            >
-              <span v-if="isLoggedIn" class="text-xs font-medium text-text-dark">{{ userInitial }}</span>
-              <svg v-else class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
               </svg>
             </button>
             <button 
@@ -552,6 +535,27 @@
 
               <!-- Lista de enlaces -->
               <div class="flex-1 overflow-y-auto py-2">
+                <!-- Mi Cuenta / Iniciar Sesión -->
+                <button 
+                  v-if="isLoggedIn"
+                  @click="closeMobileMenu(); $router.push('/mi-cuenta')"
+                  class="flex items-center gap-3 px-4 py-3 text-[12px] tracking-[0.08em] uppercase text-text-dark font-medium active:bg-nude-50 transition-colors border-b border-black/[0.04] w-full text-left"
+                >
+                  <div class="w-6 h-6 rounded-full bg-brand-50 flex items-center justify-center flex-shrink-0">
+                    <span class="text-[10px] font-semibold text-brand-600">{{ userInitial }}</span>
+                  </div>
+                  Mi Cuenta
+                </button>
+                <button 
+                  v-else
+                  @click="closeMobileMenu(); handleMenuAction('login')"
+                  class="flex items-center gap-3 px-4 py-3 text-[12px] tracking-[0.08em] uppercase text-text-dark font-medium active:bg-nude-50 transition-colors border-b border-black/[0.04] w-full text-left"
+                >
+                  <svg class="w-4 h-4 text-brand-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+                  </svg>
+                  Iniciar Sesión
+                </button>
                 <router-link 
                   to="/catalogo" 
                   @click="closeMobileMenu" 
@@ -669,24 +673,24 @@
         <!-- Overlay Retail Móvil - Solo gradiente inferior, imagen limpia arriba -->
         <div class="sm:hidden absolute inset-0 hero-overlay-mobile z-10"></div>
         
-        <!-- Carousel Indicators - Ocultos en móvil para diseño limpio -->
+        <!-- Carousel Indicators - Desktop only (mobile dots are in content block) -->
         <div class="hidden sm:flex absolute bottom-8 left-1/2 -translate-x-1/2 z-20 items-center gap-2">
           <button 
             v-for="(slide, index) in activeHeroSlides" 
             :key="index"
             @click="goToSlide(index)"
             :class="[
-              'w-2 h-2 rounded-full transition-all duration-300',
+              'rounded-full transition-all duration-300',
               currentSlide === index 
-                ? 'bg-white w-6' 
-                : 'bg-white/40 hover:bg-white/60'
+                ? 'bg-white w-6 h-2' 
+                : 'bg-white/40 hover:bg-white/60 w-2 h-2'
             ]"
           ></button>
         </div>
       </div>
 
       <!-- ===== CONTENT ===== -->
-      <div class="relative z-10 w-full h-full sm:min-h-screen flex flex-col justify-end sm:justify-center max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pb-7 sm:pb-0 sm:pt-20">
+      <div class="relative z-10 w-full h-full sm:min-h-screen flex flex-col justify-end sm:justify-center max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 pb-4 sm:pb-0 sm:pt-20">
         
         <!-- Desktop content block (hidden on mobile) -->
         <div class="hidden sm:block max-w-3xl text-left">
@@ -734,13 +738,13 @@
           </div>
         </div>
 
-        <!-- Mobile content block - Bottom aligned, retail clean -->
+        <!-- Mobile content block - Bottom aligned, editorial clean -->
         <div class="sm:hidden text-left">
-          <!-- Title Móvil - Solo H1, grande y compacto -->
-          <h1 class="text-white leading-[1.1] mb-5 hero-animate-title">
-            <span class="block text-[2rem] font-bold tracking-tight">
-              Cabello 100%<br>Natural Premium
-            </span>
+          <!-- Title Móvil - Editorial Serif Look -->
+          <h1 class="text-white leading-[1.08] mb-3.5 hero-animate-title">
+            <span class="block text-[1.85rem] font-bold tracking-tight" style="font-family: 'Inter', sans-serif;">Cabello 100%</span>
+            <span class="block text-[2.1rem] font-bold tracking-tight" style="font-family: 'Inter', sans-serif;">Natural</span>
+            <span class="block text-[2.4rem] italic tracking-wide text-white/95" style="font-family: 'Cormorant Garamond', 'Playfair Display', serif; font-weight: 500;">Premium</span>
           </h1>
           
           <!-- CTAs Móvil - Side by side, compactos -->
@@ -759,6 +763,21 @@
               MAYORISTA
             </a>
           </div>
+
+          <!-- Mobile Carousel Dots -->
+          <div class="flex justify-center items-center gap-1.5 mt-4">
+            <button 
+              v-for="(slide, index) in activeHeroSlides" 
+              :key="'mob-dot-'+index"
+              @click="goToSlide(index)"
+              :class="[
+                'rounded-full transition-all duration-300',
+                currentSlide === index 
+                  ? 'bg-white w-5 h-[5px]' 
+                  : 'bg-white/40 w-[5px] h-[5px]'
+              ]"
+            ></button>
+          </div>
         </div>
       </div>
 
@@ -767,84 +786,94 @@
     <!-- ========================================
          TRUST BAR - Premium Editorial Ribbon (3 en móvil, 4 en desktop)
          ======================================== -->
-    <section class="trust-ribbon-premium relative overflow-hidden py-5 sm:py-0">
+    <section class="trust-ribbon-premium relative overflow-hidden py-0 sm:py-0">
       
-      <div class="relative max-w-6xl mx-auto px-3 sm:px-4">
-        <!-- Grid 3 columnas en móvil, flex en desktop -->
-        <div class="grid grid-cols-3 gap-2 sm:flex sm:flex-wrap lg:flex-nowrap sm:items-stretch sm:justify-center sm:gap-8">
+      <!-- Mobile: Bloques con círculos sobre fondo rosa -->
+      <div class="sm:hidden bg-[#FFF5F7] py-5">
+        <div class="flex items-start justify-evenly px-3">
+          <!-- Envío Gratis -->
+          <div class="flex flex-col items-center text-center gap-2">
+            <div class="w-11 h-11 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] flex items-center justify-center">
+              <svg class="w-[18px] h-[18px] text-[#8B7355]" fill="none" stroke="currentColor" stroke-width="1.3" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+              </svg>
+            </div>
+            <span class="text-[11px] font-bold tracking-[0.04em] uppercase text-[#1a1a1a] leading-tight">Envío<br>Gratis</span>
+          </div>
+          <!-- Pago Seguro -->
+          <div class="flex flex-col items-center text-center gap-2">
+            <div class="w-11 h-11 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] flex items-center justify-center">
+              <svg class="w-[18px] h-[18px] text-[#8B7355]" fill="none" stroke="currentColor" stroke-width="1.3" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+              </svg>
+            </div>
+            <span class="text-[11px] font-bold tracking-[0.04em] uppercase text-[#1a1a1a] leading-tight">Pago<br>Seguro</span>
+          </div>
+          <!-- Asesoría VIP -->
+          <div class="flex flex-col items-center text-center gap-2">
+            <div class="w-11 h-11 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] flex items-center justify-center">
+              <svg class="w-[18px] h-[18px] text-[#8B7355]" fill="none" stroke="currentColor" stroke-width="1.3" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+              </svg>
+            </div>
+            <span class="text-[11px] font-bold tracking-[0.04em] uppercase text-[#1a1a1a] leading-tight">Asesoría<br>VIP</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Desktop: Layout original con círculos -->
+      <div class="hidden sm:block relative max-w-6xl mx-auto px-4">
+        <div class="flex flex-wrap lg:flex-nowrap items-stretch justify-center gap-8">
           
           <!-- Item 1: Envíos VIP -->
-          <div class="trust-item-premium group py-3 sm:py-7 lg:py-9 px-1 sm:px-3 lg:px-8 flex flex-col items-center text-center relative">
-            
+          <div class="trust-item-premium group py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative">
             <div class="relative z-10 flex flex-col items-center">
-              <!-- Icon container - Compacto en móvil -->
-              <div class="w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-md sm:shadow-lg flex items-center justify-center mb-1.5 sm:mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
-                <svg class="w-5 h-5 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+              <div class="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-lg flex items-center justify-center mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                <svg class="w-7 h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
                 </svg>
               </div>
-              <!-- Title - Compacto en móvil -->
-              <h4 class="text-[10px] sm:text-xs lg:text-sm font-semibold tracking-[0.05em] sm:tracking-[0.15em] uppercase text-[#1a1a1a] mb-0.5 sm:mb-1 leading-tight">
-                Envío Gratis
-              </h4>
-              <!-- Subtitle - Oculto en móvil para diseño limpio -->
-              <p class="hidden sm:block text-xs lg:text-sm text-[#8B7355] font-light leading-tight">
-                Desde $350.000
-              </p>
+              <h4 class="text-xs lg:text-sm font-semibold tracking-[0.15em] uppercase text-[#1a1a1a] mb-1">Envío Gratis</h4>
+              <p class="text-xs lg:text-sm text-[#8B7355] font-light leading-tight">Desde $350.000</p>
             </div>
           </div>
 
-          <!-- Item 2: Calidad Premium - Solo visible en desktop -->
-          <div class="hidden sm:flex trust-item-premium group py-7 lg:py-9 px-3 lg:px-8 flex-col items-center text-center relative">
-            
+          <!-- Item 2: Calidad Premium -->
+          <div class="trust-item-premium group py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative">
             <div class="relative z-10 flex flex-col items-center">
               <div class="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-lg flex items-center justify-center mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
                 <svg class="w-7 h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
                 </svg>
               </div>
-              <h4 class="text-xs lg:text-sm font-semibold tracking-[0.15em] uppercase text-[#1a1a1a] mb-1">
-                Calidad Premium
-              </h4>
-              <p class="text-xs lg:text-sm text-[#8B7355] font-light leading-tight">
-                Productos garantizados
-              </p>
+              <h4 class="text-xs lg:text-sm font-semibold tracking-[0.15em] uppercase text-[#1a1a1a] mb-1">Calidad Premium</h4>
+              <p class="text-xs lg:text-sm text-[#8B7355] font-light leading-tight">Productos garantizados</p>
             </div>
           </div>
 
           <!-- Item 3: Pago Seguro -->
-          <div class="trust-item-premium group py-3 sm:py-7 lg:py-9 px-1 sm:px-3 lg:px-8 flex flex-col items-center text-center relative">
-            
+          <div class="trust-item-premium group py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative">
             <div class="relative z-10 flex flex-col items-center">
-              <div class="w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-md sm:shadow-lg flex items-center justify-center mb-1.5 sm:mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
-                <svg class="w-5 h-5 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+              <div class="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-lg flex items-center justify-center mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                <svg class="w-7 h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
                 </svg>
               </div>
-              <h4 class="text-[10px] sm:text-xs lg:text-sm font-semibold tracking-[0.05em] sm:tracking-[0.15em] uppercase text-[#1a1a1a] mb-0.5 sm:mb-1 leading-tight">
-                Pago Seguro
-              </h4>
-              <p class="hidden sm:block text-xs lg:text-sm text-[#8B7355] font-light leading-tight">
-                SSL 256-bit
-              </p>
+              <h4 class="text-xs lg:text-sm font-semibold tracking-[0.15em] uppercase text-[#1a1a1a] mb-1">Pago Seguro</h4>
+              <p class="text-xs lg:text-sm text-[#8B7355] font-light leading-tight">SSL 256-bit</p>
             </div>
           </div>
 
           <!-- Item 4: Asesoría VIP -->
-          <div class="trust-item-premium group py-3 sm:py-7 lg:py-9 px-1 sm:px-3 lg:px-8 flex flex-col items-center text-center relative">
-            
+          <div class="trust-item-premium group py-7 lg:py-9 px-3 lg:px-8 flex flex-col items-center text-center relative">
             <div class="relative z-10 flex flex-col items-center">
-              <div class="w-11 h-11 sm:w-16 sm:h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-md sm:shadow-lg flex items-center justify-center mb-1.5 sm:mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
-                <svg class="w-5 h-5 sm:w-7 sm:h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+              <div class="w-16 h-16 lg:w-20 lg:h-20 rounded-full bg-gradient-to-br from-white to-gray-50 shadow-lg flex items-center justify-center mb-4 group-hover:shadow-xl group-hover:scale-110 transition-all duration-300">
+                <svg class="w-7 h-7 lg:w-8 lg:h-8 text-[#8B7355] group-hover:text-[#D81B60] transition-colors duration-300" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
                 </svg>
               </div>
-              <h4 class="text-[10px] sm:text-xs lg:text-sm font-semibold tracking-[0.05em] sm:tracking-[0.15em] uppercase text-[#1a1a1a] mb-0.5 sm:mb-1 leading-tight">
-                Asesoría VIP
-              </h4>
-              <p class="hidden sm:block text-xs lg:text-sm text-[#8B7355] font-light leading-tight">
-                Personalizada
-              </p>
+              <h4 class="text-xs lg:text-sm font-semibold tracking-[0.15em] uppercase text-[#1a1a1a] mb-1">Asesoría VIP</h4>
+              <p class="text-xs lg:text-sm text-[#8B7355] font-light leading-tight">Personalizada</p>
             </div>
           </div>
 
@@ -859,7 +888,7 @@
       <div class="max-w-7xl mx-auto px-3 sm:px-8 lg:px-12">
         <!-- Section Header - Ultra compacto en móvil -->
         <div class="text-center mb-3 sm:mb-10 lg:mb-14">
-          <span class="inline-block text-brand-600 font-medium text-xs sm:text-sm tracking-widest uppercase mb-2 sm:mb-4">Nuestro Catálogo</span>
+          <span class="hidden sm:inline-block text-brand-600 font-medium text-xs sm:text-sm tracking-widest uppercase mb-2 sm:mb-4">Nuestro Catálogo</span>
           <h2 class="font-luxury text-xl sm:text-4xl lg:text-5xl text-text-dark mb-0 sm:mb-4">
             Categorías <em class="not-italic text-brand-600">Exclusivas</em>
           </h2>
