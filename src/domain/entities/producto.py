@@ -32,6 +32,7 @@ class Producto(EntidadBase):
         precio: Dinero,
         stock_actual: int = 0,
         stock_minimo: int = 0,
+        cantidad_minima_mayorista: int = 1,
         id: Optional[UUID] = None,
         fecha_creacion: Optional[datetime] = None,
         fecha_modificacion: Optional[datetime] = None,
@@ -56,6 +57,7 @@ class Producto(EntidadBase):
         self._precio = precio
         self._stock_actual = stock_actual
         self._stock_minimo = stock_minimo
+        self._cantidad_minima_mayorista = cantidad_minima_mayorista
         self._categoria = categoria
         self._imagen_principal = imagen_principal
         self._color = color
@@ -199,6 +201,15 @@ class Producto(EntidadBase):
     def stock_minimo(self, valor: int) -> None:
         """Actualiza el stock mínimo"""
         self._stock_minimo = valor
+        self.marcar_modificado()
+
+    @property
+    def cantidad_minima_mayorista(self) -> int:
+        return self._cantidad_minima_mayorista
+
+    @cantidad_minima_mayorista.setter
+    def cantidad_minima_mayorista(self, valor: int) -> None:
+        self._cantidad_minima_mayorista = valor
         self.marcar_modificado()
     
     @property

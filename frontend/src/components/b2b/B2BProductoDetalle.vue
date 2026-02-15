@@ -170,7 +170,7 @@
           <!-- Quick Specs -->
           <div class="flex flex-wrap gap-2 mb-4">
             <span class="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
-              Lote mín: {{ LOTE_MINIMO }} uds
+              Lote mín: {{ loteMinimo }} uds
             </span>
             <span v-if="producto.tipo" class="px-2.5 py-1 bg-gray-100 text-gray-600 text-xs rounded-full">
               {{ producto.tipo }}
@@ -258,7 +258,7 @@
             <!-- Quick Quantity Buttons -->
             <div class="grid grid-cols-4 gap-2 mb-4">
               <button 
-                v-for="lote in [10, 20, 50, 100]" 
+                v-for="lote in lotesRapidos" 
                 :key="lote"
                 @click="seleccionarLote(lote)"
                 :disabled="lote > stockDisponible"
@@ -279,7 +279,7 @@
               <div class="flex items-center border-2 border-gray-200 rounded-lg overflow-hidden">
                 <button 
                   @click="decrementarLote"
-                  :disabled="cantidad <= LOTE_MINIMO"
+                  :disabled="cantidad <= loteMinimo"
                   class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-30"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -289,7 +289,7 @@
                 <span class="w-12 text-center font-bold text-gray-900">{{ cantidad }}</span>
                 <button 
                   @click="incrementarLote"
-                  :disabled="cantidad + LOTE_MINIMO > stockDisponible"
+                  :disabled="cantidad + loteMinimo > stockDisponible"
                   class="w-10 h-10 flex items-center justify-center text-gray-600 hover:bg-gray-50 disabled:opacity-30"
                 >
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -319,7 +319,7 @@
             <!-- Add to Cart Button -->
             <button 
               @click="agregarAlCarrito"
-              :disabled="stockDisponible < LOTE_MINIMO || agregando || selectionIncomplete"
+              :disabled="stockDisponible < loteMinimo || agregando || selectionIncomplete"
               class="w-full py-4 bg-[#1A1A1A] hover:bg-black text-white font-bold text-base rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
             >
               <svg v-if="!agregando" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -605,7 +605,7 @@
                 Stock {{ stockDisponible }} uds
               </span>
               <span class="px-3 py-1 rounded-full bg-white border border-gray-200 text-[#5A5A5A]">
-                Lote minimo {{ LOTE_MINIMO }}
+                Lote minimo {{ loteMinimo }}
               </span>
               <span v-if="producto.metodo" class="px-3 py-1 rounded-full bg-white border border-gray-200 text-[#5A5A5A]">
                 {{ producto.metodo }}
@@ -890,7 +890,7 @@
                     </tr>
                     <tr>
                       <td class="py-2 text-gray-500">Lote mínimo</td>
-                      <td class="py-2 font-semibold text-gray-900">{{ LOTE_MINIMO }} uds</td>
+                      <td class="py-2 font-semibold text-gray-900">{{ loteMinimo }} uds</td>
                     </tr>
                   </tbody>
                 </table>
@@ -922,13 +922,13 @@
                 <!-- Selector de Cantidad -->
                 <div class="p-4 sm:p-5 border-b border-gray-100 bg-white">
                   <label class="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2.5 block">
-                    Cantidad (mín. {{ LOTE_MINIMO }})
+                    Cantidad (mín. {{ loteMinimo }})
                   </label>
                   
                   <!-- Botones Rápidos -->
                   <div class="flex flex-wrap gap-1.5 mb-3">
                     <button 
-                      v-for="lote in [10, 20, 50, 100]" 
+                      v-for="lote in lotesRapidos" 
                       :key="lote"
                       @click="seleccionarLote(lote)"
                       :disabled="lote > stockDisponible"
@@ -947,7 +947,7 @@
                   <div class="flex items-center border border-gray-300 rounded-md overflow-hidden">
                     <button 
                       @click="decrementarLote"
-                      :disabled="cantidad <= LOTE_MINIMO"
+                      :disabled="cantidad <= loteMinimo"
                       class="w-11 h-11 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-30 border-r border-gray-200"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -957,14 +957,14 @@
                     <input 
                       type="number" 
                       v-model.number="cantidad" 
-                      :min="LOTE_MINIMO" 
+                      :min="loteMinimo" 
                       :max="stockDisponible"
-                      :step="LOTE_MINIMO"
+                      :step="loteMinimo"
                       class="flex-1 text-center font-bold text-lg py-2 focus:outline-none bg-gray-50"
                     />
                     <button 
                       @click="incrementarLote"
-                      :disabled="cantidad + LOTE_MINIMO > stockDisponible"
+                      :disabled="cantidad + loteMinimo > stockDisponible"
                       class="w-11 h-11 flex items-center justify-center hover:bg-gray-100 transition-colors disabled:opacity-30 border-l border-gray-200"
                     >
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -995,7 +995,7 @@
                 <div class="p-4 sm:p-5 bg-white">
                   <button 
                     @click="agregarAlCarrito"
-                    :disabled="stockDisponible < LOTE_MINIMO || agregando || selectionIncomplete"
+                    :disabled="stockDisponible < loteMinimo || agregando || selectionIncomplete"
                     class="w-full py-3.5 bg-[#1A1A1A] hover:bg-black text-white font-bold text-base rounded-md flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <svg v-if="!agregando" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1150,6 +1150,7 @@ import { resenasService } from '@/services/resenas'
 import { B2BToast, useToast } from './ui'
 import { getImageUrl } from '@/services/api'
 import { formatColorLabel } from '@/utils/colorLabels'
+import { getUnitPriceForQty, normalizeB2BTiers } from '@/utils/b2bPricing'
 
 export default {
   name: 'B2BProductoDetalle',
@@ -1161,15 +1162,13 @@ export default {
     const router = useRouter()
     const toast = useToast()
     
-    // ===== CONSTANTES LOTES =====
-    const LOTE_MINIMO = 10
-    const lotesRapidos = [10, 20, 50, 100, 200]
+    // ===== LOTES B2B =====
     
     // State
     const producto = ref({})
     const loading = ref(true)
     const error = ref(null)
-    const cantidad = ref(LOTE_MINIMO) // Empieza en mínimo del lote
+    const cantidad = ref(1)
     const imagenActualIndex = ref(0)
     const esFavorito = ref(false)
     const agregando = ref(false)
@@ -1316,10 +1315,12 @@ export default {
           sku: producto.value.sku || producto.value.codigo || '',
           color: null,
           largo: null,
-          precio_monto: precioMayorista.value,
+          precio_monto: producto.value.precio_mayorista || producto.value.monto_precio || 0,
           precio_moneda: 'COP',
           stock_actual: producto.value.stock_actual ?? 0,
           stock_minimo: producto.value.stock_minimo ?? 0,
+          cantidad_minima_mayorista: producto.value.cantidad_minima_mayorista ?? producto.value.cantidad_minima ?? 1,
+          descuentos_volumen: producto.value.descuentos_volumen || [],
           imagen_url: producto.value.imagen_principal || null,
           activo: true,
           orden: 0
@@ -1327,6 +1328,28 @@ export default {
       }
       if (!colorSeleccionado.value && !largoSeleccionado.value) return null
       return variantesFiltradas.value.find(v => (v.stock_actual ?? 0) > 0) || variantesFiltradas.value[0] || null
+    })
+
+    const loteMinimo = computed(() => {
+      const raw = varianteSeleccionada.value?.cantidad_minima_mayorista
+        ?? producto.value?.cantidad_minima_mayorista
+        ?? producto.value?.cantidad_minima
+      const value = Number(raw || 1)
+      return value > 0 ? value : 1
+    })
+
+    const descuentosVolumen = computed(() => {
+      const source = varianteSeleccionada.value?.descuentos_volumen?.length
+        ? varianteSeleccionada.value.descuentos_volumen
+        : producto.value?.descuentos_volumen
+      return normalizeB2BTiers(source)
+    })
+
+    const lotesRapidos = computed(() => {
+      const set = new Set()
+      if (loteMinimo.value > 0) set.add(loteMinimo.value)
+      descuentosVolumen.value.forEach((tier) => set.add(tier.cantidad_minima))
+      return Array.from(set).sort((a, b) => a - b).slice(0, 4)
     })
 
     const stockDisponible = computed(() => {
@@ -1366,11 +1389,7 @@ export default {
     
     // Precio unitario con descuento por volumen
     const precioUnitarioActual = computed(() => {
-      const base = precioMayorista.value
-      if (cantidad.value >= 200) return base * 0.90 // 10% extra
-      if (cantidad.value >= 100) return base * 0.95 // 5% extra
-      if (cantidad.value >= 50) return base * 0.97 // 3% extra
-      return base
+      return getUnitPriceForQty(precioMayorista.value, cantidad.value, descuentosVolumen.value)
     })
     
     const subtotal = computed(() => precioUnitarioActual.value * cantidad.value)
@@ -1388,13 +1407,25 @@ export default {
     // Tabla de precios por volumen
     const preciosPorVolumen = computed(() => {
       const base = precioMayorista.value
-      return [
-        { cantidad: 10, precioUnitario: base, precioTotal: base * 10, descripcion: 'Lote mínimo' },
-        { cantidad: 20, precioUnitario: base, precioTotal: base * 20, descripcion: 'Ideal para probar' },
-        { cantidad: 50, precioUnitario: base * 0.97, precioTotal: base * 0.97 * 50, descripcion: '3% OFF' },
-        { cantidad: 100, precioUnitario: base * 0.95, precioTotal: base * 0.95 * 100, descripcion: '5% OFF' },
-        { cantidad: 200, precioUnitario: base * 0.90, precioTotal: base * 0.90 * 200, descripcion: '10% OFF - Mejor precio' }
-      ]
+      const tiers = descuentosVolumen.value.length
+        ? descuentosVolumen.value
+        : [{ cantidad_minima: loteMinimo.value, descuento_porcentaje: 0 }]
+
+      return tiers.map((tier) => {
+        const pct = Number(tier.descuento_porcentaje || 0)
+        const cantidad = Number(tier.cantidad_minima)
+        const precioUnitario = base * (1 - pct / 100)
+        const descripcion = pct > 0
+          ? `${pct}% OFF`
+          : (cantidad === loteMinimo.value ? 'Lote mínimo' : 'Precio base')
+
+        return {
+          cantidad,
+          precioUnitario,
+          precioTotal: precioUnitario * cantidad,
+          descripcion
+        }
+      })
     })
 
     const selectionIncomplete = computed(() => {
@@ -1480,15 +1511,15 @@ export default {
     }
     
     function incrementarLote() {
-      const nuevo = cantidad.value + LOTE_MINIMO
+      const nuevo = cantidad.value + loteMinimo.value
       if (nuevo <= stockDisponible.value) {
         cantidad.value = nuevo
       }
     }
     
     function decrementarLote() {
-      const nuevo = cantidad.value - LOTE_MINIMO
-      if (nuevo >= LOTE_MINIMO) {
+      const nuevo = cantidad.value - loteMinimo.value
+      if (nuevo >= loteMinimo.value) {
         cantidad.value = nuevo
       }
     }
@@ -1591,6 +1622,8 @@ export default {
         
         if (existingIndex >= 0) {
           cart.items[existingIndex].cantidad += cantidad.value
+          cart.items[existingIndex].cantidad_minima_mayorista = loteMinimo.value
+          cart.items[existingIndex].descuentos_volumen = descuentosVolumen.value
         } else {
           cart.items.push({
             id: producto.value.id,
@@ -1601,6 +1634,8 @@ export default {
             nombre: producto.value.nombre,
             imagen: varianteSeleccionada.value.imagen_url || producto.value.imagen_principal,
             precio: precioMayorista.value,
+            cantidad_minima_mayorista: loteMinimo.value,
+            descuentos_volumen: descuentosVolumen.value,
             cantidad: cantidad.value
           })
         }
@@ -1752,6 +1787,13 @@ export default {
         largoSeleccionado.value = ''
       }
     })
+
+    watch(loteMinimo, (minimo) => {
+      if (!minimo) return
+      if (cantidad.value < minimo) {
+        cantidad.value = minimo
+      }
+    })
     
     // Lifecycle
     onMounted(() => {
@@ -1762,7 +1804,7 @@ export default {
     
     return {
       // Constantes
-      LOTE_MINIMO,
+      loteMinimo,
       lotesRapidos,
       // State
       producto,

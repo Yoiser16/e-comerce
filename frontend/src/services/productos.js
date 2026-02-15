@@ -63,6 +63,27 @@ export const productosService = {
     return response.data
   },
 
+  // Descuentos por volumen B2B (admin)
+  async getB2BDescuentos(productoId) {
+    const response = await apiClient.get(`/productos/${productoId}/b2b-descuentos`)
+    return response.data
+  },
+
+  async updateB2BDescuentos(productoId, descuentos) {
+    const response = await apiClient.put(`/productos/${productoId}/b2b-descuentos`, descuentos)
+    return response.data
+  },
+
+  async getB2BDescuentosVariante(varianteId) {
+    const response = await apiClient.get(`/productos/variantes/${varianteId}/b2b-descuentos`)
+    return response.data
+  },
+
+  async updateB2BDescuentosVariante(varianteId, descuentos) {
+    const response = await apiClient.put(`/productos/variantes/${varianteId}/b2b-descuentos`, descuentos)
+    return response.data
+  },
+
   // Eliminar producto (soft delete)
   async eliminar(id) {
     await apiClient.delete(`/productos/${id}`)

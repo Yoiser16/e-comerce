@@ -716,7 +716,7 @@
           </div>
 
           <!-- VARIANTES: Calidad/Densidad (Pills) -->
-          <div v-if="calidadesDisponibles.length > 1" class="space-y-3">
+          <div v-if="calidadesDisponibles.length" class="space-y-3">
             <p class="text-xs uppercase tracking-[0.15em] text-text-light">Calidad</p>
             <div class="flex flex-wrap gap-2">
               <button
@@ -1424,7 +1424,30 @@ const largosDisponibles = computed(() => {
   return Array.from(map.values())
 })
 
-const calidadesDisponibles = ref(['Densidad 150%', 'Densidad 180%', 'Densidad 200%'])
+const formatCalidadLabel = (value) => {
+  if (!value) return ''
+  return String(value)
+    .replace(/_/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+}
+
+const parseCalidades = (raw) => {
+  if (!raw) return []
+  if (Array.isArray(raw)) {
+    return raw.map(formatCalidadLabel).filter(Boolean)
+  }
+  if (typeof raw === 'string') {
+    return raw
+      .split(/[|,]/)
+      .map((item) => formatCalidadLabel(item))
+      .filter(Boolean)
+  }
+  return []
+}
+
+const calidadesDisponibles = computed(() => parseCalidades(producto.value?.calidad))
 
 // Cart State
 const cantidad = ref(1)
@@ -1740,7 +1763,8 @@ const cargarProducto = async () => {
       if (data.color) colorSeleccionado.value = data.color
       if (data.largo) largoSeleccionado.value = data.largo
     }
-    if (data.calidad) calidadSeleccionada.value = data.calidad
+    const calidades = parseCalidades(data.calidad)
+    calidadSeleccionada.value = calidades[0] || ''
 
     await cargarResumenResenas()
     await cargarResenasProducto()

@@ -241,9 +241,9 @@
                           <span class="md:col-span-2">Color</span>
                           <span class="md:col-span-2">Largo</span>
                           <span class="md:col-span-2">Precio</span>
-                          <span class="md:col-span-2">Stock</span>
+                          <span class="md:col-span-3">Stock / Min / May</span>
                           <span class="md:col-span-2">SKU</span>
-                          <span class="md:col-span-2 text-right">Activo</span>
+                          <span class="md:col-span-1 text-right">Activo</span>
                         </div>
 
                         <div
@@ -287,7 +287,7 @@
                             >
                           </div>
 
-                          <div class="md:col-span-2 grid grid-cols-2 gap-2">
+                          <div class="md:col-span-3 grid grid-cols-3 gap-2">
                             <div>
                               <label class="md:hidden text-xs text-text-light">Stock</label>
                               <input
@@ -304,6 +304,15 @@
                                 class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-xs"
                               >
                             </div>
+                            <div>
+                              <label class="md:hidden text-xs text-text-light">Min May</label>
+                              <input
+                                v-model.number="variante.cantidad_minima_mayorista"
+                                type="number"
+                                min="1"
+                                class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-xs"
+                              >
+                            </div>
                           </div>
 
                           <div class="md:col-span-2">
@@ -315,7 +324,7 @@
                             >
                           </div>
 
-                          <div class="md:col-span-2 flex items-center justify-between md:justify-end gap-3">
+                          <div class="md:col-span-1 flex items-center justify-between md:justify-end gap-3">
                             <label class="flex items-center gap-2 text-xs text-text-dark">
                               <input v-model="variante.activo" type="checkbox" class="w-4 h-4 text-[#D81B60] border-gray-300 rounded">
                               Activo
@@ -813,6 +822,7 @@ const addVariante = () => {
     precio_moneda: form.value.precio_moneda || 'COP',
     stock_actual: 0,
     stock_minimo: 0,
+    cantidad_minima_mayorista: form.value.cantidad_minima_mayorista || 1,
     imagen_url: '',
     activo: true,
     orden: form.value.variantes.length
@@ -835,6 +845,7 @@ const normalizeVariantes = () => {
       precio_moneda: v.precio_moneda || form.value.precio_moneda || 'COP',
       stock_actual: Number(v.stock_actual || 0),
       stock_minimo: Number(v.stock_minimo || 0),
+      cantidad_minima_mayorista: Number(v.cantidad_minima_mayorista || form.value.cantidad_minima_mayorista || 1),
       imagen_url: v.imagen_url || null,
       activo: v.activo !== false,
       orden: v.orden ?? idx
@@ -873,6 +884,9 @@ const validarFormulario = () => {
       }
       if (variante.stock_actual === null || variante.stock_actual === undefined || Number(variante.stock_actual) < 0) {
         return `El stock de la variante ${i + 1} es obligatorio`
+      }
+      if (!variante.cantidad_minima_mayorista || Number(variante.cantidad_minima_mayorista) < 1) {
+        return `La cantidad mínima mayorista de la variante ${i + 1} debe ser mayor a 0`
       }
     }
   }
@@ -1027,6 +1041,7 @@ const loadProduct = async () => {
         precio_moneda: v.precio_moneda || producto.precio?.moneda || producto.precio_moneda || 'COP',
         stock_actual: v.stock_actual ?? 0,
         stock_minimo: v.stock_minimo ?? 0,
+        cantidad_minima_mayorista: v.cantidad_minima_mayorista ?? producto.cantidad_minima_mayorista ?? 1,
         imagen_url: v.imagen_url || '',
         activo: v.activo !== false,
         orden: v.orden ?? 0

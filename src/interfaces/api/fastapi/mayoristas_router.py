@@ -142,7 +142,7 @@ def obtener_productos_b2b(
                 precio_retail=float(p.monto_precio_original or p.monto_precio),
                 precio_mayorista=calcular_precio_mayorista(p),
                 stock=p.stock_actual - p.stock_reservado,
-                cantidad_minima=5 if p.metodo == 'bundle' else 1
+                cantidad_minima=int(p.cantidad_minima_mayorista or 1)
             ))
         
         return result
@@ -183,7 +183,7 @@ def obtener_productos_destacados_b2b(
                 precio_retail=float(p.monto_precio_original or p.monto_precio),
                 precio_mayorista=calcular_precio_mayorista(p),
                 stock=p.stock_actual - p.stock_reservado,
-                cantidad_minima=5 if p.metodo == 'bundle' else 1
+                cantidad_minima=int(p.cantidad_minima_mayorista or 1)
             ))
         
         return result
@@ -211,6 +211,7 @@ class ProductoDetalleB2B(BaseModel):
     stock: int
     stock_actual: int
     cantidad_minima: int = 1
+    cantidad_minima_mayorista: int = 1
     metodo: Optional[str] = None
     color: Optional[str] = None
     largo: Optional[str] = None
@@ -220,6 +221,7 @@ class ProductoDetalleB2B(BaseModel):
     peso_gramos: Optional[int] = None
     activo: bool = True
     variantes: List[dict] = []
+    descuentos_volumen: List[dict] = []
 
 
 @router.get("/b2b/productos/{producto_id}", response_model=ProductoDetalleB2B)
@@ -232,7 +234,7 @@ def obtener_producto_b2b(
     """
     close_old_connections()
     try:
-        from infrastructure.persistence.django.models import ProductoModel
+        from infrastructure.persistence.django.models import ProductoModel, ProductoDescuentoVolumenModel, ProductoVarianteDescuentoVolumenModel
         from uuid import UUID
         
         try:
@@ -273,7 +275,26 @@ def obtener_producto_b2b(
         
         variantes = []
         try:
-            for variante in p.variantes.all():
+            variantes_qs = list(p.variantes.all())
+            variantes_ids = [v.id for v in variantes_qs if v.activo]
+            descuentos_por_variante = {}
+
+            if variantes_ids:
+                descuentos_qs = ProductoVarianteDescuentoVolumenModel.objects.filter(
+                    variante_id__in=variantes_ids,
+                    activo=True
+                ).order_by('cantidad_minima', 'orden')
+                for d in descuentos_qs:
+                    key = str(d.variante_id)
+                    descuentos_por_variante.setdefault(key, []).append({
+                        'id': str(d.id),
+                        'cantidad_minima': d.cantidad_minima,
+                        'descuento_porcentaje': int(d.descuento_porcentaje or 0),
+                        'activo': d.activo,
+                        'orden': d.orden
+                    })
+
+            for variante in variantes_qs:
                 if not variante.activo:
                     continue
                 variantes.append({
@@ -285,12 +306,28 @@ def obtener_producto_b2b(
                     'precio_moneda': variante.precio_moneda,
                     'stock_actual': variante.stock_actual,
                     'stock_minimo': variante.stock_minimo,
+                    'cantidad_minima_mayorista': int(getattr(variante, 'cantidad_minima_mayorista', 1) or 1),
+                    'descuentos_volumen': descuentos_por_variante.get(str(variante.id), []),
                     'imagen_url': variante.imagen_url,
                     'activo': variante.activo,
                     'orden': variante.orden
                 })
         except Exception:
             variantes = []
+
+        descuentos_volumen = []
+        try:
+            descuentos_qs = ProductoDescuentoVolumenModel.objects.filter(producto=p, activo=True).order_by('cantidad_minima', 'orden')
+            for d in descuentos_qs:
+                descuentos_volumen.append({
+                    'id': str(d.id),
+                    'cantidad_minima': d.cantidad_minima,
+                    'descuento_porcentaje': int(d.descuento_porcentaje or 0),
+                    'activo': d.activo,
+                    'orden': d.orden
+                })
+        except Exception:
+            descuentos_volumen = []
 
         return ProductoDetalleB2B(
             id=str(p.id),
@@ -313,7 +350,8 @@ def obtener_producto_b2b(
             precio_original=precio_retail,
             stock=p.stock_actual - p.stock_reservado,
             stock_actual=p.stock_actual,
-            cantidad_minima=10 if p.metodo == 'bundle' else 1,
+            cantidad_minima=int(p.cantidad_minima_mayorista or 1),
+            cantidad_minima_mayorista=int(p.cantidad_minima_mayorista or 1),
             metodo=get_choice_label(p.metodo, ProductoModel.METODO_CHOICES),
             color=get_choice_label(p.color, ProductoModel.COLOR_CHOICES),
             largo=f"{p.largo} pulgadas" if p.largo else None,
@@ -322,7 +360,8 @@ def obtener_producto_b2b(
             calidad=get_choice_label(p.calidad, ProductoModel.CALIDAD_CHOICES),
             peso_gramos=p.peso_gramos,
             activo=p.activo,
-            variantes=variantes
+            variantes=variantes,
+            descuentos_volumen=descuentos_volumen
         )
     except HTTPException:
         raise
