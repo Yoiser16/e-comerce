@@ -2122,7 +2122,7 @@ export default {
             : (data?.items || [])
           const items = rawItems.map((item) => {
             const productoId = item?.producto_id ?? item?.id
-            const varianteId = item?.variante_id ?? productoId
+            const varianteId = item?.variante_id ?? null
             return {
               ...item,
               producto_id: productoId,

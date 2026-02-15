@@ -1250,7 +1250,7 @@
             <div v-else class="space-y-4">
               <div 
                 v-for="item in carritoItems" 
-                :key="item.id"
+                :key="item.variante_id || item.producto_id || item.id"
                 class="flex gap-4 p-4 bg-nude-50/50 rounded-xl"
               >
                 <img 
@@ -1266,7 +1266,20 @@
                   </svg>
                 </div>
                 <div class="flex-1">
-                  <h3 class="text-sm font-medium text-text-dark line-clamp-2">{{ item.nombre }}</h3>
+                  <div class="flex items-start justify-between gap-3">
+                    <h3 class="text-sm font-medium text-text-dark line-clamp-2">{{ item.nombre }}</h3>
+                    <button
+                      type="button"
+                      class="p-1.5 rounded-full border border-transparent text-text-light hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors"
+                      @click="removeCartItem(item)"
+                      aria-label="Eliminar"
+                      title="Eliminar"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 3h6m-7 4h8m-1 0v11a2 2 0 01-2 2H9a2 2 0 01-2-2V7m3 4v6m4-6v6" />
+                      </svg>
+                    </button>
+                  </div>
                   <p v-if="item.color || item.largo" class="text-[11px] text-text-light mt-1">
                     <span v-if="item.color">Color: {{ formatColorLabel(item.color) }}</span>
                     <span v-if="item.color && item.largo"> · </span>
@@ -1579,7 +1592,7 @@ const loadCartFromLocal = () => {
       const normalized = Array.isArray(rawItems) ? rawItems : []
       carritoItems.value = normalized.map((item) => {
         const productoId = item?.producto_id ?? item?.id
-        const varianteId = item?.variante_id ?? productoId
+        const varianteId = item?.variante_id ?? null
         return {
           ...item,
           producto_id: productoId,
@@ -1594,6 +1607,27 @@ const loadCartFromLocal = () => {
   } catch (err) {
     carritoItems.value = []
   }
+}
+
+const saveCartToLocal = () => {
+  const total = carritoItems.value.reduce((acc, item) => {
+    const unit = item.precio_unitario ?? item.precio_monto ?? item.precio ?? 0
+    const qty = item.cantidad ?? 1
+    return acc + unit * qty
+  }, 0)
+  localStorage.setItem('kharis_cart_cache', JSON.stringify({ items: carritoItems.value, total, timestamp: Date.now() }))
+  cartCount.value = carritoItems.value.reduce((acc, item) => acc + (item.cantidad || 1), 0)
+  localStorage.setItem('kharis_cart_count', cartCount.value.toString())
+}
+
+const getCartItemKey = (item) => {
+  return item?.variante_id ?? item?.producto_id ?? item?.id
+}
+
+const removeCartItem = (item) => {
+  const key = getCartItemKey(item)
+  carritoItems.value = carritoItems.value.filter(i => getCartItemKey(i) !== key)
+  saveCartToLocal()
 }
 
 const irACheckout = () => {
@@ -1834,14 +1868,7 @@ const addToCart = (producto) => {
   }
   
   // Guardar en localStorage (mismo formato que Home.vue espera)
-  const total = carritoItems.value.reduce((acc, item) => {
-    const unit = item.precio_unitario ?? item.precio_monto ?? item.precio ?? 0
-    const qty = item.cantidad ?? 1
-    return acc + unit * qty
-  }, 0)
-  localStorage.setItem('kharis_cart_cache', JSON.stringify({ items: carritoItems.value, total, timestamp: Date.now() }))
-  cartCount.value = carritoItems.value.reduce((acc, item) => acc + item.cantidad, 0)
-  localStorage.setItem('kharis_cart_count', cartCount.value.toString())
+  saveCartToLocal()
   
   showToastMessage(`${producto.nombre} añadido al carrito`)
 }

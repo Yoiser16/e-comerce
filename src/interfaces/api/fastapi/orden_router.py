@@ -344,14 +344,31 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
     """Crea una orden (sync) con validacion atomica de stock"""
     from django.db import transaction
     from infrastructure.auth.models import Usuario
+    from uuid import UUID
     
     with transaction.atomic():
+        if not data.items:
+            raise Exception("La orden debe incluir al menos un producto")
+
+        def normalize_uuid(value):
+            if not value:
+                return None
+            if isinstance(value, str) and value.strip().lower() in {'null', 'none', 'undefined'}:
+                return None
+            try:
+                return str(UUID(str(value)))
+            except Exception:
+                return None
+
         # 0. VALIDAR STOCK PRIMERO (con bloqueo pesimista)
         for item in data.items:
-            if item.variante_id:
+            variante_id = normalize_uuid(item.variante_id)
+            producto_id = normalize_uuid(item.producto_id)
+
+            if variante_id:
                 try:
-                    variante = ProductoVarianteModel.objects.select_for_update().select_related('producto').get(id=item.variante_id)
-                    if item.producto_id and str(variante.producto_id) != str(item.producto_id):
+                    variante = ProductoVarianteModel.objects.select_for_update().select_related('producto').get(id=variante_id)
+                    if producto_id and str(variante.producto_id) != str(producto_id):
                         raise Exception("Variante no corresponde al producto solicitado")
                     if variante.stock_actual < item.cantidad:
                         raise Exception(
@@ -359,143 +376,145 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
                             f"Disponible: {variante.stock_actual}, Solicitado: {item.cantidad}"
                         )
                 except ProductoVarianteModel.DoesNotExist:
-                    raise Exception(f"Variante no encontrada: {item.variante_id}")
+                    raise Exception(f"Variante no encontrada: {variante_id}")
                 continue
 
-            if item.producto_id and item.producto_id != '00000000-0000-0000-0000-000000000000':
+            if producto_id and producto_id != '00000000-0000-0000-0000-000000000000':
                 try:
-                    producto = ProductoModel.objects.select_for_update().get(id=item.producto_id)
+                    producto = ProductoModel.objects.select_for_update().get(id=producto_id)
                     if producto.stock_actual < item.cantidad:
                         raise Exception(
                             f"Stock insuficiente para {producto.nombre}. "
                             f"Disponible: {producto.stock_actual}, Solicitado: {item.cantidad}"
                         )
                 except ProductoModel.DoesNotExist:
-                    raise Exception(f"Producto no encontrado: {item.producto_id}")
+                    raise Exception(f"Producto no encontrado: {producto_id}")
         
         # 1. Obtener o crear cliente
         cliente = ClienteModel.objects.filter(email=data.email).first()
     
-    tipo_doc = data.tipo_documento or None
-    numero_doc = data.numero_documento or None
+        tipo_doc = data.tipo_documento or None
+        numero_doc = data.numero_documento or None
 
-    if not numero_doc:
-        usuario = Usuario.objects.filter(email=data.email, tipo='MAYORISTA').first()
-        if usuario and usuario.numero_documento:
-            tipo_doc = usuario.tipo_documento or 'CC'
-            numero_doc = usuario.numero_documento
+        if not numero_doc:
+            usuario = Usuario.objects.filter(email=data.email, tipo='MAYORISTA').first()
+            if usuario and usuario.numero_documento:
+                tipo_doc = usuario.tipo_documento or 'CC'
+                numero_doc = usuario.numero_documento
 
-    if not numero_doc:
-        numero_doc = f"AUTO-{uuid4().hex[:8].upper()}"
-    if not tipo_doc:
-        tipo_doc = 'CC'
+        if not numero_doc:
+            numero_doc = f"AUTO-{uuid4().hex[:8].upper()}"
+        if not tipo_doc:
+            tipo_doc = 'CC'
 
-    if not cliente:
-        cliente = ClienteModel.objects.create(
+        if not cliente:
+            cliente = ClienteModel.objects.create(
+                id=uuid4(),
+                email=data.email,
+                nombre=data.nombre,
+                apellido=data.apellido,
+                telefono=data.telefono,
+                tipo_documento=tipo_doc,
+                numero_documento=numero_doc,
+                activo=True
+            )
+        else:
+            # Actualizar datos si cambiaron
+            actualizado = False
+            if cliente.nombre != data.nombre:
+                cliente.nombre = data.nombre
+                actualizado = True
+            if cliente.apellido != data.apellido:
+                cliente.apellido = data.apellido
+                actualizado = True
+            if cliente.telefono != data.telefono:
+                cliente.telefono = data.telefono
+                actualizado = True
+            # Actualizar documento si se proporciona uno nuevo o si viene del mayorista
+            if numero_doc and cliente.numero_documento != numero_doc:
+                cliente.numero_documento = numero_doc
+                actualizado = True
+            if tipo_doc and cliente.tipo_documento != tipo_doc:
+                cliente.tipo_documento = tipo_doc
+                actualizado = True
+            if actualizado:
+                cliente.save()
+    
+        # 2. Generar código único
+        while True:
+            numero = random.randint(1000, 9999)
+            codigo = f"KH-{numero}"
+            if not OrdenModel.objects.filter(codigo=codigo).exists():
+                break
+    
+        # 3. Crear la orden
+        # Si el pago fue por Wompi, la orden ya está pagada → confirmada
+        estado_inicial = 'confirmada' if data.metodo_pago == 'wompi' else 'pendiente'
+    
+        orden = OrdenModel.objects.create(
             id=uuid4(),
-            email=data.email,
-            nombre=data.nombre,
-            apellido=data.apellido,
-            telefono=data.telefono,
-            tipo_documento=tipo_doc,
-            numero_documento=numero_doc,
+            cliente=cliente,
+            codigo=codigo,
+            direccion_envio=data.direccion,
+            departamento=data.departamento,
+            municipio=data.municipio,
+            barrio=data.barrio or '',
+            notas_envio=data.notas or '',
+            estado=estado_inicial,
+            metodo_pago=data.metodo_pago,
+            subtotal_monto=Decimal(str(data.subtotal)),
+            envio_monto=Decimal(str(data.envio)),
+            total_monto=Decimal(str(data.total)),
+            total_moneda='COP',
             activo=True
         )
-    else:
-        # Actualizar datos si cambiaron
-        actualizado = False
-        if cliente.nombre != data.nombre:
-            cliente.nombre = data.nombre
-            actualizado = True
-        if cliente.apellido != data.apellido:
-            cliente.apellido = data.apellido
-            actualizado = True
-        if cliente.telefono != data.telefono:
-            cliente.telefono = data.telefono
-            actualizado = True
-        # Actualizar documento si se proporciona uno nuevo o si viene del mayorista
-        if numero_doc and cliente.numero_documento != numero_doc:
-            cliente.numero_documento = numero_doc
-            actualizado = True
-        if tipo_doc and cliente.tipo_documento != tipo_doc:
-            cliente.tipo_documento = tipo_doc
-            actualizado = True
-        if actualizado:
-            cliente.save()
     
-    # 2. Generar código único
-    while True:
-        numero = random.randint(1000, 9999)
-        codigo = f"KH-{numero}"
-        if not OrdenModel.objects.filter(codigo=codigo).exists():
-            break
-    
-    # 3. Crear la orden
-    # Si el pago fue por Wompi, la orden ya está pagada → confirmada
-    estado_inicial = 'confirmada' if data.metodo_pago == 'wompi' else 'pendiente'
-    
-    orden = OrdenModel.objects.create(
-        id=uuid4(),
-        cliente=cliente,
-        codigo=codigo,
-        direccion_envio=data.direccion,
-        departamento=data.departamento,
-        municipio=data.municipio,
-        barrio=data.barrio or '',
-        notas_envio=data.notas or '',
-        estado=estado_inicial,
-        metodo_pago=data.metodo_pago,
-        subtotal_monto=Decimal(str(data.subtotal)),
-        envio_monto=Decimal(str(data.envio)),
-        total_monto=Decimal(str(data.total)),
-        total_moneda='COP',
-        activo=True
-    )
-    
-    # 4. Crear líneas de la orden
-    items_response = []
-    for item in data.items:
-        producto = None
-        variante = None
-        producto_nombre = item.nombre or 'Producto'
+        # 4. Crear líneas de la orden
+        items_response = []
+        for item in data.items:
+            variante_id = normalize_uuid(item.variante_id)
+            producto_id = normalize_uuid(item.producto_id)
+            producto = None
+            variante = None
+            producto_nombre = item.nombre or 'Producto'
         
-        if item.variante_id:
-            try:
-                variante = ProductoVarianteModel.objects.select_related('producto').get(id=item.variante_id)
-                producto = variante.producto
-                producto_nombre = producto.nombre
-            except (ProductoVarianteModel.DoesNotExist, Exception):
-                variante = None
-                producto = None
+            if variante_id:
+                try:
+                    variante = ProductoVarianteModel.objects.select_related('producto').get(id=variante_id)
+                    producto = variante.producto
+                    producto_nombre = producto.nombre
+                except (ProductoVarianteModel.DoesNotExist, Exception):
+                    variante = None
+                    producto = None
 
-        # Intentar buscar el producto si hay producto_id válido
-        if not producto and item.producto_id and item.producto_id != '00000000-0000-0000-0000-000000000000':
-            try:
-                producto = ProductoModel.objects.get(id=item.producto_id)
-                producto_nombre = producto.nombre
-            except (ProductoModel.DoesNotExist, Exception):
-                producto = None
+            # Intentar buscar el producto si hay producto_id válido
+            if not producto and producto_id and producto_id != '00000000-0000-0000-0000-000000000000':
+                try:
+                    producto = ProductoModel.objects.get(id=producto_id)
+                    producto_nombre = producto.nombre
+                except (ProductoModel.DoesNotExist, Exception):
+                    producto = None
         
-        subtotal = Decimal(str(item.precio_unitario)) * item.cantidad
+            subtotal = Decimal(str(item.precio_unitario)) * item.cantidad
         
-        # Solo crear línea si hay producto válido
-        if producto:
+            if not producto:
+                raise Exception(f"Producto no encontrado para item: {item.nombre or item.producto_id}")
+
             LineaOrdenModel.objects.create(
                 id=uuid4(),
                 orden=orden,
                 producto=producto,
-                variante_id=item.variante_id,
+                variante_id=variante_id,
                 cantidad=item.cantidad,
                 precio_unitario_monto=Decimal(str(item.precio_unitario)),
                 precio_unitario_moneda='COP',
                 subtotal_monto=subtotal,
                 subtotal_moneda='COP',
-                variante_sku=item.variante_sku or (variante.sku if variante else ''),
-                color_snapshot=item.color or (variante.color if variante else ''),
-                largo_snapshot=item.largo or (variante.largo if variante else '')
+                variante_sku=item.variante_sku or (variante.sku if variante else '') or '',
+                color_snapshot=item.color or (variante.color or '' if variante else ''),
+                largo_snapshot=item.largo or (variante.largo or '' if variante else '')
             )
 
-            
             # DESCONTAR STOCK AQUÍ (orden PENDIENTE)
             # El stock se devuelve solo si se CANCELA la orden
             if variante:
@@ -513,18 +532,18 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
                 producto.stock_actual -= item.cantidad
                 producto.save()
                 print(f'📦 Stock descontado: {producto.nombre} - {item.cantidad} unidades. Stock anterior: {stock_anterior}, Stock nuevo: {producto.stock_actual}')
-        
-        items_response.append({
-            'producto_id': item.producto_id or 'sin-id',
-            'variante_id': item.variante_id,
-            'nombre': producto_nombre,
-            'cantidad': item.cantidad,
-            'precio_unitario': item.precio_unitario,
-            'subtotal': float(subtotal),
-            'variante_sku': item.variante_sku or (variante.sku if variante else ''),
-            'color': item.color or (variante.color if variante else ''),
-            'largo': item.largo or (variante.largo if variante else '')
-        })
+
+            items_response.append({
+                'producto_id': producto_id or 'sin-id',
+                'variante_id': variante_id,
+                'nombre': producto_nombre,
+                'cantidad': item.cantidad,
+                'precio_unitario': item.precio_unitario,
+                'subtotal': float(subtotal),
+                'variante_sku': item.variante_sku or (variante.sku if variante else '') or '',
+                'color': item.color or (variante.color or '' if variante else ''),
+                'largo': item.largo or (variante.largo or '' if variante else '')
+            })
     
     # Preparar datos de productos para el email (con imágenes)
     productos_email = []
@@ -908,7 +927,13 @@ async def crear_orden(data: CrearOrdenInput):
     except Exception as e:
         # Diferenciar errores de stock de otros errores
         error_msg = str(e)
-        if "Stock insuficiente" in error_msg or "Producto no encontrado" in error_msg:
+        if (
+            "Stock insuficiente" in error_msg
+            or "Producto no encontrado" in error_msg
+            or "Variante no encontrada" in error_msg
+            or "Variante no corresponde" in error_msg
+            or "La orden debe incluir" in error_msg
+        ):
             raise HTTPException(
                 status_code=status.HTTP_409_CONFLICT,
                 detail=error_msg

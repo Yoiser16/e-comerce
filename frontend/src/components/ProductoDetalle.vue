@@ -758,7 +758,20 @@
                   class="w-20 h-20 object-cover bg-[#F9F8F6]"
                 >
                 <div class="flex-1 min-w-0">
-                  <h4 class="text-sm font-medium text-text-dark line-clamp-2">{{ item.nombre }}</h4>
+                  <div class="flex items-start justify-between gap-3">
+                    <h4 class="text-sm font-medium text-text-dark line-clamp-2">{{ item.nombre }}</h4>
+                    <button
+                      type="button"
+                      class="p-1.5 rounded-full border border-transparent text-text-light hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors"
+                      @click="removeCartItem(item)"
+                      aria-label="Eliminar"
+                      title="Eliminar"
+                    >
+                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 3h6m-7 4h8m-1 0v11a2 2 0 01-2 2H9a2 2 0 01-2-2V7m3 4v6m4-6v6" />
+                      </svg>
+                    </button>
+                  </div>
                   <p v-if="item.color || item.largo" class="text-xs text-text-light mt-1">
                     <span v-if="item.color">Color: {{ formatColorLabel(item.color) }}</span>
                     <span v-if="item.color && item.largo"> · </span>
@@ -1025,7 +1038,7 @@ const loadCartFromLocal = () => {
       const rawItems = data.items || []
       return rawItems.map((item) => {
         const productoId = item?.producto_id ?? item?.id
-        const varianteId = item?.variante_id ?? productoId
+        const varianteId = item?.variante_id ?? null
         return {
           ...item,
           producto_id: productoId,
@@ -1037,6 +1050,18 @@ const loadCartFromLocal = () => {
     console.warn('No se pudo leer el carrito local:', e)
   }
   return []
+}
+
+const getCartItemKey = (item) => {
+  return item?.variante_id ?? item?.producto_id ?? item?.id
+}
+
+const removeCartItem = (item) => {
+  const key = getCartItemKey(item)
+  const items = loadCartFromLocal().filter(i => getCartItemKey(i) !== key)
+  const count = items.reduce((sum, i) => sum + (i.cantidad || 1), 0)
+  saveCartToLocal(items, count)
+  carritoItems.value = items
 }
 
 const loadCartCount = () => {
