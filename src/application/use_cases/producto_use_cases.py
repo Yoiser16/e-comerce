@@ -32,7 +32,8 @@ class CrearProductoUseCase(CasoUsoBase[CrearProductoDTO, ProductoDTO]):
             descripcion=request.descripcion,
             precio=Dinero(request.precio_monto, request.precio_moneda),
             stock_actual=request.stock_actual,
-            stock_minimo=request.stock_minimo
+            stock_minimo=request.stock_minimo,
+            cantidad_minima_mayorista=request.cantidad_minima_mayorista
         )
         
         # Pasar atributos adicionales al repositorio
@@ -48,6 +49,7 @@ class CrearProductoUseCase(CasoUsoBase[CrearProductoDTO, ProductoDTO]):
             'destacado': request.destacado,
             'disponible_b2b': request.disponible_b2b,
             'porcentaje_descuento_b2b': request.porcentaje_descuento_b2b,
+            'cantidad_minima_mayorista': request.cantidad_minima_mayorista,
             'variantes': request.variantes
         }
         
@@ -118,6 +120,8 @@ class ActualizarProductoUseCase(CasoUsoBase[ActualizarProductoDTO, ProductoDTO])
             producto.precio = Dinero(request.precio_monto, producto.precio.moneda)
         if request.stock_actual is not None:
             producto.stock_actual = request.stock_actual
+        if request.cantidad_minima_mayorista is not None:
+            producto.cantidad_minima_mayorista = request.cantidad_minima_mayorista
         
         # Preparar atributos adicionales para actualizar
         atributos_adicionales = {}
@@ -147,6 +151,8 @@ class ActualizarProductoUseCase(CasoUsoBase[ActualizarProductoDTO, ProductoDTO])
             atributos_adicionales['disponible_b2b'] = request.disponible_b2b
         if request.porcentaje_descuento_b2b is not None:
             atributos_adicionales['porcentaje_descuento_b2b'] = request.porcentaje_descuento_b2b
+        if request.cantidad_minima_mayorista is not None:
+            atributos_adicionales['cantidad_minima_mayorista'] = request.cantidad_minima_mayorista
         if request.variantes is not None:
             atributos_adicionales['variantes'] = request.variantes
         

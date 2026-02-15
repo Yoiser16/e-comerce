@@ -63,6 +63,7 @@ class ProductoRepositoryImpl(ProductoRepository):
             destacado=model.destacado,
             disponible_b2b=model.disponible_b2b,
             porcentaje_descuento_b2b=model.porcentaje_descuento_b2b,
+            cantidad_minima_mayorista=getattr(model, 'cantidad_minima_mayorista', 1),
             variantes=self._map_variantes(model)
         )
 
@@ -96,6 +97,7 @@ class ProductoRepositoryImpl(ProductoRepository):
                     precio=Dinero(variante.precio_monto, variante.precio_moneda),
                     stock_actual=variante.stock_actual,
                     stock_minimo=variante.stock_minimo,
+                    cantidad_minima_mayorista=getattr(variante, 'cantidad_minima_mayorista', 1),
                     imagen_url=variante.imagen_url,
                     activo=variante.activo,
                     orden=variante.orden,
@@ -119,6 +121,7 @@ class ProductoRepositoryImpl(ProductoRepository):
             stock_actual=entity.stock_actual,
             stock_minimo=entity.stock_minimo,
             stock_reservado=getattr(entity, 'stock_reservado', 0),
+            cantidad_minima_mayorista=getattr(entity, 'cantidad_minima_mayorista', 1),
             activo=entity.activo,
             fecha_creacion=entity.fecha_creacion,
             fecha_modificacion=entity.fecha_modificacion,
@@ -182,6 +185,7 @@ class ProductoRepositoryImpl(ProductoRepository):
             'precio_moneda': variante.precio_moneda,
             'stock_actual': variante.stock_actual,
             'stock_minimo': variante.stock_minimo,
+            'cantidad_minima_mayorista': getattr(variante, 'cantidad_minima_mayorista', 1),
             'imagen_url': variante.imagen_url,
             'activo': variante.activo,
             'orden': variante.orden
@@ -200,6 +204,7 @@ class ProductoRepositoryImpl(ProductoRepository):
                 'precio_moneda': v.precio_moneda,
                 'stock_actual': v.stock_actual,
                 'stock_minimo': v.stock_minimo,
+                'cantidad_minima_mayorista': getattr(v, 'cantidad_minima_mayorista', 1),
                 'imagen_url': v.imagen_url,
                 'activo': v.activo,
                 'orden': v.orden
@@ -233,6 +238,7 @@ class ProductoRepositoryImpl(ProductoRepository):
                 'precio_moneda': producto_model.moneda_precio,
                 'stock_actual': producto_model.stock_actual,
                 'stock_minimo': producto_model.stock_minimo,
+                'cantidad_minima_mayorista': getattr(producto_model, 'cantidad_minima_mayorista', 1),
                 'imagen_url': producto_model.imagen_principal,
                 'activo': True,
                 'orden': -1
@@ -252,6 +258,7 @@ class ProductoRepositoryImpl(ProductoRepository):
                 'precio_moneda': payload.get('precio_moneda') or producto_model.moneda_precio,
                 'stock_actual': payload.get('stock_actual', 0),
                 'stock_minimo': payload.get('stock_minimo', 0),
+                'cantidad_minima_mayorista': payload.get('cantidad_minima_mayorista') or getattr(producto_model, 'cantidad_minima_mayorista', 1),
                 'imagen_url': payload.get('imagen_url'),
                 'activo': payload.get('activo', True),
                 'orden': payload.get('orden', idx)
@@ -328,6 +335,11 @@ class ProductoRepositoryImpl(ProductoRepository):
                 model_anterior.monto_precio = entidad.precio.monto
                 model_anterior.stock_actual = entidad.stock_actual
                 model_anterior.stock_minimo = entidad.stock_minimo
+                model_anterior.cantidad_minima_mayorista = getattr(
+                    entidad,
+                    'cantidad_minima_mayorista',
+                    model_anterior.cantidad_minima_mayorista
+                )
                 model_anterior.activo = entidad.activo
                 # Asignar categoría si se proporciona
                 if categoria_id:
@@ -355,6 +367,8 @@ class ProductoRepositoryImpl(ProductoRepository):
                         model_anterior.disponible_b2b = atributos_adicionales['disponible_b2b']
                     if 'porcentaje_descuento_b2b' in atributos_adicionales:
                         model_anterior.porcentaje_descuento_b2b = atributos_adicionales['porcentaje_descuento_b2b']
+                    if 'cantidad_minima_mayorista' in atributos_adicionales:
+                        model_anterior.cantidad_minima_mayorista = atributos_adicionales['cantidad_minima_mayorista']
                 model = model_anterior
             else:
                 # Crear nuevo modelo
@@ -384,6 +398,8 @@ class ProductoRepositoryImpl(ProductoRepository):
                         model.disponible_b2b = atributos_adicionales['disponible_b2b']
                     if 'porcentaje_descuento_b2b' in atributos_adicionales:
                         model.porcentaje_descuento_b2b = atributos_adicionales['porcentaje_descuento_b2b']
+                    if 'cantidad_minima_mayorista' in atributos_adicionales:
+                        model.cantidad_minima_mayorista = atributos_adicionales['cantidad_minima_mayorista']
             
             model.save()
 

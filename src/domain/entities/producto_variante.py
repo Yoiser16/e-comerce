@@ -22,6 +22,7 @@ class ProductoVariante(EntidadBase):
     precio: Dinero
     stock_actual: int
     stock_minimo: int
+    cantidad_minima_mayorista: int
     imagen_url: Optional[str] = None
     activo: bool = True
     orden: int = 0
@@ -35,6 +36,7 @@ class ProductoVariante(EntidadBase):
         precio: Dinero,
         stock_actual: int,
         stock_minimo: int,
+        cantidad_minima_mayorista: int = 1,
         imagen_url: Optional[str] = None,
         activo: bool = True,
         orden: int = 0,
@@ -50,5 +52,6 @@ class ProductoVariante(EntidadBase):
         self.precio = precio
         self.stock_actual = stock_actual
         self.stock_minimo = stock_minimo
+        self.cantidad_minima_mayorista = cantidad_minima_mayorista
         self.imagen_url = imagen_url
         self.orden = orden

@@ -284,6 +284,15 @@
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                     </svg>
                   </button>
+                  <button
+                    @click="openB2BModal(producto)"
+                    class="p-2 text-gray-500 hover:text-[#8B7355] hover:bg-[#FAF5F2] rounded-lg transition-colors"
+                    title="Descuentos Mayoristas"
+                  >
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-7.5 2.5a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0zm7 7a2.5 2.5 0 115 0 2.5 2.5 0 01-5 0z" />
+                    </svg>
+                  </button>
                   <button 
                     @click="confirmDelete(producto)"
                     :class="activeTab === 'inactivos' ? 'text-red-600 hover:bg-red-50' : 'text-text-medium hover:text-red-600 hover:bg-red-50'"
@@ -368,6 +377,104 @@
       @updated="handleProductUpdated"
       @created="handleProductUpdated"
     />
+
+    <!-- Volume Discounts Modal -->
+    <div v-if="showB2BModal" class="fixed inset-0 bg-black/60 flex items-center justify-center z-50 p-4">
+      <div class="bg-[#FAFAFA] rounded-3xl max-w-2xl w-full p-6 sm:p-7 space-y-5 border border-black/5 shadow-[0_25px_70px_rgba(0,0,0,0.18)]">
+        <div class="flex items-start justify-between gap-4">
+          <div>
+            <h3 class="text-lg sm:text-xl font-luxury text-text-dark">Descuentos por volumen · Mayoristas</h3>
+            <p class="text-[11px] uppercase tracking-[0.12em] text-text-light mt-1">
+              Producto: <span class="font-medium text-text-dark">{{ b2bProduct?.nombre }}</span>
+              · Mínimo: <span class="font-medium text-text-dark">{{ getB2BTargetMin() }}</span>
+            </p>
+            <div v-if="b2bVariants.length" class="mt-2">
+              <label class="block text-[11px] font-semibold text-text-medium uppercase tracking-[0.14em]">Aplicar a</label>
+              <select
+                v-model="b2bTargetKey"
+                @change="handleB2BTargetChange"
+                class="mt-1 w-full px-3 py-2.5 border border-text-dark/10 rounded-lg text-sm focus:outline-none focus:border-text-dark/30 bg-white"
+              >
+                <option value="producto">Producto base</option>
+                <option v-for="variante in b2bVariants" :key="variante.id" :value="variante.id">
+                  {{ getVarianteLabel(variante) }}
+                </option>
+              </select>
+            </div>
+          </div>
+          <button @click="closeB2BModal" class="text-text-light hover:text-text-dark">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+            </svg>
+          </button>
+        </div>
+
+        <div v-if="b2bLoading" class="py-8 text-center text-text-light">Cargando...</div>
+
+        <div v-else class="space-y-3">
+          <div class="grid grid-cols-12 gap-3 text-[11px] font-semibold text-text-medium uppercase tracking-[0.14em]">
+            <div class="col-span-5">Cantidad mínima</div>
+            <div class="col-span-5">Descuento (%)</div>
+            <div class="col-span-2 text-right">Acción</div>
+          </div>
+
+          <div v-for="(tier, index) in b2bTiers" :key="index" class="grid grid-cols-12 gap-3 items-center">
+            <div class="col-span-5">
+              <input
+                v-model.number="tier.cantidad_minima"
+                type="number"
+                min="1"
+                class="w-full px-3 py-2.5 border border-text-dark/10 rounded-lg text-sm focus:outline-none focus:border-text-dark/30 bg-white"
+              >
+            </div>
+            <div class="col-span-5">
+              <input
+                v-model.number="tier.descuento_porcentaje"
+                type="number"
+                min="0"
+                max="90"
+                class="w-full px-3 py-2.5 border border-text-dark/10 rounded-lg text-sm focus:outline-none focus:border-text-dark/30 bg-white"
+              >
+            </div>
+            <div class="col-span-2 flex justify-end">
+              <button
+                @click="removeB2BTier(index)"
+                class="px-2 py-1 text-[11px] text-text-light hover:text-text-dark"
+                title="Eliminar tramo"
+              >
+                Quitar
+              </button>
+            </div>
+          </div>
+
+          <button
+            type="button"
+            @click="addB2BTier"
+            class="text-sm text-text-dark font-medium hover:text-black"
+          >
+            + Agregar tramo
+          </button>
+        </div>
+
+        <p v-if="b2bError" class="text-sm text-red-600">{{ b2bError }}</p>
+
+        <div class="flex justify-end gap-3 pt-2">
+          <button
+            @click="closeB2BModal"
+            class="px-4 py-2 text-sm text-text-dark border border-text-dark/20 rounded-lg hover:border-text-dark/40"
+          >
+            Cancelar
+          </button>
+          <button
+            @click="saveB2BTiers"
+            class="px-4 py-2 text-sm text-white bg-text-dark hover:bg-black rounded-lg"
+            :disabled="b2bLoading"
+          >
+            Guardar
+          </button>
+        </div>
+      </div>
+    </div>
 
     <!-- Delete Confirmation Modal -->
     <div v-if="showDeleteModal" class="fixed inset-0 bg-black/50 flex items-center justify-center z-50 p-4">
@@ -666,6 +773,13 @@ export default {
     const activeTab = ref('activos')
     const showHistoryWarningModal = ref(false)
     const historyWarningData = ref(null)
+    const showB2BModal = ref(false)
+    const b2bProduct = ref(null)
+    const b2bTiers = ref([])
+    const b2bLoading = ref(false)
+    const b2bError = ref('')
+    const b2bVariants = ref([])
+    const b2bTargetKey = ref('producto')
     const selectedIds = ref([])
     const bulkLoading = ref(false)
     const bulkConfirm = ref({ open: false, action: '', message: '' })
@@ -760,6 +874,49 @@ export default {
       if (stock === 0) return 'text-red-600'
       if (stock <= stockMinimo) return 'text-orange-600'
       return 'text-gray-900'
+    }
+
+    const getVarianteLabel = (variante) => {
+      if (!variante) return 'Variante'
+      const parts = []
+      if (variante.color) parts.push(variante.color)
+      if (variante.largo) parts.push(`${variante.largo} pulg`)
+      const suffix = parts.length ? parts.join(' · ') : 'Sin atributos'
+      return `${suffix} (${variante.sku || 'SKU'})`
+    }
+
+    const getB2BTargetMin = () => {
+      if (b2bTargetKey.value === 'producto') {
+        return Number(b2bProduct.value?.cantidad_minima_mayorista || 1)
+      }
+      const variante = b2bVariants.value.find(v => String(v.id) === String(b2bTargetKey.value))
+      return Number(variante?.cantidad_minima_mayorista || b2bProduct.value?.cantidad_minima_mayorista || 1)
+    }
+
+    const loadB2BTiers = async () => {
+      if (!b2bProduct.value) return
+      b2bLoading.value = true
+      b2bError.value = ''
+
+      try {
+        const minimo = getB2BTargetMin()
+        const data = b2bTargetKey.value === 'producto'
+          ? await productosService.getB2BDescuentos(b2bProduct.value.id)
+          : await productosService.getB2BDescuentosVariante(b2bTargetKey.value)
+
+        const tiers = Array.isArray(data) ? data : []
+        b2bTiers.value = tiers.length
+          ? tiers.map((t) => ({
+              cantidad_minima: Number(t.cantidad_minima || minimo),
+              descuento_porcentaje: Number(t.descuento_porcentaje || 0)
+            }))
+          : [{ cantidad_minima: minimo, descuento_porcentaje: 0 }]
+      } catch (err) {
+        b2bError.value = 'No se pudieron cargar los descuentos por volumen.'
+        b2bTiers.value = []
+      } finally {
+        b2bLoading.value = false
+      }
     }
 
     const getCategoryLabel = (producto) => {
@@ -865,6 +1022,90 @@ export default {
     const handleProductUpdated = async () => {
       // Recargar lista de productos después de editar/crear
       await loadProducts()
+    }
+
+    const openB2BModal = async (producto) => {
+      b2bProduct.value = producto
+      showB2BModal.value = true
+      b2bError.value = ''
+      b2bLoading.value = true
+      b2bTargetKey.value = 'producto'
+      b2bVariants.value = []
+      try {
+        const detalle = await productosService.getProducto(producto.id)
+        const variantes = Array.isArray(detalle?.variantes) ? detalle.variantes : []
+        b2bVariants.value = variantes.filter(v => v && v.activo !== false)
+        await loadB2BTiers()
+      } catch (err) {
+        b2bError.value = 'No se pudieron cargar los descuentos por volumen.'
+        b2bTiers.value = []
+      } finally {
+        b2bLoading.value = false
+      }
+    }
+
+    const closeB2BModal = () => {
+      showB2BModal.value = false
+      b2bProduct.value = null
+      b2bTiers.value = []
+      b2bVariants.value = []
+      b2bTargetKey.value = 'producto'
+      b2bError.value = ''
+    }
+
+    const handleB2BTargetChange = async () => {
+      await loadB2BTiers()
+    }
+
+    const addB2BTier = () => {
+      b2bTiers.value = [
+        ...b2bTiers.value,
+        { cantidad_minima: 1, descuento_porcentaje: 0 }
+      ]
+    }
+
+    const removeB2BTier = (index) => {
+      b2bTiers.value = b2bTiers.value.filter((_, i) => i !== index)
+    }
+
+    const saveB2BTiers = async () => {
+      if (!b2bProduct.value) return
+      const payload = b2bTiers.value
+        .map((t, idx) => ({
+          cantidad_minima: Number(t.cantidad_minima || 0),
+          descuento_porcentaje: Number(t.descuento_porcentaje || 0),
+          activo: true,
+          orden: idx
+        }))
+        .filter(t => t.cantidad_minima > 0)
+
+      if (!payload.length) {
+        b2bError.value = 'Agrega al menos un tramo con cantidad mínima.'
+        return
+      }
+
+      const cantidades = payload.map(t => t.cantidad_minima)
+      const unique = new Set(cantidades)
+      if (unique.size !== cantidades.length) {
+        b2bError.value = 'No se permiten cantidades mínimas duplicadas.'
+        return
+      }
+
+      b2bLoading.value = true
+      b2bError.value = ''
+      try {
+        if (b2bTargetKey.value === 'producto') {
+          await productosService.updateB2BDescuentos(b2bProduct.value.id, payload)
+        } else {
+          await productosService.updateB2BDescuentosVariante(b2bTargetKey.value, payload)
+        }
+        await loadProducts()
+        closeB2BModal()
+      } catch (err) {
+        b2bError.value = err?.response?.data?.detail || 'No se pudieron guardar los descuentos.'
+      } finally {
+        b2bLoading.value = false
+      }
     }
 
     const confirmDelete = (producto) => {
@@ -1127,6 +1368,13 @@ export default {
       activeTab,
       showHistoryWarningModal,
       historyWarningData,
+      showB2BModal,
+      b2bProduct,
+      b2bVariants,
+      b2bTargetKey,
+      b2bTiers,
+      b2bLoading,
+      b2bError,
       selectedCount,
       allDisplayedSelected,
       someDisplayedSelected,
@@ -1141,12 +1389,20 @@ export default {
       getTotalStock,
       getTotalStockMin,
       getStockClass,
+      getVarianteLabel,
+      getB2BTargetMin,
       getCategoryLabel,
       handleImageError,
       openCreateModal,
       openEditModal,
       closeEditModal,
       handleProductUpdated,
+      openB2BModal,
+      closeB2BModal,
+      handleB2BTargetChange,
+      addB2BTier,
+      removeB2BTier,
+      saveB2BTiers,
       confirmDelete,
       deleteProduct,
       clearFilters,

@@ -258,6 +258,35 @@ class ProductoModel(models.Model):
         """Indica si el producto está disponible para venta"""
         return self.activo and self.stock_actual > 0
 
+class ProductoDescuentoVolumenModel(models.Model):
+    """
+    Descuentos por volumen para ventas B2B.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    producto = models.ForeignKey(ProductoModel, on_delete=models.CASCADE, related_name='descuentos_volumen')
+    cantidad_minima = models.IntegerField(default=1)
+    descuento_porcentaje = models.PositiveSmallIntegerField(default=0)
+    activo = models.BooleanField(default=True)
+    orden = models.IntegerField(default=0)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'productos_descuentos_volumen'
+        verbose_name = 'Descuento por Volumen'
+        verbose_name_plural = 'Descuentos por Volumen'
+        ordering = ['cantidad_minima', 'orden']
+        indexes = [
+            models.Index(fields=['producto', 'activo']),
+            models.Index(fields=['producto', 'cantidad_minima'])
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=['producto', 'cantidad_minima'], name='unique_descuento_por_cantidad')
+        ]
+
+    def __str__(self) -> str:
+        return f"Descuento {self.descuento_porcentaje}% desde {self.cantidad_minima} - {self.producto}"
+
 
 class ProductoVarianteModel(models.Model):
     """
@@ -270,6 +299,7 @@ class ProductoVarianteModel(models.Model):
     largo = models.CharField(max_length=50, choices=ProductoModel.LARGO_CHOICES, null=True, blank=True, db_index=True)
     precio_monto = models.DecimalField(max_digits=10, decimal_places=2)
     precio_moneda = models.CharField(max_length=3, default='COP')
+    cantidad_minima_mayorista = models.IntegerField(default=1, help_text='Cantidad mínima para venta mayorista por variante')
     stock_actual = models.IntegerField(default=0)
     stock_minimo = models.IntegerField(default=0)
     imagen_url = models.URLField(max_length=500, null=True, blank=True)
@@ -295,6 +325,36 @@ class ProductoVarianteModel(models.Model):
 
     def __str__(self) -> str:
         return f"Variante {self.sku} - {self.producto}"
+
+
+class ProductoVarianteDescuentoVolumenModel(models.Model):
+    """
+    Descuentos por volumen para ventas B2B por variante.
+    """
+    id = models.UUIDField(primary_key=True, default=uuid4, editable=False)
+    variante = models.ForeignKey(ProductoVarianteModel, on_delete=models.CASCADE, related_name='descuentos_volumen')
+    cantidad_minima = models.IntegerField(default=1)
+    descuento_porcentaje = models.PositiveSmallIntegerField(default=0)
+    activo = models.BooleanField(default=True)
+    orden = models.IntegerField(default=0)
+    fecha_creacion = models.DateTimeField(auto_now_add=True)
+    fecha_modificacion = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        db_table = 'productos_variantes_descuentos_volumen'
+        verbose_name = 'Descuento por Volumen (Variante)'
+        verbose_name_plural = 'Descuentos por Volumen (Variante)'
+        ordering = ['cantidad_minima', 'orden']
+        indexes = [
+            models.Index(fields=['variante', 'activo']),
+            models.Index(fields=['variante', 'cantidad_minima'])
+        ]
+        constraints = [
+            models.UniqueConstraint(fields=['variante', 'cantidad_minima'], name='unique_descuento_variante_por_cantidad')
+        ]
+
+    def __str__(self) -> str:
+        return f"Descuento {self.descuento_porcentaje}% desde {self.cantidad_minima} - {self.variante}"
 
 
 class ImagenProductoModel(models.Model):

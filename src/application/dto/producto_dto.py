@@ -22,6 +22,7 @@ class ProductoVarianteDTO:
     precio_moneda: str
     stock_actual: int
     stock_minimo: int
+    cantidad_minima_mayorista: int = 1
     imagen_url: Optional[str] = None
     activo: bool = True
     orden: int = 0
@@ -37,6 +38,7 @@ class ProductoVarianteDTO:
             precio_moneda=variante.precio.moneda,
             stock_actual=variante.stock_actual,
             stock_minimo=variante.stock_minimo,
+            cantidad_minima_mayorista=getattr(variante, 'cantidad_minima_mayorista', 1),
             imagen_url=variante.imagen_url,
             activo=variante.activo,
             orden=variante.orden
@@ -54,6 +56,7 @@ class ProductoVarianteInputDTO:
     precio_moneda: str = "COP"
     stock_actual: int = 0
     stock_minimo: int = 0
+    cantidad_minima_mayorista: int = 1
     imagen_url: Optional[str] = None
     activo: bool = True
     orden: int = 0
@@ -69,6 +72,7 @@ class CrearProductoDTO:
     precio_moneda: str = "COP"
     stock_actual: int = 0
     stock_minimo: int = 0
+    cantidad_minima_mayorista: int = 1
     categoria: Optional[str] = None
     imagen_principal: Optional[str] = None
     imagenes: List[str] = field(default_factory=list)
@@ -93,6 +97,7 @@ class ActualizarProductoDTO:
     precio_monto: Optional[Decimal] = None
     stock_actual: Optional[int] = None
     stock_minimo: Optional[int] = None
+    cantidad_minima_mayorista: Optional[int] = None
     categoria: Optional[str] = None
     imagen_principal: Optional[str] = None
     imagenes: Optional[List[str]] = None
@@ -124,6 +129,7 @@ class ProductoDTO:
     activo: bool
     fecha_creacion: datetime
     fecha_modificacion: datetime
+    cantidad_minima_mayorista: int = 1
     categoria: Optional[str] = None
     imagen_principal: Optional[str] = None
     imagenes: List[str] = field(default_factory=list)
@@ -154,6 +160,7 @@ class ProductoDTO:
             precio_moneda=producto.precio.moneda,
             stock_actual=producto.stock_actual,
             stock_minimo=producto.stock_minimo,
+            cantidad_minima_mayorista=getattr(producto, 'cantidad_minima_mayorista', 1),
             activo=producto.activo,
             fecha_creacion=producto.fecha_creacion,
             fecha_modificacion=producto.fecha_modificacion,

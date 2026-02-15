@@ -584,6 +584,7 @@ import { useRouter } from 'vue-router'
 import apiClient from '@/services/api'
 import { generateReference, toCents, buildCheckoutUrl, loadWompiSDK } from '@/services/wompi'
 import { crearOrden, validarStock } from '@/services/mayoristas'
+import { getUnitPriceForQty } from '@/utils/b2bPricing'
 
 // API de Colombia - Datos oficiales de departamentos y municipios
 const COLOMBIA_API = {
@@ -667,11 +668,13 @@ export default {
       return parts.filter(p => p).join(', ')
     })
 
+    const getBasePrice = (item) => item.precio || item.wholesalePrice || 0
+    const getUnitPrice = (item) => getUnitPriceForQty(getBasePrice(item), item.cantidad || item.quantity || 1, item.descuentos_volumen)
+
     const subtotal = computed(() => {
       return cartItems.value.reduce((sum, item) => {
         const qty = item.cantidad || item.quantity || 1
-        const price = item.precio || item.wholesalePrice || 0
-        return sum + (price * qty)
+        return sum + (getUnitPrice(item) * qty)
       }, 0)
     })
 
@@ -963,7 +966,7 @@ export default {
           color: item.color || '',
           largo: item.largo || '',
           cantidad: item.cantidad || item.quantity || 1,
-          precio_unitario: item.precio || item.wholesalePrice || 0,
+          precio_unitario: getUnitPrice(item),
           nombre: item.nombre || item.name
         }))
 
@@ -1018,7 +1021,7 @@ export default {
           const itemsText = cartItems.value.map(item => {
             const name = item.nombre || item.name
             const qty = item.cantidad || item.quantity
-            const price = item.precio || item.wholesalePrice
+            const price = getUnitPrice(item)
             const detalles = [
               item.color ? `Color: ${item.color}` : '',
               item.largo ? `Largo: ${item.largo}` : ''
@@ -1075,7 +1078,7 @@ export default {
               largo: item.largo || '',
               nombre: item.nombre || item.name,
               cantidad: item.cantidad || item.quantity || 1,
-              precio: item.precio || item.wholesalePrice || 0
+              precio: getUnitPrice(item)
             })),
             subtotal: subtotal.value,
             envio: shippingCost.value,

@@ -97,7 +97,7 @@
 
               <!-- Precio unitario -->
               <p class="text-sm text-[#8B7355] font-medium mt-1">
-                ${{ formatPrice(item.precio || item.wholesalePrice) }} <span class="text-gray-400 font-normal">c/u</span>
+                ${{ formatPrice(getUnitPrice(item)) }} <span class="text-gray-400 font-normal">c/u</span>
               </p>
             </div>
             </div>
@@ -131,7 +131,7 @@
 
               <!-- Subtotal línea -->
               <div class="text-right">
-                <p class="text-lg font-bold text-[#1A1A1A]">${{ formatPrice((item.precio || item.wholesalePrice) * (item.cantidad || item.quantity)) }}</p>
+                <p class="text-lg font-bold text-[#1A1A1A]">${{ formatPrice(getUnitPrice(item) * (item.cantidad || item.quantity)) }}</p>
               </div>
             </div>
 
@@ -297,6 +297,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { getImageUrl } from '@/services/api'
 import { useRouter } from 'vue-router'
 import { formatColorLabel } from '@/utils/colorLabels'
+import { getUnitPriceForQty } from '@/utils/b2bPricing'
 
 export default {
   name: 'B2BCarrito',
@@ -310,6 +311,8 @@ export default {
     const getQuantity = (item) => item.cantidad || item.quantity || 1
     const getPrice = (item) => item.precio || item.wholesalePrice || 0
     const getRetailPrice = (item) => item.precioPublico || item.retailPrice || getPrice(item)
+    const getMinOrder = (item) => Number(item.cantidad_minima_mayorista || item.minOrder || 1)
+    const getUnitPrice = (item) => getUnitPriceForQty(getPrice(item), getQuantity(item), item.descuentos_volumen)
 
     // Cargar carrito desde localStorage
     function loadCart() {
@@ -337,11 +340,11 @@ export default {
     // Computed
     const totalUnits = computed(() => cartItems.value.reduce((sum, item) => sum + getQuantity(item), 0))
 
-    const subtotal = computed(() => cartItems.value.reduce((sum, item) => sum + (getPrice(item) * getQuantity(item)), 0))
+    const subtotal = computed(() => cartItems.value.reduce((sum, item) => sum + (getUnitPrice(item) * getQuantity(item)), 0))
 
     const totalDiscount = computed(() => {
       return cartItems.value.reduce((sum, item) => {
-        const discount = (getRetailPrice(item) - getPrice(item)) * getQuantity(item)
+        const discount = (getRetailPrice(item) - getUnitPrice(item)) * getQuantity(item)
         return sum + Math.max(0, discount)
       }, 0)
     })
@@ -355,8 +358,7 @@ export default {
 
     const canCheckout = computed(() => {
       if (cartItems.value.length === 0) return false
-      // Validar que todos los productos tengan al menos 10 unidades
-      return cartItems.value.every(item => getQuantity(item) >= 10)
+      return cartItems.value.every(item => getQuantity(item) >= getMinOrder(item))
     })
 
     // Methods
@@ -382,13 +384,12 @@ export default {
     function updateQuantity(itemKey, newQuantity) {
       const item = cartItems.value.find(i => (i.variante_id || i.id) === itemKey)
       if (item) {
-        const ORDEN_MINIMA = 10 // Compra mínima para mayoristas
-        const minQty = Math.max(item.minOrder || 1, ORDEN_MINIMA)
+        const minQty = getMinOrder(item)
         const maxQty = item.stock || 999
         
         // Validar que la cantidad no sea menor a la orden mínima
-        if (newQuantity < ORDEN_MINIMA) {
-          alert(`La compra mínima para mayoristas es de ${ORDEN_MINIMA} unidades por producto.`)
+        if (newQuantity < minQty) {
+          alert(`La compra mínima para mayoristas es de ${minQty} unidades por producto.`)
           return
         }
         
@@ -430,7 +431,8 @@ export default {
     return {
       cartItems, orderNotes,
       totalUnits, subtotal, totalDiscount, shippingCost, total, canCheckout,
-      formatPrice, formatColorLabel, handleImageError, updateQuantity, removeItem, limpiarCarrito, proceedToCheckout
+      formatPrice, formatColorLabel, handleImageError, updateQuantity, removeItem, limpiarCarrito, proceedToCheckout,
+      getUnitPrice
       , isVideo, getCartMediaUrl
     }
   }
