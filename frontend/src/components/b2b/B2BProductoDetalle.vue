@@ -179,6 +179,76 @@
               {{ producto.origen }}
             </span>
           </div>
+
+          <!-- Variantes (Mobile) -->
+          <div v-if="tieneVariantes" class="border border-gray-200 rounded-lg p-3 bg-white/80 mb-4">
+            <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Variantes</p>
+            <div v-if="coloresDisponibles.length" class="mb-3">
+              <div class="flex items-center justify-between mb-2">
+                <p class="text-xs text-gray-500">Color</p>
+                <span class="text-[11px] text-gray-600">{{ colorSeleccionadoLabel }}</span>
+              </div>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-if="varianteBase"
+                  type="button"
+                  class="w-9 h-9 rounded-full border transition-all flex items-center justify-center"
+                  :class="colorSeleccionado === BASE_VARIANTE_VALUE ? 'border-[#007185] ring-2 ring-[#007185]/30' : 'border-gray-200 hover:border-[#007185]/40'"
+                  @click="colorSeleccionado = BASE_VARIANTE_VALUE; largoSeleccionado = ''"
+                  :style="{ backgroundColor: COLOR_BASE_HEX }"
+                >
+                  <svg
+                    v-if="colorSeleccionado === BASE_VARIANTE_VALUE"
+                    class="w-4 h-4"
+                    :class="isLightColor(COLOR_BASE_HEX) ? 'text-gray-900' : 'text-white'"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </button>
+                <button
+                  v-for="color in coloresDisponibles"
+                  :key="color"
+                  type="button"
+                  class="w-9 h-9 rounded-full border transition-all flex items-center justify-center"
+                  :class="colorSeleccionado === color ? 'border-[#007185] ring-2 ring-[#007185]/30' : 'border-gray-200 hover:border-[#007185]/40'"
+                  @click="colorSeleccionado = color"
+                  :style="{ backgroundColor: getColorHex(color) }"
+                >
+                  <svg
+                    v-if="colorSeleccionado === color"
+                    class="w-4 h-4"
+                    :class="isLightColor(getColorHex(color)) ? 'text-gray-900' : 'text-white'"
+                    fill="none"
+                    stroke="currentColor"
+                    stroke-width="2"
+                    viewBox="0 0 24 24"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+            <div v-if="largosDisponibles.length">
+              <p class="text-xs text-gray-500 mb-2">Largo</p>
+              <div class="flex flex-wrap gap-2">
+                <button
+                  v-for="largo in largosDisponibles"
+                  :key="largo"
+                  type="button"
+                  class="px-2.5 py-1.5 text-xs rounded-md border transition-colors"
+                  :class="String(largoSeleccionado) === String(largo) ? 'border-[#007185] text-[#007185] bg-[#F7FAFA]' : 'border-gray-200 text-gray-700 hover:border-[#007185]/40'"
+                  @click="largoSeleccionado = largo"
+                >
+                  {{ largo }}"
+                </button>
+              </div>
+            </div>
+            <p v-if="selectionIncomplete" class="text-[11px] text-orange-600 mt-2">Selecciona una variante para continuar.</p>
+          </div>
           
           <!-- Quantity Selector Mobile - Card compacta -->
           <div class="border border-gray-200 rounded-xl p-4 mt-4 bg-white">
@@ -249,7 +319,7 @@
             <!-- Add to Cart Button -->
             <button 
               @click="agregarAlCarrito"
-              :disabled="stockDisponible < LOTE_MINIMO || agregando"
+              :disabled="stockDisponible < LOTE_MINIMO || agregando || selectionIncomplete"
               class="w-full py-4 bg-[#1A1A1A] hover:bg-black text-white font-bold text-base rounded-lg flex items-center justify-center gap-2 disabled:opacity-50 transition-colors"
             >
               <svg v-if="!agregando" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -540,6 +610,76 @@
               <span v-if="producto.metodo" class="px-3 py-1 rounded-full bg-white border border-gray-200 text-[#5A5A5A]">
                 {{ producto.metodo }}
               </span>
+            </div>
+
+            <!-- Variantes (Desktop) -->
+            <div v-if="tieneVariantes" class="border border-gray-200 rounded-lg p-3 bg-white/80">
+              <p class="text-[11px] font-bold text-gray-500 uppercase tracking-wider mb-2">Variantes</p>
+              <div v-if="coloresDisponibles.length" class="mb-3">
+                <div class="flex items-center justify-between mb-2">
+                  <p class="text-xs text-gray-500">Color</p>
+                  <span class="text-[11px] text-gray-600">{{ colorSeleccionadoLabel }}</span>
+                </div>
+                <div class="flex flex-wrap gap-2">
+                  <button
+                    v-if="varianteBase"
+                    type="button"
+                    class="w-9 h-9 rounded-full border transition-all flex items-center justify-center"
+                    :class="colorSeleccionado === BASE_VARIANTE_VALUE ? 'border-[#007185] ring-2 ring-[#007185]/30' : 'border-gray-200 hover:border-[#007185]/40'"
+                    @click="colorSeleccionado = BASE_VARIANTE_VALUE; largoSeleccionado = ''"
+                    :style="{ backgroundColor: COLOR_BASE_HEX }"
+                  >
+                    <svg
+                      v-if="colorSeleccionado === BASE_VARIANTE_VALUE"
+                      class="w-4 h-4"
+                      :class="isLightColor(COLOR_BASE_HEX) ? 'text-gray-900' : 'text-white'"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </button>
+                  <button
+                    v-for="color in coloresDisponibles"
+                    :key="color"
+                    type="button"
+                    class="w-9 h-9 rounded-full border transition-all flex items-center justify-center"
+                    :class="colorSeleccionado === color ? 'border-[#007185] ring-2 ring-[#007185]/30' : 'border-gray-200 hover:border-[#007185]/40'"
+                    @click="colorSeleccionado = color"
+                    :style="{ backgroundColor: getColorHex(color) }"
+                  >
+                    <svg
+                      v-if="colorSeleccionado === color"
+                      class="w-4 h-4"
+                      :class="isLightColor(getColorHex(color)) ? 'text-gray-900' : 'text-white'"
+                      fill="none"
+                      stroke="currentColor"
+                      stroke-width="2"
+                      viewBox="0 0 24 24"
+                    >
+                      <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  </button>
+                </div>
+              </div>
+              <div v-if="largosDisponibles.length">
+                <p class="text-xs text-gray-500 mb-2">Largo</p>
+                <div class="flex flex-wrap gap-2">
+                  <button
+                    v-for="largo in largosDisponibles"
+                    :key="largo"
+                    type="button"
+                    class="px-2.5 py-1.5 text-xs rounded-md border transition-colors"
+                    :class="String(largoSeleccionado) === String(largo) ? 'border-[#007185] text-[#007185] bg-[#F7FAFA]' : 'border-gray-200 text-gray-700 hover:border-[#007185]/40'"
+                    @click="largoSeleccionado = largo"
+                  >
+                    {{ largo }}"
+                  </button>
+                </div>
+              </div>
+              <p v-if="selectionIncomplete" class="text-[11px] text-orange-600 mt-2">Selecciona una variante para continuar.</p>
             </div>
             
             <!-- Separador -->
@@ -855,7 +995,7 @@
                 <div class="p-4 sm:p-5 bg-white">
                   <button 
                     @click="agregarAlCarrito"
-                    :disabled="stockDisponible < LOTE_MINIMO || agregando"
+                    :disabled="stockDisponible < LOTE_MINIMO || agregando || selectionIncomplete"
                     class="w-full py-3.5 bg-[#1A1A1A] hover:bg-black text-white font-bold text-base rounded-md flex items-center justify-center gap-2 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     <svg v-if="!agregando" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -1035,6 +1175,35 @@ export default {
     const agregando = ref(false)
     const productosRelacionados = ref([])
     const mediaErrors = reactive({})
+    const colorSeleccionado = ref('')
+    const largoSeleccionado = ref('')
+    const BASE_VARIANTE_VALUE = '__base__'
+    const COLOR_BASE_HEX = '#F5EFE7'
+    const COLOR_HEX = {
+      negro_natural: '#1A1A1A',
+      negro_azabache: '#0f0f10',
+      castano_oscuro: '#3d2314',
+      castano_medio: '#6b4423',
+      castano_claro: '#8b6b47',
+      castano_chocolate: '#4d2a1f',
+      rubio_oscuro: '#a67b5b',
+      rubio_medio: '#c19a6b',
+      rubio_claro: '#e0c3a0',
+      rubio_platino: '#e5e4e2',
+      rubio_cenizo: '#b8a898',
+      rubio_miel: '#d6a66a',
+      pelirrojo: '#8b0000',
+      cobrizo: '#b87333',
+      borgona: '#722f37',
+      rosa: '#f3a8c2',
+      azul: '#3f6ea6',
+      morado: '#6b4ea1',
+      verde: '#3b7a57',
+      gris: '#9ca3af',
+      ombre: '#8c6f5a',
+      balayage: '#c6a36b',
+      highlights: '#e6cfa8'
+    }
 
     // Reseñas
     const resenasProducto = ref([])
@@ -1101,17 +1270,73 @@ export default {
       return variantes.filter(v => v && v.activo !== false)
     })
 
+    const tieneVariantes = computed(() => variantesDisponibles.value.length > 0)
+
+    const varianteBase = computed(() => {
+      return variantesDisponibles.value.find(v => !v.color && !v.largo) || null
+    })
+
+    const coloresDisponibles = computed(() => {
+      const colores = new Set()
+      variantesDisponibles.value.forEach((v) => {
+        if (v.color) colores.add(v.color)
+      })
+      return Array.from(colores)
+    })
+
+    const largosDisponibles = computed(() => {
+      if (colorSeleccionado.value === BASE_VARIANTE_VALUE) return []
+      const largos = new Set()
+      const source = colorSeleccionado.value
+        ? variantesDisponibles.value.filter(v => v.color === colorSeleccionado.value)
+        : variantesDisponibles.value
+      source.forEach((v) => {
+        if (v.largo) largos.add(v.largo)
+      })
+      return Array.from(largos)
+    })
+
+    const variantesFiltradas = computed(() => {
+      if (!tieneVariantes.value) return []
+      if (colorSeleccionado.value === BASE_VARIANTE_VALUE) {
+        return varianteBase.value ? [varianteBase.value] : []
+      }
+      return variantesDisponibles.value.filter((v) => {
+        if (colorSeleccionado.value && v.color !== colorSeleccionado.value) return false
+        if (largoSeleccionado.value && String(v.largo) !== String(largoSeleccionado.value)) return false
+        return true
+      })
+    })
+
     const varianteSeleccionada = computed(() => {
-      if (!variantesDisponibles.value.length) return null
-      return variantesDisponibles.value.find(v => (v.stock_actual ?? 0) > 0) || variantesDisponibles.value[0]
+      if (!tieneVariantes.value) return null
+      if (colorSeleccionado.value === BASE_VARIANTE_VALUE) {
+        return varianteBase.value || {
+          id: null,
+          sku: producto.value.sku || producto.value.codigo || '',
+          color: null,
+          largo: null,
+          precio_monto: precioMayorista.value,
+          precio_moneda: 'COP',
+          stock_actual: producto.value.stock_actual ?? 0,
+          stock_minimo: producto.value.stock_minimo ?? 0,
+          imagen_url: producto.value.imagen_principal || null,
+          activo: true,
+          orden: 0
+        }
+      }
+      if (!colorSeleccionado.value && !largoSeleccionado.value) return null
+      return variantesFiltradas.value.find(v => (v.stock_actual ?? 0) > 0) || variantesFiltradas.value[0] || null
     })
 
     const stockDisponible = computed(() => {
-      return varianteSeleccionada.value?.stock_actual ?? producto.value.stock_actual ?? 0
+      if (tieneVariantes.value) return varianteSeleccionada.value?.stock_actual ?? 0
+      return producto.value.stock_actual ?? 0
     })
     
     const precioMayorista = computed(() => {
-      return varianteSeleccionada.value?.precio_monto || producto.value.precio_mayorista || producto.value.monto_precio || 0
+      if (tieneVariantes.value) return varianteSeleccionada.value?.precio_monto || 0
+      return producto.value.precio_mayorista || producto.value.monto_precio || 0
     })
     
     const precioRetail = computed(() => {
@@ -1153,6 +1378,12 @@ export default {
     const ahorroTotal = computed(() => {
       return (precioMayorista.value * cantidad.value) - subtotal.value
     })
+
+    const colorSeleccionadoLabel = computed(() => {
+      if (colorSeleccionado.value === BASE_VARIANTE_VALUE) return 'Estándar'
+      if (!colorSeleccionado.value) return ''
+      return formatColorLabel(colorSeleccionado.value)
+    })
     
     // Tabla de precios por volumen
     const preciosPorVolumen = computed(() => {
@@ -1164,6 +1395,10 @@ export default {
         { cantidad: 100, precioUnitario: base * 0.95, precioTotal: base * 0.95 * 100, descripcion: '5% OFF' },
         { cantidad: 200, precioUnitario: base * 0.90, precioTotal: base * 0.90 * 200, descripcion: '10% OFF - Mejor precio' }
       ]
+    })
+
+    const selectionIncomplete = computed(() => {
+      return tieneVariantes.value && !varianteSeleccionada.value
     })
     
     const tieneEspecificaciones = computed(() => {
@@ -1185,6 +1420,20 @@ export default {
     // Methods
     function formatPrice(value) {
       return Number(value || 0).toLocaleString('es-CO')
+    }
+
+    function getColorHex(color) {
+      return COLOR_HEX[color] || '#9ca3af'
+    }
+
+    function isLightColor(hex) {
+      const c = hex.substring(1)
+      const rgb = parseInt(c, 16)
+      const r = (rgb >> 16) & 0xff
+      const g = (rgb >> 8) & 0xff
+      const b = (rgb >> 0) & 0xff
+      const luma = 0.2126 * r + 0.7152 * g + 0.0722 * b
+      return luma > 160
     }
     
     function getPlaceholderImage() {
@@ -1225,14 +1474,14 @@ export default {
 
     // ===== MÉTODOS DE LOTES =====
     function seleccionarLote(lote) {
-      if (lote <= producto.value.stock_actual) {
+      if (lote <= stockDisponible.value) {
         cantidad.value = lote
       }
     }
     
     function incrementarLote() {
       const nuevo = cantidad.value + LOTE_MINIMO
-      if (nuevo <= producto.value.stock_actual) {
+      if (nuevo <= stockDisponible.value) {
         cantidad.value = nuevo
       }
     }
@@ -1331,7 +1580,7 @@ export default {
       try {
         agregando.value = true
 
-        if (!varianteSeleccionada.value) {
+        if (tieneVariantes.value && !varianteSeleccionada.value) {
           toast.error('Selecciona una variante disponible antes de continuar', 3000)
           return
         }
@@ -1474,6 +1723,35 @@ export default {
         window.scrollTo(0, 0)
       }
     })
+
+    watch(coloresDisponibles, (colores) => {
+      if (!tieneVariantes.value) return
+      if (!colorSeleccionado.value && varianteBase.value) {
+        colorSeleccionado.value = BASE_VARIANTE_VALUE
+        return
+      }
+      if (colores.length === 1) {
+        colorSeleccionado.value = colores[0]
+      }
+      if (
+        colorSeleccionado.value &&
+        colorSeleccionado.value !== BASE_VARIANTE_VALUE &&
+        !colores.includes(colorSeleccionado.value)
+      ) {
+        colorSeleccionado.value = ''
+      }
+    })
+
+    watch([colorSeleccionado, largosDisponibles], () => {
+      if (largosDisponibles.value.length === 1 && !largoSeleccionado.value) {
+        largoSeleccionado.value = largosDisponibles.value[0]
+        return
+      }
+      if (!largoSeleccionado.value) return
+      if (!largosDisponibles.value.includes(largoSeleccionado.value)) {
+        largoSeleccionado.value = ''
+      }
+    })
     
     // Lifecycle
     onMounted(() => {
@@ -1498,6 +1776,14 @@ export default {
       agregando,
       productosRelacionados,
       tieneCaracteristicas,
+      tieneVariantes,
+      varianteBase,
+      coloresDisponibles,
+      largosDisponibles,
+      colorSeleccionado,
+      largoSeleccionado,
+      BASE_VARIANTE_VALUE,
+      COLOR_BASE_HEX,
       stockDisponible,
       resenasProducto,
       resenasLoading,
@@ -1518,11 +1804,15 @@ export default {
       precioUnitarioActual,
       ahorroTotal,
       preciosPorVolumen,
+      selectionIncomplete,
       tieneEspecificaciones,
       whatsappUrl,
       formatColorLabel,
+      colorSeleccionadoLabel,
       // Methods
       formatPrice,
+      getColorHex,
+      isLightColor,
       handleImageError,
       handleVideoError,
       getDisplayMedia,

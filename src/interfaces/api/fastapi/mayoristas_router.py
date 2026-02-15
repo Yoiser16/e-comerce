@@ -219,6 +219,7 @@ class ProductoDetalleB2B(BaseModel):
     calidad: Optional[str] = None
     peso_gramos: Optional[int] = None
     activo: bool = True
+    variantes: List[dict] = []
 
 
 @router.get("/b2b/productos/{producto_id}", response_model=ProductoDetalleB2B)
@@ -240,7 +241,7 @@ def obtener_producto_b2b(
             raise HTTPException(status_code=400, detail="ID de producto inválido")
         
         try:
-            p = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').get(id=uid)
+            p = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes', 'variantes').get(id=uid)
         except ProductoModel.DoesNotExist:
             raise HTTPException(status_code=404, detail="Producto no encontrado")
 
@@ -270,6 +271,27 @@ def obtener_producto_b2b(
                     return v
             return value
         
+        variantes = []
+        try:
+            for variante in p.variantes.all():
+                if not variante.activo:
+                    continue
+                variantes.append({
+                    'id': str(variante.id),
+                    'sku': variante.sku,
+                    'color': variante.color,
+                    'largo': variante.largo,
+                    'precio_monto': float(variante.precio_monto),
+                    'precio_moneda': variante.precio_moneda,
+                    'stock_actual': variante.stock_actual,
+                    'stock_minimo': variante.stock_minimo,
+                    'imagen_url': variante.imagen_url,
+                    'activo': variante.activo,
+                    'orden': variante.orden
+                })
+        except Exception:
+            variantes = []
+
         return ProductoDetalleB2B(
             id=str(p.id),
             nombre=p.nombre,
@@ -299,7 +321,8 @@ def obtener_producto_b2b(
             origen=get_choice_label(p.origen, ProductoModel.ORIGEN_CHOICES),
             calidad=get_choice_label(p.calidad, ProductoModel.CALIDAD_CHOICES),
             peso_gramos=p.peso_gramos,
-            activo=p.activo
+            activo=p.activo,
+            variantes=variantes
         )
     except HTTPException:
         raise
