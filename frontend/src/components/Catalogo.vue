@@ -4,7 +4,7 @@
     <!-- ========================================
          TOP BAR - Carrusel de Anuncios (Minimalista)
          ======================================== -->
-    <div class="fixed top-0 left-0 right-0 z-[60] bg-white h-7 flex items-center justify-center overflow-hidden">
+    <div class="bg-white h-7 flex items-center justify-center overflow-hidden">
       <div class="relative h-full w-full flex items-center justify-center">
         <transition
           mode="out-in"
@@ -30,48 +30,42 @@
          ======================================== -->
     <header 
       :class="[
-        'fixed left-0 right-0 z-50 transition-all duration-300',
+        'sticky top-0 z-50 transition-all duration-300',
         'bg-white border-b border-text-dark/5',
         isScrolled ? 'shadow-sm' : ''
       ]"
-      style="top: 28px;"
     >
-      <!-- Mobile Header (lg:hidden) - App Style -->
+      <!-- Mobile Header (lg:hidden) - Normalized Luxury Style -->
       <div class="lg:hidden">
-        <div class="flex items-center justify-between h-12 px-3">
-          <!-- Left: Menu + Search -->
-          <div class="flex items-center gap-0.5">
+        <div class="flex items-center justify-between px-4 py-2">
+          <!-- Left: Hamburger -->
+          <button 
+            @click="mobileMenuOpen = !mobileMenuOpen"
+            class="w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target hover:bg-black/5"
+          >
+            <svg class="w-5 h-5 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
+            </svg>
+          </button>
+
+          <!-- Center: Logo Wordmark -->
+          <router-link to="/" class="absolute left-1/2 -translate-x-1/2 flex items-center">
+            <span class="text-[22px] font-semibold tracking-[0.18em] text-[#111] uppercase" style="font-family: 'Cormorant Garamond', 'Playfair Display', serif;">KHARIS</span>
+          </router-link>
+
+          <!-- Right: Search + Cart -->
+          <div class="flex items-center gap-1">
+            <!-- Search -->
             <button 
-              @click="mobileMenuOpen = !mobileMenuOpen"
-              class="w-10 h-10 flex items-center justify-center -ml-2"
+              @click="mobileSearchOpen = true"
+              class="w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target hover:bg-black/5"
             >
-              <svg class="w-5 h-5 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6.75h16.5M3.75 12h16.5M3.75 17.25h16.5" />
-              </svg>
-            </button>
-            <button 
-              @click="mobileSearchOpen = !mobileSearchOpen"
-              class="w-10 h-10 flex items-center justify-center"
-            >
-              <svg class="w-5 h-5 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg class="w-[18px] h-[18px] text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
               </svg>
             </button>
-          </div>
-          
-          <!-- Center: Logo -->
-          <router-link to="/" class="absolute left-1/2 -translate-x-1/2">
-            <img 
-              src="/logo-kharis.png" 
-              alt="Kharis" 
-              class="h-8 w-auto object-contain"
-            />
-          </router-link>
-          
-          <!-- Right: User + Cart -->
-          <div class="flex items-center gap-0.5">
-            <!-- Usuario con dropdown -->
-            <div class="relative" ref="userMenuRefMobile">
+            <!-- Usuario dropdown (hidden on mobile, Teleport preserved for desktop) -->
+            <div class="relative hidden" ref="userMenuRefMobile">
               <button 
                 @click="toggleUserMenu"
                 class="w-10 h-10 flex items-center justify-center rounded-full transition-colors"
@@ -190,50 +184,21 @@
               </Teleport>
             </div>
             <button 
-              class="relative w-10 h-10 flex items-center justify-center -mr-2"
-              @click="mostrarCarrito = true"
+              class="relative w-9 h-9 rounded-full flex items-center justify-center transition-colors duration-300 touch-target hover:bg-black/5"
+              @click="openCartDrawer()"
             >
-              <svg class="w-5 h-5 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
               </svg>
               <span 
                 v-if="cartCount > 0"
-                class="absolute top-1 right-1 w-4 h-4 text-[9px] font-bold rounded-full flex items-center justify-center bg-text-dark text-white"
+                class="absolute -top-0.5 -right-0.5 w-4 h-4 text-[9px] font-medium rounded-full flex items-center justify-center bg-text-dark text-white"
               >
                 {{ cartCount }}
               </span>
             </button>
           </div>
         </div>
-        
-        <!-- Mobile Search Bar (expandible) -->
-        <transition
-          enter-active-class="transition duration-200 ease-out"
-          enter-from-class="opacity-0 -translate-y-2"
-          enter-to-class="opacity-100 translate-y-0"
-          leave-active-class="transition duration-150 ease-in"
-          leave-from-class="opacity-100 translate-y-0"
-          leave-to-class="opacity-0 -translate-y-2"
-        >
-          <div v-if="mobileSearchOpen" class="px-3 pb-3">
-            <div class="relative">
-              <input 
-                type="text"
-                v-model="searchQuery"
-                @input="getSuggestions"
-                @keyup.enter="handleSearch()"
-                placeholder="Buscar productos..."
-                class="w-full pl-10 pr-4 py-2.5 bg-[#f5f5f5] border-0 rounded-lg text-sm text-text-dark placeholder-text-light focus:outline-none focus:ring-2 focus:ring-text-dark/10"
-              />
-              <svg 
-                class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-text-light pointer-events-none"
-                fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24"
-              >
-                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-              </svg>
-            </div>
-          </div>
-        </transition>
       </div>
       
       <!-- Desktop Header (hidden en móvil) -->
@@ -321,13 +286,13 @@
             </div>
 
             <!-- Navegación Desktop -->
-            <nav class="flex items-center gap-8">
-              <router-link to="/catalogo" class="text-[11px] font-medium tracking-[1.5px] text-brand-600">CATÁLOGO</router-link>
-              <router-link to="/#categorias" class="text-[11px] font-medium tracking-[1.5px] text-text-dark hover:text-brand-600 transition-colors">CATEGORÍAS</router-link>
-              <router-link to="/#productos" class="text-[11px] font-medium tracking-[1.5px] text-text-dark hover:text-brand-600 transition-colors">PRODUCTOS</router-link>
-              <router-link to="/#mayoreo" class="text-[11px] font-medium tracking-[1.5px] text-text-dark hover:text-brand-600 transition-colors">MAYOREO</router-link>
-              <router-link to="/#testimonios" class="text-[11px] font-medium tracking-[1.5px] text-text-dark hover:text-brand-600 transition-colors">RESEÑAS</router-link>
-              <router-link to="/#contacto" class="text-[11px] font-medium tracking-[1.5px] text-text-dark hover:text-brand-600 transition-colors">CONTACTO</router-link>
+            <nav class="flex items-center gap-7">
+              <router-link to="/catalogo" class="nav-link-luxury !text-brand-600">CATÁLOGO</router-link>
+              <router-link to="/#categorias" class="nav-link-luxury">CATEGORÍAS</router-link>
+              <router-link to="/#productos" class="nav-link-luxury">PRODUCTOS</router-link>
+              <router-link to="/#mayoreo" class="nav-link-luxury">MAYOREO</router-link>
+              <router-link to="/#testimonios" class="nav-link-luxury">RESEÑAS</router-link>
+              <router-link to="/#contacto" class="nav-link-luxury">CONTACTO</router-link>
             </nav>
 
             <!-- Acciones Desktop -->
@@ -355,7 +320,7 @@
               </div>
               <button 
                 class="relative w-10 h-10 rounded-full flex items-center justify-center hover:bg-[#f5f5f5] transition-colors"
-                @click="mostrarCarrito = true"
+                @click="openCartDrawer()"
               >
                 <svg class="w-5 h-5 text-text-dark" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
@@ -373,56 +338,258 @@
       </div>
     </header>
 
-    <!-- Mobile Menu Drawer -->
+    <!-- Mobile Search Overlay (Full-Screen) -->
     <Teleport to="body">
-      <Transition name="drawer-fade">
-        <div 
-          v-if="mobileMenuOpen"
-          class="fixed inset-0 bg-black/40 z-50 lg:hidden"
-          @click.self="mobileMenuOpen = false"
-        ></div>
-      </Transition>
-      <Transition name="drawer-slide-left">
-        <div 
-          v-if="mobileMenuOpen"
-          class="fixed left-0 top-0 bottom-0 w-72 bg-white z-50 lg:hidden flex flex-col"
-        >
-          <!-- Menu Header -->
-          <div class="flex items-center justify-between p-4 border-b border-text-dark/5">
-            <img src="/logo-kharis.png" alt="Kharis" class="h-8" />
-            <button @click="mobileMenuOpen = false" class="w-10 h-10 flex items-center justify-center">
-              <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+      <transition
+        enter-active-class="transition duration-200 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition duration-150 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div v-if="mobileSearchOpen" class="fixed inset-0 z-[9998] bg-white lg:hidden">
+          <!-- Header del Search overlay -->
+          <div class="flex items-center gap-3 px-4 py-3 border-b border-black/5">
+            <button 
+              @click="mobileSearchOpen = false"
+              class="w-10 h-10 flex items-center justify-center rounded-full hover:bg-nude-100 active:bg-nude-200 transition-colors flex-shrink-0"
+              aria-label="Cerrar búsqueda"
+            >
+              <svg class="w-5 h-5 text-text-dark" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M10.5 19.5L3 12m0 0l7.5-7.5M3 12h18" />
+              </svg>
+            </button>
+            <div class="flex-1 relative">
+              <input 
+                ref="mobileSearchInputRef"
+                type="text"
+                v-model="searchQuery"
+                @input="getSuggestions"
+                @keyup.enter="handleSearch()"
+                placeholder="Buscar extensiones, accesorios..."
+                class="w-full py-2.5 px-4 bg-[#F5F5F5] rounded-full text-sm text-text-dark placeholder-text-light/50 focus:outline-none focus:bg-[#EFEFEF] transition-colors"
+              />
+            </div>
+            <button 
+              v-if="searchQuery.length > 0"
+              @click="searchQuery = ''; searchSuggestions = []; showSuggestions = false"
+              class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-nude-100 transition-colors flex-shrink-0"
+            >
+              <svg class="w-4 h-4 text-text-light" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
-          
-          <!-- Menu Links -->
-          <nav class="flex-1 py-4">
-            <router-link to="/catalogo" @click="mobileMenuOpen = false" class="block px-6 py-3 text-sm font-medium text-brand-600">Catálogo</router-link>
-            <router-link to="/#categorias" @click="mobileMenuOpen = false" class="block px-6 py-3 text-sm font-medium text-text-dark">Categorías</router-link>
-            <router-link to="/#productos" @click="mobileMenuOpen = false" class="block px-6 py-3 text-sm font-medium text-text-dark">Productos</router-link>
-            <router-link to="/#mayoreo" @click="mobileMenuOpen = false" class="block px-6 py-3 text-sm font-medium text-text-dark">Mayoreo</router-link>
-            <router-link to="/#testimonios" @click="mobileMenuOpen = false" class="block px-6 py-3 text-sm font-medium text-text-dark">Reseñas</router-link>
-            <router-link to="/#contacto" @click="mobileMenuOpen = false" class="block px-6 py-3 text-sm font-medium text-text-dark">Contacto</router-link>
-          </nav>
-          
-          <!-- Menu Footer -->
-          <div class="p-4 border-t border-text-dark/5">
-            <router-link 
-              to="/login" 
-              @click="mobileMenuOpen = false"
-              class="block w-full py-3 text-center text-sm font-medium text-white bg-text-dark rounded-lg"
-            >
-              Iniciar Sesión
-            </router-link>
+
+          <!-- Resultados / Sugerencias -->
+          <div class="flex-1 overflow-y-auto">
+            <!-- Estado vacío -->
+            <div v-if="!searchQuery.trim()" class="flex flex-col items-center justify-center pt-20 px-6">
+              <svg class="w-12 h-12 text-text-light/30 mb-4" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+              <p class="text-sm text-text-light/60 text-center">Busca extensiones, accesorios y más</p>
+            </div>
+
+            <!-- Lista de sugerencias -->
+            <div v-else-if="showSuggestions && searchSuggestions.length > 0" class="divide-y divide-black/5">
+              <button
+                v-for="producto in searchSuggestions"
+                :key="producto.id"
+                @click="verProducto(producto.id); mobileSearchOpen = false"
+                class="w-full px-5 py-3.5 flex items-center gap-4 text-left active:bg-nude-50 transition-colors"
+              >
+                <div class="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-nude-50 ring-1 ring-nude-200/30">
+                  <video
+                    v-if="producto.imagen_principal && isVideo(getImageUrl(producto.imagen_principal))"
+                    :src="getImageUrl(producto.imagen_principal)"
+                    class="w-full h-full object-cover"
+                    muted playsinline loop autoplay preload="metadata"
+                  ></video>
+                  <img 
+                    v-else-if="producto.imagen_principal"
+                    :src="getImageUrl(producto.imagen_principal)"
+                    :alt="producto.nombre"
+                    class="w-full h-full object-cover"
+                    @error="handleImageError"
+                  />
+                </div>
+                <div class="flex-1 min-w-0">
+                  <p class="text-sm font-medium text-text-dark truncate">{{ producto.nombre }}</p>
+                  <p class="text-xs font-semibold text-brand-600 mt-0.5">{{ formatearPrecio(producto.precio_monto) }}</p>
+                </div>
+                <svg class="w-4 h-4 text-text-light/30 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+                </svg>
+              </button>
+            </div>
+
+            <!-- Sin resultados -->
+            <div v-else-if="searchQuery.trim().length >= 2 && !showSuggestions" class="flex flex-col items-center justify-center pt-20 px-6">
+              <p class="text-sm text-text-light/60 text-center">No encontramos resultados para "{{ searchQuery }}"</p>
+              <p class="text-xs text-text-light/40 mt-1">Intenta con otra palabra</p>
+            </div>
           </div>
         </div>
-      </Transition>
+      </transition>
     </Teleport>
 
-    <!-- Spacer para el header fijo + top bar (28px + 48px/64px) -->
-    <div class="h-[76px] lg:h-[92px]"></div>
+    <!-- Mobile Menu Off-Canvas Sidebar -->
+    <Teleport to="body">
+      <!-- Backdrop -->
+      <transition
+        enter-active-class="transition-opacity duration-300 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity duration-200 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
+        <div 
+          v-if="mobileMenuOpen" 
+          class="fixed inset-0 z-[9996] bg-black/50 lg:hidden"
+          @click="mobileMenuOpen = false"
+        ></div>
+      </transition>
+
+      <!-- Sidebar Panel -->
+      <transition
+        enter-active-class="transition-transform duration-300 ease-out"
+        enter-from-class="-translate-x-full"
+        enter-to-class="translate-x-0"
+        leave-active-class="transition-transform duration-200 ease-in"
+        leave-from-class="translate-x-0"
+        leave-to-class="-translate-x-full"
+      >
+        <nav v-if="mobileMenuOpen" class="fixed top-0 left-0 z-[9997] w-[52%] max-w-[220px] h-full bg-white lg:hidden flex flex-col">
+          
+          <!-- Header del Sidebar -->
+          <div class="flex items-center justify-between px-4 py-3.5 border-b border-black/5">
+            <img src="/logo-kharis.png" alt="Kharis" class="h-8 w-auto object-contain" />
+            <button 
+              @click="mobileMenuOpen = false"
+              class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-nude-100 active:bg-nude-200 transition-colors"
+              aria-label="Cerrar menú"
+            >
+              <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+            </button>
+          </div>
+
+          <!-- Lista de enlaces -->
+          <div class="flex-1 overflow-y-auto py-2">
+            <!-- Mi Cuenta / Iniciar Sesión -->
+            <button 
+              v-if="isLoggedIn"
+              @click="mobileMenuOpen = false; $router.push('/mi-cuenta')"
+              class="flex items-center gap-3 px-4 py-3 text-[12px] tracking-[0.08em] uppercase text-text-dark font-medium active:bg-nude-50 transition-colors border-b border-black/[0.04] w-full text-left"
+            >
+              <div class="w-6 h-6 rounded-full bg-brand-50 flex items-center justify-center flex-shrink-0">
+                <span class="text-[10px] font-semibold text-brand-600">{{ userInitial }}</span>
+              </div>
+              Mi Cuenta
+            </button>
+            <button 
+              v-else
+              @click="mobileMenuOpen = false; handleMenuAction('login')"
+              class="flex items-center gap-3 px-4 py-3 text-[12px] tracking-[0.08em] uppercase text-text-dark font-medium active:bg-nude-50 transition-colors border-b border-black/[0.04] w-full text-left"
+            >
+              <svg class="w-4 h-4 text-brand-600 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
+              </svg>
+              Iniciar Sesión
+            </button>
+            <router-link 
+              to="/catalogo" 
+              @click="mobileMenuOpen = false" 
+              class="flex items-center gap-3 px-4 py-3 text-[12px] tracking-[0.08em] uppercase text-text-dark font-medium active:bg-nude-50 transition-colors border-b border-black/[0.04]"
+            >
+              <svg class="w-4 h-4 text-text-light/50 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.75 6A2.25 2.25 0 016 3.75h2.25A2.25 2.25 0 0110.5 6v2.25a2.25 2.25 0 01-2.25 2.25H6a2.25 2.25 0 01-2.25-2.25V6zM3.75 15.75A2.25 2.25 0 016 13.5h2.25a2.25 2.25 0 012.25 2.25V18a2.25 2.25 0 01-2.25 2.25H6A2.25 2.25 0 013.75 18v-2.25zM13.5 6a2.25 2.25 0 012.25-2.25H18A2.25 2.25 0 0120.25 6v2.25A2.25 2.25 0 0118 10.5h-2.25a2.25 2.25 0 01-2.25-2.25V6zM13.5 15.75a2.25 2.25 0 012.25-2.25H18a2.25 2.25 0 012.25 2.25V18A2.25 2.25 0 0118 20.25h-2.25A2.25 2.25 0 0113.5 18v-2.25z" />
+              </svg>
+              Catálogo
+            </router-link>
+            <router-link 
+              to="/#categorias" 
+              @click="mobileMenuOpen = false" 
+              class="flex items-center gap-3 px-4 py-3 text-[12px] tracking-[0.08em] uppercase text-text-dark font-medium active:bg-nude-50 transition-colors border-b border-black/[0.04]"
+            >
+              <svg class="w-4 h-4 text-text-light/50 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M9.568 3H5.25A2.25 2.25 0 003 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 005.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 009.568 3z" />
+                <path stroke-linecap="round" stroke-linejoin="round" d="M6 6h.008v.008H6V6z" />
+              </svg>
+              Categorías
+            </router-link>
+            <router-link 
+              to="/#productos" 
+              @click="mobileMenuOpen = false" 
+              class="flex items-center gap-3 px-4 py-3 text-[12px] tracking-[0.08em] uppercase text-text-dark font-medium active:bg-nude-50 transition-colors border-b border-black/[0.04]"
+            >
+              <svg class="w-4 h-4 text-text-light/50 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+              </svg>
+              Productos
+            </router-link>
+            <router-link 
+              to="/#mayoreo" 
+              @click="mobileMenuOpen = false" 
+              class="flex items-center gap-3 px-4 py-3 text-[12px] tracking-[0.08em] uppercase text-text-dark font-medium active:bg-nude-50 transition-colors border-b border-black/[0.04]"
+            >
+              <svg class="w-4 h-4 text-text-light/50 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 21v-7.5a.75.75 0 01.75-.75h3a.75.75 0 01.75.75V21m-4.5 0H2.36m11.14 0H18m0 0h3.64m-1.39 0V9.349m-16.5 11.65V9.35m0 0a3.001 3.001 0 003.75-.615A2.993 2.993 0 009.75 9.75c.896 0 1.7-.393 2.25-1.016a2.993 2.993 0 002.25 1.016c.896 0 1.7-.393 2.25-1.016A3.001 3.001 0 0021 9.349m-18 0a2.998 2.998 0 00.832-2.078c.1-.695.564-1.267 1.168-1.521L7.5 4.5h9l2.5 1.25c.604.254 1.067.826 1.168 1.521A2.998 2.998 0 0021 9.35" />
+              </svg>
+              Mayoreo
+            </router-link>
+            <router-link 
+              to="/#testimonios" 
+              @click="mobileMenuOpen = false" 
+              class="flex items-center gap-3 px-4 py-3 text-[12px] tracking-[0.08em] uppercase text-text-dark font-medium active:bg-nude-50 transition-colors border-b border-black/[0.04]"
+            >
+              <svg class="w-4 h-4 text-text-light/50 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M7.5 8.25h9m-9 3H12m-9.75 1.51c0 1.6 1.123 2.994 2.707 3.227 1.129.166 2.27.293 3.423.379.35.026.67.21.865.501L12 21l2.755-4.133a1.14 1.14 0 01.865-.501 48.172 48.172 0 003.423-.379c1.584-.233 2.707-1.626 2.707-3.228V6.741c0-1.602-1.123-2.995-2.707-3.228A48.394 48.394 0 0012 3c-2.392 0-4.744.175-7.043.513C3.373 3.746 2.25 5.14 2.25 6.741v6.018z" />
+              </svg>
+              Reseñas
+            </router-link>
+            <router-link 
+              to="/#contacto" 
+              @click="mobileMenuOpen = false" 
+              class="flex items-center gap-3 px-4 py-3 text-[12px] tracking-[0.08em] uppercase text-text-dark font-medium active:bg-nude-50 transition-colors"
+            >
+              <svg class="w-4 h-4 text-text-light/50 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M21.75 6.75v10.5a2.25 2.25 0 01-2.25 2.25h-15a2.25 2.25 0 01-2.25-2.25V6.75m19.5 0A2.25 2.25 0 0019.5 4.5h-15a2.25 2.25 0 00-2.25 2.25m19.5 0v.243a2.25 2.25 0 01-1.07 1.916l-7.5 4.615a2.25 2.25 0 01-2.36 0L3.32 8.91a2.25 2.25 0 01-1.07-1.916V6.75" />
+              </svg>
+              Contacto
+            </router-link>
+          </div>
+
+          <!-- Footer del Sidebar -->
+          <div class="px-4 py-4 border-t border-black/5">
+            <p class="text-[9px] tracking-[0.12em] uppercase text-text-light/40 mb-2 font-medium">Síguenos</p>
+            <div class="flex items-center gap-2">
+              <a href="https://www.instagram.com/kharisdistribuidora" target="_blank" class="w-7 h-7 rounded-full bg-nude-50 flex items-center justify-center active:bg-nude-200 transition-colors">
+                <svg class="w-3.5 h-3.5 text-text-dark/50" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2.163c3.204 0 3.584.012 4.85.07 3.252.148 4.771 1.691 4.919 4.919.058 1.265.069 1.645.069 4.849 0 3.205-.012 3.584-.069 4.849-.149 3.225-1.664 4.771-4.919 4.919-1.266.058-1.644.07-4.85.07-3.204 0-3.584-.012-4.849-.07-3.26-.149-4.771-1.699-4.919-4.92-.058-1.265-.07-1.644-.07-4.849 0-3.204.013-3.583.07-4.849.149-3.227 1.664-4.771 4.919-4.919 1.266-.057 1.645-.069 4.849-.069zM12 0C8.741 0 8.333.014 7.053.072 2.695.272.273 2.69.073 7.052.014 8.333 0 8.741 0 12c0 3.259.014 3.668.072 4.948.2 4.358 2.618 6.78 6.98 6.98C8.333 23.986 8.741 24 12 24c3.259 0 3.668-.014 4.948-.072 4.354-.2 6.782-2.618 6.979-6.98.059-1.28.073-1.689.073-4.948 0-3.259-.014-3.667-.072-4.947-.196-4.354-2.617-6.78-6.979-6.98C15.668.014 15.259 0 12 0zm0 5.838a6.162 6.162 0 100 12.324 6.162 6.162 0 000-12.324zM12 16a4 4 0 110-8 4 4 0 010 8zm6.406-11.845a1.44 1.44 0 100 2.881 1.44 1.44 0 000-2.881z"/>
+                </svg>
+              </a>
+              <a href="https://wa.me/18298776031" target="_blank" class="w-7 h-7 rounded-full bg-nude-50 flex items-center justify-center active:bg-nude-200 transition-colors">
+                <svg class="w-3.5 h-3.5 text-text-dark/50" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+                </svg>
+              </a>
+              <a href="https://www.tiktok.com/@kharisdistribuidora" target="_blank" class="w-7 h-7 rounded-full bg-nude-50 flex items-center justify-center active:bg-nude-200 transition-colors">
+                <svg class="w-3.5 h-3.5 text-text-dark/50" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 0010.86 4.46V13.2a8.16 8.16 0 005.58 2.17V12a4.85 4.85 0 01-5.58-2.17V2h3.45a4.83 4.83 0 003.77 4.25v3.44h-1.64z"/>
+                </svg>
+              </a>
+            </div>
+            <p class="text-[9px] text-text-light/35 mt-3">&copy; 2026 Kharis Distribuidora</p>
+          </div>
+        </nav>
+      </transition>
+    </Teleport>
+
 
     <!-- ========================================
          ENCABEZADO DE COLECCIÓN - Editorial Style
@@ -455,7 +622,7 @@
     <!-- ========================================
          BARRA DE FILTROS MÓVIL - Horizontal
          ======================================== -->
-    <div class="lg:hidden sticky top-[76px] z-30 bg-white border-b border-text-dark/5">
+    <div class="lg:hidden bg-white border-b border-text-dark/5">
       <div class="flex items-center justify-between px-4 py-2.5">
         <!-- Botón Filtrar -->
         <button 
@@ -494,7 +661,7 @@
              SIDEBAR DE FILTROS - Desktop (Sticky)
              ======================================== -->
         <aside class="hidden lg:block lg:col-span-3">
-          <div class="sticky top-28 space-y-5 max-h-[calc(100vh-140px)] overflow-y-auto pr-2 scrollbar-thin">
+          <div class="sticky top-16 space-y-5 max-h-[calc(100vh-80px)] overflow-y-auto pr-2 scrollbar-thin">
             
             <!-- Título Filtros + Limpiar alineados -->
             <div class="flex items-center justify-between">
@@ -1200,132 +1367,211 @@
     </Teleport>
 
     <!-- ========================================
-         DRAWER DEL CARRITO
+         DRAWER DEL CARRITO - Soft Beauty Style (Normalized)
          ======================================== -->
     <Teleport to="body">
-      <Transition name="drawer-fade">
+      <transition
+        enter-active-class="transition-opacity duration-300 ease-out"
+        enter-from-class="opacity-0"
+        enter-to-class="opacity-100"
+        leave-active-class="transition-opacity duration-200 ease-in"
+        leave-from-class="opacity-100"
+        leave-to-class="opacity-0"
+      >
         <div 
-          v-if="mostrarCarrito"
-          class="fixed inset-0 bg-black/40 z-40"
-          @click.self="mostrarCarrito = false"
+          v-if="showCartDrawer"
+          class="fixed inset-0 bg-black/40 z-50"
+          @click="closeCartDrawer"
         ></div>
-      </Transition>
-      <Transition name="drawer-slide">
+      </transition>
+      
+      <transition
+        enter-active-class="transition-transform duration-300 ease-out"
+        leave-active-class="transition-transform duration-200 ease-in"
+        enter-from-class="translate-x-full"
+        enter-to-class="translate-x-0"
+        leave-from-class="translate-x-0"
+        leave-to-class="translate-x-full"
+      >
         <div 
-          v-if="mostrarCarrito"
-          class="fixed right-0 top-0 bottom-0 w-full max-w-md bg-white shadow-2xl z-50 flex flex-col"
+          v-if="showCartDrawer"
+          class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-[60] flex flex-col"
+          style="box-shadow: -20px 0 60px -15px rgba(0, 0, 0, 0.15);"
+          @click.stop
         >
-          <!-- Header -->
-          <div class="flex-shrink-0 border-b border-text-dark/5 p-6 flex items-center justify-between">
-            <div>
-              <h2 class="font-luxury text-xl text-text-dark">Mi Carrito</h2>
-              <p class="text-xs text-text-medium mt-1">{{ carritoItems.length }} productos</p>
-            </div>
+          <!-- Header - Elegante con Serif -->
+          <div class="flex items-center justify-between px-6 py-5 border-b border-nude-200/50">
+            <h2 class="font-luxury text-xl text-text-dark tracking-wide">Tu Selección</h2>
             <button 
-              @click="mostrarCarrito = false"
-              class="w-10 h-10 rounded-full hover:bg-nude-100 flex items-center justify-center transition-colors"
+              @click="closeCartDrawer"
+              class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-nude-100 transition-colors"
             >
-              <svg class="w-5 h-5 text-text-dark" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <svg class="w-4 h-4 text-text-medium" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
               </svg>
             </button>
           </div>
 
-          <!-- Items del carrito -->
-          <div class="flex-1 overflow-y-auto p-6">
-            <div v-if="carritoItems.length === 0" class="text-center py-16">
-              <div class="w-20 h-20 mx-auto mb-4 bg-nude-100 rounded-full flex items-center justify-center">
-                <svg class="w-10 h-10 text-text-light" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+          <!-- Barra de Progreso Envío Gratis -->
+          <div v-if="getCartSubtotal() < 300000 && carritoItems.length > 0" class="px-6 py-4 bg-gradient-to-r from-nude-50 to-white">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs text-text-medium">
+                Te faltan {{ formatearPrecio(300000 - getCartSubtotal()) }} para envío gratis
+              </span>
+              <span class="text-xs text-brand-600 font-medium">{{ Math.min(100, Math.round((getCartSubtotal() / 300000) * 100)) }}%</span>
+            </div>
+            <div class="h-1 bg-nude-200 rounded-full overflow-hidden">
+              <div 
+                class="h-full bg-gradient-to-r from-brand-500 to-brand-600 rounded-full transition-all duration-500"
+                :style="{ width: Math.min(100, (getCartSubtotal() / 300000) * 100) + '%' }"
+              ></div>
+            </div>
+          </div>
+          <div v-else-if="carritoItems.length > 0" class="px-6 py-4 bg-gradient-to-r from-green-50 to-white">
+            <div class="flex items-center justify-center gap-2">
+              <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
+              </svg>
+              <span class="text-sm text-green-700 font-medium">Envío gratis aplicado</span>
+            </div>
+          </div>
+          
+          <!-- Contenido del Carrito -->
+          <div class="flex-1 overflow-y-auto px-4">
+            <!-- Loading -->
+            <div v-if="cartLoading" class="flex items-center justify-center h-32">
+              <div class="w-8 h-8 border-2 border-brand-400 border-t-transparent rounded-full animate-spin"></div>
+            </div>
+            
+            <!-- Carrito vacío - Femenino -->
+            <div v-else-if="carritoItems.length === 0" class="flex flex-col items-center justify-center h-72 text-center px-4">
+              <div class="w-24 h-24 rounded-full bg-gradient-to-br from-nude-100 to-nude-200 flex items-center justify-center mb-5">
+                <svg class="w-10 h-10 text-brand-400" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                 </svg>
               </div>
-              <p class="text-text-medium text-sm">Tu carrito está vacío</p>
+              <h3 class="font-luxury text-lg text-text-dark mb-2">Tu selección está vacía</h3>
+              <p class="text-text-medium text-sm mb-6">Descubre productos increíbles para ti</p>
               <button 
-                @click="mostrarCarrito = false"
-                class="mt-4 text-sm text-brand-600 hover:text-brand-700 font-medium"
+                @click="closeCartDrawer"
+                class="bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm px-8 py-3 rounded-full transition-all hover:shadow-lg hover:shadow-brand-600/25"
               >
-                Continuar comprando
+                Explorar colección
               </button>
             </div>
-            <div v-else class="space-y-4">
+            
+            <!-- Items del carrito - Soft Beauty -->
+            <div v-else class="py-4 space-y-4">
               <div 
                 v-for="item in carritoItems" 
-                :key="item.variante_id || item.producto_id || item.id"
-                class="flex gap-4 p-4 bg-nude-50/50 rounded-xl"
+                :key="item.variante_id || item.producto_id"
+                class="flex gap-4 p-3 bg-white rounded-xl border border-nude-100 hover:border-nude-200 transition-colors"
               >
-                <img 
-                  v-if="getCartMediaUrl(item)"
-                  :src="getCartMediaUrl(item)"
-                  :alt="item.nombre"
-                  @error="handleImageError"
-                  class="w-20 h-20 object-cover rounded-lg bg-white"
-                >
-                <div v-else class="w-20 h-20 flex items-center justify-center rounded-lg bg-white border border-text-dark/5">
-                  <svg class="w-6 h-6 text-text-light" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01" />
+                <!-- Imagen del producto -->
+                <div class="w-[90px] h-[90px] bg-gradient-to-br from-nude-50 to-nude-100 rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center">
+                  <img 
+                    v-if="getCartMediaUrl(item)" 
+                    :src="getCartMediaUrl(item)" 
+                    :alt="item.nombre"
+                    class="w-full h-full object-cover"
+                    @error="handleImageError"
+                  />
+                  <svg v-else class="w-8 h-8 text-nude-300" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
                   </svg>
                 </div>
-                <div class="flex-1">
-                  <div class="flex items-start justify-between gap-3">
-                    <h3 class="text-sm font-medium text-text-dark line-clamp-2">{{ item.nombre }}</h3>
-                    <button
-                      type="button"
-                      class="p-1.5 rounded-full border border-transparent text-text-light hover:text-red-600 hover:border-red-200 hover:bg-red-50 transition-colors"
-                      @click="removeCartItem(item)"
-                      aria-label="Eliminar"
-                      title="Eliminar"
-                    >
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M9 3h6m-7 4h8m-1 0v11a2 2 0 01-2 2H9a2 2 0 01-2-2V7m3 4v6m4-6v6" />
-                      </svg>
-                    </button>
+                
+                <!-- Info del producto -->
+                <div class="flex-1 min-w-0 flex flex-col justify-between py-1">
+                  <div>
+                    <h3 class="text-sm font-medium text-text-dark leading-snug line-clamp-2 mb-1">
+                      {{ item.nombre || 'Producto' }}
+                    </h3>
+                    <p v-if="item.color || item.largo" class="text-xs text-text-light">
+                      <span v-if="item.color">Color: {{ formatColorLabel(item.color) }}</span>
+                      <span v-if="item.color && item.largo"> · </span>
+                      <span v-if="item.largo">Largo: {{ item.largo }}</span>
+                    </p>
+                    
+                    <!-- Selector de Cantidad - Estilo Píldora -->
+                    <div class="flex items-center gap-2 mt-2">
+                      <div class="inline-flex items-center border border-nude-200 rounded-full">
+                        <button 
+                          @click="updateQuantity(item.variante_id || item.producto_id, (item.cantidad || 1) - 1)"
+                          class="w-7 h-7 flex items-center justify-center text-text-medium hover:text-text-dark transition-colors"
+                          :disabled="(item.cantidad || 1) <= 1"
+                        >
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" d="M5 12h14" />
+                          </svg>
+                        </button>
+                        <span class="w-8 text-center text-sm font-medium text-text-dark">{{ item.cantidad || 1 }}</span>
+                        <button 
+                          @click="updateQuantity(item.variante_id || item.producto_id, (item.cantidad || 1) + 1)"
+                          class="w-7 h-7 flex items-center justify-center text-text-medium hover:text-text-dark transition-colors"
+                        >
+                          <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" d="M12 5v14m-7-7h14" />
+                          </svg>
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                  <p v-if="item.color || item.largo" class="text-[11px] text-text-light mt-1">
-                    <span v-if="item.color">Color: {{ formatColorLabel(item.color) }}</span>
-                    <span v-if="item.color && item.largo"> · </span>
-                    <span v-if="item.largo">Largo: {{ item.largo }}</span>
+                  
+                  <!-- Precio -->
+                  <p class="text-base font-semibold text-text-dark mt-1">
+                    {{ formatearPrecio(getItemPrice(item)) }}
                   </p>
-                  <p class="text-xs text-text-medium mt-1">Cantidad: {{ item.cantidad }}</p>
-                  <p class="text-sm font-semibold text-text-dark mt-2">{{ formatearPrecio((item.precio_unitario || item.precio_monto || 0) * item.cantidad) }}</p>
                 </div>
+                
+                <!-- Eliminar -->
+                <button 
+                  @click.stop="removeFromCart(item.variante_id || item.producto_id)"
+                  class="self-start mt-1 w-8 h-8 rounded-full flex items-center justify-center bg-red-50 hover:bg-red-100 transition-colors group"
+                  title="Eliminar producto"
+                >
+                  <svg class="w-4 h-4 text-red-400 group-hover:text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
-
-          <!-- Footer con totales y botones -->
-          <div v-if="carritoItems.length > 0" class="flex-shrink-0 border-t border-text-dark/5 p-6 bg-nude-50/30">
-            <div class="space-y-3 mb-6">
-              <div class="flex justify-between text-sm text-text-medium">
-                <span>Subtotal:</span>
-                <span>{{ formatearPrecio(precioSubtotal) }}</span>
+          
+          <!-- Footer - Fondo Nude, Botón Pill con Glow -->
+          <div v-if="carritoItems.length > 0" class="border-t border-nude-200" style="background: #FDFBF7;">
+            <div class="px-6 py-4 space-y-2">
+              <div class="flex items-center justify-between text-sm">
+                <span class="text-text-medium">Subtotal</span>
+                <span class="text-text-dark">{{ formatearPrecio(getCartSubtotal()) }}</span>
               </div>
-              <div class="flex justify-between text-sm text-text-medium">
-                <span>Envío:</span>
-                <span class="text-green-600 font-medium">Gratis</span>
+              <div class="flex items-center justify-between text-sm">
+                <span class="text-text-medium">Envío</span>
+                <span class="text-text-medium italic">Por calcular</span>
               </div>
-              <div class="flex justify-between text-lg font-semibold text-text-dark pt-3 border-t border-text-dark/10">
-                <span>Total:</span>
-                <span>{{ formatearPrecio(precioSubtotal) }}</span>
+              <div class="flex items-center justify-between pt-3 border-t border-nude-200">
+                <span class="text-text-dark font-medium">Total</span>
+                <span class="font-luxury text-2xl font-bold text-text-dark">{{ formatearPrecio(getCartSubtotal()) }}</span>
               </div>
             </div>
-            <button 
-              @click="irACheckout"
-              class="w-full bg-text-dark hover:bg-brand-600 text-white font-medium py-4 rounded-full transition-colors flex items-center justify-center gap-2"
-            >
-              Completar pedido
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
-              </svg>
-            </button>
-            <button 
-              @click="mostrarCarrito = false"
-              class="w-full mt-3 text-sm text-text-medium hover:text-text-dark transition-colors"
-            >
-              Seguir comprando
-            </button>
+            
+            <div class="px-6 pb-6 space-y-3">
+              <button 
+                @click="irACheckout"
+                class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm py-4 rounded-full transition-all uppercase tracking-wider hover:shadow-xl hover:shadow-brand-600/30"
+              >
+                Finalizar Compra
+              </button>
+              <button 
+                @click="closeCartDrawer"
+                class="w-full text-sm text-text-medium hover:text-text-dark transition-colors py-2"
+              >
+                Seguir comprando
+              </button>
+            </div>
           </div>
         </div>
-      </Transition>
+      </transition>
     </Teleport>
 
     <!-- ========================================
@@ -1356,7 +1602,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
+import { ref, computed, onMounted, onUnmounted, watch, nextTick } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
 import axios from 'axios'
 import { API_BASE_URL, getImageUrl } from '../services/api'
@@ -1371,8 +1617,9 @@ const productos = ref([])
 const categorias = ref([])
 const loading = ref(true)
 const cartCount = ref(0)
-const mostrarCarrito = ref(false)
+const showCartDrawer = ref(false)
 const carritoItems = ref([])
+const cartLoading = ref(false)
 const videoPosters = ref({})
 
 // Usuario y menú
@@ -1386,6 +1633,7 @@ const userMenuRefDesktop = ref(null)
 const isScrolled = ref(false)
 const mobileMenuOpen = ref(false)
 const mobileSearchOpen = ref(false)
+const mobileSearchInputRef = ref(null)
 
 // Búsqueda
 const searchQuery = ref('')
@@ -1523,13 +1771,6 @@ const productosFiltrados = computed(() => {
 })
 
 // Cálculo del precio subtotal del carrito
-const precioSubtotal = computed(() => {
-  return carritoItems.value.reduce((total, item) => {
-    const precio = item.precio_unitario || item.precio_monto || 0
-    return total + (precio * item.cantidad)
-  }, 0)
-})
-
 // Métodos
 const cargarProductos = async () => {
   try {
@@ -1592,7 +1833,7 @@ const loadCartFromLocal = () => {
       const normalized = Array.isArray(rawItems) ? rawItems : []
       carritoItems.value = normalized.map((item) => {
         const productoId = item?.producto_id ?? item?.id
-        const varianteId = item?.variante_id ?? null
+        const varianteId = item?.variante_id ?? productoId
         return {
           ...item,
           producto_id: productoId,
@@ -1609,30 +1850,130 @@ const loadCartFromLocal = () => {
   }
 }
 
-const saveCartToLocal = () => {
-  const total = carritoItems.value.reduce((acc, item) => {
-    const unit = item.precio_unitario ?? item.precio_monto ?? item.precio ?? 0
-    const qty = item.cantidad ?? 1
-    return acc + unit * qty
-  }, 0)
-  localStorage.setItem('kharis_cart_cache', JSON.stringify({ items: carritoItems.value, total, timestamp: Date.now() }))
-  cartCount.value = carritoItems.value.reduce((acc, item) => acc + (item.cantidad || 1), 0)
-  localStorage.setItem('kharis_cart_count', cartCount.value.toString())
-}
-
-const getCartItemKey = (item) => {
-  return item?.variante_id ?? item?.producto_id ?? item?.id
-}
-
-const removeCartItem = (item) => {
-  const key = getCartItemKey(item)
-  carritoItems.value = carritoItems.value.filter(i => getCartItemKey(i) !== key)
-  saveCartToLocal()
-}
-
 const irACheckout = () => {
-  mostrarCarrito.value = false
+  document.body.style.overflow = ''
+  showCartDrawer.value = false
   router.push('/checkout')
+}
+
+const closeCartDrawer = () => {
+  showCartDrawer.value = false
+  document.body.style.overflow = ''
+}
+
+const openCartDrawer = async () => {
+  showCartDrawer.value = true
+  document.body.style.overflow = 'hidden'
+  await loadCartItems()
+}
+
+// Helper para obtener precio del item del carrito
+const getItemPrice = (item) => {
+  const price = item.subtotal || item.precio_unitario || item.precio || item.precio_final || item.precio_monto || 0
+  const cantidad = item.cantidad || 1
+  if (item.subtotal) return item.subtotal
+  return price * cantidad
+}
+
+// Helper para calcular el subtotal del carrito
+const getCartSubtotal = () => {
+  if (!carritoItems.value || carritoItems.value.length === 0) return 0
+  return carritoItems.value.reduce((total, item) => {
+    return total + getItemPrice(item)
+  }, 0)
+}
+
+// Cargar items del carrito (localStorage + API si logged in)
+const loadCartItems = async () => {
+  cartLoading.value = true
+  
+  // Primero cargar desde cache local
+  loadCartFromLocal()
+  
+  // Si está logueado, sincronizar con backend
+  if (isLoggedIn.value) {
+    try {
+      const data = await carritoServiceImport.getCarrito()
+      if (data && data.items && data.items.length > 0) {
+        carritoItems.value = data.items
+        cartCount.value = data.items.reduce((sum, item) => sum + item.cantidad, 0)
+        localStorage.setItem('kharis_cart_cache', JSON.stringify({ items: data.items, timestamp: Date.now() }))
+        localStorage.setItem('kharis_cart_count', String(cartCount.value))
+        if (data.id) localStorage.setItem('kharis_cart_id', data.id)
+      }
+    } catch (err) {
+      if (err.response?.status !== 401 && err.response?.status !== 404) {
+        console.error('Error cargando carrito:', err)
+      }
+    }
+  }
+  
+  cartLoading.value = false
+}
+
+// Actualizar cantidad de un producto en el carrito
+const updateQuantity = async (itemKey, nuevaCantidad) => {
+  if (nuevaCantidad < 1) {
+    await removeFromCart(itemKey)
+    return
+  }
+  
+  const itemIndex = carritoItems.value.findIndex(i => (i.variante_id || i.producto_id) === itemKey)
+  if (itemIndex >= 0) {
+    carritoItems.value[itemIndex].cantidad = nuevaCantidad
+    const item = carritoItems.value[itemIndex]
+    item.subtotal = (item.precio_unitario || item.precio || item.precio_monto || 0) * nuevaCantidad
+    
+    const newCount = carritoItems.value.reduce((sum, i) => sum + i.cantidad, 0)
+    localStorage.setItem('kharis_cart_cache', JSON.stringify({ items: carritoItems.value, timestamp: Date.now() }))
+    localStorage.setItem('kharis_cart_count', String(newCount))
+    cartCount.value = newCount
+    
+    if (isLoggedIn.value) {
+      try {
+        await carritoServiceImport.actualizarCantidad(
+          item.producto_id,
+          item.variante_id,
+          nuevaCantidad,
+          localStorage.getItem('kharis_cart_id')
+        )
+      } catch (err) {
+        console.warn('Error sync cantidad con backend:', err)
+      }
+    }
+  }
+}
+
+// Eliminar producto del carrito
+const removeFromCart = async (itemKey) => {
+  const itemIndex = carritoItems.value.findIndex(i => (i.variante_id || i.producto_id) === itemKey)
+  if (itemIndex >= 0) {
+    carritoItems.value.splice(itemIndex, 1)
+    
+    if (carritoItems.value.length === 0) {
+      localStorage.removeItem('kharis_cart_cache')
+      localStorage.removeItem('kharis_cart_count')
+      cartCount.value = 0
+    } else {
+      const newCount = carritoItems.value.reduce((sum, item) => sum + (item.cantidad || 1), 0)
+      cartCount.value = newCount
+      localStorage.setItem('kharis_cart_cache', JSON.stringify({ items: carritoItems.value, timestamp: Date.now() }))
+      localStorage.setItem('kharis_cart_count', String(newCount))
+    }
+    
+    if (isLoggedIn.value) {
+      try {
+        const item = carritoItems.value.find(i => (i.variante_id || i.producto_id) === itemKey)
+        await carritoServiceImport.eliminarProducto(
+          item?.producto_id,
+          item?.variante_id,
+          localStorage.getItem('kharis_cart_id')
+        )
+      } catch (backendErr) {
+        console.warn('Error sync eliminar con backend:', backendErr)
+      }
+    }
+  }
 }
 
 // getImageUrl is imported from '../services/api'
@@ -1868,7 +2209,14 @@ const addToCart = (producto) => {
   }
   
   // Guardar en localStorage (mismo formato que Home.vue espera)
-  saveCartToLocal()
+  const total = carritoItems.value.reduce((acc, item) => {
+    const unit = item.precio_unitario ?? item.precio_monto ?? item.precio ?? 0
+    const qty = item.cantidad ?? 1
+    return acc + unit * qty
+  }, 0)
+  localStorage.setItem('kharis_cart_cache', JSON.stringify({ items: carritoItems.value, total, timestamp: Date.now() }))
+  cartCount.value = carritoItems.value.reduce((acc, item) => acc + item.cantidad, 0)
+  localStorage.setItem('kharis_cart_count', cartCount.value.toString())
   
   showToastMessage(`${producto.nombre} añadido al carrito`)
 }
@@ -1981,11 +2329,7 @@ onMounted(() => {
 onUnmounted(() => {
   window.removeEventListener('scroll', handleScroll)
   document.removeEventListener('click', handleClickOutside)
-  
-  // Limpiar intervalo del carrusel
-  if (announcementInterval) {
-    clearInterval(announcementInterval)
-  }
+  if (announcementInterval) clearInterval(announcementInterval)
 })
 
 // Mantener filtro en sync si cambia la query
@@ -1995,6 +2339,19 @@ watch(
     filtroCategoria.value = nuevaCategoria || null
   }
 )
+
+// Auto-focus en el input de búsqueda cuando se abre el overlay
+watch(mobileSearchOpen, (isOpen) => {
+  if (isOpen) {
+    nextTick(() => {
+      mobileSearchInputRef.value?.focus()
+    })
+  } else {
+    searchQuery.value = ''
+    searchSuggestions.value = []
+    showSuggestions.value = false
+  }
+})
 </script>
 
 <style scoped>
@@ -2185,4 +2542,5 @@ input[type="checkbox"]:checked {
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
+
 </style>

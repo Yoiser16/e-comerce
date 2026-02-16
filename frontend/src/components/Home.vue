@@ -1,12 +1,36 @@
 <template>
   <div class="min-h-screen bg-[#FAFAFA]">
+
+    <!-- ========================================
+         TOP BAR - Carrusel de Anuncios (Minimalista)
+         ======================================== -->
+    <div class="bg-white h-7 flex items-center justify-center overflow-hidden">
+      <div class="relative h-full w-full flex items-center justify-center">
+        <transition
+          mode="out-in"
+          enter-active-class="transition-all duration-500 ease-out"
+          enter-from-class="opacity-0 translate-y-full"
+          enter-to-class="opacity-100 translate-y-0"
+          leave-active-class="transition-all duration-300 ease-in"
+          leave-from-class="opacity-100 translate-y-0"
+          leave-to-class="opacity-0 -translate-y-full"
+        >
+          <p 
+            :key="currentAnnouncement"
+            class="text-[#333] text-[10px] font-normal uppercase tracking-[2px] text-center px-4"
+          >
+            {{ announcements[currentAnnouncement] }}
+          </p>
+        </transition>
+      </div>
+    </div>
     
     <!-- ========================================
          NAVBAR - Ultra-Minimal Luxury Glassmorphism
          ======================================== -->
     <header 
       :class="[
-        'fixed top-0 left-0 right-0 z-50',
+        'sticky top-0 z-50 transition-all duration-300',
         isScrolled ? 'header-luxury-scrolled py-2' : 'header-luxury py-4'
       ]"
     >
@@ -651,7 +675,7 @@
     <!-- ========================================
          HERO SECTION - Full Screen High Impact
          ======================================== -->
-    <section class="relative mt-14 sm:mt-0 h-[75svh] min-h-[500px] sm:h-auto sm:min-h-screen flex items-center overflow-hidden">
+    <section class="relative sm:mt-0 h-[75svh] min-h-[500px] sm:h-auto sm:min-h-screen flex items-center overflow-hidden">
       
       <!-- ===== BACKGROUND CAROUSEL ===== -->
       <div class="absolute inset-0 z-0">
@@ -1972,6 +1996,16 @@ export default {
     const isScrolled = ref(false)
     const showFloatingBtns = ref(false)
     const windowWidth = ref(typeof window !== 'undefined' ? window.innerWidth : 1024)
+
+    // Top Bar Announcements
+    const announcements = ref([
+      'ENVÍO GRATIS EN COMPRAS SUPERIORES A $200.000',
+      '5% OFF ADICIONAL PAGANDO CON TRANSFERENCIA',
+      'NUEVA COLECCIÓN: EXTENSIONES REMY PREMIUM'
+    ])
+    const currentAnnouncement = ref(0)
+    let announcementInterval = null
+
     const mobileMenuOpen = ref(false)
     const mobileSearchOpen = ref(false)
     const mobileSearchInputRef = ref(null)
@@ -2922,6 +2956,11 @@ export default {
       handleResize()
       startSlideshow()
       
+      // Iniciar carrusel de anuncios
+      announcementInterval = setInterval(() => {
+        currentAnnouncement.value = (currentAnnouncement.value + 1) % announcements.value.length
+      }, 3500)
+      
       // Manejar scroll al hash cuando venimos de otra página
       if (route.hash) {
         Promise.allSettled([categoriasPromise, productosPromise]).then(async () => {
@@ -2945,6 +2984,7 @@ export default {
       document.removeEventListener('click', handleClickOutside)
       document.removeEventListener('click', handleClickOutsideSearch)
       if (slideInterval) clearInterval(slideInterval)
+      if (announcementInterval) clearInterval(announcementInterval)
     })
 
     return {
@@ -2996,6 +3036,9 @@ export default {
       cerrarSesion,
       showUserMenu,
       userMenuRef,
+      // Announcements
+      announcements,
+      currentAnnouncement,
       isLoggedIn,
       currentUser,
       userInitial,

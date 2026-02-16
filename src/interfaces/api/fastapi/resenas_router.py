@@ -6,6 +6,7 @@ from pydantic import BaseModel, conint
 from typing import List, Optional
 from uuid import UUID
 from asgiref.sync import sync_to_async
+from django.db import close_old_connections
 from django.db.models import Avg
 
 import django
@@ -62,10 +63,12 @@ def _cliente_display(cliente: ClienteModel) -> str:
 
 
 def _get_cliente_por_email(email: str) -> Optional[ClienteModel]:
+    close_old_connections()
     return ClienteModel.objects.filter(email=email).first()
 
 
 def _get_orden_compra(cliente: ClienteModel, producto: ProductoModel) -> Optional[OrdenModel]:
+    close_old_connections()
     estados_validos = ['confirmada', 'en_proceso', 'enviada', 'completada']
     return (
         OrdenModel.objects
@@ -100,6 +103,7 @@ async def crear_resena(
             raise HTTPException(status_code=403, detail="Solo clientes con compra pueden calificar este producto")
 
         def _upsert():
+            close_old_connections()
             resena, created = ResenaProductoModel.objects.get_or_create(
                 producto=producto,
                 cliente=cliente,
@@ -136,6 +140,7 @@ async def listar_resenas_producto(
 ):
     """Lista reseñas aprobadas de un producto."""
     def _listar():
+        close_old_connections()
         qs = (
             ResenaProductoModel.objects
             .select_related('cliente', 'producto')
@@ -162,6 +167,7 @@ async def listar_resenas_producto(
 async def resumen_resenas_producto(producto_id: UUID):
     """Resumen de reseñas aprobadas (promedio y total)."""
     def _resumen():
+        close_old_connections()
         qs = ResenaProductoModel.objects.filter(producto_id=producto_id, estado='aprobada')
         total = qs.count()
         promedio = qs.aggregate(avg=Avg('rating'))['avg'] or 0
@@ -178,6 +184,7 @@ async def resumen_resenas_producto(producto_id: UUID):
 async def listar_resenas_destacadas(limit: int = 6):
     """Lista reseñas aprobadas recientes para la home."""
     def _listar():
+        close_old_connections()
         qs = (
             ResenaProductoModel.objects
             .select_related('cliente', 'producto')
@@ -207,6 +214,7 @@ async def listar_resenas_admin(
 ):
     """Lista reseñas para moderación (admin)."""
     def _listar():
+        close_old_connections()
         qs = (
             ResenaProductoModel.objects
             .select_related('cliente', 'producto')
@@ -240,6 +248,7 @@ async def cambiar_estado_resena(
         raise HTTPException(status_code=400, detail="Estado inválido")
 
     def _actualizar():
+        close_old_connections()
         resena = ResenaProductoModel.objects.filter(id=resena_id).first()
         if not resena:
             return None
