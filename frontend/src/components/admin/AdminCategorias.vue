@@ -596,8 +596,8 @@ export default {
         }
 
         const data = await response.json()
-        // Convertir URL relativa a absoluta usando getImageUrl()
-        form.value.imagen = getImageUrl(data.url)
+        // Guardar URL relativa (sin dominio) para que funcione en cualquier entorno
+        form.value.imagen = data.url
         
       } catch (err) {
         console.error('Error uploading image:', err)

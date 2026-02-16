@@ -812,35 +812,33 @@
          ======================================== -->
     <section class="trust-ribbon-premium relative overflow-hidden py-0 sm:py-0">
       
-      <!-- Mobile: Bloques con círculos sobre fondo rosa -->
-      <div class="sm:hidden bg-[#FFF5F7] py-5">
-        <div class="flex items-start justify-evenly px-3">
+      <!-- Mobile: Banda horizontal dark retail-style -->
+      <div class="sm:hidden bg-[#1a1a1a] py-3.5">
+        <div class="flex items-center justify-evenly px-3">
           <!-- Envío Gratis -->
-          <div class="flex flex-col items-center text-center gap-2">
-            <div class="w-11 h-11 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] flex items-center justify-center">
-              <svg class="w-[18px] h-[18px] text-[#8B7355]" fill="none" stroke="currentColor" stroke-width="1.3" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-              </svg>
-            </div>
-            <span class="text-[11px] font-bold tracking-[0.04em] uppercase text-[#1a1a1a] leading-tight">Envío<br>Gratis</span>
+          <div class="flex items-center gap-2">
+            <svg class="w-[18px] h-[18px] text-white/70 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
+            </svg>
+            <span class="text-[11px] font-bold tracking-wider uppercase text-white leading-tight">Envío Gratis</span>
           </div>
+          <!-- Divider -->
+          <div class="w-px h-4 bg-white/20"></div>
           <!-- Pago Seguro -->
-          <div class="flex flex-col items-center text-center gap-2">
-            <div class="w-11 h-11 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] flex items-center justify-center">
-              <svg class="w-[18px] h-[18px] text-[#8B7355]" fill="none" stroke="currentColor" stroke-width="1.3" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
-              </svg>
-            </div>
-            <span class="text-[11px] font-bold tracking-[0.04em] uppercase text-[#1a1a1a] leading-tight">Pago<br>Seguro</span>
+          <div class="flex items-center gap-2">
+            <svg class="w-[18px] h-[18px] text-white/70 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75m-3-7.036A11.959 11.959 0 013.598 6 11.99 11.99 0 003 9.749c0 5.592 3.824 10.29 9 11.623 5.176-1.332 9-6.03 9-11.622 0-1.31-.21-2.571-.598-3.751h-.152c-3.196 0-6.1-1.248-8.25-3.285z" />
+            </svg>
+            <span class="text-[11px] font-bold tracking-wider uppercase text-white leading-tight">Pago Seguro</span>
           </div>
+          <!-- Divider -->
+          <div class="w-px h-4 bg-white/20"></div>
           <!-- Asesoría VIP -->
-          <div class="flex flex-col items-center text-center gap-2">
-            <div class="w-11 h-11 rounded-full bg-white shadow-[0_2px_8px_rgba(0,0,0,0.06)] flex items-center justify-center">
-              <svg class="w-[18px] h-[18px] text-[#8B7355]" fill="none" stroke="currentColor" stroke-width="1.3" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
-              </svg>
-            </div>
-            <span class="text-[11px] font-bold tracking-[0.04em] uppercase text-[#1a1a1a] leading-tight">Asesoría<br>VIP</span>
+          <div class="flex items-center gap-2">
+            <svg class="w-[18px] h-[18px] text-white/70 flex-shrink-0" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M20.25 8.511c.884.284 1.5 1.128 1.5 2.097v4.286c0 1.136-.847 2.1-1.98 2.193-.34.027-.68.052-1.02.072v3.091l-3-3c-1.354 0-2.694-.055-4.02-.163a2.115 2.115 0 01-.825-.242m9.345-8.334a2.126 2.126 0 00-.476-.095 48.64 48.64 0 00-8.048 0c-1.131.094-1.976 1.057-1.976 2.192v4.286c0 .837.46 1.58 1.155 1.951m9.345-8.334V6.637c0-1.621-1.152-3.026-2.76-3.235A48.455 48.455 0 0011.25 3c-2.115 0-4.198.137-6.24.402-1.608.209-2.76 1.614-2.76 3.235v6.226c0 1.621 1.152 3.026 2.76 3.235.577.075 1.157.14 1.74.194V21l4.155-4.155" />
+            </svg>
+            <span class="text-[11px] font-bold tracking-wider uppercase text-white leading-tight">Asesoría VIP</span>
           </div>
         </div>
       </div>
@@ -910,10 +908,10 @@
          ======================================== -->
     <section id="categorias" class="py-5 sm:py-12 lg:py-28 bg-[#FAFAFA]">
       <div class="max-w-7xl mx-auto px-3 sm:px-8 lg:px-12">
-        <!-- Section Header - Ultra compacto en móvil -->
-        <div class="text-center mb-3 sm:mb-10 lg:mb-14">
+        <!-- Section Header - Left-aligned mobile, centered desktop -->
+        <div class="text-left sm:text-center mb-3 sm:mb-10 lg:mb-14">
           <span class="hidden sm:inline-block text-brand-600 font-medium text-xs sm:text-sm tracking-widest uppercase mb-2 sm:mb-4">Nuestro Catálogo</span>
-          <h2 class="font-luxury text-xl sm:text-4xl lg:text-5xl text-text-dark mb-0 sm:mb-4">
+          <h2 class="text-[17px] font-bold uppercase tracking-wide sm:tracking-normal sm:normal-case sm:font-luxury sm:text-4xl lg:text-5xl text-text-dark mb-0 sm:mb-4">
             Categorías <em class="not-italic text-brand-600">Exclusivas</em>
           </h2>
           <p class="hidden sm:block text-text-medium max-w-xl mx-auto text-sm lg:text-base">
@@ -921,16 +919,29 @@
           </p>
         </div>
 
-        <!-- Bento Grid - Smart Grid con última impar full-width -->
-        <div class="category-smart-grid grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-5 lg:gap-6">
+        <!-- Categories: Horizontal Carousel (mobile) / Bento Grid (desktop) -->
+        <div class="relative">
+          <!-- Scroll arrow indicator (mobile only, Mercado Libre style) -->
+          <button 
+            v-if="categorias.length > 1"
+            @click="scrollCategorias"
+            class="cat-scroll-arrow md:hidden absolute right-0 top-1/2 -translate-y-1/2 z-20 w-9 h-9 bg-white shadow-lg flex items-center justify-center transition-opacity duration-500"
+            :class="{ 'opacity-0 pointer-events-none': catScrolled }"
+            aria-label="Deslizar categorías"
+          >
+            <svg class="w-5 h-5 text-text-dark" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 4.5l7.5 7.5-7.5 7.5" />
+            </svg>
+          </button>
+
+        <div ref="categoriasCarouselRef" class="categories-carousel md:grid md:grid-cols-2 lg:grid-cols-3 md:gap-5 lg:gap-6" @scroll="onCatScroll">
           <div 
             v-for="(categoria, index) in categorias" 
             :key="categoria.id"
             :class="[
               'group cursor-pointer category-card-item',
-              // En móvil, solo categoría destacada (P1) ocupa 2 columnas
-              categoria.prioridad === 1 && index === 0 ? 'col-span-2' : '',
-              // Lógica adaptativa para tablet y desktop
+              // Mobile: carousel card sizing (handled via CSS)
+              // Desktop grid logic
               categorias.length === 1 ? 'md:col-span-2 lg:col-span-3' : 
               categorias.length === 2 ? 'md:col-span-1 lg:col-span-1.5' : 
               categorias.length === 3 && categoria.prioridad === 1 ? 'md:col-span-2 lg:col-span-2 lg:row-span-2' : 
@@ -944,14 +955,17 @@
           >
             <div 
               :class="[
-                'relative bento-item shadow-soft hover-lift overflow-hidden rounded-xl sm:rounded-2xl lg:rounded-3xl',
-                // Altura adaptativa móvil primero - más compacto
-                categoria.prioridad === 1 && index === 0 ? 'h-44 sm:h-80 lg:h-96' : 'h-32 sm:h-64 lg:h-80',
-                // Lógica para otros tamaños
-                categorias.length === 1 ? 'sm:h-96 lg:h-[500px]' :
-                categorias.length === 2 ? 'sm:h-80 lg:h-96' :
-                categorias.length === 3 && categoria.prioridad === 1 ? 'sm:h-80 lg:h-full lg:min-h-[400px]' :
-                categorias.length === 3 && categoria.prioridad !== 1 ? 'sm:h-64 lg:h-full lg:min-h-[200px]' : ''
+                'relative cat-card-inner bento-item shadow-soft hover-lift overflow-hidden',
+                // Mobile: zero radius via CSS override; Desktop: rounded
+                'rounded-none md:rounded-2xl lg:rounded-3xl',
+                // Mobile: tall uniform height for carousel impact
+                'h-72 sm:h-80',
+                // Desktop: adaptive heights
+                categoria.prioridad === 1 && index === 0 ? 'md:h-80 lg:h-96' : 'md:h-64 lg:h-80',
+                categorias.length === 1 ? 'md:h-96 lg:h-[500px]' :
+                categorias.length === 2 ? 'md:h-80 lg:h-96' :
+                categorias.length === 3 && categoria.prioridad === 1 ? 'md:h-80 lg:h-full lg:min-h-[400px]' :
+                categorias.length === 3 && categoria.prioridad !== 1 ? 'md:h-64 lg:h-full lg:min-h-[200px]' : ''
               ]"
             >
               <img 
@@ -959,29 +973,25 @@
                 :alt="categoria.nombre" 
                 class="absolute inset-0 w-full h-full object-cover img-zoom"
               >
-              <!-- Overlay mejorado para legibilidad móvil -->
-              <div class="absolute inset-0 bento-overlay-mobile sm:bento-overlay"></div>
+              <!-- Overlay: hard gradient on mobile, soft on desktop -->
+              <div class="absolute inset-0 cat-overlay-sharp sm:bento-overlay"></div>
               <div 
                 :class="[
                   'absolute bottom-0 left-0 right-0',
-                  // Padding adaptativo - ultra compacto en móvil
-                  categoria.prioridad === 1 && index === 0 ? 'p-3 sm:p-6 lg:p-8' : 'p-2.5 sm:p-5 lg:p-6'
+                  'p-4 sm:p-6 lg:p-8'
                 ]"
               >
-                <!-- Badge "MÁS VENDIDO" solo para la primera P1 -->
+                <!-- Badge "MÁS VENDIDO" - solid label style on mobile -->
                 <span 
                   v-if="categoria.prioridad === 1 && categoria.orden === 1" 
-                  class="inline-block bg-gold-400 text-white text-[9px] sm:text-xs font-bold px-2 sm:px-3 py-0.5 sm:py-1 rounded-full mb-1.5 sm:mb-3"
+                  class="cat-badge-sharp inline-block bg-black text-white text-[10px] sm:text-xs font-bold uppercase tracking-wider px-2.5 py-1 sm:px-3 sm:py-1 rounded-none sm:rounded-full mb-2 sm:mb-3"
                 >
                   MÁS VENDIDO
                 </span>
                 
-                <!-- Título adaptativo - más compacto móvil -->
+                <!-- Title: Bold sans-serif uppercase on mobile, luxury on desktop -->
                 <h3 
-                  :class="[
-                    'font-luxury text-white leading-tight',
-                    categoria.prioridad === 1 && index === 0 ? 'text-base sm:text-2xl lg:text-3xl mb-1 sm:mb-2' : 'text-[13px] sm:text-xl lg:text-2xl'
-                  ]"
+                  class="cat-title-sharp text-white leading-tight text-lg sm:text-2xl lg:text-3xl font-black uppercase sm:normal-case sm:font-luxury mb-1 sm:mb-2"
                 >
                   {{ categoria.nombre }}
                 </h3>
@@ -1000,27 +1010,19 @@
                   {{ categoria.descripcion_corta || categoria.descripcion }}
                 </p>
                 
-                <!-- CTA - minimalista en móvil -->
+                <!-- CTA: sharp label style on mobile -->
                 <span 
-                  :class="[
-                    'inline-flex items-center gap-1 sm:gap-2 text-white font-medium transition-all mt-1 sm:mt-0',
-                    categoria.prioridad === 1 && index === 0 ? 'text-[11px] sm:text-base group-hover:gap-4' : 'text-[10px] sm:text-sm group-hover:gap-3'
-                  ]"
+                  class="cat-cta-sharp inline-flex items-center gap-1.5 sm:gap-2 text-white font-bold text-xs sm:text-sm uppercase tracking-wider sm:tracking-normal sm:normal-case sm:font-medium transition-all group-hover:gap-4 mt-1 sm:mt-0"
                 >
-                  {{ categoria.prioridad === 1 && index === 0 ? 'Explorar colección' : 'Ver más' }}
-                  <svg 
-                    :class="categoria.prioridad === 1 && index === 0 ? 'w-3.5 h-3.5 sm:w-5 sm:h-5' : 'w-3 h-3 sm:w-4 sm:h-4'" 
-                    fill="none" 
-                    stroke="currentColor" 
-                    stroke-width="2" 
-                    viewBox="0 0 24 24"
-                  >
+                  VER COLECCIÓN
+                  <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
                   </svg>
                 </span>
               </div>
             </div>
           </div>
+        </div>
         </div>
       </div>
     </section>
@@ -1032,9 +1034,9 @@
       <div class="max-w-screen-xl mx-auto px-3 sm:px-8 lg:px-10">
         <!-- Section Header - Compacto en móvil -->
         <div class="flex flex-col lg:flex-row lg:items-end lg:justify-between gap-3 sm:gap-6 mb-5 sm:mb-14">
-          <div class="text-center sm:text-left">
+          <div class="text-left sm:text-left">
             <span class="hidden sm:inline-block text-brand-600 font-medium text-sm tracking-widest uppercase mb-4">Selección Premium</span>
-            <h2 class="font-luxury text-2xl sm:text-4xl lg:text-5xl text-text-dark">
+            <h2 class="text-[17px] font-bold uppercase tracking-wide sm:tracking-normal sm:normal-case sm:font-luxury sm:text-4xl lg:text-5xl text-text-dark">
               Productos <em class="not-italic text-brand-600">Destacados</em>
             </h2>
           </div>
@@ -1066,7 +1068,7 @@
             @click="irADetalle(producto.id)"
             class="group cursor-pointer product-card-mobile"
           >
-            <div class="relative bg-white rounded-xl sm:rounded-3xl overflow-hidden shadow-soft sm:hover-lift mb-2 sm:mb-5">
+            <div class="relative bg-white rounded-none sm:rounded-3xl overflow-hidden shadow-soft sm:hover-lift mb-2 sm:mb-5">
               <!-- Badge - Sutil en móvil, oculto si no es necesario -->
               <div class="absolute top-2 sm:top-4 left-2 sm:left-4 z-10">
                 <span class="product-badge-mobile bg-white/90 sm:bg-white/90 sm:backdrop-blur-sm text-text-dark text-[9px] sm:text-xs font-medium px-1.5 sm:px-3 py-0.5 sm:py-1.5 rounded-full shadow-sm">
@@ -2007,6 +2009,24 @@ export default {
     const showSuggestions = ref(false)
     const searchInputRef = ref(null)
     const suggestionsRef = ref(null)
+
+    // ===== Carousel de categorías (móvil) =====
+    const categoriasCarouselRef = ref(null)
+    const catScrolled = ref(false)
+
+    const scrollCategorias = () => {
+      const el = categoriasCarouselRef.value
+      if (el) {
+        el.scrollBy({ left: el.offsetWidth * 0.85, behavior: 'smooth' })
+      }
+    }
+
+    const onCatScroll = () => {
+      const el = categoriasCarouselRef.value
+      if (el && el.scrollLeft > 30) {
+        catScrolled.value = true
+      }
+    }
 
     // ===== Funciones del menú móvil off-canvas =====
     const openMobileMenu = () => {
@@ -3058,7 +3078,12 @@ export default {
       getProductoMediaUrl,
       getCartSourceUrl,
       getCartMediaUrl,
-      isVideo
+      isVideo,
+      // Carousel categorías
+      categoriasCarouselRef,
+      catScrolled,
+      scrollCategorias,
+      onCatScroll
     }
   }
 }
@@ -3257,5 +3282,108 @@ export default {
 }
 .sidebar-leave-to {
   transform: translateX(-100%);
+}
+
+/* ==========================================
+   CATEGORÍAS - CARRUSEL HORIZONTAL (MOBILE)
+   Sharp & Bold Retail Style
+   ========================================== */
+
+/* Mobile only: horizontal carousel */
+@media (max-width: 767px) {
+  .categories-carousel {
+    display: flex;
+    gap: 8px;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    padding-bottom: 2px;
+
+    /* Hide scrollbar - all browsers */
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+  .categories-carousel::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Each card: 85% width — photo is the protagonist */
+  .categories-carousel .category-card-item {
+    flex: 0 0 85%;
+    min-width: 85%;
+    scroll-snap-align: start;
+  }
+
+  .categories-carousel .category-card-item:first-child {
+    margin-left: 0;
+  }
+
+  .categories-carousel .category-card-item:last-child {
+    margin-right: 4px;
+  }
+
+  /* === SCROLL ARROW INDICATOR (Mercado Libre style) === */
+  .cat-scroll-arrow {
+    border-radius: 0;
+    border: none;
+    box-shadow: -4px 0 12px rgba(0, 0, 0, 0.12);
+    animation: cat-arrow-pulse 1.8s ease-in-out infinite;
+  }
+
+  @keyframes cat-arrow-pulse {
+    0%, 100% { transform: translateY(-50%) translateX(0); }
+    50% { transform: translateY(-50%) translateX(4px); }
+  }
+
+  /* === ZERO RADIUS — Hard geometric edges === */
+  .cat-card-inner {
+    border-radius: 0 !important;
+  }
+
+  .cat-badge-sharp {
+    border-radius: 0 !important;
+  }
+
+  /* === BOLD SANS-SERIF TYPOGRAPHY === */
+  .cat-title-sharp {
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif !important;
+    font-weight: 900;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  .cat-cta-sharp {
+    font-family: 'Inter', 'Helvetica Neue', Arial, sans-serif;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  /* === HARD OVERLAY — dark bottom band for text legibility === */
+  .cat-overlay-sharp {
+    background: linear-gradient(
+      to top,
+      rgba(0, 0, 0, 0.82) 0%,
+      rgba(0, 0, 0, 0.35) 40%,
+      rgba(0, 0, 0, 0.05) 65%,
+      transparent 80%
+    );
+  }
+
+  /* === PRODUCT CARDS — Zero radius on mobile === */
+  .product-card-mobile .rounded-xl,
+  .product-card-mobile .rounded-3xl {
+    border-radius: 0 !important;
+  }
+
+  .product-badge-mobile {
+    border-radius: 0 !important;
+  }
+
+  /* Product grid: tighter gap on mobile */
+  .product-grid-mobile {
+    gap: 6px !important;
+  }
 }
 </style>
