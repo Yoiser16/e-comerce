@@ -98,6 +98,10 @@ class LargoCabello(str, Enum):
     PULGADAS_28 = "28"
     PULGADAS_30 = "30"
     PULGADAS_32 = "32"
+    PULGADAS_34 = "34"
+    PULGADAS_36 = "36"
+    PULGADAS_38 = "38"
+    PULGADAS_40 = "40"
     
     @property
     def valor_numerico(self) -> int:

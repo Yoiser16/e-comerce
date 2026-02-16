@@ -946,7 +946,7 @@
                           : 'border-text-dark/10 text-text-medium hover:border-brand-300 hover:text-brand-600'
                       ]"
                     >
-                      {{ largo }}
+                      {{ largo }}"
                     </button>
                   </div>
                 </div>
@@ -1691,7 +1691,7 @@ const toastMessage = ref('')
 // Opciones de filtros disponibles
 const coloresDisponibles = ref(['Negro', 'Castaño', 'Rubio', 'Rojo', 'Borgogña', 'Platino', 'Rubio Ceniza'])
 const tiposDisponibles = ref(['Liso', 'Ondulado', 'Rizado', 'Afro'])
-const largosDisponibles = ref(['30cm', '40cm', '45cm', '50cm', '55cm', '60cm', '65cm', '70cm'])
+const largosDisponibles = ref(['8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30', '32', '34', '36', '38', '40'])
 
 // Computed para usuario
 const userInitial = computed(() => {
@@ -1709,6 +1709,12 @@ const activeFiltersCount = computed(() => {
   if (precioRangoMin.value > precioMinDisponible.value || precioRangoMax.value < precioMaxDisponible.value) count++
   return count
 })
+
+const normalizeLargoValue = (value) => {
+  if (!value) return ''
+  const match = String(value).match(/\d+/)
+  return match ? match[0] : ''
+}
 
 // Productos filtrados
 const productosFiltrados = computed(() => {
@@ -1751,7 +1757,7 @@ const productosFiltrados = computed(() => {
 
   // Filtro por largo
   if (filtrosLargo.value.length > 0) {
-    resultado = resultado.filter(p => filtrosLargo.value.includes(p.largo))
+    resultado = resultado.filter(p => filtrosLargo.value.includes(normalizeLargoValue(p.largo)))
   }
 
   // Ordenar
