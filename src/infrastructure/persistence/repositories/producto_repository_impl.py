@@ -97,7 +97,6 @@ class ProductoRepositoryImpl(ProductoRepository):
                     precio=Dinero(variante.precio_monto, variante.precio_moneda),
                     stock_actual=variante.stock_actual,
                     stock_minimo=variante.stock_minimo,
-                    cantidad_minima_mayorista=getattr(variante, 'cantidad_minima_mayorista', 1),
                     imagen_url=variante.imagen_url,
                     activo=variante.activo,
                     orden=variante.orden,
@@ -185,7 +184,6 @@ class ProductoRepositoryImpl(ProductoRepository):
             'precio_moneda': variante.precio_moneda,
             'stock_actual': variante.stock_actual,
             'stock_minimo': variante.stock_minimo,
-            'cantidad_minima_mayorista': getattr(variante, 'cantidad_minima_mayorista', 1),
             'imagen_url': variante.imagen_url,
             'activo': variante.activo,
             'orden': variante.orden
@@ -204,7 +202,6 @@ class ProductoRepositoryImpl(ProductoRepository):
                 'precio_moneda': v.precio_moneda,
                 'stock_actual': v.stock_actual,
                 'stock_minimo': v.stock_minimo,
-                'cantidad_minima_mayorista': getattr(v, 'cantidad_minima_mayorista', 1),
                 'imagen_url': v.imagen_url,
                 'activo': v.activo,
                 'orden': v.orden
@@ -238,7 +235,6 @@ class ProductoRepositoryImpl(ProductoRepository):
                 'precio_moneda': producto_model.moneda_precio,
                 'stock_actual': producto_model.stock_actual,
                 'stock_minimo': producto_model.stock_minimo,
-                'cantidad_minima_mayorista': getattr(producto_model, 'cantidad_minima_mayorista', 1),
                 'imagen_url': producto_model.imagen_principal,
                 'activo': True,
                 'orden': -1
@@ -258,7 +254,6 @@ class ProductoRepositoryImpl(ProductoRepository):
                 'precio_moneda': payload.get('precio_moneda') or producto_model.moneda_precio,
                 'stock_actual': payload.get('stock_actual', 0),
                 'stock_minimo': payload.get('stock_minimo', 0),
-                'cantidad_minima_mayorista': payload.get('cantidad_minima_mayorista') or getattr(producto_model, 'cantidad_minima_mayorista', 1),
                 'imagen_url': payload.get('imagen_url'),
                 'activo': payload.get('activo', True),
                 'orden': payload.get('orden', idx)

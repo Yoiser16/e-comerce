@@ -696,7 +696,7 @@
           </div>
 
           <!-- VARIANTES: Largo (Pills) -->
-          <div v-if="largosDisponibles.length > 1" class="space-y-3">
+          <div v-if="largosDisponibles.length" class="space-y-3">
             <p class="text-xs uppercase tracking-[0.15em] text-text-light">Largo</p>
             <div class="flex flex-wrap gap-2">
               <button
@@ -1421,6 +1421,12 @@ const largosDisponibles = computed(() => {
       })
     }
   })
+  if (!map.size && producto.value?.largo) {
+    map.set(producto.value.largo, {
+      value: producto.value.largo,
+      label: formatLargoLabel(producto.value.largo)
+    })
+  }
   return Array.from(map.values())
 })
 

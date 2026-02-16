@@ -107,6 +107,10 @@ class ProductoModel(models.Model):
         ('28', '28 pulgadas'),
         ('30', '30 pulgadas'),
         ('32', '32 pulgadas'),
+        ('34', '34 pulgadas'),
+        ('36', '36 pulgadas'),
+        ('38', '38 pulgadas'),
+        ('40', '40 pulgadas'),
     ]
     
     ORIGEN_CHOICES = [

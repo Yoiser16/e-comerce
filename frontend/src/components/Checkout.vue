@@ -1086,10 +1086,23 @@ export default {
     
     // Storage functions
     const STORAGE_KEY = 'kharis_checkout_form'
+    const DOC_STORAGE_KEY = 'kharis_checkout_doc'
     
+    const saveDocToStorage = () => {
+      try {
+        localStorage.setItem(DOC_STORAGE_KEY, JSON.stringify({
+          tipoDocumento: form.value.tipoDocumento || 'CC',
+          numeroDocumento: form.value.numeroDocumento || ''
+        }))
+      } catch (e) {
+        console.warn('Error saving document to storage', e)
+      }
+    }
+
     const saveFormToStorage = () => {
       try {
         localStorage.setItem(STORAGE_KEY, JSON.stringify(form.value))
+        saveDocToStorage()
       } catch (e) {
         console.warn('Error saving form to storage', e)
       }
@@ -1143,6 +1156,21 @@ export default {
             data.municipio = String(data.municipio)
           }
           Object.assign(form.value, data)
+        }
+
+        const savedDoc = localStorage.getItem(DOC_STORAGE_KEY)
+        if (savedDoc) {
+          try {
+            const docData = JSON.parse(savedDoc)
+            if (docData.tipoDocumento && !form.value.tipoDocumento) {
+              form.value.tipoDocumento = docData.tipoDocumento
+            }
+            if (docData.numeroDocumento && !form.value.numeroDocumento) {
+              form.value.numeroDocumento = docData.numeroDocumento
+            }
+          } catch {
+            localStorage.removeItem(DOC_STORAGE_KEY)
+          }
         }
       } catch (e) {
         console.warn('Error loading form from storage', e)
