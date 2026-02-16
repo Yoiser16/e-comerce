@@ -2,9 +2,9 @@
   <div class="min-h-screen bg-[#FAFAFA]">
 
     <!-- ========================================
-         TOP BAR - Carrusel de Anuncios (Minimalista)
+         TOP BAR - Carrusel de Anuncios (Solo Móvil)
          ======================================== -->
-    <div class="bg-white h-7 flex items-center justify-center overflow-hidden">
+    <div class="sm:hidden bg-white h-7 flex items-center justify-center overflow-hidden">
       <div class="relative h-full w-full flex items-center justify-center">
         <transition
           mode="out-in"
@@ -30,7 +30,7 @@
          ======================================== -->
     <header 
       :class="[
-        'sticky top-0 z-50 transition-all duration-300',
+        'sticky sm:fixed top-0 left-0 right-0 z-50 transition-all duration-300',
         isScrolled ? 'header-luxury-scrolled py-2' : 'header-luxury py-4'
       ]"
     >
@@ -1038,9 +1038,9 @@
               Productos <em class="not-italic text-brand-600">Destacados</em>
             </h2>
           </div>
-          <router-link to="/catalogo" class="hidden sm:inline-flex items-center gap-2 text-text-medium hover:text-brand-600 font-medium transition-colors group">
-            Ver todo el catálogo
-            <svg class="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+          <router-link to="/catalogo" class="hidden sm:inline-flex items-center gap-2 text-[13px] text-text-dark font-medium uppercase tracking-[0.1em] border border-text-dark/20 px-6 py-3 rounded-sm hover:bg-text-dark hover:text-white transition-all group">
+            VER TODO EL CATÁLOGO
+            <svg class="w-3.5 h-3.5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
             </svg>
           </router-link>
@@ -1182,9 +1182,9 @@
 
         <!-- CTA Ver catálogo - Visible solo en móvil debajo del grid -->
         <div v-if="productos.length > 0" class="flex sm:hidden justify-center mt-6">
-          <router-link to="/catalogo" class="inline-flex items-center gap-2 text-sm text-brand-600 font-medium border border-brand-200 px-5 py-2.5 rounded-full hover:bg-brand-50 transition-all">
-            Ver todo el catálogo
-            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+          <router-link to="/catalogo" class="w-full inline-flex items-center justify-center gap-2 text-[13px] text-text-dark font-medium uppercase tracking-[0.1em] border border-text-dark/20 px-5 py-3 rounded-sm hover:bg-text-dark hover:text-white transition-all">
+            VER TODO EL CATÁLOGO
+            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
             </svg>
           </router-link>
@@ -1246,15 +1246,15 @@
     <!-- ========================================
          SECCIÓN MAYORISTA - Diseño Premium
          ======================================== -->
-    <section id="mayoreo" class="py-14 sm:py-20 lg:py-32 relative overflow-hidden bg-gradient-to-br from-[#F5EDE4] via-[#FBF7F3] to-[#F0E6DC]">
+    <section id="mayoreo" class="py-10 sm:py-20 lg:py-32 relative overflow-hidden bg-gradient-to-br from-[#F5EDE4] via-[#FBF7F3] to-[#F0E6DC]">
       <!-- Decorative Pattern -->
       <div class="absolute inset-0 opacity-[0.03]" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23000000\' fill-opacity=\'1\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
       
       <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12 relative z-10">
         <div class="grid lg:grid-cols-2 gap-8 sm:gap-12 lg:gap-16 items-center">
           
-          <!-- Image First -->
-          <div class="relative order-2 lg:order-1">
+          <!-- Image - Oculta en móvil para mantener sección compacta -->
+          <div class="relative order-2 lg:order-1 hidden sm:block">
             <div class="relative rounded-3xl overflow-hidden shadow-2xl">
               <img 
                 src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=700&h=800&fit=crop&q=85" 
@@ -1264,7 +1264,7 @@
               <div class="absolute inset-0 bg-gradient-to-t from-black/40 to-transparent"></div>
               
               <!-- Stats Card -->
-              <div class="absolute bottom-6 left-6 right-6 bg-white/95 backdrop-blur-sm rounded-2xl shadow-xl p-6">
+              <div class="absolute bottom-6 left-6 right-6 bg-white/95 rounded-2xl shadow-xl p-6">
                 <div class="flex items-center justify-around gap-4">
                   <div class="text-center">
                     <p class="text-3xl sm:text-4xl font-bold text-brand-600 mb-1">2K+</p>
@@ -1293,7 +1293,7 @@
               Impulsa tu <em class="not-italic text-brand-600">Negocio</em> de Belleza
             </h2>
 
-            <p class="text-text-medium text-lg mb-8 max-w-xl leading-relaxed">
+            <p class="text-text-medium text-sm sm:text-lg mb-6 sm:mb-8 max-w-xl leading-relaxed">
               Únete a más de 2,000 profesionales que confían en Kharis para surtir sus salones, tiendas y negocios de belleza.
             </p>
 
@@ -1334,18 +1334,8 @@
               </li>
             </ul>
 
-            <!-- CTAs - Más compactos en móvil -->
+            <!-- CTA -->
             <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
-              <a 
-                href="https://wa.me/4796657763?text=Hola,%20me%20interesa%20el%20programa%20de%20mayoristas"
-                target="_blank"
-                class="inline-flex items-center justify-center gap-2 sm:gap-3 bg-green-500 hover:bg-green-600 text-white font-semibold text-sm sm:text-base px-5 py-3 sm:px-7 sm:py-3.5 rounded-full transition-all shadow-lg touch-target"
-              >
-                <svg class="w-4 h-4 sm:w-5 sm:h-5" fill="currentColor" viewBox="0 0 24 24">
-                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413Z"/>
-                </svg>
-                Contactar por WhatsApp
-              </a>
               <a 
                 href="https://pro.demostracion.store/"
                 class="inline-flex items-center justify-center gap-2 sm:gap-3 bg-white hover:bg-nude-50 border-2 border-nude-300 text-text-dark font-medium text-sm sm:text-base px-5 py-3 sm:px-7 sm:py-3.5 rounded-full transition-all hover:border-brand-400 touch-target"
@@ -1365,7 +1355,7 @@
     <!-- ========================================
          GUÍA RÁPIDA - Elección Premium
          ======================================== -->
-    <section class="relative bg-gradient-to-br from-[#FDFBFA] via-[#FAF7F5] to-[#FDFBFA] overflow-hidden py-20 lg:py-28">
+    <section class="relative bg-gradient-to-br from-[#FDFBFA] via-[#FAF7F5] to-[#FDFBFA] overflow-hidden py-12 sm:py-20 lg:py-28">
       <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4B9A9]/30 to-transparent"></div>
       <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4B9A9]/30 to-transparent"></div>
 
@@ -1411,21 +1401,24 @@
               Responde en segundos y descubre la pieza ideal segun tu objetivo, textura y tono.
             </p>
 
-            <div class="flex flex-col sm:flex-row gap-3 sm:gap-4">
+            <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
               <router-link
                 to="/catalogo"
-                class="inline-flex items-center justify-center gap-3 bg-text-dark hover:bg-black text-white font-medium text-sm tracking-wide px-8 py-4 rounded-sm transition-all hover:shadow-lg touch-target"
+                class="inline-flex items-center justify-center gap-3 bg-text-dark hover:bg-black text-white font-medium text-[13px] sm:text-sm uppercase tracking-[0.1em] px-8 py-3.5 sm:py-4 rounded-sm transition-all hover:shadow-lg touch-target"
               >
-                <span>IR A LA GUIA</span>
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                IR A LA GUIA
+                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
                 </svg>
               </router-link>
               <router-link
                 to="/catalogo"
-                class="inline-flex items-center justify-center gap-3 bg-white hover:bg-nude-50 border border-nude-300 text-text-dark font-medium text-sm tracking-wide px-8 py-4 rounded-sm transition-all"
+                class="inline-flex items-center justify-center gap-1.5 text-text-medium hover:text-text-dark text-xs sm:text-sm tracking-wide transition-colors group"
               >
-                Ver todo el catalogo
+                Ver todo el catálogo
+                <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
+                </svg>
               </router-link>
             </div>
           </div>
@@ -3143,6 +3136,8 @@ export default {
 /* ==========================================
    VIDEO HERO - CINEMÁTICO MÓVIL
    ========================================== */
+
+/* (guia rapida movil usa utilidades Tailwind, no requiere CSS custom) */
 
 /* Móvil: gradiente cinemático - limpio arriba, texto legible abajo */
 @media (max-width: 767px) {
