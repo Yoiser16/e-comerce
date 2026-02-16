@@ -255,12 +255,19 @@
                   <td class="col-product">
                     <div class="product-cell">
                       <div class="product-thumb">
-                        <img v-if="item.imagen" :src="item.imagen" :alt="item.nombre" />
+                        <img v-if="getItemMediaUrl(item)" :src="getItemMediaUrl(item)" :alt="item.nombre" />
                         <svg v-else fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
                         </svg>
                       </div>
-                      <span class="product-name">{{ item.nombre }}</span>
+                      <div class="product-info">
+                        <span class="product-name">{{ item.nombre }}</span>
+                        <span v-if="item.color || item.color_snapshot || item.largo || item.largo_snapshot" class="product-meta">
+                          <span v-if="item.color || item.color_snapshot">Color: {{ formatVariantLabel(item.color || item.color_snapshot) }}</span>
+                          <span v-if="(item.color || item.color_snapshot) && (item.largo || item.largo_snapshot)" class="meta-sep">•</span>
+                          <span v-if="item.largo || item.largo_snapshot">Largo: {{ formatLargoLabel(item.largo || item.largo_snapshot) }}</span>
+                        </span>
+                      </div>
                     </div>
                   </td>
                   <td class="col-qty">{{ item.cantidad }}</td>
@@ -926,6 +933,88 @@ const formatPaymentMethod = (method) => {
 // Formateo
 const formatNumber = (num) => {
   return new Intl.NumberFormat('es-CO').format(num || 0)
+}
+
+const videoPosters = ref({})
+
+const isVideo = (url) => {
+  if (!url) return false
+  const lower = String(url).toLowerCase()
+  return ['.mp4', '.webm', '.ogg', '.mov'].some(ext => lower.endsWith(ext))
+}
+
+const createVideoPoster = (url) => {
+  return new Promise((resolve) => {
+    try {
+      const video = document.createElement('video')
+      video.crossOrigin = 'anonymous'
+      video.preload = 'metadata'
+      video.src = url
+      video.muted = true
+      video.playsInline = true
+
+      const drawFrame = () => {
+        try {
+          const canvas = document.createElement('canvas')
+          canvas.width = video.videoWidth || 480
+          canvas.height = video.videoHeight || 270
+          const ctx = canvas.getContext('2d')
+          if (!ctx) return resolve(null)
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+          resolve(canvas.toDataURL('image/jpeg', 0.82))
+        } catch {
+          resolve(null)
+        }
+      }
+
+      const onLoadedMeta = () => {
+        const targetTime = Math.min(0.2, Math.max(0, (video.duration || 0) / 2))
+        if (targetTime > 0) {
+          video.currentTime = targetTime
+        } else {
+          drawFrame()
+        }
+      }
+
+      video.addEventListener('loadedmetadata', onLoadedMeta, { once: true })
+      video.addEventListener('seeked', drawFrame, { once: true })
+      video.addEventListener('error', () => resolve(null), { once: true })
+    } catch {
+      resolve(null)
+    }
+  })
+}
+
+const ensureVideoPoster = async (url) => {
+  if (!url || videoPosters.value[url]) return
+  const poster = await createVideoPoster(url)
+  if (poster) {
+    videoPosters.value = { ...videoPosters.value, [url]: poster }
+  }
+}
+
+const getItemMediaUrl = (item) => {
+  const url = item?.imagen || ''
+  if (!url) return ''
+  if (isVideo(url)) {
+    ensureVideoPoster(url)
+    return videoPosters.value[url] || ''
+  }
+  return url
+}
+
+const formatVariantLabel = (value) => {
+  if (!value) return ''
+  return String(value)
+    .replace(/_/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim()
+    .replace(/\b\w/g, (char) => char.toUpperCase())
+}
+
+const formatLargoLabel = (value) => {
+  if (!value) return ''
+  return String(value).trim()
 }
 
 const formatDate = (date) => {
@@ -1753,6 +1842,13 @@ defineExpose({ getUnseenCount })
   gap: 14px;
 }
 
+.product-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 0;
+}
+
 .product-thumb {
   width: 44px;
   height: 44px;
@@ -1779,6 +1875,19 @@ defineExpose({ getUnseenCount })
 
 .product-name {
   font-weight: 500;
+}
+
+.product-meta {
+  font-size: 12px;
+  color: #6b7280;
+  line-height: 1.2;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.meta-sep {
+  color: #cbd5f5;
 }
 
 .empty-row {

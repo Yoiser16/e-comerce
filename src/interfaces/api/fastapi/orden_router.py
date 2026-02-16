@@ -145,10 +145,11 @@ def _listar_ordenes_sync(estado: Optional[str], limite: int, include_items: bool
     # Si se incluyen items, hacer prefetch optimizado
     if include_items:
         queryset = queryset.prefetch_related(
-            Prefetch('lineas', queryset=LineaOrdenModel.objects.select_related('producto').only(
+            Prefetch('lineas', queryset=LineaOrdenModel.objects.select_related('producto').prefetch_related('producto__imagenes').only(
                 'id', 'orden_id', 'producto_id', 'cantidad', 
                 'precio_unitario_monto', 'subtotal_monto',
-                'producto__id', 'producto__nombre', 'producto__codigo'
+                'variante_sku', 'color_snapshot', 'largo_snapshot',
+                'producto__id', 'producto__nombre', 'producto__codigo', 'producto__imagen_principal'
             ))
         )
     
@@ -196,14 +197,27 @@ def _listar_ordenes_sync(estado: Optional[str], limite: int, include_items: bool
         if include_items:
             items = []
             for linea in orden.lineas.all():
+                imagen_url = ''
+                if linea.producto:
+                    imagen_url = getattr(linea.producto, 'imagen_principal', None) or ''
+                    if not imagen_url and hasattr(linea.producto, 'imagenes'):
+                        primera_img = linea.producto.imagenes.first()
+                        if primera_img:
+                            imagen_url = primera_img.url
+                if imagen_url and not imagen_url.startswith('http'):
+                    imagen_url = f"http://localhost:8000{imagen_url}"
                 items.append({
                     'id': str(linea.id),
                     'producto_id': str(linea.producto_id),
                     'sku': linea.producto.codigo if linea.producto else 'N/A',
+                    'variante_sku': linea.variante_sku or '',
+                    'color': linea.color_snapshot or '',
+                    'largo': linea.largo_snapshot or '',
                     'nombre': linea.producto.nombre if linea.producto else 'Producto',
                     'cantidad': linea.cantidad,
                     'precio_unitario': float(linea.precio_unitario_monto),
-                    'subtotal': float(linea.subtotal_monto)
+                    'subtotal': float(linea.subtotal_monto),
+                    'imagen': imagen_url
                 })
             orden_data['items'] = items
         
@@ -248,6 +262,10 @@ def _listar_ordenes_por_email_sync(email: str) -> List[dict]:
             items.append({
                 'id': str(linea.id),
                 'producto_id': str(producto.id) if producto else '',
+                'sku': getattr(producto, 'codigo', '') if producto else '',
+                'variante_sku': linea.variante_sku or '',
+                'color': linea.color_snapshot or '',
+                'largo': linea.largo_snapshot or '',
                 'nombre': getattr(producto, 'nombre', '') if producto else '',
                 'cantidad': linea.cantidad,
                 'precio': float(getattr(linea, 'precio_unitario_monto', 0) or 0),
@@ -629,18 +647,31 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
 
 def _obtener_orden_sync(orden_id: str) -> dict:
     """Obtiene detalle de una orden (sync)"""
-    orden = OrdenModel.objects.select_related('cliente').prefetch_related('lineas__producto').get(id=orden_id)
+    orden = OrdenModel.objects.select_related('cliente').prefetch_related('lineas__producto', 'lineas__producto__imagenes').get(id=orden_id)
     
     items = []
     for linea in orden.lineas.all():
+        imagen_url = ''
+        if linea.producto:
+            imagen_url = getattr(linea.producto, 'imagen_principal', None) or ''
+            if not imagen_url and hasattr(linea.producto, 'imagenes'):
+                primera_img = linea.producto.imagenes.first()
+                if primera_img:
+                    imagen_url = primera_img.url
+        if imagen_url and not imagen_url.startswith('http'):
+            imagen_url = f"http://localhost:8000{imagen_url}"
         items.append({
             'id': str(linea.id),
             'producto_id': str(linea.producto_id),
             'sku': linea.producto.codigo if linea.producto else 'N/A',
+            'variante_sku': linea.variante_sku or '',
+            'color': linea.color_snapshot or '',
+            'largo': linea.largo_snapshot or '',
             'nombre': linea.producto.nombre if linea.producto else 'Producto',
             'cantidad': linea.cantidad,
             'precio_unitario': float(linea.precio_unitario_monto),
-            'subtotal': float(linea.subtotal_monto)
+            'subtotal': float(linea.subtotal_monto),
+            'imagen': imagen_url
         })
     
     return {
