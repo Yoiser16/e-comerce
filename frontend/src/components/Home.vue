@@ -2678,19 +2678,22 @@ export default {
     const agregarAlCarrito = async (producto) => {
       try {
         const variantes = Array.isArray(producto?.variantes) ? producto.variantes : []
-        const varianteSeleccionada = variantes.find(v => v.activo !== false && (v.stock_actual ?? 0) > 0) || variantes[0]
-        if (!varianteSeleccionada) {
-          showToast('Este producto no tiene variantes disponibles', 'info')
+        const varianteSeleccionada = variantes.find(v => v.activo !== false && (v.stock_actual ?? 0) > 0) || variantes[0] || null
+        const requiereVariante = variantes.length > 0
+        if (requiereVariante && !varianteSeleccionada) {
+          showToast('Selecciona una combinación disponible', 'info')
           return
         }
 
         const precioProducto = Number(
-          varianteSeleccionada.precio_monto ?? producto.precio_monto ?? producto.precio_final ?? producto.precio ?? 0
+          varianteSeleccionada?.precio_monto ?? producto.precio_monto ?? producto.precio_final ?? producto.precio ?? 0
         )
+        const itemKey = requiereVariante ? (varianteSeleccionada?.id || producto.id) : producto.id
+        const varianteId = requiereVariante ? (varianteSeleccionada?.id || null) : null
         
         // Actualizar carrito local inmediatamente (para todos los usuarios)
         const currentItems = [...cartItems.value]
-        const existingIndex = currentItems.findIndex(i => (i.variante_id || i.producto_id) === varianteSeleccionada.id)
+        const existingIndex = currentItems.findIndex(i => (i.variante_id || i.producto_id) === itemKey)
         if (existingIndex >= 0) {
           currentItems[existingIndex].cantidad++
           currentItems[existingIndex].subtotal = currentItems[existingIndex].cantidad * currentItems[existingIndex].precio_unitario
@@ -2698,12 +2701,12 @@ export default {
           const imgUrl = producto.imagen_url || producto.imagen_principal || producto.imagen || producto.imagenes?.[0] || null
           currentItems.push({
             producto_id: producto.id,
-            variante_id: varianteSeleccionada.id,
-            variante_sku: varianteSeleccionada.sku || '',
-            color: varianteSeleccionada.color || '',
-            largo: varianteSeleccionada.largo || '',
+            variante_id: varianteId,
+            variante_sku: varianteSeleccionada?.sku || '',
+            color: varianteSeleccionada?.color || '',
+            largo: varianteSeleccionada?.largo || '',
             nombre: producto.nombre,
-            imagen_url: getImageUrl(varianteSeleccionada.imagen_url || imgUrl),
+            imagen_url: getImageUrl(varianteSeleccionada?.imagen_url || imgUrl),
             precio_unitario: precioProducto,
             cantidad: 1,
             subtotal: precioProducto
@@ -2725,7 +2728,7 @@ export default {
         // Si está logueado, también sincronizar con el backend
         if (isLoggedIn.value) {
           try {
-            await carritoService.agregarProducto(producto.id, varianteSeleccionada.id, 1)
+            await carritoService.agregarProducto(producto.id, varianteId, 1)
             // Sincronizar con backend en segundo plano
             cargarResumenCarrito().catch(e => console.warn('Error sync resumen:', e))
           } catch (backendErr) {
