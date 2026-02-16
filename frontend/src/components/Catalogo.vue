@@ -1833,7 +1833,7 @@ const loadCartFromLocal = () => {
       const normalized = Array.isArray(rawItems) ? rawItems : []
       carritoItems.value = normalized.map((item) => {
         const productoId = item?.producto_id ?? item?.id
-        const varianteId = item?.variante_id ?? productoId
+        const varianteId = item?.variante_id ?? null
         return {
           ...item,
           producto_id: productoId,
@@ -2180,31 +2180,34 @@ const addToCart = (producto) => {
   loadCartFromLocal()
 
   const varianteSeleccionada = getDefaultVariante(producto)
-  if (!varianteSeleccionada) {
-    showToastMessage('Este producto no tiene variantes disponibles')
+  const requiereVariante = Array.isArray(producto?.variantes) && producto.variantes.length > 0
+  if (requiereVariante && !varianteSeleccionada) {
+    showToastMessage('Selecciona una combinación disponible')
     return
   }
   const precioUnitario = Number(
-    varianteSeleccionada.precio_monto ?? producto.precio_monto ?? producto.precio ?? 0
+    varianteSeleccionada?.precio_monto ?? producto.precio_monto ?? producto.precio ?? 0
   )
+  const itemKey = requiereVariante ? (varianteSeleccionada?.id || producto.id) : producto.id
+  const varianteId = requiereVariante ? (varianteSeleccionada?.id || null) : null
   
-  const existingIdx = carritoItems.value.findIndex(item => (item.variante_id || item.producto_id || item.id) === varianteSeleccionada.id)
+  const existingIdx = carritoItems.value.findIndex(item => (item.variante_id || item.producto_id || item.id) === itemKey)
   
   if (existingIdx > -1) {
     carritoItems.value[existingIdx].cantidad += 1
   } else {
     carritoItems.value.push({
       producto_id: producto.id,
-      variante_id: varianteSeleccionada.id,
+      variante_id: varianteId,
       id: producto.id,
       nombre: producto.nombre,
-      variante_sku: varianteSeleccionada.sku || '',
-      color: varianteSeleccionada.color || '',
-      largo: varianteSeleccionada.largo || '',
+      variante_sku: varianteSeleccionada?.sku || '',
+      color: varianteSeleccionada?.color || '',
+      largo: varianteSeleccionada?.largo || '',
       precio_monto: precioUnitario,
       precio_unitario: precioUnitario,
       cantidad: 1,
-      imagen_url: varianteSeleccionada.imagen_url || producto.imagen_principal
+      imagen_url: varianteSeleccionada?.imagen_url || producto.imagen_principal
     })
   }
   
