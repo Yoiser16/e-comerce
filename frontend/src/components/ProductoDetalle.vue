@@ -1625,7 +1625,7 @@ const loadCartFromLocal = () => {
       const rawItems = data.items || []
       return rawItems.map((item) => {
         const productoId = item?.producto_id ?? item?.id
-        const varianteId = item?.variante_id ?? productoId
+        const varianteId = item?.variante_id ?? null
         return {
           ...item,
           producto_id: productoId,
@@ -1842,7 +1842,8 @@ const agregarAlCarrito = async () => {
     return
   }
 
-  if (!varianteSeleccionada.value) {
+  const requiereVariante = variantesDisponibles.value.length > 0
+  if (requiereVariante && !varianteSeleccionada.value) {
     mensajeError.value = 'Selecciona una combinación de color y largo'
     mensaje.value = ''
     return
@@ -1850,12 +1851,14 @@ const agregarAlCarrito = async () => {
 
   try {
     const precioUnitario = Number(
-      varianteSeleccionada.value.precio_monto ?? producto.value.precio_monto ?? producto.value.precio ?? 0
+      varianteSeleccionada.value?.precio_monto ?? producto.value.precio_monto ?? producto.value.precio ?? 0
     )
+    const itemKey = requiereVariante ? (varianteSeleccionada.value?.id || producto.value.id) : producto.value.id
+    const varianteId = requiereVariante ? (varianteSeleccionada.value?.id || null) : null
     
     // Usar SIEMPRE localStorage - el carrito es local
     const items = loadCartFromLocal()
-    const idx = items.findIndex((i) => (i.variante_id || i.producto_id) === varianteSeleccionada.value.id)
+    const idx = items.findIndex((i) => (i.variante_id || i.producto_id) === itemKey)
     const cantidadEnCarrito = idx >= 0 ? items[idx].cantidad : 0
     const cantidadTotal = cantidadEnCarrito + cantidad.value
     
@@ -1871,12 +1874,12 @@ const agregarAlCarrito = async () => {
     } else {
       items.push({
         producto_id: producto.value.id,
-        variante_id: varianteSeleccionada.value.id,
-        variante_sku: varianteSeleccionada.value.sku || '',
-        color: varianteSeleccionada.value.color || '',
-        largo: varianteSeleccionada.value.largo || '',
+        variante_id: varianteId,
+        variante_sku: varianteSeleccionada.value?.sku || '',
+        color: varianteSeleccionada.value?.color || '',
+        largo: varianteSeleccionada.value?.largo || '',
         nombre: producto.value.nombre,
-        imagen_url: getImageUrl(varianteSeleccionada.value.imagen_url || producto.value.imagen_principal),
+        imagen_url: getImageUrl(varianteSeleccionada.value?.imagen_url || producto.value.imagen_principal),
         precio_unitario: precioUnitario,
         cantidad: cantidad.value,
         subtotal: precioUnitario * cantidad.value,

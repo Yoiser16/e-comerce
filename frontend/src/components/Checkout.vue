@@ -1602,6 +1602,19 @@ export default {
         processing.value = true
         
         try {
+          if (!cartItems.value.length) {
+            alert('Tu carrito está vacío. Agrega productos antes de continuar.')
+            processing.value = false
+            return
+          }
+
+          const invalidItems = cartItems.value.filter(item => !item.variante_id && !item.producto_id && !item.id)
+          if (invalidItems.length > 0) {
+            alert('Hay productos sin identificador válido. Actualiza el carrito e intenta nuevamente.')
+            processing.value = false
+            return
+          }
+
           // 0. VALIDAR STOCK ANTES DE CREAR ORDEN
           console.log('🔍 Validando disponibilidad de stock...')
           const stockValidationUrl = `${API_BASE_URL}/api/v1/ordenes/validar-stock`
@@ -1779,6 +1792,8 @@ export default {
           
           // 4. Limpiar carrito y formulario
           localStorage.removeItem('kharis_cart_cache')
+          localStorage.removeItem('kharis_cart_count')
+          cartItems.value = []
           clearFormStorage()
           
           // 5. Limpiar sessionStorage después de un pequeño delay para asegurar que PedidoConfirmado puede leer los datos
@@ -1803,31 +1818,8 @@ export default {
             return
           }
           
-          // Otros errores: intentar abrir WhatsApp de todos modos para no perder la venta
-          console.warn('⚠️ API falló, abriendo WhatsApp de respaldo...')
-          const code = `K-${Math.floor(1000 + Math.random() * 9000)}`
-          sessionStorage.setItem('temp_order_code', code)
-          const msg = buildWhatsAppMessage()
-          const whatsappFinal = '4796657763'
-          sessionStorage.setItem('orden_whatsapp', JSON.stringify({
-            codigo: code,
-            total: getTotal(),
-            productos: cartItems.value,
-            cliente: {
-              nombre: form.value.nombre,
-              apellido: form.value.apellido,
-              telefono: form.value.telefono,
-              email: form.value.email,
-              departamento: form.value.departamento,
-              municipio: form.value.municipio,
-              direccion: form.value.direccion,
-              apartamento: form.value.apartamento,
-              barrio: form.value.barrio,
-              indicacionesRural: form.value.indicacionesRural
-            },
-            whatsappUrl: `https://wa.me/${whatsappFinal}?text=${msg}`
-          }))
-          window.location.href = '/pedido-confirmado'
+          alert('No se pudo registrar la orden. Verifica tu carrito y vuelve a intentarlo.')
+          return
         } finally {
           processing.value = false
         }
@@ -1909,7 +1901,7 @@ export default {
           const rawItems = data.items || []
           cartItems.value = rawItems.map((item) => {
             const productoId = item?.producto_id ?? item?.id
-            const varianteId = item?.variante_id ?? productoId
+            const varianteId = item?.variante_id ?? null
             return {
               ...item,
               producto_id: productoId,

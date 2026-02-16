@@ -1611,14 +1611,20 @@ export default {
       try {
         agregando.value = true
 
-        if (tieneVariantes.value && !varianteSeleccionada.value) {
+        const requiereVariante = tieneVariantes.value
+        if (requiereVariante && !varianteSeleccionada.value) {
           toast.error('Selecciona una variante disponible antes de continuar', 3000)
           return
         }
+
+        const itemKey = requiereVariante
+          ? (varianteSeleccionada.value?.id || producto.value.id)
+          : producto.value.id
+        const varianteId = requiereVariante ? (varianteSeleccionada.value?.id || null) : null
         
         // Agregar al carrito del storage
         const cart = JSON.parse(localStorage.getItem('b2b_cart') || '{"items":[]}')
-        const existingIndex = cart.items.findIndex(i => i.variante_id === varianteSeleccionada.value.id)
+        const existingIndex = cart.items.findIndex(i => (i.variante_id || i.id || i.producto_id) === itemKey)
         
         if (existingIndex >= 0) {
           cart.items[existingIndex].cantidad += cantidad.value
@@ -1627,12 +1633,12 @@ export default {
         } else {
           cart.items.push({
             id: producto.value.id,
-            variante_id: varianteSeleccionada.value.id,
-            variante_sku: varianteSeleccionada.value.sku || '',
-            color: varianteSeleccionada.value.color || '',
-            largo: varianteSeleccionada.value.largo || '',
+            variante_id: varianteId,
+            variante_sku: varianteSeleccionada.value?.sku || producto.value.sku || producto.value.codigo || '',
+            color: varianteSeleccionada.value?.color || '',
+            largo: varianteSeleccionada.value?.largo || '',
             nombre: producto.value.nombre,
-            imagen: varianteSeleccionada.value.imagen_url || producto.value.imagen_principal,
+            imagen: varianteSeleccionada.value?.imagen_url || producto.value.imagen_principal,
             precio: precioMayorista.value,
             cantidad_minima_mayorista: loteMinimo.value,
             descuentos_volumen: descuentosVolumen.value,
