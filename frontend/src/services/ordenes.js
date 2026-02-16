@@ -35,6 +35,22 @@ export const ordenesService = {
   },
 
   /**
+   * Actualizar estado de pago de una orden
+   */
+  async actualizarEstadoPago(ordenId, estadoPago) {
+    const response = await apiClient.patch(`/ordenes/${ordenId}`, { estado_pago: estadoPago })
+    return response.data
+  },
+
+  /**
+   * Actualizar estado de envío de una orden
+   */
+  async actualizarEstadoEnvio(ordenId, estadoEnvio) {
+    const response = await apiClient.patch(`/ordenes/${ordenId}`, { estado_envio: estadoEnvio })
+    return response.data
+  },
+
+  /**
    * Obtener detalles de una orden
    * NOTA: Si ya tienes los datos del listado con include_items=true,
    * no necesitas llamar este endpoint

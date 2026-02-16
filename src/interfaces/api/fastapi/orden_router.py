@@ -67,6 +67,8 @@ class OrdenResponse(BaseModel):
     id: str
     codigo: str
     estado: str
+    estado_pago: str
+    estado_envio: str
     cliente_nombre: str
     cliente_email: str
     cliente_telefono: str
@@ -92,6 +94,8 @@ class OrdenListItem(BaseModel):
     id: str
     codigo: str
     estado: str
+    estado_pago: str
+    estado_envio: str
     cliente_nombre: str
     cliente_email: str
     cliente_telefono: str
@@ -113,7 +117,9 @@ class OrdenListItem(BaseModel):
 
 
 class CambiarEstadoInput(BaseModel):
-    estado: str
+    estado: Optional[str] = None
+    estado_pago: Optional[str] = None
+    estado_envio: Optional[str] = None
 
 
 class ValidarStockInput(BaseModel):
@@ -131,6 +137,33 @@ class ValidarStockResponse(BaseModel):
 # ═══════════════════════════════════════════════════════════════════════════
 # Funciones SYNC que seran envueltas en async
 # ═══════════════════════════════════════════════════════════════════════════
+
+def _legacy_estado_from_states(estado_pago: str, estado_envio: str) -> str:
+    pago = (estado_pago or 'pendiente').lower()
+    envio = (estado_envio or 'no_enviado').lower()
+
+    if pago == 'cancelado':
+        return 'cancelada'
+    if envio == 'entregado':
+        return 'completada'
+    if envio == 'enviado':
+        return 'enviada'
+    if pago == 'pagado':
+        return 'confirmada'
+    return 'pendiente'
+
+
+def _states_from_legacy_estado(estado: str) -> tuple[str, str]:
+    raw = (estado or 'pendiente').lower()
+    if raw in {'cancelada', 'cancelado'}:
+        return ('cancelado', 'no_enviado')
+    if raw in {'completada', 'entregada', 'entregado'}:
+        return ('pagado', 'entregado')
+    if raw in {'enviada', 'enviado'}:
+        return ('pagado', 'enviado')
+    if raw in {'confirmada', 'pagada', 'pagado'}:
+        return ('pagado', 'no_enviado')
+    return ('pendiente', 'no_enviado')
 
 def _listar_ordenes_sync(estado: Optional[str], limite: int, include_items: bool = False) -> List[dict]:
     """Lista órdenes (sync) - Optimizado con annotate y prefetch_related"""
@@ -158,7 +191,7 @@ def _listar_ordenes_sync(estado: Optional[str], limite: int, include_items: bool
     
     # Usar only() para traer solo los campos necesarios
     queryset = queryset.only(
-        'id', 'codigo', 'estado', 'metodo_pago', 'fecha_creacion',
+        'id', 'codigo', 'estado', 'estado_pago', 'estado_envio', 'metodo_pago', 'fecha_creacion',
         'total_monto', 'subtotal_monto', 'envio_monto',
         'direccion_envio', 'departamento', 'municipio', 'barrio', 'notas_envio',
         'cliente__id', 'cliente__nombre', 'cliente__apellido', 
@@ -170,10 +203,15 @@ def _listar_ordenes_sync(estado: Optional[str], limite: int, include_items: bool
     
     resultado = []
     for orden in ordenes:
+        pago_fallback, envio_fallback = _states_from_legacy_estado(orden.estado)
+        estado_pago = getattr(orden, 'estado_pago', None) or pago_fallback
+        estado_envio = getattr(orden, 'estado_envio', None) or envio_fallback
         orden_data = {
             'id': str(orden.id),
             'codigo': orden.codigo or f"ORD-{str(orden.id)[:8]}",
             'estado': orden.estado.upper(),
+            'estado_pago': estado_pago.upper(),
+            'estado_envio': estado_envio.upper(),
             'cliente_nombre': f"{orden.cliente.nombre} {orden.cliente.apellido}".strip() if orden.cliente else "Sin cliente",
             'cliente_email': orden.cliente.email if orden.cliente else "",
             'cliente_telefono': orden.cliente.telefono if orden.cliente else "",
@@ -246,6 +284,9 @@ def _listar_ordenes_por_email_sync(email: str) -> List[dict]:
     
     resultado = []
     for orden in ordenes:
+        pago_fallback, envio_fallback = _states_from_legacy_estado(orden.estado)
+        estado_pago = getattr(orden, 'estado_pago', None) or pago_fallback
+        estado_envio = getattr(orden, 'estado_envio', None) or envio_fallback
         # Obtener items de la orden
         items = []
         for linea in orden.lineas.all():
@@ -277,6 +318,8 @@ def _listar_ordenes_por_email_sync(email: str) -> List[dict]:
             'id': str(orden.id),
             'numero': orden.codigo or f"ORD-{str(orden.id)[:8]}",
             'estado': orden.estado,
+            'estado_pago': estado_pago,
+            'estado_envio': estado_envio,
             'fecha': orden.fecha_creacion,
             'total': float(orden.total_monto),
             'subtotal': float(orden.subtotal_monto),
@@ -466,8 +509,10 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
                 break
     
         # 3. Crear la orden
-        # Si el pago fue por Wompi, la orden ya está pagada → confirmada
-        estado_inicial = 'confirmada' if data.metodo_pago == 'wompi' else 'pendiente'
+        # Si el pago fue por Wompi, la orden ya está pagada
+        estado_pago = 'pagado' if data.metodo_pago == 'wompi' else 'pendiente'
+        estado_envio = 'no_enviado'
+        estado_inicial = _legacy_estado_from_states(estado_pago, estado_envio)
     
         orden = OrdenModel.objects.create(
             id=uuid4(),
@@ -479,6 +524,8 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
             barrio=data.barrio or '',
             notas_envio=data.notas or '',
             estado=estado_inicial,
+            estado_pago=estado_pago,
+            estado_envio=estado_envio,
             metodo_pago=data.metodo_pago,
             subtotal_monto=Decimal(str(data.subtotal)),
             envio_monto=Decimal(str(data.envio)),
@@ -626,6 +673,8 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
         'id': str(orden.id),
         'codigo': orden.codigo,
         'estado': orden.estado,
+        'estado_pago': estado_pago,
+        'estado_envio': estado_envio,
         'cliente_nombre': f"{cliente.nombre} {cliente.apellido}",
         'cliente_email': cliente.email,
         'cliente_telefono': cliente.telefono or '',
@@ -678,6 +727,8 @@ def _obtener_orden_sync(orden_id: str) -> dict:
         'id': str(orden.id),
         'codigo': orden.codigo,
         'estado': orden.estado.upper(),
+        'estado_pago': (orden.estado_pago or _states_from_legacy_estado(orden.estado)[0]).upper(),
+        'estado_envio': (orden.estado_envio or _states_from_legacy_estado(orden.estado)[1]).upper(),
         'cliente_nombre': f"{orden.cliente.nombre} {orden.cliente.apellido}".strip() if orden.cliente else "Sin cliente",
         'cliente_email': orden.cliente.email if orden.cliente else "",
         'cliente_telefono': orden.cliente.telefono if orden.cliente else "",
@@ -697,88 +748,144 @@ def _obtener_orden_sync(orden_id: str) -> dict:
     }
 
 
-def _actualizar_estado_sync(orden_id: str, estado: str) -> dict:
-    """Actualiza estado de una orden (sync) y devuelve stock si se CANCELA"""
+def _enviar_email_estado(orden: OrdenModel, estado_nuevo: str) -> None:
+    try:
+        if not orden.cliente:
+            return
+
+        lineas_orden = LineaOrdenModel.objects.filter(orden=orden).select_related('producto').prefetch_related('producto__imagenes')
+        productos_email = []
+        for linea in lineas_orden:
+            producto_data = {
+                'nombre': linea.producto.nombre if linea.producto else 'Producto',
+                'cantidad': linea.cantidad,
+                'imagen': ''
+            }
+            if linea.producto:
+                primera_imagen_obj = linea.producto.imagenes.filter(es_principal=True).first()
+                if not primera_imagen_obj:
+                    primera_imagen_obj = linea.producto.imagenes.order_by('orden').first()
+
+                if primera_imagen_obj:
+                    url_imagen = primera_imagen_obj.url
+                    producto_data['imagen'] = url_imagen if url_imagen.startswith('http') else f"http://localhost:8000{url_imagen}"
+
+            productos_email.append(producto_data)
+
+        direccion_completa = ", ".join(filter(None, [orden.direccion_envio, orden.municipio, orden.departamento]))
+
+        print(f"📧 Enviando email de cambio de estado a {orden.cliente.email} - Estado: {estado_nuevo}")
+        send_order_status_email(
+            email=orden.cliente.email,
+            nombre=f"{orden.cliente.nombre} {orden.cliente.apellido}".strip(),
+            codigo=orden.codigo,
+            estado=estado_nuevo,
+            total=float(orden.total_monto),
+            direccion=direccion_completa,
+            productos=productos_email,
+            thread_id=orden.email_thread_id or None,
+        )
+        print("✅ Email enviado exitosamente")
+    except Exception as e:
+        print(f"❌ Error enviando email de cambio de estado: {e}")
+        import traceback
+        traceback.print_exc()
+
+
+def _devolver_stock_si_cancelada(orden: OrdenModel) -> None:
+    print(f'↩️ Cancelando orden {orden.codigo} - Devolviendo stock...')
+    lineas = LineaOrdenModel.objects.filter(orden=orden).select_related('producto')
+    for linea in lineas:
+        if linea.producto:
+            producto = ProductoModel.objects.select_for_update().get(id=linea.producto_id)
+            stock_anterior = producto.stock_actual
+            producto.stock_actual += linea.cantidad
+            producto.save()
+            print(
+                f'✅ Stock devuelto: {producto.nombre} - {linea.cantidad} unidades. '
+                f'Stock anterior: {stock_anterior}, Stock nuevo: {producto.stock_actual}'
+            )
+
+
+def _actualizar_estado_pago_sync(orden_id: str, estado_pago: str) -> dict:
     from django.db import transaction
-    
-    estados_validos = ['pendiente', 'confirmada', 'en_proceso', 'enviada', 'completada', 'cancelada']
-    estado_nuevo = estado.lower()
-    
+
+    estados_validos = ['pendiente', 'pagado', 'cancelado']
+    estado_nuevo = (estado_pago or '').lower()
     if estado_nuevo not in estados_validos:
-        raise ValueError(f"Estado inválido. Estados válidos: {estados_validos}")
-    
+        raise ValueError(f"Estado de pago inválido. Estados válidos: {estados_validos}")
+
     with transaction.atomic():
         orden = OrdenModel.objects.select_for_update().get(id=orden_id)
-        estado_anterior = orden.estado
-        
-        # Si cambia a CANCELADA → Devolver stock
-        if estado_nuevo == 'cancelada' and estado_anterior != 'cancelada':
-            print(f'↩️ Cancelando orden {orden.codigo} - Devolviendo stock...')
-            
-            # Obtener líneas de la orden
-            lineas = LineaOrdenModel.objects.filter(orden=orden).select_related('producto')
-            
-            for linea in lineas:
-                if linea.producto:
-                    # Bloqueo pesimista del producto
-                    producto = ProductoModel.objects.select_for_update().get(id=linea.producto_id)
-                    
-                    # Devolver stock
-                    stock_anterior = producto.stock_actual
-                    producto.stock_actual += linea.cantidad
-                    producto.save()
-                    
-                    print(f'✅ Stock devuelto: {producto.nombre} - {linea.cantidad} unidades. '
-                          f'Stock anterior: {stock_anterior}, Stock nuevo: {producto.stock_actual}')
-        
-        # Actualizar estado
+
+        if estado_nuevo == 'pagado':
+            if not orden.lineas.exists():
+                raise ValueError("No se puede confirmar una orden sin productos")
+
+        if estado_nuevo == 'cancelado' and orden.estado_pago != 'cancelado':
+            _devolver_stock_si_cancelada(orden)
+            orden.estado_envio = 'no_enviado'
+        if estado_nuevo in {'pendiente', 'cancelado'}:
+            orden.estado_envio = 'no_enviado'
+
+        orden.estado_pago = estado_nuevo
+        orden.estado = _legacy_estado_from_states(orden.estado_pago, orden.estado_envio)
+        orden.save()
+
+        _enviar_email_estado(orden, orden.estado)
+
+    return {"mensaje": "Estado de pago actualizado", "estado_pago": estado_nuevo.upper()}
+
+
+def _actualizar_estado_envio_sync(orden_id: str, estado_envio: str) -> dict:
+    from django.db import transaction
+
+    estados_validos = ['no_enviado', 'enviado', 'entregado']
+    estado_nuevo = (estado_envio or '').lower()
+    if estado_nuevo not in estados_validos:
+        raise ValueError(f"Estado de envío inválido. Estados válidos: {estados_validos}")
+
+    with transaction.atomic():
+        orden = OrdenModel.objects.select_for_update().get(id=orden_id)
+        if orden.estado_pago != 'pagado':
+            raise ValueError("No se puede actualizar envío si el pago no está confirmado")
+
+        orden.estado_envio = estado_nuevo
+        orden.estado = _legacy_estado_from_states(orden.estado_pago, orden.estado_envio)
+        orden.save()
+
+        _enviar_email_estado(orden, orden.estado)
+
+    return {"mensaje": "Estado de envío actualizado", "estado_envio": estado_nuevo.upper()}
+
+
+def _actualizar_estado_legacy_sync(orden_id: str, estado: str) -> dict:
+    from django.db import transaction
+
+    estados_validos = ['pendiente', 'confirmada', 'en_proceso', 'enviada', 'completada', 'cancelada']
+    estado_nuevo = (estado or '').lower()
+    if estado_nuevo not in estados_validos:
+        raise ValueError(f"Estado inválido. Estados válidos: {estados_validos}")
+
+    estado_pago, estado_envio = _states_from_legacy_estado(estado_nuevo)
+
+    with transaction.atomic():
+        orden = OrdenModel.objects.select_for_update().get(id=orden_id)
+
+        if estado_pago == 'pagado':
+            if not orden.lineas.exists():
+                raise ValueError("No se puede confirmar una orden sin productos")
+
+        if estado_pago == 'cancelado' and orden.estado_pago != 'cancelado':
+            _devolver_stock_si_cancelada(orden)
+
+        orden.estado_pago = estado_pago
+        orden.estado_envio = estado_envio
         orden.estado = estado_nuevo
         orden.save()
 
+        _enviar_email_estado(orden, orden.estado)
 
-        try:
-            if orden.cliente:
-                # Obtener productos con imágenes
-                lineas_orden = LineaOrdenModel.objects.filter(orden=orden).select_related('producto').prefetch_related('producto__imagenes')
-                productos_email = []
-                for linea in lineas_orden:
-                    producto_data = {
-                        'nombre': linea.producto.nombre if linea.producto else 'Producto',
-                        'cantidad': linea.cantidad,
-                        'imagen': ''
-                    }
-                    if linea.producto:
-                        # Buscar imagen principal o la primera disponible
-                        primera_imagen_obj = linea.producto.imagenes.filter(es_principal=True).first()
-                        if not primera_imagen_obj:
-                            primera_imagen_obj = linea.producto.imagenes.order_by('orden').first()
-                        
-                        if primera_imagen_obj:
-                            url_imagen = primera_imagen_obj.url
-                            producto_data['imagen'] = url_imagen if url_imagen.startswith('http') else f"http://localhost:8000{url_imagen}"
-                    
-                    productos_email.append(producto_data)
-                
-                direccion_completa = ", ".join(filter(None, [orden.direccion_envio, orden.municipio, orden.departamento]))
-                
-                print(f"📧 Enviando email de cambio de estado a {orden.cliente.email} - Estado: {estado_nuevo}")
-                send_order_status_email(
-                    email=orden.cliente.email,
-                    nombre=f"{orden.cliente.nombre} {orden.cliente.apellido}".strip(),
-                    codigo=orden.codigo,
-                    estado=estado_nuevo,
-                    total=float(orden.total_monto),
-                    direccion=direccion_completa,
-                    productos=productos_email,
-                    thread_id=orden.email_thread_id or None,  # Threading: encadenar como respuesta
-                )
-                print(f"✅ Email enviado exitosamente")
-        except Exception as e:
-            # No bloquear el cambio de estado por fallas de email
-            print(f"❌ Error enviando email de cambio de estado: {e}")
-            import traceback
-            traceback.print_exc()
-    
     return {"mensaje": "Estado actualizado", "estado": estado_nuevo.upper()}
 
 
@@ -999,7 +1106,7 @@ async def confirmar_orden(orden_id: str):
     El stock ya fue descontado cuando la orden se creó en estado PENDIENTE.
     """
     try:
-        resultado = await sync_to_async(_actualizar_estado_sync)(orden_id, 'confirmada')
+        resultado = await sync_to_async(_actualizar_estado_pago_sync)(orden_id, 'pagado')
         return resultado
     except OrdenModel.DoesNotExist:
         raise HTTPException(status_code=404, detail="Orden no encontrada")
@@ -1016,7 +1123,17 @@ async def confirmar_orden(orden_id: str):
 async def actualizar_estado(orden_id: str, data: CambiarEstadoInput):
     """Actualiza el estado de una orden"""
     try:
-        resultado = await sync_to_async(_actualizar_estado_sync)(orden_id, data.estado)
+        if data.estado_pago and data.estado_envio:
+            raise ValueError("Envía solo un cambio de estado a la vez")
+
+        if data.estado_pago:
+            resultado = await sync_to_async(_actualizar_estado_pago_sync)(orden_id, data.estado_pago)
+        elif data.estado_envio:
+            resultado = await sync_to_async(_actualizar_estado_envio_sync)(orden_id, data.estado_envio)
+        elif data.estado:
+            resultado = await sync_to_async(_actualizar_estado_legacy_sync)(orden_id, data.estado)
+        else:
+            raise ValueError("Debe enviar estado_pago o estado_envio")
         return resultado
     except OrdenModel.DoesNotExist:
         raise HTTPException(status_code=404, detail="Orden no encontrada")

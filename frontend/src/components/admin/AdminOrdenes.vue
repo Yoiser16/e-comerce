@@ -524,28 +524,42 @@ const filteredOrdenes = computed(() => {
 })
 
 // Mapear estados
-const mapEstadoPago = (estado) => {
-  const e = estado?.toString().toUpperCase() || 'PENDIENTE'
+const mapEstadoPago = (estadoPago, estadoLegacy) => {
+  const raw = (estadoPago || '').toString().toUpperCase()
+  if (['PENDIENTE', 'PAGADO', 'CANCELADO'].includes(raw)) return raw
+
+  const legacy = (estadoLegacy || '').toString().toUpperCase()
   const map = {
     'PENDIENTE': 'PENDIENTE',
     'CONFIRMADA': 'PAGADO',
     'PAGADA': 'PAGADO',
     'PAGADO': 'PAGADO',
+    'EN_PROCESO': 'PAGADO',
+    'ENVIADA': 'PAGADO',
+    'ENVIADO': 'PAGADO',
+    'ENTREGADA': 'PAGADO',
+    'ENTREGADO': 'PAGADO',
+    'COMPLETADA': 'PAGADO',
     'CANCELADA': 'CANCELADO',
     'CANCELADO': 'CANCELADO'
   }
-  return map[e] || 'PENDIENTE'
+  return map[legacy] || 'PENDIENTE'
 }
 
-const mapEstadoEnvio = (estado) => {
-  const e = estado?.toString().toUpperCase() || 'NO_ENVIADO'
+const mapEstadoEnvio = (estadoEnvio, estadoLegacy) => {
+  const raw = (estadoEnvio || '').toString().toUpperCase()
+  if (['NO_ENVIADO', 'ENVIADO', 'ENTREGADO'].includes(raw)) return raw
+
+  const legacy = (estadoLegacy || '').toString().toUpperCase()
   const map = {
+    'PENDIENTE': 'NO_ENVIADO',
+    'CONFIRMADA': 'NO_ENVIADO',
     'ENVIADA': 'ENVIADO',
     'ENVIADO': 'ENVIADO',
     'ENTREGADA': 'ENTREGADO',
     'ENTREGADO': 'ENTREGADO'
   }
-  return map[e] || 'NO_ENVIADO'
+  return map[legacy] || 'NO_ENVIADO'
 }
 
 // Cargar órdenes - Versión optimizada con items incluidos
@@ -572,8 +586,8 @@ const cargarOrdenes = async (silent = false) => {
       municipio: orden.municipio || '',
       barrio: orden.barrio || '',
       notas_envio: orden.notas_envio || '',
-      estado_pago: mapEstadoPago(orden.estado),
-      estado_envio: mapEstadoEnvio(orden.estado),
+      estado_pago: mapEstadoPago(orden.estado_pago, orden.estado),
+      estado_envio: mapEstadoEnvio(orden.estado_envio, orden.estado),
       metodo_pago: orden.metodo_pago || 'whatsapp',
       fecha_creacion: orden.fecha_creacion,
       // Guardar items pre-cargados
@@ -667,7 +681,9 @@ const selectOrder = async (orden) => {
     orderDetail.value = {
       id: orden.id,
       codigo: orden.codigo,
-      estado: orden.estado_pago,
+      estado: orden.estado,
+      estado_pago: orden.estado_pago,
+      estado_envio: orden.estado_envio,
       cliente_nombre: orden.cliente_nombre,
       cliente_email: orden.cliente_email,
       cliente_telefono: orden.cliente_telefono,
@@ -755,8 +771,8 @@ const updateEstadoPago = async () => {
       console.log('✅ Orden confirmada - Stock descontado')
     } else {
       // Para otros estados (PENDIENTE, CANCELADO), solo actualizar estado
-      const estadoMap = { 'PENDIENTE': 'pendiente', 'CANCELADO': 'cancelada' }
-      await ordenesService.actualizarEstado(selectedOrder.value.id, estadoMap[nuevoEstado])
+      const estadoMap = { 'PENDIENTE': 'pendiente', 'CANCELADO': 'cancelado' }
+      await ordenesService.actualizarEstadoPago(selectedOrder.value.id, estadoMap[nuevoEstado])
     }
     
     // Si no está pagado, resetear estado de envío
@@ -842,8 +858,8 @@ const updateEstadoEnvio = async () => {
   loadingEstadoChange.value = true
   
   try {
-    const estadoMap = { 'NO_ENVIADO': 'confirmada', 'ENVIADO': 'enviada', 'ENTREGADO': 'entregada' }
-    await ordenesService.actualizarEstado(selectedOrder.value.id, estadoMap[selectedOrder.value.estado_envio])
+    const estadoMap = { 'NO_ENVIADO': 'no_enviado', 'ENVIADO': 'enviado', 'ENTREGADO': 'entregado' }
+    await ordenesService.actualizarEstadoEnvio(selectedOrder.value.id, estadoMap[selectedOrder.value.estado_envio])
     
     selectedOrder.value._estadoEnvioOriginal = nuevoEstado
     

@@ -447,6 +447,20 @@ class OrdenModel(models.Model):
         ('completada', 'Completada'),
         ('cancelada', 'Cancelada'),
     ]
+
+    # Estados de pago
+    ESTADO_PAGO_CHOICES = [
+        ('pendiente', 'Pendiente'),
+        ('pagado', 'Pagado'),
+        ('cancelado', 'Cancelado'),
+    ]
+
+    # Estados de envío
+    ESTADO_ENVIO_CHOICES = [
+        ('no_enviado', 'No Enviado'),
+        ('enviado', 'Enviado'),
+        ('entregado', 'Entregado'),
+    ]
     
     # Métodos de pago
     METODO_PAGO_CHOICES = [
@@ -479,6 +493,8 @@ class OrdenModel(models.Model):
     
     # Estado y método de pago
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')
+    estado_pago = models.CharField(max_length=20, choices=ESTADO_PAGO_CHOICES, default='pendiente', db_index=True)
+    estado_envio = models.CharField(max_length=20, choices=ESTADO_ENVIO_CHOICES, default='no_enviado', db_index=True)
     metodo_pago = models.CharField(max_length=20, choices=METODO_PAGO_CHOICES, default='whatsapp')
     
     # Totales
@@ -503,6 +519,8 @@ class OrdenModel(models.Model):
         indexes = [
             models.Index(fields=['cliente']),
             models.Index(fields=['estado']),
+            models.Index(fields=['estado_pago']),
+            models.Index(fields=['estado_envio']),
             models.Index(fields=['fecha_creacion']),
             models.Index(fields=['codigo']),
             # Índices compuestos para consultas frecuentes del admin
