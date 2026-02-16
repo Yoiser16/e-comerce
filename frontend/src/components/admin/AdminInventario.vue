@@ -112,7 +112,7 @@
             <td class="col-producto">
               <div class="producto-cell">
                 <div class="producto-thumb">
-                  <img v-if="item.imagen" :src="getImageUrl(item.imagen)" :alt="item.nombre" />
+                  <img v-if="item.imagen" :src="getMediaThumb(item.imagen)" :alt="item.nombre" />
                   <svg v-else fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                   </svg>
@@ -238,7 +238,7 @@
               <td class="col-producto">
                 <div class="producto-mini">
                   <div class="producto-mini-thumb">
-                    <img v-if="mov.producto_imagen" :src="getImageUrl(mov.producto_imagen)" :alt="mov.producto_nombre" />
+                    <img v-if="mov.producto_imagen" :src="getMediaThumb(mov.producto_imagen)" :alt="mov.producto_nombre" />
                     <svg v-else fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4" />
                     </svg>
@@ -333,6 +333,7 @@ export default {
 
     // Movimientos reales desde el backend
     const movimientos = ref([])
+    const videoPosters = ref({})
 
     const cargarMovimientos = async () => {
       try {
@@ -459,6 +460,70 @@ export default {
 
     const formatNumber = (num) => {
       return new Intl.NumberFormat('es-CO').format(num || 0)
+    }
+
+    const isVideo = (url) => {
+      if (!url) return false
+      const cleanUrl = url.split('?')[0].toLowerCase()
+      return ['.mp4', '.webm', '.ogg', '.mov'].some(ext => cleanUrl.endsWith(ext))
+    }
+
+    const createVideoPoster = (url) => {
+      return new Promise((resolve) => {
+        try {
+          const video = document.createElement('video')
+          video.src = url
+          video.muted = true
+          video.playsInline = true
+          video.crossOrigin = 'anonymous'
+
+          const onError = () => resolve(null)
+
+          video.addEventListener('error', onError, { once: true })
+          video.addEventListener('loadeddata', () => {
+            const seekTo = Math.min(1, video.duration || 1)
+            try {
+              video.currentTime = seekTo
+            } catch {
+              resolve(null)
+            }
+          }, { once: true })
+
+          video.addEventListener('seeked', () => {
+            try {
+              const canvas = document.createElement('canvas')
+              canvas.width = video.videoWidth || 120
+              canvas.height = video.videoHeight || 120
+              const ctx = canvas.getContext('2d')
+              if (!ctx) return resolve(null)
+              ctx.drawImage(video, 0, 0, canvas.width, canvas.height)
+              resolve(canvas.toDataURL('image/jpeg', 0.82))
+            } catch {
+              resolve(null)
+            }
+          }, { once: true })
+        } catch {
+          resolve(null)
+        }
+      })
+    }
+
+    const ensureVideoPoster = async (url) => {
+      if (videoPosters.value[url]) return
+      const poster = await createVideoPoster(url)
+      if (poster) {
+        videoPosters.value = { ...videoPosters.value, [url]: poster }
+      }
+    }
+
+    const getMediaThumb = (rawUrl) => {
+      const url = getImageUrl(rawUrl)
+      if (!url) return ''
+      if (isVideo(url)) {
+        ensureVideoPoster(url)
+        return videoPosters.value[url] || '/placeholder.png'
+      }
+      return url
     }
 
     // ===== Funciones para Tab de Movimientos =====
@@ -599,7 +664,8 @@ export default {
       getTipoBadgeClass,
       getCantidadClass,
       formatCantidad,
-      getInitials
+      getInitials,
+      getMediaThumb
     }
   }
 }
