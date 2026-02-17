@@ -91,14 +91,7 @@ def _build_body(
         for p in productos:
             nombre = p.get('nombre', 'Producto')
             cantidad = p.get('cantidad', 1)
-            # Asumimos que el precio no viene en el dict de productos por defecto en la lógica anterior,
-            # pero si estuviera, lo usamos. Si no, dejamos un placeholder o lo calculamos si es posible.
-            # Ajuste: La lógica original no pasaba precio unitario en 'productos', solo nombre y cantidad.
-            # Sin modificar lógica (backend), no tengo el precio unitario aquí. 
-            # Usaré "$-" para indicar que no tengo el dato, o lo omitiré si no es crítico, 
-            # pero el diseño lo pide. Asumiré que en el futuro se pasará o pondré un placeholder visual.
-            # Para cumplir "no toques lógica", mostraré solo lo que hay disponible visualmente.
-            precio_unit = p.get('precio_unitario', 0) 
+            precio_unit = p.get('precio_unitario', 0)
             precio_fmt = f"${precio_unit:,.0f}" if precio_unit else "$-"
             
             filas_productos += f"""
@@ -146,18 +139,12 @@ def _build_body(
             .total-label {{ font-size: 14px; color: #666; margin-bottom: 5px; }}
             .total-amount {{ font-size: 28px; font-weight: 800; color: #111; letter-spacing: -0.5px; }}
             .footer {{ text-align: center; margin-top: 40px; color: #9CA3AF; font-size: 13px; }}
-            .footer-links {{ display: flex; justify-content: center; gap: 20px; margin-top: 10px; }}
-            .footer-link {{ display: flex; align-items: center; gap: 6px; color: #6B7280; text-decoration: none; }}
+            .footer-link {{ display: inline-block; margin-top: 6px; color: #6B7280; text-decoration: none; }}
+            .ig-button {{ display: inline-block; margin-top: 12px; background: #111; color: #fff; padding: 10px 16px; border-radius: 999px; text-decoration: none; font-size: 13px; }}
         </style>
     </head>
     <body style="background-color: #F3F4F6;">
         <div class="container">
-            <!-- Header Logo (Simulado para ejemplo, idealmente usar URL real) -->
-            <div class="header">
-                 <!-- Placeholder de Logo Floral -->
-                 <img src="https://i.ibb.co/wzr84d1c/kharis-logo-placeholder.png" alt="Kharis Distribuidora" style="width: 150px; height: auto;" />
-            </div>
-
             <div class="order-title">
                 {_get_email_title(estado, codigo)}
             </div>
@@ -190,10 +177,9 @@ def _build_body(
             </div>
 
             <div class="footer">
-                <div class="footer-links" style="text-align: center;">
-                    <span style="margin: 0 10px;">📸 @KharisDistribuidora</span>
-                    <span style="margin: 0 10px;">📍 Bello, Antioquia</span>
-                </div>
+                <a class="ig-button" href="https://www.instagram.com/kharisdistribuidora/" target="_blank" rel="noopener noreferrer">
+                    Ver Instagram
+                </a>
             </div>
         </div>
     </body>
