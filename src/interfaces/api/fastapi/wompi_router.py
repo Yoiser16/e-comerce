@@ -277,6 +277,7 @@ async def process_approved_transaction(transaction: dict):
                                 producto_data = {
                                     'nombre': linea.producto.nombre if linea.producto else 'Producto',
                                     'cantidad': linea.cantidad,
+                                    'precio_unitario': float(linea.precio_unitario_monto),
                                     'imagen': ''
                                 }
                                 if linea.producto:

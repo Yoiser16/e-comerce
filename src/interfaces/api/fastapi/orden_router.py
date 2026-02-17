@@ -621,7 +621,12 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
     # Preparar datos de productos para el email (con imágenes)
     productos_email = []
     for item in data.items:
-        producto_data = {'nombre': item.nombre or 'Producto', 'cantidad': item.cantidad, 'imagen': ''}
+        producto_data = {
+            'nombre': item.nombre or 'Producto',
+            'cantidad': item.cantidad,
+            'precio_unitario': float(item.precio_unitario),
+            'imagen': ''
+        }
         if item.producto_id and item.producto_id != '00000000-0000-0000-0000-000000000000':
             try:
                 producto_obj = ProductoModel.objects.get(id=item.producto_id)
@@ -771,6 +776,7 @@ def _enviar_email_estado(orden: OrdenModel, estado_nuevo: str) -> None:
             producto_data = {
                 'nombre': linea.producto.nombre if linea.producto else 'Producto',
                 'cantidad': linea.cantidad,
+                'precio_unitario': float(linea.precio_unitario_monto),
                 'imagen': ''
             }
             if linea.producto:
