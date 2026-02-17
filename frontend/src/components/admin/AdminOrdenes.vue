@@ -267,44 +267,46 @@
               <span class="invoice-title">Productos</span>
               <span class="invoice-count">{{ orderDetail?.items?.length || 0 }} items</span>
             </div>
-            <table class="invoice-table">
-              <thead>
-                <tr>
-                  <th class="col-product">Producto</th>
-                  <th class="col-qty">Cant.</th>
-                  <th class="col-price">Precio</th>
-                  <th class="col-subtotal">Subtotal</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="(item, idx) in orderDetail?.items" :key="idx" class="invoice-row">
-                  <td class="col-product">
-                    <div class="product-cell">
-                      <div class="product-thumb">
-                        <img v-if="getItemMediaUrl(item)" :src="getItemMediaUrl(item)" :alt="item.nombre" />
-                        <svg v-else fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
-                        </svg>
+            <div class="invoice-table-wrapper">
+              <table class="invoice-table">
+                <thead>
+                  <tr>
+                    <th class="col-product">Producto</th>
+                    <th class="col-qty">Cant.</th>
+                    <th class="col-price">Precio</th>
+                    <th class="col-subtotal">Subtotal</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr v-for="(item, idx) in orderDetail?.items" :key="idx" class="invoice-row">
+                    <td class="col-product">
+                      <div class="product-cell">
+                        <div class="product-thumb">
+                          <img v-if="getItemMediaUrl(item)" :src="getItemMediaUrl(item)" :alt="item.nombre" />
+                          <svg v-else fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1" d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"/>
+                          </svg>
+                        </div>
+                        <div class="product-info">
+                          <span class="product-name">{{ item.nombre }}</span>
+                          <span v-if="item.color || item.color_snapshot || item.largo || item.largo_snapshot" class="product-meta">
+                            <span v-if="item.color || item.color_snapshot">Color: {{ formatVariantLabel(item.color || item.color_snapshot) }}</span>
+                            <span v-if="(item.color || item.color_snapshot) && (item.largo || item.largo_snapshot)" class="meta-sep">•</span>
+                            <span v-if="item.largo || item.largo_snapshot">Largo: {{ formatLargoLabel(item.largo || item.largo_snapshot) }}</span>
+                          </span>
+                        </div>
                       </div>
-                      <div class="product-info">
-                        <span class="product-name">{{ item.nombre }}</span>
-                        <span v-if="item.color || item.color_snapshot || item.largo || item.largo_snapshot" class="product-meta">
-                          <span v-if="item.color || item.color_snapshot">Color: {{ formatVariantLabel(item.color || item.color_snapshot) }}</span>
-                          <span v-if="(item.color || item.color_snapshot) && (item.largo || item.largo_snapshot)" class="meta-sep">•</span>
-                          <span v-if="item.largo || item.largo_snapshot">Largo: {{ formatLargoLabel(item.largo || item.largo_snapshot) }}</span>
-                        </span>
-                      </div>
-                    </div>
-                  </td>
-                  <td class="col-qty">{{ item.cantidad }}</td>
-                  <td class="col-price">${{ formatNumber(item.precio_unitario) }}</td>
-                  <td class="col-subtotal">${{ formatNumber(item.subtotal) }}</td>
-                </tr>
-                <tr v-if="!orderDetail?.items?.length">
-                  <td colspan="4" class="empty-row">Sin productos</td>
-                </tr>
-              </tbody>
-            </table>
+                    </td>
+                    <td class="col-qty">{{ item.cantidad }}</td>
+                    <td class="col-price">${{ formatNumber(item.precio_unitario) }}</td>
+                    <td class="col-subtotal">${{ formatNumber(item.subtotal) }}</td>
+                  </tr>
+                  <tr v-if="!orderDetail?.items?.length">
+                    <td colspan="4" class="empty-row">Sin productos</td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
 
             <!-- Totales alineados a la derecha -->
             <div class="invoice-totals">
@@ -1894,7 +1896,7 @@ defineExpose({ getUnseenCount })
   /* background managed by utility classes */
   border: 1px solid #e5e7eb;
   border-radius: 12px;
-  overflow: hidden;
+  overflow: visible;
 }
 
 .invoice-header {
@@ -1919,9 +1921,16 @@ defineExpose({ getUnseenCount })
   color: #6b7280;
 }
 
+.invoice-table-wrapper {
+  width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
 .invoice-table {
   width: 100%;
   border-collapse: collapse;
+  min-width: 620px;
 }
 
 .invoice-table thead tr {
@@ -1943,11 +1952,11 @@ defineExpose({ getUnseenCount })
 .invoice-table .col-price,
 .invoice-table .col-subtotal {
   text-align: right;
-  width: 100px;
+  width: 92px;
 }
 
 .invoice-table .col-qty {
-  width: 70px;
+  width: 64px;
   text-align: center;
 }
 
@@ -2049,12 +2058,14 @@ defineExpose({ getUnseenCount })
   padding: 16px 20px;
   background: #fafafa;
   border-top: 1px solid #e5e7eb;
+  width: min(320px, 100%);
+  margin-left: auto;
 }
 
 .totals-row {
   display: flex;
   justify-content: space-between;
-  width: 220px;
+  width: 100%;
   padding: 6px 0;
 }
 

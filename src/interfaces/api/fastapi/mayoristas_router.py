@@ -765,6 +765,52 @@ async def verificar_email(request: VerificarEmailRequest):
 from fastapi import Form, UploadFile, File
 from django.core.files.base import ContentFile
 import os
+import re
+
+
+def validar_numero_documento(tipo_documento: str, numero_documento: str) -> tuple[bool, str]:
+    """
+    Valida el número de documento según el tipo.
+    Retorna (es_valido, mensaje_error)
+    """
+    # Solo números
+    if not re.match(r'^\d+$', numero_documento):
+        return False, "El número de documento solo debe contener números"
+    
+    longitud = len(numero_documento)
+    
+    if tipo_documento in ['CC', 'CE']:
+        if longitud < 8 or longitud > 10:
+            return False, f"El documento {tipo_documento} debe tener entre 8 y 10 dígitos"
+    elif tipo_documento == 'NIT':
+        if longitud != 9:
+            return False, "El NIT debe tener exactamente 9 dígitos"
+    elif tipo_documento == 'PASAPORTE':
+        if longitud < 10 or longitud > 13:
+            return False, "El pasaporte debe tener entre 10 y 13 dígitos"
+    
+    return True, ""
+
+
+def validar_contraseña_segura(password: str) -> tuple[bool, str]:
+    """
+    Valida que la contraseña sea segura.
+    Debe tener: mínimo 8 caracteres, mayúscula, número y carácter especial.
+    Retorna (es_valida, mensaje_error)
+    """
+    if len(password) < 8:
+        return False, "La contraseña debe tener al menos 8 caracteres"
+    
+    if not re.search(r'[A-Z]', password):
+        return False, "La contraseña debe contener al menos una mayúscula"
+    
+    if not re.search(r'\d', password):
+        return False, "La contraseña debe contener al menos un número"
+    
+    if not re.search(r'[!@#$%^&*()_+\-=\[\]{};\':"\\|,.<>\/?]', password):
+        return False, "La contraseña debe contener al menos un carácter especial"
+    
+    return True, ""
 
 
 @router.post("/mayoristas/registro", status_code=201)
@@ -776,7 +822,7 @@ async def registrar_mayorista(
     telefono: str = Form(...),
     tipo_documento: str = Form(...),
     numero_documento: str = Form(...),
-    nombre_empresa: str = Form(...),
+    nombre_empresa: str = Form(""),
     nit_empresa: str = Form(""),
     cedula_frente: UploadFile = File(None),
     cedula_dorso: UploadFile = File(None),
@@ -790,6 +836,16 @@ async def registrar_mayorista(
     from django.db.models import Q
     
     try:
+        # Validar número de documento
+        es_valido_doc, msg_error_doc = validar_numero_documento(tipo_documento, numero_documento)
+        if not es_valido_doc:
+            raise HTTPException(status_code=400, detail=msg_error_doc)
+        
+        # Validar contraseña segura
+        es_valida_pwd, msg_error_pwd = validar_contraseña_segura(password)
+        if not es_valida_pwd:
+            raise HTTPException(status_code=400, detail=msg_error_pwd)
+        
         # Verificar si el email o número de documento ya existen
         existing_user = await sync_to_async(
             Usuario.objects.filter(
