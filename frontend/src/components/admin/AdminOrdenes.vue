@@ -184,6 +184,32 @@
                     <option value="ENTREGADO">Entregado</option>
                   </select>
                 </div>
+                <div class="shipping-tracking">
+                  <label class="compact-label">Numero de guia</label>
+                  <input
+                    v-model="selectedOrder.guia_envio"
+                    type="text"
+                    :disabled="!canEditTracking"
+                    placeholder="Ej: 1Z999AA10123456784"
+                    class="compact-input"
+                  >
+                  <label class="compact-label">Link de rastreo</label>
+                  <input
+                    v-model="selectedOrder.link_rastreo"
+                    type="url"
+                    :disabled="!canEditTracking"
+                    placeholder="https://transportadora.com/rastreo"
+                    class="compact-input"
+                  >
+                  <button
+                    type="button"
+                    class="tracking-save"
+                    :disabled="!canEditTracking || loadingEstadoChange"
+                    @click="saveTrackingInfo"
+                  >
+                    Guardar guia
+                  </button>
+                </div>
               </div>
             </div>
 
@@ -523,6 +549,10 @@ const filteredOrdenes = computed(() => {
   return result
 })
 
+const canEditTracking = computed(() => {
+  return selectedOrder.value?.estado_envio === 'ENVIADO' || selectedOrder.value?.estado_envio === 'ENTREGADO'
+})
+
 // Mapear estados
 const mapEstadoPago = (estadoPago, estadoLegacy) => {
   const raw = (estadoPago || '').toString().toUpperCase()
@@ -586,6 +616,8 @@ const cargarOrdenes = async (silent = false) => {
       municipio: orden.municipio || '',
       barrio: orden.barrio || '',
       notas_envio: orden.notas_envio || '',
+      guia_envio: orden.guia_envio || '',
+      link_rastreo: orden.link_rastreo || '',
       estado_pago: mapEstadoPago(orden.estado_pago, orden.estado),
       estado_envio: mapEstadoEnvio(orden.estado_envio, orden.estado),
       metodo_pago: orden.metodo_pago || 'whatsapp',
@@ -694,6 +726,8 @@ const selectOrder = async (orden) => {
       municipio: orden.municipio || '',
       barrio: orden.barrio || '',
       notas_envio: orden.notas_envio || '',
+      guia_envio: orden.guia_envio || '',
+      link_rastreo: orden.link_rastreo || '',
       subtotal_monto: orden.subtotal_monto || 0,
       envio_monto: orden.envio_monto || 0,
       total: orden.total || 0,
@@ -859,7 +893,14 @@ const updateEstadoEnvio = async () => {
   
   try {
     const estadoMap = { 'NO_ENVIADO': 'no_enviado', 'ENVIADO': 'enviado', 'ENTREGADO': 'entregado' }
-    await ordenesService.actualizarEstadoEnvio(selectedOrder.value.id, estadoMap[selectedOrder.value.estado_envio])
+    await ordenesService.actualizarEstadoEnvio(
+      selectedOrder.value.id,
+      estadoMap[selectedOrder.value.estado_envio],
+      {
+        guia_envio: selectedOrder.value.guia_envio || '',
+        link_rastreo: selectedOrder.value.link_rastreo || ''
+      }
+    )
     
     selectedOrder.value._estadoEnvioOriginal = nuevoEstado
     
@@ -867,6 +908,8 @@ const updateEstadoEnvio = async () => {
     if (idx !== -1) {
       ordenes.value[idx].estado_envio = selectedOrder.value.estado_envio
       ordenes.value[idx]._estadoEnvioOriginal = nuevoEstado
+      ordenes.value[idx].guia_envio = selectedOrder.value.guia_envio || ''
+      ordenes.value[idx].link_rastreo = selectedOrder.value.link_rastreo || ''
     }
     
     openModal('success', '¡Listo!', 'Estado de envío actualizado')
@@ -887,6 +930,36 @@ const updateEstadoEnvio = async () => {
     selectedOrder.value.estado_envio = estadoAnterior
   } finally {
     // Desactivar loading
+    loadingEstadoChange.value = false
+  }
+}
+
+const saveTrackingInfo = async () => {
+  if (!selectedOrder.value || !canEditTracking.value) return
+  loadingEstadoChange.value = true
+
+  try {
+    const estadoMap = { 'NO_ENVIADO': 'no_enviado', 'ENVIADO': 'enviado', 'ENTREGADO': 'entregado' }
+    await ordenesService.actualizarEstadoEnvio(
+      selectedOrder.value.id,
+      estadoMap[selectedOrder.value.estado_envio],
+      {
+        guia_envio: selectedOrder.value.guia_envio || '',
+        link_rastreo: selectedOrder.value.link_rastreo || ''
+      }
+    )
+
+    const idx = ordenes.value.findIndex(o => o.id === selectedOrder.value.id)
+    if (idx !== -1) {
+      ordenes.value[idx].guia_envio = selectedOrder.value.guia_envio || ''
+      ordenes.value[idx].link_rastreo = selectedOrder.value.link_rastreo || ''
+    }
+
+    openModal('success', '¡Listo!', 'Datos de rastreo guardados')
+  } catch (error) {
+    console.error('Error:', error)
+    openModal('error', 'Error', 'No se pudieron guardar los datos de rastreo')
+  } finally {
     loadingEstadoChange.value = false
   }
 }
@@ -1668,6 +1741,13 @@ defineExpose({ getUnseenCount })
   margin-bottom: 14px;
 }
 
+.shipping-tracking {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 6px;
+}
+
 .compact-label {
   font-size: 10px;
   font-weight: 600;
@@ -1691,6 +1771,53 @@ defineExpose({ getUnseenCount })
   background-image: url("data:image/svg+xml,%3Csvg width='10' height='6' viewBox='0 0 10 6' fill='none' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M1 1L5 5L9 1' stroke='%236b7280' stroke-width='1.5' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-position: right 10px center;
+}
+
+.compact-input {
+  padding: 8px 12px;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  font-size: 12px;
+  font-weight: 500;
+  color: #111827;
+  background: #fff;
+  outline: none;
+  transition: all 0.15s ease;
+}
+
+.compact-input:focus {
+  border-color: #111827;
+  box-shadow: 0 0 0 2px rgba(17, 24, 39, 0.08);
+}
+
+.compact-input:disabled {
+  background: #f9fafb;
+  color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.tracking-save {
+  align-self: flex-start;
+  padding: 8px 12px;
+  border-radius: 8px;
+  border: 1px solid rgba(17, 24, 39, 0.2);
+  background: #111827;
+  color: #fff;
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  transition: all 0.2s ease;
+}
+
+.tracking-save:hover {
+  background: #000;
+  border-color: rgba(17, 24, 39, 0.4);
+}
+
+.tracking-save:disabled {
+  opacity: 0.6;
+  cursor: not-allowed;
 }
 
 .compact-select:hover {

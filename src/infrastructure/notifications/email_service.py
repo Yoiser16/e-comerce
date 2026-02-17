@@ -47,12 +47,24 @@ def _build_body(
     estado: str, 
     total: float, 
     direccion: str,
-    productos: Optional[List[Dict]] = None
+    productos: Optional[List[Dict]] = None,
+    guia_envio: Optional[str] = None,
+    link_rastreo: Optional[str] = None
 ) -> tuple[str, str]:
     estado_texto = ESTADO_HUMANO.get(estado, estado)
     total_str = f"${total:,.0f} COP".replace(",", ".")
+    show_tracking = estado in {"enviada", "completada", "enviado", "entregado"} and (guia_envio or link_rastreo)
     
     # Texto plano
+    tracking_text = ""
+    if show_tracking:
+        tracking_lines = []
+        if guia_envio:
+            tracking_lines.append(f"Numero de guia: {guia_envio}")
+        if link_rastreo:
+            tracking_lines.append(f"Link de rastreo: {link_rastreo}")
+        tracking_text = "\n".join(tracking_lines) + "\n\n"
+
     if estado == "cancelada":
         text = (
             f"Hola {cliente},\n\n"
@@ -67,6 +79,7 @@ def _build_body(
             f"Tu orden {codigo} ahora está *{estado_texto}*.\n"
             f"Total: {total_str}\n"
             f"Dirección de entrega: {direccion}\n\n"
+            f"{tracking_text}"
             "Gracias por comprar con Kharis Distribuidora."
         )
     
@@ -95,6 +108,22 @@ def _build_body(
                 <td style="padding: 12px 0; border-bottom: 1px solid #eee; color: #333; text-align: right;">{precio_fmt}</td>
             </tr>
             """
+
+    tracking_block = ""
+    if show_tracking:
+        tracking_items = []
+        if guia_envio:
+            tracking_items.append(f"<div><strong>Numero de guia:</strong> {guia_envio}</div>")
+        if link_rastreo:
+            tracking_items.append(
+                f"<div><strong>Link de rastreo:</strong> <a href=\"{link_rastreo}\" style=\"color: #2563eb; text-decoration: none;\" target=\"_blank\">{link_rastreo}</a></div>"
+            )
+        tracking_block = f"""
+                <div style=\"margin: 18px 0 8px; padding: 14px 16px; border: 1px solid #f3f4f6; border-radius: 12px; background: #fafafa; color: #111; font-size: 14px; line-height: 1.6;\">
+                    <div style=\"font-weight: 700; margin-bottom: 6px;\">Detalles de envio</div>
+                    {"".join(tracking_items)}
+                </div>
+        """
 
     html = f"""
     <!DOCTYPE html>
@@ -139,6 +168,8 @@ def _build_body(
                     {"Te informamos que tu pedido fue" if estado == "cancelada" else "Gracias por tu compra. Tu pedido está"}
                     <strong>{estado_texto}</strong>.
                 </p>
+
+                {tracking_block}
 
                 <table class="product-table">
                     <thead>
@@ -365,12 +396,23 @@ def send_order_status_email(
     direccion: str,
     productos: Optional[List[Dict]] = None,
     thread_id: Optional[str] = None,
+    guia_envio: Optional[str] = None,
+    link_rastreo: Optional[str] = None,
 ) -> Optional[str]:
     """Envía email de estado de orden."""
     if not email: return None
     try:
         subject = _build_subject(codigo, estado)
-        text_body, html_body = _build_body(nombre, codigo, estado.lower(), total, direccion, productos)
+        text_body, html_body = _build_body(
+            nombre,
+            codigo,
+            estado.lower(),
+            total,
+            direccion,
+            productos,
+            guia_envio,
+            link_rastreo,
+        )
         return _send_email_base(email, subject, text_body, html_body, thread_id)
     except Exception as exc:
         _log_error(f"Fallo enviando email orden {codigo}", exc)

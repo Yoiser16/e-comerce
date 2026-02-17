@@ -893,7 +893,10 @@ export default {
     const getVarianteLabel = (variante) => {
       if (!variante) return 'Variante'
       const colorLabel = variante.color ? formatAttributeValue(variante.color) : 'Sin color'
-      return colorLabel
+      const largoLabel = variante.largo ? `${variante.largo}"` : ''
+      const labelParts = [colorLabel]
+      if (largoLabel) labelParts.push(largoLabel)
+      return labelParts.join(' · ')
     }
 
     const getB2BTargetMin = () => {

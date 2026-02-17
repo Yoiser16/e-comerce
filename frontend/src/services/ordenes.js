@@ -45,8 +45,9 @@ export const ordenesService = {
   /**
    * Actualizar estado de envío de una orden
    */
-  async actualizarEstadoEnvio(ordenId, estadoEnvio) {
-    const response = await apiClient.patch(`/ordenes/${ordenId}`, { estado_envio: estadoEnvio })
+  async actualizarEstadoEnvio(ordenId, estadoEnvio, trackingData = {}) {
+    const payload = { estado_envio: estadoEnvio, ...trackingData }
+    const response = await apiClient.patch(`/ordenes/${ordenId}`, payload)
     return response.data
   },
 

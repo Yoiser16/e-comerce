@@ -494,6 +494,8 @@ class OrdenModel(models.Model):
     municipio = models.CharField(max_length=100, default='')
     barrio = models.CharField(max_length=100, blank=True, default='')
     notas_envio = models.TextField(blank=True, default='')
+    guia_envio = models.CharField(max_length=120, blank=True, default='')
+    link_rastreo = models.URLField(max_length=600, blank=True, default='')
     
     # Estado y método de pago
     estado = models.CharField(max_length=20, choices=ESTADO_CHOICES, default='pendiente')

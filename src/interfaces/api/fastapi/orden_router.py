@@ -79,6 +79,8 @@ class OrdenResponse(BaseModel):
     municipio: str
     barrio: Optional[str] = ''
     notas_envio: Optional[str] = ''
+    guia_envio: Optional[str] = ''
+    link_rastreo: Optional[str] = ''
     subtotal_monto: Optional[float] = 0.0
     envio_monto: Optional[float] = 0.0
     total: float
@@ -111,6 +113,8 @@ class OrdenListItem(BaseModel):
     municipio: Optional[str] = ''
     barrio: Optional[str] = ''
     notas_envio: Optional[str] = ''
+    guia_envio: Optional[str] = ''
+    link_rastreo: Optional[str] = ''
     cliente_tipo_doc: Optional[str] = ''
     cliente_num_doc: Optional[str] = ''
     items: Optional[List[dict]] = None  # Solo se incluye si include_items=true
@@ -120,6 +124,8 @@ class CambiarEstadoInput(BaseModel):
     estado: Optional[str] = None
     estado_pago: Optional[str] = None
     estado_envio: Optional[str] = None
+    guia_envio: Optional[str] = None
+    link_rastreo: Optional[str] = None
 
 
 class ValidarStockInput(BaseModel):
@@ -193,7 +199,7 @@ def _listar_ordenes_sync(estado: Optional[str], limite: int, include_items: bool
     queryset = queryset.only(
         'id', 'codigo', 'estado', 'estado_pago', 'estado_envio', 'metodo_pago', 'fecha_creacion',
         'total_monto', 'subtotal_monto', 'envio_monto',
-        'direccion_envio', 'departamento', 'municipio', 'barrio', 'notas_envio',
+        'direccion_envio', 'departamento', 'municipio', 'barrio', 'notas_envio', 'guia_envio', 'link_rastreo',
         'cliente__id', 'cliente__nombre', 'cliente__apellido', 
         'cliente__email', 'cliente__telefono',
         'cliente__tipo_documento', 'cliente__numero_documento'
@@ -225,6 +231,8 @@ def _listar_ordenes_sync(estado: Optional[str], limite: int, include_items: bool
             'municipio': orden.municipio or '',
             'barrio': orden.barrio or '',
             'notas_envio': orden.notas_envio or '',
+            'guia_envio': orden.guia_envio or '',
+            'link_rastreo': orden.link_rastreo or '',
             'total_items': orden.num_items,
             'metodo_pago': orden.metodo_pago or 'whatsapp',
             'fecha_creacion': orden.fecha_creacion,
@@ -685,6 +693,8 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
         'municipio': orden.municipio,
         'barrio': orden.barrio or '',
         'notas_envio': orden.notas_envio or '',
+        'guia_envio': orden.guia_envio or '',
+        'link_rastreo': orden.link_rastreo or '',
         'subtotal_monto': float(orden.subtotal_monto),
         'envio_monto': float(orden.envio_monto),
         'total': float(orden.total_monto),
@@ -739,6 +749,8 @@ def _obtener_orden_sync(orden_id: str) -> dict:
         'municipio': orden.municipio or '',
         'barrio': orden.barrio or '',
         'notas_envio': orden.notas_envio or '',
+        'guia_envio': orden.guia_envio or '',
+        'link_rastreo': orden.link_rastreo or '',
         'subtotal_monto': float(orden.subtotal_monto),
         'envio_monto': float(orden.envio_monto),
         'total': float(orden.total_monto),
@@ -784,6 +796,8 @@ def _enviar_email_estado(orden: OrdenModel, estado_nuevo: str) -> None:
             direccion=direccion_completa,
             productos=productos_email,
             thread_id=orden.email_thread_id or None,
+            guia_envio=orden.guia_envio or None,
+            link_rastreo=orden.link_rastreo or None,
         )
         print("✅ Email enviado exitosamente")
     except Exception as e:
@@ -837,7 +851,12 @@ def _actualizar_estado_pago_sync(orden_id: str, estado_pago: str) -> dict:
     return {"mensaje": "Estado de pago actualizado", "estado_pago": estado_nuevo.upper()}
 
 
-def _actualizar_estado_envio_sync(orden_id: str, estado_envio: str) -> dict:
+def _actualizar_estado_envio_sync(
+    orden_id: str,
+    estado_envio: str,
+    guia_envio: Optional[str] = None,
+    link_rastreo: Optional[str] = None
+) -> dict:
     from django.db import transaction
 
     estados_validos = ['no_enviado', 'enviado', 'entregado']
@@ -851,6 +870,13 @@ def _actualizar_estado_envio_sync(orden_id: str, estado_envio: str) -> dict:
             raise ValueError("No se puede actualizar envío si el pago no está confirmado")
 
         orden.estado_envio = estado_nuevo
+        if guia_envio is not None:
+            orden.guia_envio = guia_envio or ''
+        if link_rastreo is not None:
+            orden.link_rastreo = link_rastreo or ''
+        if estado_nuevo == 'no_enviado':
+            orden.guia_envio = ''
+            orden.link_rastreo = ''
         orden.estado = _legacy_estado_from_states(orden.estado_pago, orden.estado_envio)
         orden.save()
 
@@ -1129,7 +1155,12 @@ async def actualizar_estado(orden_id: str, data: CambiarEstadoInput):
         if data.estado_pago:
             resultado = await sync_to_async(_actualizar_estado_pago_sync)(orden_id, data.estado_pago)
         elif data.estado_envio:
-            resultado = await sync_to_async(_actualizar_estado_envio_sync)(orden_id, data.estado_envio)
+            resultado = await sync_to_async(_actualizar_estado_envio_sync)(
+                orden_id,
+                data.estado_envio,
+                data.guia_envio,
+                data.link_rastreo
+            )
         elif data.estado:
             resultado = await sync_to_async(_actualizar_estado_legacy_sync)(orden_id, data.estado)
         else:
