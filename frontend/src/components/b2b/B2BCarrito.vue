@@ -321,10 +321,9 @@ export default {
         try {
           const data = JSON.parse(cart)
           const items = Array.isArray(data.items) ? data.items : []
-          cartItems.value = items.map((item) => ({
-            ...item,
-            variante_id: item.variante_id || item.id
-          }))
+          // NO modificar variante_id - mantener valores originales
+          // Si es null, debe quedarse null para que el backend busque por producto_id
+          cartItems.value = items
         } catch {
           cartItems.value = []
         }

@@ -359,14 +359,20 @@ export default {
       if (existingIndex >= 0) {
         cart.items[existingIndex].cantidad += CANTIDAD_MINIMA
       } else {
+        // Estructura completa con variante_id: null para productos sin variante
         cart.items.push({
           id: producto.id || item.producto_id,
+          producto_id: producto.id || item.producto_id,
+          variante_id: null,
+          variante_sku: producto.sku || '',
+          color: '',
+          largo: '',
           nombre: producto.nombre || 'Producto',
           imagen: producto.imagen_principal || producto.imagen || '/placeholder.png',
           precio: producto.precio_mayorista || producto.monto_precio || producto.precio || 0,
-          cantidad: CANTIDAD_MINIMA,
-          sku: producto.sku || null,
-          categoria: producto.categoria?.nombre || 'Productos'
+          cantidad_minima_mayorista: producto.cantidad_minima_mayorista || 1,
+          descuentos_volumen: [],
+          cantidad: CANTIDAD_MINIMA
         })
       }
       

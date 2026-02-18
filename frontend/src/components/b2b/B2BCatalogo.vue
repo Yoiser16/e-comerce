@@ -648,7 +648,21 @@ export default {
       if (existing) {
         existing.quantity += quantity
       } else {
-        cart.items.push({ ...product, quantity })
+        // Estructura completa con variante_id: null para productos sin variante
+        cart.items.push({
+          id: product.id,
+          producto_id: product.id,
+          variante_id: null,
+          variante_sku: product.sku || '',
+          color: '',
+          largo: '',
+          nombre: product.name,
+          imagen: product.image,
+          precio: product.wholesalePrice,
+          cantidad_minima_mayorista: product.minOrder || 1,
+          descuentos_volumen: [],
+          cantidad: quantity
+        })
       }
       localStorage.setItem('b2b_cart', JSON.stringify(cart))
       window.dispatchEvent(new CustomEvent('cart-updated'))
