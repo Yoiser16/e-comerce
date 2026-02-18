@@ -690,6 +690,14 @@ export default {
       return value?.toLocaleString('es-CO') || '0'
     }
 
+    function humanizeVariant(text) {
+      // Reemplazar guiones bajos con espacios y capitalizar cada palabra
+      return text
+        ?.split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ') || ''
+    }
+
     function getStepClass(index) {
       if (currentStep.value > index) return 'bg-gray-900 text-white'
       if (currentStep.value === index) return 'bg-gray-900 text-white'
@@ -1023,12 +1031,12 @@ export default {
             const qty = item.cantidad || item.quantity
             const price = getUnitPrice(item)
             const detalles = [
-              item.color ? `Color: ${item.color}` : '',
-              item.largo ? `Largo: ${item.largo}` : ''
+              item.color ? `Color: ${humanizeVariant(item.color)}` : '',
+              item.largo ? `Largo: ${humanizeVariant(item.largo)}` : ''
             ].filter(Boolean).join(' · ')
             const sufijo = detalles ? ` (${detalles})` : ''
             return `• ${name}${sufijo} x${qty} = $${formatPrice(price * qty)}`
-          }).join('%0A')
+          }).join('\n')
 
           const direccionCompleta = [
             form.direccion,
@@ -1036,22 +1044,22 @@ export default {
             form.barrio,
             form.municipio,
             form.departamento
-          ].filter(Boolean).join(', ')
+          ].filter(Boolean).join('\n')
 
           const codigoOrden = ordenResult ? ordenResult.codigo : ''
-          const message = `🛒 *PEDIDO MAYORISTA${codigoOrden ? ` ${codigoOrden}` : ''}*%0A%0A` +
-            `📦 *Productos:*%0A${itemsText}%0A%0A` +
-            `💰 *Subtotal:* $${formatPrice(subtotal.value)}%0A` +
-            `🚚 *Envío:* $${formatPrice(shippingCost.value)}%0A` +
-            `*TOTAL: $${formatPrice(total.value)}*%0A%0A` +
-            `📍 *Dirección:*%0A${direccionCompleta}%0A%0A` +
-            `👤 *Contacto:* ${form.nombreContacto}%0A` +
-            `📱 *Teléfono:* ${form.telefono}%0A` +
-            (form.indicaciones ? `📝 *Indicaciones:* ${form.indicaciones}%0A` : '') +
-            (form.notas ? `📝 *Notas:* ${form.notas}` : '')
+          const message = `*PEDIDO MAYORISTA${codigoOrden ? ` ${codigoOrden}` : ''}*\n\n` +
+            `*Productos:*\n${itemsText}\n\n` +
+            `*Subtotal:* $${formatPrice(subtotal.value)}\n` +
+            `*Envío:* $${formatPrice(shippingCost.value)}\n` +
+            `*TOTAL:* $${formatPrice(total.value)}\n\n` +
+            `*Dirección:*\n${direccionCompleta}\n\n` +
+            `*Contacto:* ${form.nombreContacto}\n` +
+            `*Teléfono:* ${form.telefono}\n` +
+            (form.indicaciones ? `*Indicaciones:* ${form.indicaciones}\n` : '') +
+            (form.notas ? `*Notas:* ${form.notas}` : '')
 
           const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '573001234567'
-          window.open(`https://wa.me/${whatsappNumber}?text=${message}`, '_blank')
+          window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(message)}`, '_blank')
           localStorage.removeItem('b2b_cart')
           router.push({ path: '/portal/cuenta', query: { tab: 'pedidos', success: 'whatsapp' } })
 

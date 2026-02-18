@@ -1413,8 +1413,8 @@ export default {
     const buildWhatsAppMessage = () => {
       const productos = cartItems.value.map((i) => {
         const detalles = [
-          i.color ? `Color: ${i.color}` : '',
-          i.largo ? `Largo: ${i.largo}` : ''
+          i.color ? `Color: ${humanizeVariant(i.color)}` : '',
+          i.largo ? `Largo: ${humanizeVariant(i.largo)}` : ''
         ].filter(Boolean).join(' · ')
         const sufijo = detalles ? ` (${detalles})` : ''
         return `• ${i.nombre || 'Producto'}${sufijo} x${i.cantidad || 1}`
@@ -1550,6 +1550,14 @@ export default {
     const formatPrice = (price) => {
       const num = Number(price)
       return isNaN(num) ? '0' : new Intl.NumberFormat('es-CO').format(num)
+    }
+
+    const humanizeVariant = (text) => {
+      // Reemplazar guiones bajos con espacios y capitalizar cada palabra
+      return text
+        ?.split('_')
+        .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+        .join(' ') || ''
     }
 
     const isVideo = (url) => {

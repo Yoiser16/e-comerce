@@ -1,5 +1,37 @@
 <template>
   <div class="min-h-screen bg-[#FAFAFA] pb-24 lg:pb-0">
+    <!-- Modal de confirmación para limpiar carrito -->
+    <div v-if="showClearModal" class="fixed inset-0 bg-black/30 flex items-center justify-center z-[60] p-4">
+      <div class="bg-white rounded-2xl shadow-2xl max-w-sm w-full animate-in fade-in zoom-in-95 duration-300">
+        <div class="p-6 sm:p-8">
+          <div class="flex justify-center mb-4">
+            <div class="w-14 h-14 rounded-full bg-red-50 flex items-center justify-center">
+              <svg class="w-7 h-7 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"/>
+              </svg>
+            </div>
+          </div>
+          
+          <h3 class="text-xl font-semibold text-gray-900 text-center mb-2">¿Limpiar carrito?</h3>
+          <p class="text-gray-500 text-center text-sm mb-7">Se eliminarán todos los productos de tu pedido. Esta acción no se puede deshacer.</p>
+          
+          <div class="flex gap-3">
+            <button
+              @click="showClearModal = false"
+              class="flex-1 px-4 py-3 border-2 border-gray-200 text-gray-900 font-medium rounded-lg hover:bg-gray-50 transition-colors"
+            >
+              Cancelar
+            </button>
+            <button
+              @click="confirmClearCart"
+              class="flex-1 px-4 py-3 bg-red-500 hover:bg-red-600 text-white font-medium rounded-lg transition-colors"
+            >
+              Eliminar todo
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
     <div class="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8 py-4 lg:py-8">
       
       <!-- Breadcrumb discreto - Oculto en móvil -->
@@ -305,6 +337,7 @@ export default {
     const router = useRouter()
     const cartItems = ref([])
     const orderNotes = ref('')
+    const showClearModal = ref(false)
     const freeShippingThreshold = 500000
 
     // Helpers para compatibilidad de campos
@@ -409,10 +442,13 @@ export default {
     }
 
     function limpiarCarrito() {
-      if (confirm('¿Estás seguro de eliminar todos los productos del carrito?')) {
-        cartItems.value = []
-        saveCart()
-      }
+      showClearModal.value = true
+    }
+
+    function confirmClearCart() {
+      cartItems.value = []
+      saveCart()
+      showClearModal.value = false
     }
 
     function proceedToCheckout() {
@@ -428,9 +464,9 @@ export default {
     })
 
     return {
-      cartItems, orderNotes,
+      cartItems, orderNotes, showClearModal,
       totalUnits, subtotal, totalDiscount, shippingCost, total, canCheckout,
-      formatPrice, formatColorLabel, handleImageError, updateQuantity, removeItem, limpiarCarrito, proceedToCheckout,
+      formatPrice, formatColorLabel, handleImageError, updateQuantity, removeItem, limpiarCarrito, proceedToCheckout, confirmClearCart,
       getUnitPrice
       , isVideo, getCartMediaUrl
     }
