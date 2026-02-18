@@ -254,6 +254,7 @@ class ProductoRepositoryImpl(ProductoRepository):
                 'precio_moneda': payload.get('precio_moneda') or producto_model.moneda_precio,
                 'stock_actual': payload.get('stock_actual', 0),
                 'stock_minimo': payload.get('stock_minimo', 0),
+                'cantidad_minima_mayorista': payload.get('cantidad_minima_mayorista', 1),
                 'imagen_url': payload.get('imagen_url'),
                 'activo': payload.get('activo', True),
                 'orden': payload.get('orden', idx)

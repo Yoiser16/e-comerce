@@ -147,20 +147,13 @@
                           placeholder="5"
                         >
                       </div>
-                      <div>
-                        <label class="block text-sm font-medium text-text-dark mb-2">Cantidad mínima mayorista <span class="text-red-500">*</span></label>
-                        <input 
-                          v-model.number="form.cantidad_minima_mayorista"
-                          type="number"
-                          min="1"
-                          required
-                          class="w-full px-4 py-3 bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white transition-all text-sm"
-                          placeholder="1"
-                        >
-                      </div>
                     </div>
 
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <div class="p-4 bg-blue-50 border border-blue-200 rounded-lg">
+                      <p class="text-xs text-blue-900 font-medium">💡 <strong>Mayorista:</strong> Configura cantidad mínima y descuentos en el botón "Descuentos Mayoristas" de la lista de productos.</p>
+                    </div>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-1 gap-4">
                       <div>
                         <label class="block text-sm font-medium text-text-dark mb-2">Disponible en mayoristas</label>
                         <label class="flex items-center justify-between px-4 py-3 bg-[#FAFAFA] border border-text-dark/10 rounded-lg cursor-pointer hover:bg-white transition-all">
@@ -168,18 +161,6 @@
                           <input v-model="form.disponible_b2b" type="checkbox" class="sr-only peer">
                           <div class="relative w-11 h-6 bg-gray-200 peer-focus:ring-2 peer-focus:ring-[#D81B60]/20 rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px] after:start-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all peer-checked:bg-[#D81B60]"></div>
                         </label>
-                      </div>
-                      <div>
-                        <label class="block text-sm font-medium text-text-dark mb-2">Descuento mayorista (%)</label>
-                        <input
-                          v-model.number="form.porcentaje_descuento_b2b"
-                          type="number"
-                          min="0"
-                          max="90"
-                          class="w-full px-4 py-3 bg-[#FAFAFA] border border-text-dark/10 rounded-lg focus:outline-none focus:border-text-dark/30 focus:bg-white transition-all text-sm"
-                          placeholder="Ej: 15"
-                        >
-                        <p class="text-xs text-text-light mt-1">Se aplica sobre el precio base cuando el producto está en canal mayorista.</p>
                       </div>
                     </div>
                   </div>
@@ -238,23 +219,23 @@
 
                       <div v-if="form.variantes.length" class="space-y-4">
                         <!-- Headers Desktop -->
-                        <div class="hidden md:grid md:grid-cols-12 px-4 py-2 bg-[#FAF5F2] rounded-lg border border-black/5">
-                          <span class="md:col-span-2 text-xs font-semibold text-text-dark uppercase tracking-wider">Color</span>
-                          <span class="md:col-span-2 text-xs font-semibold text-text-dark uppercase tracking-wider">Largo</span>
-                          <span class="md:col-span-2 text-xs font-semibold text-text-dark uppercase tracking-wider">Precio</span>
-                          <span class="md:col-span-4 text-xs font-semibold text-text-dark uppercase tracking-wider">Stock / Min / May</span>
-                          <span class="md:col-span-1 text-xs font-semibold text-text-dark uppercase tracking-wider">SKU</span>
-                          <span class="md:col-span-1 text-xs font-semibold text-text-dark uppercase tracking-wider text-right">Activo</span>
+                        <div class="hidden md:grid md:grid-cols-[1.2fr_1.1fr_1.3fr_1.8fr_1fr_110px] gap-3 px-4 py-3 bg-[#FAF5F2] rounded-lg border border-black/5">
+                          <span class="text-xs font-semibold text-text-dark uppercase tracking-wider">Color</span>
+                          <span class="text-xs font-semibold text-text-dark uppercase tracking-wider">Largo</span>
+                          <span class="text-xs font-semibold text-text-dark uppercase tracking-wider">Precio</span>
+                          <span class="text-xs font-semibold text-text-dark uppercase tracking-wider">Stock / Mínimo</span>
+                          <span class="text-xs font-semibold text-text-dark uppercase tracking-wider">SKU</span>
+                          <span class="text-xs font-semibold text-text-dark uppercase tracking-wider text-center">Activo</span>
                         </div>
 
                         <!-- Variante Card -->
                         <div
                           v-for="(variante, index) in form.variantes"
                           :key="index"
-                          class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-3 items-start md:items-center bg-[#FAFAFA] border border-black/8 rounded-xl p-4 md:p-4 hover:border-text-dark/20 transition-all duration-300"
+                          class="grid grid-cols-1 md:grid-cols-[1.2fr_1.1fr_1.3fr_1.8fr_1fr_110px] gap-4 md:gap-3 items-start md:items-center bg-[#FAFAFA] border border-black/8 rounded-xl p-4 hover:border-text-dark/20 transition-all duration-300"
                         >
                           <!-- Color -->
-                          <div class="md:col-span-2">
+                          <div>
                             <label class="block md:hidden text-xs font-medium text-text-dark mb-2 uppercase tracking-wider">Color</label>
                             <select
                               v-model="variante.color"
@@ -268,7 +249,7 @@
                           </div>
 
                           <!-- Largo -->
-                          <div class="md:col-span-2">
+                          <div>
                             <label class="block md:hidden text-xs font-medium text-text-dark mb-2 uppercase tracking-wider">Largo</label>
                             <select
                               v-model="variante.largo"
@@ -282,7 +263,7 @@
                           </div>
 
                           <!-- Precio -->
-                          <div class="md:col-span-2">
+                          <div>
                             <label class="block md:hidden text-xs font-medium text-text-dark mb-2 uppercase tracking-wider">Precio</label>
                             <div class="relative">
                               <span class="absolute left-3 top-1/2 -translate-y-1/2 text-text-medium text-sm">$</span>
@@ -296,66 +277,53 @@
                             </div>
                           </div>
 
-                          <!-- Stock / Min / May -->
-                          <div class="md:col-span-4">
-                            <label class="block md:hidden text-xs font-medium text-text-dark mb-2 uppercase tracking-wider">Stock / Mín / May</label>
-                            <div class="grid grid-cols-3 gap-2">
-                              <div>
-                                <input
-                                  v-model.number="variante.stock_actual"
-                                  type="number"
-                                  class="w-full px-2 py-2.5 bg-white border border-text-dark/15 rounded-lg text-sm focus:outline-none focus:border-text-dark/40 focus:ring-1 focus:ring-text-dark/20 transition-all text-center"
-                                  placeholder="0"
-                                  title="Stock Actual"
-                                >
-                              </div>
-                              <div>
-                                <input
-                                  v-model.number="variante.stock_minimo"
-                                  type="number"
-                                  class="w-full px-2 py-2.5 bg-white border border-text-dark/15 rounded-lg text-sm focus:outline-none focus:border-text-dark/40 focus:ring-1 focus:ring-text-dark/20 transition-all text-center"
-                                  placeholder="0"
-                                  title="Stock Mínimo"
-                                >
-                              </div>
-                              <div>
-                                <input
-                                  v-model.number="variante.cantidad_minima_mayorista"
-                                  type="number"
-                                  min="1"
-                                  class="w-full px-2 py-2.5 bg-white border border-text-dark/15 rounded-lg text-sm focus:outline-none focus:border-text-dark/40 focus:ring-1 focus:ring-text-dark/20 transition-all text-center"
-                                  placeholder="1"
-                                  title="Cantidad Mínima Mayorista"
-                                >
-                              </div>
+                          <!-- Stock / Mínimo -->
+                          <div>
+                            <label class="block md:hidden text-xs font-medium text-text-dark mb-2 uppercase tracking-wider">Stock / Mínimo</label>
+                            <div class="grid grid-cols-2 gap-2.5">
+                              <input
+                                v-model.number="variante.stock_actual"
+                                type="number"
+                                class="w-full px-3 py-2.5 bg-white border border-text-dark/15 rounded-lg text-sm focus:outline-none focus:border-text-dark/40 focus:ring-1 focus:ring-text-dark/20 transition-all text-center font-medium"
+                                placeholder="10"
+                                title="Stock Actual"
+                              >
+                              <input
+                                v-model.number="variante.stock_minimo"
+                                type="number"
+                                class="w-full px-3 py-2.5 bg-white border border-text-dark/15 rounded-lg text-sm focus:outline-none focus:border-text-dark/40 focus:ring-1 focus:ring-text-dark/20 transition-all text-center"
+                                placeholder="0"
+                                title="Stock Mínimo"
+                              >
                             </div>
                           </div>
 
                           <!-- SKU -->
-                          <div class="md:col-span-1">
+                          <div>
                             <label class="block md:hidden text-xs font-medium text-text-dark mb-2 uppercase tracking-wider">SKU</label>
                             <input
                               v-model="variante.sku"
                               type="text"
-                              class="w-full px-2 py-2.5 bg-white border border-text-dark/15 rounded-lg text-xs focus:outline-none focus:border-text-dark/40 focus:ring-1 focus:ring-text-dark/20 transition-all font-mono"
-                              placeholder="SKU-XX"
+                              class="w-full px-2.5 py-2.5 bg-white border border-text-dark/15 rounded-lg text-xs focus:outline-none focus:border-text-dark/40 focus:ring-1 focus:ring-text-dark/20 transition-all font-mono"
+                              placeholder="SKU-"
                             >
                           </div>
 
                           <!-- Activo + Quitar -->
-                          <div class="md:col-span-1 flex flex-row md:flex-col items-center justify-between md:justify-center gap-3">
-                            <label class="flex items-center gap-2 text-sm text-text-dark cursor-pointer">
+                          <div class="flex flex-row md:flex-col items-center justify-between md:justify-center gap-2 md:gap-2">
+                            <label class="flex items-center gap-2 text-sm text-text-dark cursor-pointer md:flex-col md:gap-0">
                               <input 
                                 v-model="variante.activo" 
                                 type="checkbox" 
-                                class="w-4 h-4 text-text-dark border-text-dark/20 rounded focus:ring-text-dark/50 focus:ring-offset-0 transition-all"
+                                class="w-5 h-5 text-text-dark border-text-dark/20 rounded focus:ring-text-dark/50 focus:ring-offset-0 transition-all cursor-pointer"
+                                title="Activar/Desactivar variante"
                               >
                               <span class="md:hidden">Activo</span>
                             </label>
                             <button
                               type="button"
                               @click="removeVariante(index)"
-                              class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-white hover:bg-red-600 border border-red-300 rounded-lg transition-all duration-300"
+                              class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-white hover:bg-red-600 border border-red-300 hover:border-red-600 rounded-lg transition-all duration-300 whitespace-nowrap"
                               title="Eliminar variante"
                             >
                               Quitar
@@ -876,7 +844,7 @@ const normalizeVariantes = () => {
       precio_moneda: v.precio_moneda || form.value.precio_moneda || 'COP',
       stock_actual: Number(v.stock_actual || 0),
       stock_minimo: Number(v.stock_minimo || 0),
-      cantidad_minima_mayorista: Number(v.cantidad_minima_mayorista || form.value.cantidad_minima_mayorista || 1),
+      cantidad_minima_mayorista: Number(v.cantidad_minima_mayorista || 1),
       imagen_url: v.imagen_url || null,
       activo: v.activo !== false,
       orden: v.orden ?? idx
@@ -1178,9 +1146,7 @@ const submitForm = async () => {
       imagen_principal: imagenUrl || null,
       imagenes: galleryUrls.value,
       destacado: form.value.destacado,
-      cantidad_minima_mayorista: form.value.cantidad_minima_mayorista ?? 1,
       disponible_b2b: !!form.value.disponible_b2b,
-      porcentaje_descuento_b2b: form.value.porcentaje_descuento_b2b ?? null,
       variantes: modoProducto.value === 'variantes' ? normalizeVariantes() : []
     }
     

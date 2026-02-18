@@ -779,6 +779,7 @@ export default {
           precio_moneda: v.precio_moneda || form.value.precio_moneda || 'COP',
           stock_actual: Number(v.stock_actual || 0),
           stock_minimo: Number(v.stock_minimo || 0),
+          cantidad_minima_mayorista: Number(v.cantidad_minima_mayorista || form.value.cantidad_minima_mayorista || 1),
           imagen_url: v.imagen_url || null,
           activo: v.activo !== false,
           orden: v.orden ?? idx

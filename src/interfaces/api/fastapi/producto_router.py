@@ -20,7 +20,12 @@ from application.use_cases.producto_use_cases import (
 )
 from application.dto.producto_dto import CrearProductoDTO, ProductoDTO, ActualizarProductoDTO
 from domain.exceptions.dominio import ExcepcionDominio
-from infrastructure.persistence.django.models import ProductoModel, ProductoDescuentoVolumenModel
+from infrastructure.persistence.django.models import (
+    ProductoModel, 
+    ProductoDescuentoVolumenModel,
+    ProductoVarianteModel,
+    ProductoVarianteDescuentoVolumenModel
+)
 
 router = APIRouter(prefix="/api/v1/productos", tags=["productos"])
 
@@ -282,3 +287,96 @@ def eliminar_producto(
         raise e
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
+
+
+# ═══════════════════════════════════════════════════════════════════════════
+# ENDPOINTS DE DESCUENTOS B2B PARA VARIANTES ESPECÍFICAS
+# ═══════════════════════════════════════════════════════════════════════════
+
+@router.get("/variantes/{variante_id}/b2b-descuentos", response_model=List[DescuentoVolumenOut])
+def obtener_descuentos_b2b_variante(variante_id: UUID):
+    """
+    Lista descuentos por volumen B2B de una variante específica.
+    """
+    try:
+        variante = ProductoVarianteModel.objects.get(id=variante_id)
+        descuentos = ProductoVarianteDescuentoVolumenModel.objects.filter(
+            variante=variante
+        ).order_by('cantidad_minima', 'orden')
+        
+        return [
+            DescuentoVolumenOut(
+                id=str(d.id),
+                cantidad_minima=d.cantidad_minima,
+                descuento_porcentaje=int(d.descuento_porcentaje or 0),
+                activo=d.activo,
+                orden=d.orden
+            )
+            for d in descuentos
+        ]
+    except ProductoVarianteModel.DoesNotExist:
+        raise HTTPException(status_code=404, detail="Variante no encontrada")
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@router.put("/variantes/{variante_id}/b2b-descuentos", response_model=List[DescuentoVolumenOut])
+def actualizar_descuentos_b2b_variante(variante_id: UUID, datos: List[DescuentoVolumenIn]):
+    """
+    Reemplaza la configuración de descuentos por volumen B2B de una variante específica.
+    """
+    try:
+        variante = ProductoVarianteModel.objects.get(id=variante_id)
+        
+        # Validaciones
+        seen = set()
+        for idx, d in enumerate(datos):
+            if d.cantidad_minima < 1:
+                raise HTTPException(
+                    status_code=400, 
+                    detail="La cantidad mínima debe ser mayor a 0"
+                )
+            if d.descuento_porcentaje < 0 or d.descuento_porcentaje > 90:
+                raise HTTPException(
+                    status_code=400, 
+                    detail="El descuento debe estar entre 0 y 90"
+                )
+            if d.cantidad_minima in seen:
+                raise HTTPException(
+                    status_code=400, 
+                    detail="No se permiten cantidades mínimas duplicadas"
+                )
+            seen.add(d.cantidad_minima)
+            if d.orden is None:
+                d.orden = idx
+
+        # Reemplazar configuración existente
+        ProductoVarianteDescuentoVolumenModel.objects.filter(variante=variante).delete()
+
+        created = []
+        for idx, d in enumerate(sorted(datos, key=lambda x: x.cantidad_minima)):
+            model = ProductoVarianteDescuentoVolumenModel.objects.create(
+                variante=variante,
+                cantidad_minima=d.cantidad_minima,
+                descuento_porcentaje=d.descuento_porcentaje,
+                activo=d.activo,
+                orden=d.orden if d.orden is not None else idx
+            )
+            created.append(
+                DescuentoVolumenOut(
+                    id=str(model.id),
+                    cantidad_minima=model.cantidad_minima,
+                    descuento_porcentaje=int(model.descuento_porcentaje or 0),
+                    activo=model.activo,
+                    orden=model.orden
+                )
+            )
+
+        return created
+    except ProductoVarianteModel.DoesNotExist:
+        raise HTTPException(status_code=404, detail="Variante no encontrada")
+    except HTTPException as e:
+        raise e
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
