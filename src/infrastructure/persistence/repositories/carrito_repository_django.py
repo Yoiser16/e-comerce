@@ -157,13 +157,14 @@ class CarritoRepositoryDjango(CarritoRepository):
             # Reservar stock de cada producto/variante
             for item in ItemCarritoModel.objects.filter(carrito_id=carrito_id):
                 if item.variante_id:
+                    # Si hay variante: descontar SOLO de la variante
                     variante = ProductoVarianteModel.objects.select_for_update().get(id=item.variante_id)
                     if variante.stock_actual < item.cantidad:
                         raise ConcurrenciaConflicto(f"Stock insuficiente para variante {variante.sku}")
                     variante.stock_actual -= item.cantidad
                     variante.save(update_fields=["stock_actual"])
-                    ProductoModel.objects.filter(id=item.producto_id).update(stock_actual=F('stock_actual') - item.cantidad)
                 else:
+                    # Si NO hay variante: descontar SOLO del producto base
                     producto = ProductoModel.objects.select_for_update().get(id=item.producto_id)
                     if producto.stock_actual < item.cantidad:
                         raise ConcurrenciaConflicto(f"Stock insuficiente para {producto.nombre}")
@@ -188,11 +189,12 @@ class CarritoRepositoryDjango(CarritoRepository):
         items = ItemCarritoModel.objects.filter(carrito_id=carrito_id)
         for item in items:
             if item.variante_id:
+                # Si hay variante: devolver SOLO a la variante
                 variante = ProductoVarianteModel.objects.select_for_update().get(id=item.variante_id)
                 variante.stock_actual += item.cantidad
                 variante.save(update_fields=["stock_actual"])
-                ProductoModel.objects.filter(id=item.producto_id).update(stock_actual=F('stock_actual') + item.cantidad)
             else:
+                # Si NO hay variante: devolver SOLO al producto base
                 producto = ProductoModel.objects.select_for_update().get(id=item.producto_id)
                 producto.stock_actual += item.cantidad
                 producto.save(update_fields=["stock_actual"])

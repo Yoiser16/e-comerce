@@ -1378,6 +1378,8 @@ const COLOR_HEX = {
 const formatLargoLabel = (largo) => (largo ? `${largo}"` : '')
 const BASE_VARIANTE_VALUE = '__base__'
 
+const baseSeleccionada = computed(() => colorSeleccionado.value === BASE_VARIANTE_VALUE)
+
 const variantesDisponibles = computed(() => {
   const variantes = Array.isArray(producto.value?.variantes) ? producto.value.variantes : []
   return variantes.filter(v => v && v.activo !== false)
@@ -1680,9 +1682,7 @@ const varianteSeleccionada = computed(() => {
   const variantes = variantesDisponibles.value
   if (!variantes.length) return null
 
-  if (colorSeleccionado.value === BASE_VARIANTE_VALUE) {
-    return varianteBase.value
-  }
+  if (baseSeleccionada.value) return null
 
   const color = colorSeleccionado.value
   const largo = largoSeleccionado.value
@@ -1705,12 +1705,20 @@ const varianteSeleccionada = computed(() => {
 })
 
 const precioUnitarioSeleccionado = computed(() => {
+  if (baseSeleccionada.value) {
+    return Number(producto.value?.precio_monto ?? producto.value?.precio ?? 0)
+  }
   return Number(
     varianteSeleccionada.value?.precio_monto ?? producto.value?.precio_monto ?? producto.value?.precio ?? 0
   )
 })
 
 const stockDisponible = computed(() => {
+  if (baseSeleccionada.value) {
+    const p = producto.value
+    if (!p) return 0
+    return Number(p.stock_actual ?? p.stock ?? p.stock_minimo ?? 0)
+  }
   if (varianteSeleccionada.value) {
     return Number(varianteSeleccionada.value.stock_actual ?? 0)
   }
@@ -1848,7 +1856,7 @@ const agregarAlCarrito = async () => {
     return
   }
 
-  const requiereVariante = variantesDisponibles.value.length > 0
+  const requiereVariante = variantesDisponibles.value.length > 0 && !baseSeleccionada.value
   if (requiereVariante && !varianteSeleccionada.value) {
     mensajeError.value = 'Selecciona una combinación de color y largo'
     mensaje.value = ''
@@ -1856,11 +1864,13 @@ const agregarAlCarrito = async () => {
   }
 
   try {
-    const precioUnitario = Number(
-      varianteSeleccionada.value?.precio_monto ?? producto.value.precio_monto ?? producto.value.precio ?? 0
-    )
-    const itemKey = requiereVariante ? (varianteSeleccionada.value?.id || producto.value.id) : producto.value.id
-    const varianteId = requiereVariante ? (varianteSeleccionada.value?.id || null) : null
+    const precioUnitario = baseSeleccionada.value
+      ? Number(producto.value?.precio_monto ?? producto.value?.precio ?? 0)
+      : Number(varianteSeleccionada.value?.precio_monto ?? producto.value?.precio_monto ?? producto.value?.precio ?? 0)
+    const itemKey = baseSeleccionada.value
+      ? producto.value.id
+      : (varianteSeleccionada.value?.id || producto.value.id)
+    const varianteId = baseSeleccionada.value ? null : (varianteSeleccionada.value?.id || null)
     
     // Usar SIEMPRE localStorage - el carrito es local
     const items = loadCartFromLocal()
@@ -1881,9 +1891,9 @@ const agregarAlCarrito = async () => {
       items.push({
         producto_id: producto.value.id,
         variante_id: varianteId,
-        variante_sku: varianteSeleccionada.value?.sku || '',
-        color: varianteSeleccionada.value?.color || '',
-        largo: varianteSeleccionada.value?.largo || '',
+        variante_sku: baseSeleccionada.value ? '' : (varianteSeleccionada.value?.sku || ''),
+        color: baseSeleccionada.value ? '' : (varianteSeleccionada.value?.color || ''),
+        largo: baseSeleccionada.value ? '' : (varianteSeleccionada.value?.largo || ''),
         nombre: producto.value.nombre,
         imagen_url: getImageUrl(varianteSeleccionada.value?.imagen_url || producto.value.imagen_principal),
         precio_unitario: precioUnitario,

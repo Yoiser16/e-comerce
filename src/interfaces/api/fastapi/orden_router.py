@@ -590,21 +590,22 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
 
             # DESCONTAR STOCK AQUÍ (orden PENDIENTE)
             # El stock se devuelve solo si se CANCELA la orden
+            # ⚠️ IMPORTANTE: Descontar SOLO de variante O producto base, NUNCA ambos
             if variante:
+                # Si hay variante: descontar SOLO de la variante
                 stock_anterior = variante.stock_actual
                 variante.stock_actual -= item.cantidad
                 variante.save()
-                producto.stock_actual -= item.cantidad
-                producto.save()
                 print(
-                    f'📦 Stock descontado: {producto.nombre} - {item.cantidad} unidades. '
-                    f'Variante {variante.sku} stock anterior: {stock_anterior}, stock nuevo: {variante.stock_actual}'
+                    f'📦 Stock descontado de VARIANTE: {producto.nombre} ({variante.sku}) - {item.cantidad} unidades. '
+                    f'Stock anterior: {stock_anterior}, stock nuevo: {variante.stock_actual}'
                 )
             else:
+                # Si NO hay variante: descontar del producto base
                 stock_anterior = producto.stock_actual
                 producto.stock_actual -= item.cantidad
                 producto.save()
-                print(f'📦 Stock descontado: {producto.nombre} - {item.cantidad} unidades. Stock anterior: {stock_anterior}, Stock nuevo: {producto.stock_actual}')
+                print(f'📦 Stock descontado de PRODUCTO BASE: {producto.nombre} - {item.cantidad} unidades. Stock anterior: {stock_anterior}, Stock nuevo: {producto.stock_actual}')
 
             items_response.append({
                 'producto_id': producto_id or 'sin-id',
@@ -814,17 +815,40 @@ def _enviar_email_estado(orden: OrdenModel, estado_nuevo: str) -> None:
 
 def _devolver_stock_si_cancelada(orden: OrdenModel) -> None:
     print(f'↩️ Cancelando orden {orden.codigo} - Devolviendo stock...')
+    from infrastructure.persistence.django.models import ProductoVarianteModel
+    
     lineas = LineaOrdenModel.objects.filter(orden=orden).select_related('producto')
     for linea in lineas:
-        if linea.producto:
+        if linea.variante_id:
+            # 🎯 Si la orden usó una VARIANTE, devolver stock a la variante
+            try:
+                variante = ProductoVarianteModel.objects.select_for_update().get(id=linea.variante_id)
+                stock_anterior = variante.stock_actual
+                variante.stock_actual += linea.cantidad
+                variante.save()
+                print(
+                    f'✅ Stock devuelto a VARIANTE: {linea.producto.nombre} ({linea.color_snapshot} {linea.largo_snapshot}) '
+                    f'- {linea.cantidad} unidades. Stock anterior: {stock_anterior}, Stock nuevo: {variante.stock_actual}'
+                )
+            except ProductoVarianteModel.DoesNotExist:
+                print(f'⚠️ ADVERTENCIA: Variante {linea.variante_id} no encontrada. Devolviendo al producto base como fallback.')
+                if linea.producto:
+                    producto = ProductoModel.objects.select_for_update().get(id=linea.producto_id)
+                    stock_anterior = producto.stock_actual
+                    producto.stock_actual += linea.cantidad
+                    producto.save()
+                    print(f'✅ Stock devuelto a PRODUCTO BASE: {producto.nombre} - {linea.cantidad} unidades.')
+        elif linea.producto:
+            # Si NO hay variante, devolver al producto base
             producto = ProductoModel.objects.select_for_update().get(id=linea.producto_id)
             stock_anterior = producto.stock_actual
             producto.stock_actual += linea.cantidad
             producto.save()
             print(
-                f'✅ Stock devuelto: {producto.nombre} - {linea.cantidad} unidades. '
+                f'✅ Stock devuelto a PRODUCTO: {producto.nombre} - {linea.cantidad} unidades. '
                 f'Stock anterior: {stock_anterior}, Stock nuevo: {producto.stock_actual}'
             )
+
 
 
 def _actualizar_estado_pago_sync(orden_id: str, estado_pago: str) -> dict:

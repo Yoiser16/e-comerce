@@ -1177,6 +1177,7 @@ export default {
     const colorSeleccionado = ref('')
     const largoSeleccionado = ref('')
     const BASE_VARIANTE_VALUE = '__base__'
+    const baseSeleccionada = computed(() => colorSeleccionado.value === BASE_VARIANTE_VALUE)
     const COLOR_BASE_HEX = '#F5EFE7'
     const COLOR_HEX = {
       negro_natural: '#1A1A1A',
@@ -1611,16 +1612,16 @@ export default {
       try {
         agregando.value = true
 
-        const requiereVariante = tieneVariantes.value
+        const requiereVariante = tieneVariantes.value && !baseSeleccionada.value
         if (requiereVariante && !varianteSeleccionada.value) {
           toast.error('Selecciona una variante disponible antes de continuar', 3000)
           return
         }
 
-        const itemKey = requiereVariante
-          ? (varianteSeleccionada.value?.id || producto.value.id)
-          : producto.value.id
-        const varianteId = requiereVariante ? (varianteSeleccionada.value?.id || null) : null
+        const itemKey = baseSeleccionada.value
+          ? producto.value.id
+          : (varianteSeleccionada.value?.id || producto.value.id)
+        const varianteId = baseSeleccionada.value ? null : (varianteSeleccionada.value?.id || null)
         
         // Agregar al carrito del storage
         const cart = JSON.parse(localStorage.getItem('b2b_cart') || '{"items":[]}')
@@ -1634,9 +1635,11 @@ export default {
           cart.items.push({
             id: producto.value.id,
             variante_id: varianteId,
-            variante_sku: varianteSeleccionada.value?.sku || producto.value.sku || producto.value.codigo || '',
-            color: varianteSeleccionada.value?.color || '',
-            largo: varianteSeleccionada.value?.largo || '',
+            variante_sku: baseSeleccionada.value
+              ? (producto.value.sku || producto.value.codigo || '')
+              : (varianteSeleccionada.value?.sku || producto.value.sku || producto.value.codigo || ''),
+            color: baseSeleccionada.value ? '' : (varianteSeleccionada.value?.color || ''),
+            largo: baseSeleccionada.value ? '' : (varianteSeleccionada.value?.largo || ''),
             nombre: producto.value.nombre,
             imagen: varianteSeleccionada.value?.imagen_url || producto.value.imagen_principal,
             precio: precioMayorista.value,
