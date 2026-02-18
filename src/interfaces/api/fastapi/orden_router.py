@@ -499,11 +499,11 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
             if cliente.telefono != data.telefono:
                 cliente.telefono = data.telefono
                 actualizado = True
-            # Actualizar documento si se proporciona uno nuevo o si viene del mayorista
-            if numero_doc and cliente.numero_documento != numero_doc:
+            # Actualizar documento SOLO si el cliente no tiene uno (evita violación de unique constraint)
+            if numero_doc and not cliente.numero_documento:
                 cliente.numero_documento = numero_doc
                 actualizado = True
-            if tipo_doc and cliente.tipo_documento != tipo_doc:
+            if tipo_doc and not cliente.tipo_documento:
                 cliente.tipo_documento = tipo_doc
                 actualizado = True
             if actualizado:
