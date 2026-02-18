@@ -221,41 +221,44 @@
                     </div>
 
                     <!-- ═══ BLOQUE: VARIANTES ═══ -->
-                    <div v-if="modoProducto === 'variantes'" class="space-y-4 bg-white border border-black/5 rounded-2xl p-5 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
-                      <div class="flex items-center justify-between">
+                    <div v-if="modoProducto === 'variantes'" class="space-y-5 bg-white border border-black/5 rounded-2xl p-6 shadow-[0_10px_30px_rgba(0,0,0,0.05)]">
+                      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                         <div>
                           <h3 class="text-[11px] font-semibold text-text-medium uppercase tracking-[0.2em]">VARIANTES</h3>
-                          <p class="text-xs text-text-light mt-1">Configura color, largo, precio y stock por variante.</p>
+                          <p class="text-sm text-text-medium mt-1">Configura color, largo, precio y stock por variante.</p>
                         </div>
                         <button
                           type="button"
                           @click="addVariante"
-                          class="px-3 py-2 text-xs bg-text-dark text-white rounded-lg hover:bg-black transition-colors"
+                          class="px-5 py-2.5 text-sm font-medium bg-text-dark text-white rounded-lg hover:bg-black transition-all duration-300 shadow-sm hover:shadow-md whitespace-nowrap"
                         >
                           + Agregar Variante
                         </button>
                       </div>
 
-                      <div v-if="form.variantes.length" class="space-y-3">
-                        <div class="hidden md:grid md:grid-cols-12 text-[11px] uppercase tracking-[0.12em] text-text-light">
-                          <span class="md:col-span-2">Color</span>
-                          <span class="md:col-span-2">Largo</span>
-                          <span class="md:col-span-2">Precio</span>
-                          <span class="md:col-span-3">Stock / Min / May</span>
-                          <span class="md:col-span-2">SKU</span>
-                          <span class="md:col-span-1 text-right">Activo</span>
+                      <div v-if="form.variantes.length" class="space-y-4">
+                        <!-- Headers Desktop -->
+                        <div class="hidden md:grid md:grid-cols-12 px-4 py-2 bg-[#FAF5F2] rounded-lg border border-black/5">
+                          <span class="md:col-span-2 text-xs font-semibold text-text-dark uppercase tracking-wider">Color</span>
+                          <span class="md:col-span-2 text-xs font-semibold text-text-dark uppercase tracking-wider">Largo</span>
+                          <span class="md:col-span-2 text-xs font-semibold text-text-dark uppercase tracking-wider">Precio</span>
+                          <span class="md:col-span-4 text-xs font-semibold text-text-dark uppercase tracking-wider">Stock / Min / May</span>
+                          <span class="md:col-span-1 text-xs font-semibold text-text-dark uppercase tracking-wider">SKU</span>
+                          <span class="md:col-span-1 text-xs font-semibold text-text-dark uppercase tracking-wider text-right">Activo</span>
                         </div>
 
+                        <!-- Variante Card -->
                         <div
                           v-for="(variante, index) in form.variantes"
                           :key="index"
-                          class="grid grid-cols-1 md:grid-cols-12 gap-3 items-center border border-black/5 rounded-xl p-3"
+                          class="grid grid-cols-1 md:grid-cols-12 gap-4 md:gap-3 items-start md:items-center bg-[#FAFAFA] border border-black/8 rounded-xl p-4 md:p-4 hover:border-text-dark/20 transition-all duration-300"
                         >
+                          <!-- Color -->
                           <div class="md:col-span-2">
-                            <label class="md:hidden text-xs text-text-light">Color</label>
+                            <label class="block md:hidden text-xs font-medium text-text-dark mb-2 uppercase tracking-wider">Color</label>
                             <select
                               v-model="variante.color"
-                              class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-xs"
+                              class="w-full px-3 py-2.5 bg-white border border-text-dark/15 rounded-lg text-sm focus:outline-none focus:border-text-dark/40 focus:ring-1 focus:ring-text-dark/20 transition-all"
                             >
                               <option value="">Sin color</option>
                               <option v-for="option in COLOR_OPTIONS" :key="option.value" :value="option.value">
@@ -264,75 +267,96 @@
                             </select>
                           </div>
 
+                          <!-- Largo -->
                           <div class="md:col-span-2">
-                            <label class="md:hidden text-xs text-text-light">Largo</label>
+                            <label class="block md:hidden text-xs font-medium text-text-dark mb-2 uppercase tracking-wider">Largo</label>
                             <select
                               v-model="variante.largo"
-                              class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-xs"
+                              class="w-full px-2.5 py-2.5 bg-white border border-text-dark/15 rounded-lg text-sm focus:outline-none focus:border-text-dark/40 focus:ring-1 focus:ring-text-dark/20 transition-all"
                             >
-                              <option value="">Sin largo</option>
+                              <option value="">-</option>
                               <option v-for="option in LARGO_OPTIONS" :key="option" :value="option">
                                 {{ option }}"
                               </option>
                             </select>
                           </div>
 
+                          <!-- Precio -->
                           <div class="md:col-span-2">
-                            <label class="md:hidden text-xs text-text-light">Precio</label>
-                            <input
-                              v-model.number="variante.precio_monto"
-                              type="number"
-                              step="0.01"
-                              class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-xs"
-                            >
-                          </div>
-
-                          <div class="md:col-span-3 grid grid-cols-3 gap-2">
-                            <div>
-                              <label class="md:hidden text-xs text-text-light">Stock</label>
+                            <label class="block md:hidden text-xs font-medium text-text-dark mb-2 uppercase tracking-wider">Precio</label>
+                            <div class="relative">
+                              <span class="absolute left-3 top-1/2 -translate-y-1/2 text-text-medium text-sm">$</span>
                               <input
-                                v-model.number="variante.stock_actual"
+                                v-model.number="variante.precio_monto"
                                 type="number"
-                                class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-xs"
-                              >
-                            </div>
-                            <div>
-                              <label class="md:hidden text-xs text-text-light">Min</label>
-                              <input
-                                v-model.number="variante.stock_minimo"
-                                type="number"
-                                class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-xs"
-                              >
-                            </div>
-                            <div>
-                              <label class="md:hidden text-xs text-text-light">Min May</label>
-                              <input
-                                v-model.number="variante.cantidad_minima_mayorista"
-                                type="number"
-                                min="1"
-                                class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-xs"
+                                step="0.01"
+                                class="w-full pl-8 pr-3 py-2.5 bg-white border border-text-dark/15 rounded-lg text-sm focus:outline-none focus:border-text-dark/40 focus:ring-1 focus:ring-text-dark/20 transition-all"
+                                placeholder="0.00"
                               >
                             </div>
                           </div>
 
-                          <div class="md:col-span-2">
-                            <label class="md:hidden text-xs text-text-light">SKU</label>
+                          <!-- Stock / Min / May -->
+                          <div class="md:col-span-4">
+                            <label class="block md:hidden text-xs font-medium text-text-dark mb-2 uppercase tracking-wider">Stock / Mín / May</label>
+                            <div class="grid grid-cols-3 gap-2">
+                              <div>
+                                <input
+                                  v-model.number="variante.stock_actual"
+                                  type="number"
+                                  class="w-full px-2 py-2.5 bg-white border border-text-dark/15 rounded-lg text-sm focus:outline-none focus:border-text-dark/40 focus:ring-1 focus:ring-text-dark/20 transition-all text-center"
+                                  placeholder="0"
+                                  title="Stock Actual"
+                                >
+                              </div>
+                              <div>
+                                <input
+                                  v-model.number="variante.stock_minimo"
+                                  type="number"
+                                  class="w-full px-2 py-2.5 bg-white border border-text-dark/15 rounded-lg text-sm focus:outline-none focus:border-text-dark/40 focus:ring-1 focus:ring-text-dark/20 transition-all text-center"
+                                  placeholder="0"
+                                  title="Stock Mínimo"
+                                >
+                              </div>
+                              <div>
+                                <input
+                                  v-model.number="variante.cantidad_minima_mayorista"
+                                  type="number"
+                                  min="1"
+                                  class="w-full px-2 py-2.5 bg-white border border-text-dark/15 rounded-lg text-sm focus:outline-none focus:border-text-dark/40 focus:ring-1 focus:ring-text-dark/20 transition-all text-center"
+                                  placeholder="1"
+                                  title="Cantidad Mínima Mayorista"
+                                >
+                              </div>
+                            </div>
+                          </div>
+
+                          <!-- SKU -->
+                          <div class="md:col-span-1">
+                            <label class="block md:hidden text-xs font-medium text-text-dark mb-2 uppercase tracking-wider">SKU</label>
                             <input
                               v-model="variante.sku"
                               type="text"
-                              class="w-full px-3 py-2 bg-[#FAFAFA] border border-text-dark/10 rounded-lg text-xs"
+                              class="w-full px-2 py-2.5 bg-white border border-text-dark/15 rounded-lg text-xs focus:outline-none focus:border-text-dark/40 focus:ring-1 focus:ring-text-dark/20 transition-all font-mono"
+                              placeholder="SKU-XX"
                             >
                           </div>
 
-                          <div class="md:col-span-1 flex items-center justify-between md:justify-end gap-3">
-                            <label class="flex items-center gap-2 text-xs text-text-dark">
-                              <input v-model="variante.activo" type="checkbox" class="w-4 h-4 text-[#D81B60] border-gray-300 rounded">
-                              Activo
+                          <!-- Activo + Quitar -->
+                          <div class="md:col-span-1 flex flex-row md:flex-col items-center justify-between md:justify-center gap-3">
+                            <label class="flex items-center gap-2 text-sm text-text-dark cursor-pointer">
+                              <input 
+                                v-model="variante.activo" 
+                                type="checkbox" 
+                                class="w-4 h-4 text-text-dark border-text-dark/20 rounded focus:ring-text-dark/50 focus:ring-offset-0 transition-all"
+                              >
+                              <span class="md:hidden">Activo</span>
                             </label>
                             <button
                               type="button"
                               @click="removeVariante(index)"
-                              class="text-xs text-red-600 hover:text-red-700"
+                              class="px-3 py-1.5 text-xs font-medium text-red-600 hover:text-white hover:bg-red-600 border border-red-300 rounded-lg transition-all duration-300"
+                              title="Eliminar variante"
                             >
                               Quitar
                             </button>
@@ -340,7 +364,14 @@
                         </div>
                       </div>
 
-                      <div v-else class="text-xs text-text-light">Agrega al menos una variante si manejas precios o stock por color/largo.</div>
+                      <!-- Empty State -->
+                      <div v-else class="text-center py-8 px-4 bg-[#FAF5F2] border border-dashed border-text-dark/20 rounded-xl">
+                        <svg class="w-12 h-12 mx-auto text-text-light opacity-40 mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z" />
+                        </svg>
+                        <p class="text-sm text-text-medium mb-1 font-medium">Sin variantes agregadas</p>
+                        <p class="text-xs text-text-light">Haz clic en "Agregar Variante" para configurar precios y stock por color/largo.</p>
+                      </div>
                     </div>
 
                   <!-- ═══ BLOQUE: ATRIBUTOS (Opcional) ═══ -->
