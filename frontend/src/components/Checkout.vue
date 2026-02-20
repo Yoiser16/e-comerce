@@ -17,111 +17,143 @@
     <template v-else>
     
     <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <!-- HEADER                                                               -->
+    <!-- HEADER - Optimizado para móvil                                       -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <header class="bg-white border-b border-[#E5E7EB]">
-      <div class="max-w-7xl mx-auto px-6 py-4">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 py-3 sm:py-4">
         <div class="flex items-center justify-between">
-          <div class="w-32"></div>
-          <router-link to="/" class="font-luxury text-2xl tracking-wide text-[#1A1A1A]">
+          <router-link to="/" class="text-[#7A7A7A] hover:text-[#D81B60] transition-colors">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+            </svg>
+          </router-link>
+          <router-link to="/" class="font-luxury text-xl sm:text-2xl tracking-wide text-[#1A1A1A]">
             Kharis
           </router-link>
-          <div class="w-32 flex justify-end">
-            <div class="flex items-center gap-2 text-sm text-[#6B7280]">
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
-              </svg>
-              <span class="hidden sm:inline">Compra Segura</span>
-            </div>
+          <div class="flex items-center gap-1.5 text-xs sm:text-sm text-[#6B7280]">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+            </svg>
+            <span class="hidden sm:inline">Compra Segura</span>
           </div>
         </div>
       </div>
     </header>
 
     <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <!-- STEPPER VISUAL                                                       -->
+    <!-- STEPPER VISUAL - Compacto para móvil                                 -->
+    <!-- En móvil: solo visible cuando mobileShowForm es true                 -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <div class="bg-white border-b border-[#E5E7EB] py-8">
-      <div class="max-w-2xl mx-auto px-6">
-        <div class="flex items-center justify-between relative">
-          <div class="absolute top-5 left-[10%] right-[10%] h-[2px] bg-[#F5EBE5]"></div>
-          <div 
-            class="absolute top-5 left-[10%] h-[2px] bg-gradient-to-r from-[#D81B60] to-[#C9A962] transition-all duration-500"
-            :style="{ width: stepperProgress }"
-          ></div>
-          
-          <div class="relative z-10 flex flex-col items-center" @click="goToStep(1)">
+    <div class="bg-white border-b border-[#E5E7EB] py-4 sm:py-6" :class="{ 'hidden lg:block': !mobileShowForm }">
+      <div class="max-w-md mx-auto px-4 sm:px-6">
+        <div class="flex items-center justify-center gap-2 sm:gap-3">
+          <!-- Paso 1 -->
+          <div class="flex items-center gap-1.5 sm:gap-2" @click="goToStep(1)">
             <div :class="[
-              'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all cursor-pointer',
-              currentStep >= 1 ? 'bg-gradient-to-br from-[#D81B60] to-[#C2185B] text-white shadow-md' : 'bg-white border-2 border-[#F5EBE5] text-[#9CA3AF]'
+              'w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-sm',
+              currentStep >= 1 ? 'bg-[#D81B60] text-white' : 'bg-white border-2 border-gray-200 text-gray-400'
             ]">
-              <svg v-if="currentStep > 1" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              <svg v-if="currentStep > 1" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
               </svg>
               <span v-else>1</span>
             </div>
-            <span :class="['mt-3 text-xs font-medium tracking-wide uppercase', currentStep >= 1 ? 'text-[#D81B60]' : 'text-[#9CA3AF]']">
-              Datos
-            </span>
           </div>
           
-          <div class="relative z-10 flex flex-col items-center" @click="goToStep(2)">
+          <!-- Línea conectora 1-2 -->
+          <div class="w-12 sm:w-20 h-0.5 bg-gray-200 rounded-full overflow-hidden">
+            <div 
+              class="h-full bg-[#D81B60] transition-all duration-300"
+              :style="{ width: currentStep > 1 ? '100%' : '0%' }"
+            ></div>
+          </div>
+          
+          <!-- Paso 2 -->
+          <div class="flex items-center gap-1.5 sm:gap-2" @click="goToStep(2)">
             <div :class="[
-              'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all cursor-pointer',
-              currentStep >= 2 ? 'bg-gradient-to-br from-[#D81B60] to-[#C2185B] text-white shadow-md' : 'bg-white border-2 border-[#F5EBE5] text-[#9CA3AF]'
+              'w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-sm',
+              currentStep >= 2 ? 'bg-[#D81B60] text-white' : 'bg-white border-2 border-gray-200 text-gray-400'
             ]">
-              <svg v-if="currentStep > 2" class="w-5 h-5" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
+              <svg v-if="currentStep > 2" class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
               </svg>
               <span v-else>2</span>
             </div>
-            <span :class="['mt-3 text-xs font-medium tracking-wide uppercase', currentStep >= 2 ? 'text-[#D81B60]' : 'text-[#9CA3AF]']">
-              Envío
-            </span>
           </div>
           
-          <div class="relative z-10 flex flex-col items-center" @click="goToStep(3)">
+          <!-- Línea conectora 2-3 -->
+          <div class="w-12 sm:w-20 h-0.5 bg-gray-200 rounded-full overflow-hidden">
+            <div 
+              class="h-full bg-[#D81B60] transition-all duration-300"
+              :style="{ width: currentStep > 2 ? '100%' : '0%' }"
+            ></div>
+          </div>
+          
+          <!-- Paso 3 -->
+          <div class="flex items-center gap-1.5 sm:gap-2" @click="goToStep(3)">
             <div :class="[
-              'w-10 h-10 rounded-full flex items-center justify-center text-sm font-medium transition-all cursor-pointer',
-              currentStep >= 3 ? 'bg-gradient-to-br from-[#D81B60] to-[#C2185B] text-white shadow-md' : 'bg-white border-2 border-[#F5EBE5] text-[#9CA3AF]'
+              'w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center text-xs sm:text-sm font-bold transition-all cursor-pointer shadow-sm',
+              currentStep >= 3 ? 'bg-[#D81B60] text-white' : 'bg-white border-2 border-gray-200 text-gray-400'
             ]">
               <span>3</span>
             </div>
-            <span :class="['mt-3 text-xs font-medium tracking-wide uppercase', currentStep >= 3 ? 'text-[#D81B60]' : 'text-[#9CA3AF]']">
-              Pago
-            </span>
           </div>
         </div>
       </div>
     </div>
 
     <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <!-- CONTENIDO PRINCIPAL                                                  -->
+    <!-- CONTENIDO PRINCIPAL - Layout móvil fluid                             -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <main class="flex-1 py-10">
-      <div class="max-w-7xl mx-auto px-6">
-        <div class="flex flex-col lg:flex-row gap-10">
+    <main class="flex-1 bg-white lg:bg-[#FAFAFA]">
+      <div class="max-w-7xl mx-auto lg:px-6 lg:py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 lg:gap-10">
           
           <!-- COLUMNA IZQUIERDA: Formularios -->
-          <div class="flex-1">
-            <div class="bg-white rounded-lg shadow-sm border border-[#E5E7EB] overflow-hidden">
+          <!-- En móvil: solo visible si mobileShowForm es true -->
+          <!-- En desktop (lg:): siempre visible -->
+          <div id="checkout-form" class="lg:col-span-8 order-2 lg:order-1" :class="{ 'hidden lg:block': !mobileShowForm }">
+            <!-- Barra superior móvil: volver al resumen -->
+            <div class="lg:hidden px-5 py-3 border-b border-[#f0f0f0]">
+              <div class="flex items-center justify-between">
+                <button 
+                  @click="showMobileSummary"
+                  class="flex items-center gap-2 text-[#6B7280] hover:text-[#1A1A1A] transition-colors"
+                >
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 19.5L8.25 12l7.5-7.5" />
+                  </svg>
+                  <span class="text-sm">Volver</span>
+                </button>
+                <button 
+                  @click="showMobileSummary"
+                  class="text-xs text-[#c11252] font-medium hover:underline"
+                >
+                  Ver resumen
+                </button>
+              </div>
+            </div>
+            
+            <!-- Contenedor fluid en móvil, tarjeta en desktop -->
+            <div class="lg:bg-white lg:rounded-lg lg:shadow-sm lg:border lg:border-[#E5E7EB] lg:overflow-hidden">
               
               <!-- ═══════════════════════════════════════════════════════════ -->
-              <!-- PASO 1: Datos de Contacto                                    -->
+              <!-- PASO 1: Datos de Contacto - Diseño móvil optimizado          -->
               <!-- ═══════════════════════════════════════════════════════════ -->
               <div v-show="currentStep === 1">
-                <div class="px-8 py-6 border-b border-[#E5E7EB]">
-                  <h2 class="font-luxury text-xl text-[#1A1A1A]">Datos de Contacto</h2>
-                  <p class="text-sm text-[#7A7A7A] mt-1">Te enviaremos actualizaciones de tu pedido</p>
+                <!-- Header de sección premium -->
+                <div class="px-5 lg:px-8 py-6 lg:border-b lg:border-[#f0f0f0]">
+                  <h2 class="text-lg font-semibold text-[#1A1A1A] tracking-tight">Datos de Contacto</h2>
+                  <p class="text-sm text-[#9CA3AF] mt-1">Te enviaremos actualizaciones de tu pedido</p>
                 </div>
                 
-                <div class="p-8 space-y-5">
+                <div class="px-5 lg:px-8 pb-8 pt-4 flex flex-col gap-4">
                   <div class="input-group">
                     <label>Correo electrónico</label>
                     <input type="email" v-model="form.email" placeholder="tu@email.com" @input="saveFormToStorage" />
                   </div>
                   
-                  <div class="grid sm:grid-cols-2 gap-5">
+                  <div class="grid grid-cols-2 gap-4">
                     <div class="input-group">
                       <label>Nombre</label>
                       <input type="text" v-model="form.nombre" placeholder="Tu nombre" @input="saveFormToStorage" />
@@ -133,11 +165,11 @@
                   </div>
                   
                   <div class="input-group">
-                    <label>Teléfono (WhatsApp)</label>
+                    <label>Teléfono WhatsApp</label>
                     <div class="relative flex">
-                      <!-- Prefijo de país -->
-                      <div class="flex items-center justify-center px-4 bg-[#F5F5F5] border border-r-0 border-[#E5E7EB] rounded-l-lg">
-                        <span class="text-[#4A4A4A] text-sm font-medium">🇨🇴 +57</span>
+                      <!-- Prefijo de país - fondo blanco premium -->
+                      <div class="flex items-center justify-center px-4 bg-white border border-r-0 border-[#e0e0e0] rounded-l-lg">
+                        <span class="text-[#6B7280] text-sm">🇨🇴 +57</span>
                       </div>
                       <!-- Input de teléfono -->
                       <input 
@@ -149,27 +181,27 @@
                         maxlength="12"
                       />
                     </div>
-                    <p class="text-xs text-[#9CA3AF] mt-1.5">Te contactaremos por WhatsApp para coordinar tu envío</p>
+                    
                   </div>
                   
-                  <div class="grid sm:grid-cols-2 gap-5">
+                  <div class="grid grid-cols-2 gap-4">
                     <div class="input-group">
-                      <label>Tipo de Documento</label>
-                      <select v-model="form.tipoDocumento" @change="saveFormToStorage" class="!p-3">
-                        <option value="">Selecciona...</option>
-                        <option value="CC">Cédula de Ciudadanía (CC)</option>
-                        <option value="CE">Cédula de Extranjería (CE)</option>
-                        <option value="TI">Tarjeta de Identidad (TI)</option>
+                      <label>Tipo Doc.</label>
+                      <select v-model="form.tipoDocumento" @change="saveFormToStorage">
+                        <option value="">Selecciona</option>
+                        <option value="CC">CC</option>
+                        <option value="CE">CE</option>
+                        <option value="TI">TI</option>
                         <option value="PASAPORTE">Pasaporte</option>
                         <option value="NIT">NIT</option>
                       </select>
                     </div>
                     <div class="input-group">
-                      <label>Número de Documento</label>
+                      <label>Número Documento</label>
                       <input 
                         type="text" 
                         v-model="form.numeroDocumento" 
-                        placeholder="Ingresa tu número de documento" 
+                        placeholder="1234567890" 
                         inputmode="numeric"
                         pattern="[0-9]*"
                         minlength="5"
@@ -178,226 +210,251 @@
                       />
                     </div>
                   </div>
-                  <p class="text-xs text-[#9CA3AF] -mt-3">📦 Requerido por la transportadora para realizar la entrega</p>
+                  <p class="text-xs text-[#9CA3AF] -mt-2">Requerido por la transportadora</p>
                   
-                  <label class="flex items-center gap-3 cursor-pointer group mt-6">
+                  <label class="flex items-center gap-3 cursor-pointer group">
                     <div class="relative">
                       <input type="checkbox" v-model="form.newsletter" class="sr-only peer" @change="saveFormToStorage" />
-                      <div class="w-5 h-5 border-2 border-[#F5AEC8] rounded peer-checked:bg-gradient-to-br peer-checked:from-[#D81B60] peer-checked:to-[#C2185B] peer-checked:border-[#D81B60] transition-all"></div>
+                      <div class="w-5 h-5 border border-[#e0e0e0] rounded peer-checked:bg-[#c11252] peer-checked:border-[#c11252] transition-all"></div>
                       <svg class="absolute inset-0 w-5 h-5 text-white opacity-0 peer-checked:opacity-100" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" />
                       </svg>
                     </div>
-                    <span class="text-sm text-[#7A7A7A]">Recibir novedades y ofertas exclusivas</span>
+                    <span class="text-sm text-[#6B7280]">Recibir novedades y ofertas exclusivas</span>
                   </label>
                 </div>
                 
-                <div class="px-8 py-6 bg-[#FAFAFA] border-t border-[#E5E7EB]">
+                <!-- Footer con CTA - fluid en móvil -->
+                <div class="px-5 lg:px-8 py-4 lg:bg-[#FAFAFA] lg:border-t lg:border-[#f0f0f0]">
                   <button 
                     @click="nextStep"
                     :disabled="!isStep1Valid"
-                    class="w-full bg-gradient-to-r from-[#D81B60] to-[#C2185B] hover:from-[#C2185B] hover:to-[#AD1457] disabled:bg-[#F3F4F6] disabled:text-[#9CA3AF] text-white py-4 text-sm font-medium tracking-widest uppercase transition-all shadow-sm"
+                    class="w-full bg-[#c11252] hover:bg-[#a00f45] disabled:bg-[#e5e7eb] disabled:text-[#9CA3AF] text-white py-4 text-sm font-semibold rounded-xl transition-all"
                   >
-                    Continuar al Envío
+                    Continuar
                   </button>
                   
-                  <div class="flex items-center justify-center gap-6 mt-6 text-xs text-[#6B7280]">
-                    <div class="flex items-center gap-1.5">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                  <!-- Badges de seguridad - solo en desktop -->
+                  <div class="hidden lg:flex items-center justify-center gap-4 mt-5 text-xs text-[#9CA3AF]">
+                    <div class="flex items-center gap-1">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                       </svg>
-                      <span>Pago Seguro SSL</span>
+                      <span>Pago Seguro</span>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <div class="flex items-center gap-1">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
                       </svg>
                       <span>Envío Nacional</span>
                     </div>
-                    <div class="flex items-center gap-1.5">
-                      <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                    <div class="flex items-center gap-1">
+                      <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M9 12.75L11.25 15 15 9.75M21 12c0 1.268-.63 2.39-1.593 3.068a3.745 3.745 0 01-1.043 3.296 3.745 3.745 0 01-3.296 1.043A3.745 3.745 0 0112 21c-1.268 0-2.39-.63-3.068-1.593a3.746 3.746 0 01-3.296-1.043 3.745 3.745 0 01-1.043-3.296A3.745 3.745 0 013 12c0-1.268.63-2.39 1.593-3.068a3.745 3.745 0 011.043-3.296 3.746 3.746 0 013.296-1.043A3.746 3.746 0 0112 3c1.268 0 2.39.63 3.068 1.593a3.746 3.746 0 013.296 1.043 3.746 3.746 0 011.043 3.296A3.745 3.745 0 0121 12z" />
                       </svg>
-                      <span>Garantía de Calidad</span>
+                      <span>Garantía</span>
                     </div>
                   </div>
                 </div>
               </div>
 
+              <!-- Backdrop para dropdowns en móvil -->
+              <div 
+                v-if="dropdowns.departamento || dropdowns.municipio"
+                @click="dropdowns.departamento = false; dropdowns.municipio = false"
+                class="sm:hidden fixed inset-0 bg-black/40 z-[150]"
+              ></div>
+
               <!-- ═══════════════════════════════════════════════════════════ -->
-              <!-- PASO 2: Dirección de Envío                                   -->
+              <!-- PASO 2: Dirección de Envío - Optimizado móvil                -->
               <!-- ═══════════════════════════════════════════════════════════ -->
               <div v-show="currentStep === 2">
-                <div class="px-8 py-6 border-b border-[#E5E7EB]">
-                  <h2 class="font-luxury text-xl text-[#1A1A1A]">Dirección de Envío</h2>
-                  <p class="text-sm text-[#7A7A7A] mt-1">¿Dónde entregamos tu pedido?</p>
+                <!-- Header de sección premium -->
+                <div class="px-5 lg:px-8 py-6 lg:border-b lg:border-[#f0f0f0]">
+                  <h2 class="text-lg font-semibold text-[#1A1A1A] tracking-tight">Dirección de Envío</h2>
+                  <p class="text-sm text-[#9CA3AF] mt-1">¿Dónde entregamos tu pedido?</p>
                 </div>
                 
-                <div class="p-8 space-y-5">
-                  <!-- País y Departamento en línea -->
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- País -->
-                    <div class="input-group">
-                      <label>País</label>
-                      <div class="select-wrapper">
-                        <select v-model="form.pais" @change="onPaisChange">
-                          <option value="">Selecciona país</option>
-                          <option value="CO">Colombia</option>
-                        </select>
-                        <svg class="select-arrow" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <div class="px-5 lg:px-8 pb-8 pt-4 flex flex-col gap-4">
+                  <!-- País + Departamento en una fila horizontal -->
+                  <div class="input-group" v-if="form.pais === 'CO'">
+                    <label>Departamento</label>
+                    <div class="flex items-center gap-2">
+                      <!-- País - Badge compacto -->
+                      <div class="flex items-center justify-center w-[52px] h-[52px] bg-[#fafafa] border border-[#e0e0e0] rounded-lg flex-shrink-0">
+                        <span class="text-lg">🇨🇴</span>
+                      </div>
+                      
+                      <!-- Departamento - Ocupa el resto -->
+                      <div class="flex-1">
+                      <div class="custom-dropdown" @click.stop>
+                      <button 
+                        type="button"
+                        @click="toggleDropdown('departamento')"
+                        :disabled="loadingDepartamentos"
+                        class="dropdown-trigger"
+                      >
+                        <span :class="{ 'text-[#9CA3AF]': !getDepName }">
+                          {{ loadingDepartamentos ? 'Cargando...' : (getDepName || 'Selecciona tu departamento') }}
+                        </span>
+                        <svg v-if="!loadingDepartamentos" class="w-5 h-5 text-[#6B7280] transition-transform" :class="{ 'rotate-180': dropdowns.departamento }" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                           <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
                         </svg>
+                        <svg v-else class="w-5 h-5 text-[#6B7280] animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                      </button>
+                      
+                      <!-- Dropdown panel - Ahora fullscreen en móvil -->
+                      <div v-show="dropdowns.departamento" class="dropdown-panel">
+                        <!-- Header móvil -->
+                        <div class="sm:hidden flex items-center justify-between px-4 py-3 border-b border-[#E5E7EB]">
+                          <span class="font-medium text-[#1A1A1A]">Selecciona departamento</span>
+                          <button @click="dropdowns.departamento = false" class="p-1">
+                            <svg class="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
+                            </svg>
+                          </button>
+                        </div>
+                        <div class="dropdown-search">
+                          <svg class="w-4 h-4 text-[#9CA3AF]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                          <input 
+                            type="text" 
+                            v-model="searchDep" 
+                            placeholder="Buscar departamento..."
+                            class="!text-base"
+                            @click.stop
+                          />
+                        </div>
+                        <ul class="dropdown-list">
+                          <li 
+                            v-for="dep in departamentosFiltrados" 
+                            :key="dep.id"
+                            @click="selectDepartamento(dep)"
+                            :class="{ 'selected': dep.nombre === form.departamento || dep.id === form.departamentoId }"
+                            class="!py-3.5"
+                          >
+                            {{ dep.nombre }}
+                            <svg v-if="dep.nombre === form.departamento || dep.id === form.departamentoId" class="w-5 h-5 text-[#D81B60]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          </li>
+                          <li v-if="departamentosFiltrados.length === 0" class="empty">
+                            No se encontraron resultados
+                          </li>
+                        </ul>
                       </div>
                     </div>
-                    
-                    <!-- Departamento - Dropdown personalizado -->
-                    <div class="input-group" v-if="form.pais === 'CO'">
-                      <label>Departamento</label>
-                      <div class="custom-dropdown" @click.stop>
-                        <button 
-                          type="button"
-                          @click="toggleDropdown('departamento')"
-                          :disabled="loadingDepartamentos"
-                          class="dropdown-trigger"
-                        >
-                          <span :class="{ 'text-[#9CA3AF]': !getDepName }">
-                            {{ loadingDepartamentos ? 'Cargando...' : (getDepName || 'Selecciona departamento') }}
-                          </span>
-                          <svg v-if="!loadingDepartamentos" class="w-4 h-4 text-[#6B7280] transition-transform" :class="{ 'rotate-180': dropdowns.departamento }" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                          </svg>
-                          <svg v-else class="w-4 h-4 text-[#6B7280] animate-spin" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                          </svg>
-                        </button>
-                        
-                        <!-- Dropdown panel -->
-                        <div v-show="dropdowns.departamento" class="dropdown-panel">
-                          <div class="dropdown-search">
-                            <svg class="w-4 h-4 text-[#9CA3AF]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                    </div>
+                    </div>
+                  </div>
+                  
+                  <!-- Oculto: País -->
+                  <input type="hidden" v-model="form.pais" />
+                  
+                  <!-- Municipio -->
+                  <div class="input-group" v-if="form.departamento">
+                    <label>Ciudad / Municipio</label>
+                    <div class="custom-dropdown" @click.stop>
+                      <button 
+                        type="button"
+                        @click="toggleDropdown('municipio')"
+                        :disabled="loadingMunicipios"
+                        class="dropdown-trigger"
+                      >
+                        <span :class="{ 'text-[#9CA3AF]': !getMunName }">
+                          {{ loadingMunicipios ? 'Cargando...' : (getMunName || 'Selecciona tu ciudad') }}
+                        </span>
+                        <svg v-if="!loadingMunicipios" class="w-5 h-5 text-[#6B7280] transition-transform" :class="{ 'rotate-180': dropdowns.municipio }" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
+                        </svg>
+                        <svg v-else class="w-5 h-5 text-[#6B7280] animate-spin" fill="none" viewBox="0 0 24 24">
+                          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                        </svg>
+                      </button>
+                      
+                      <!-- Dropdown panel - Fullscreen en móvil -->
+                      <div v-show="dropdowns.municipio" class="dropdown-panel">
+                        <!-- Header móvil -->
+                        <div class="sm:hidden flex items-center justify-between px-4 py-3 border-b border-[#E5E7EB]">
+                          <span class="font-medium text-[#1A1A1A]">Selecciona tu ciudad</span>
+                          <button @click="dropdowns.municipio = false" class="p-1">
+                            <svg class="w-5 h-5 text-[#6B7280]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
                             </svg>
-                            <input 
-                              type="text" 
-                              v-model="searchDep" 
-                              placeholder="Buscar departamento..."
-                              @click.stop
-                            />
-                          </div>
-                          <ul class="dropdown-list">
-                            <li 
-                              v-for="dep in departamentosFiltrados" 
-                              :key="dep.id"
-                              @click="selectDepartamento(dep)"
-                              :class="{ 'selected': dep.nombre === form.departamento || dep.id === form.departamentoId }"
-                            >
-                              {{ dep.nombre }}
-                              <svg v-if="dep.nombre === form.departamento || dep.id === form.departamentoId" class="w-4 h-4 text-[#1A1A1A]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                              </svg>
-                            </li>
-                            <li v-if="departamentosFiltrados.length === 0" class="empty">
-                              No se encontraron resultados
-                            </li>
-                          </ul>
+                          </button>
                         </div>
+                        <div class="dropdown-search">
+                          <svg class="w-4 h-4 text-[#9CA3AF]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                          </svg>
+                          <input 
+                            type="text" 
+                            v-model="searchMun" 
+                            placeholder="Buscar municipio..."
+                            class="!text-base"
+                            @click.stop
+                          />
+                        </div>
+                        <ul class="dropdown-list">
+                          <li 
+                            v-for="mun in municipiosFiltrados" 
+                            :key="mun.id"
+                            @click="selectMunicipio(mun)"
+                            :class="{ 'selected': mun.nombre === form.municipio }"
+                            class="!py-3.5"
+                          >
+                            {{ mun.nombre }}
+                            <svg v-if="mun.nombre === form.municipio" class="w-5 h-5 text-[#D81B60]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                              <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                            </svg>
+                          </li>
+                          <li v-if="municipiosFiltrados.length === 0" class="empty">
+                            No se encontraron resultados
+                          </li>
+                        </ul>
                       </div>
                     </div>
                   </div>
                   
-                  <!-- Municipio y Tipo de Zona en línea -->
-                  <div class="grid grid-cols-1 sm:grid-cols-2 gap-4" v-if="form.departamento">
-                    <!-- Municipio - Dropdown personalizado -->
-                    <div class="input-group">
-                      <label>Municipio</label>
-                      <div class="custom-dropdown" @click.stop>
-                        <button 
-                          type="button"
-                          @click="toggleDropdown('municipio')"
-                          :disabled="loadingMunicipios"
-                          class="dropdown-trigger"
-                        >
-                          <span :class="{ 'text-[#9CA3AF]': !getMunName }">
-                            {{ loadingMunicipios ? 'Cargando...' : (getMunName || 'Selecciona municipio') }}
-                          </span>
-                          <svg v-if="!loadingMunicipios" class="w-4 h-4 text-[#6B7280] transition-transform" :class="{ 'rotate-180': dropdowns.municipio }" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7" />
-                          </svg>
-                          <svg v-else class="w-4 h-4 text-[#6B7280] animate-spin" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                          </svg>
-                        </button>
-                        
-                        <!-- Dropdown panel -->
-                        <div v-show="dropdowns.municipio" class="dropdown-panel">
-                          <div class="dropdown-search">
-                            <svg class="w-4 h-4 text-[#9CA3AF]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                              <path stroke-linecap="round" stroke-linejoin="round" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-                            </svg>
-                            <input 
-                              type="text" 
-                              v-model="searchMun" 
-                              placeholder="Buscar municipio..."
-                              @click.stop
-                            />
-                          </div>
-                          <ul class="dropdown-list">
-                            <li 
-                              v-for="mun in municipiosFiltrados" 
-                              :key="mun.id"
-                              @click="selectMunicipio(mun)"
-                              :class="{ 'selected': mun.nombre === form.municipio }"
-                            >
-                              {{ mun.nombre }}
-                              <svg v-if="mun.nombre === form.municipio" class="w-4 h-4 text-[#1A1A1A]" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                                <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                              </svg>
-                            </li>
-                            <li v-if="municipiosFiltrados.length === 0" class="empty">
-                              No se encontraron resultados
-                            </li>
-                          </ul>
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <!-- Tipo de Zona -->
-                    <div class="input-group" v-if="form.municipio">
-                      <label>Tipo de zona</label>
-                      <div class="flex gap-2 h-[50px]">
-                        <button 
-                          type="button"
-                          @click="form.tipoZona = 'urbano'; saveFormToStorage()"
-                          :class="[
-                            'flex-1 flex items-center justify-center gap-2 border transition-all text-sm font-medium',
-                            form.tipoZona === 'urbano' 
-                              ? 'border-[#1A1A1A] bg-[#1A1A1A] text-white' 
-                              : 'border-[#E5E7EB] hover:border-[#9CA3AF] text-[#4A4A4A]'
-                          ]"
-                        >
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
-                          </svg>
-                          Urbano
-                        </button>
-                        <button 
-                          type="button"
-                          @click="form.tipoZona = 'rural'; saveFormToStorage()"
-                          :class="[
-                            'flex-1 flex items-center justify-center gap-2 border transition-all text-sm font-medium',
-                            form.tipoZona === 'rural' 
-                              ? 'border-[#1A1A1A] bg-[#1A1A1A] text-white' 
-                              : 'border-[#E5E7EB] hover:border-[#9CA3AF] text-[#4A4A4A]'
-                          ]"
-                        >
-                          <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
-                          </svg>
-                          Rural
-                        </button>
-                      </div>
+                  <!-- Tipo de Zona -->
+                  <div class="input-group" v-if="form.municipio">
+                    <label>Tipo de zona</label>
+                    <div class="flex gap-3 h-[52px]">
+                      <button 
+                        type="button"
+                        @click="form.tipoZona = 'urbano'; saveFormToStorage()"
+                        :class="[
+                          'flex-1 flex items-center justify-center gap-2 border transition-all text-sm font-medium rounded-lg',
+                          form.tipoZona === 'urbano' 
+                            ? 'border-[#c11252] bg-[#c112520a] text-[#c11252]' 
+                            : 'border-[#e0e0e0] bg-white hover:border-[#d1d5db] text-[#4A4A4A]'
+                        ]"
+                      >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 21h19.5m-18-18v18m10.5-18v18m6-13.5V21M6.75 6.75h.75m-.75 3h.75m-.75 3h.75m3-6h.75m-.75 3h.75m-.75 3h.75M6.75 21v-3.375c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21M3 3h12m-.75 4.5H21m-3.75 3.75h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008zm0 3h.008v.008h-.008v-.008z" />
+                        </svg>
+                        Urbano
+                      </button>
+                      <button 
+                        type="button"
+                        @click="form.tipoZona = 'rural'; saveFormToStorage()"
+                        :class="[
+                          'flex-1 flex items-center justify-center gap-2 border transition-all text-sm font-medium rounded-lg',
+                          form.tipoZona === 'rural' 
+                            ? 'border-[#c11252] bg-[#c112520a] text-[#c11252]' 
+                            : 'border-[#e0e0e0] bg-white hover:border-[#d1d5db] text-[#4A4A4A]'
+                        ]"
+                      >
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
+                          <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 12l8.954-8.955c.44-.439 1.152-.439 1.591 0L21.75 12M4.5 9.75v10.125c0 .621.504 1.125 1.125 1.125H9.75v-4.875c0-.621.504-1.125 1.125-1.125h2.25c.621 0 1.125.504 1.125 1.125V21h4.125c.621 0 1.125-.504 1.125-1.125V9.75M8.25 21h8.25" />
+                        </svg>
+                        Rural
+                      </button>
                     </div>
                   </div>
                   
@@ -415,7 +472,7 @@
                   
                   <!-- Indicaciones (rural) -->
                   <div class="input-group" v-if="form.tipoZona === 'rural'">
-                    <label>Vereda / Indicaciones de llegada</label>
+                    <label>Indicaciones de llegada</label>
                     <textarea 
                       v-model="form.indicacionesRural" 
                       placeholder="Describe cómo llegar a tu ubicación..."
@@ -426,29 +483,30 @@
                   
                   <!-- Apartamento/Oficina -->
                   <div class="input-group" v-if="form.tipoZona">
-                    <label>Apartamento, oficina, local (opcional)</label>
+                    <label>Apartamento / Oficina (opcional)</label>
                     <input type="text" v-model="form.apartamento" placeholder="Ej: Apto 201, Torre B" @input="saveFormToStorage" />
                   </div>
                 </div>
                 
-                <div class="px-8 py-6 bg-[#FAFAFA] border-t border-[#E5E7EB]">
-                  <div class="flex gap-4">
+                <!-- Footer con CTAs - estilo premium -->
+                <div class="px-5 lg:px-8 py-6 lg:bg-[#fafafa] lg:border-t lg:border-[#f0f0f0]">
+                  <div class="flex gap-3">
                     <button 
                       @click="prevStep"
-                      class="px-8 py-4 border border-[#F5AEC8] text-[#4A4A4A] text-sm font-medium tracking-widest uppercase hover:border-[#D81B60] hover:bg-[#FEF7FA] transition-all"
+                      class="px-6 py-4 border border-[#e0e0e0] text-[#4A4A4A] text-sm font-medium rounded-lg hover:border-[#c11252] hover:text-[#c11252] transition-all bg-white"
                     >
                       Volver
                     </button>
                     <button 
                       @click="nextStep"
                       :disabled="!isStep2Valid"
-                      class="flex-1 bg-gradient-to-r from-[#D81B60] to-[#C2185B] hover:from-[#C2185B] hover:to-[#AD1457] disabled:bg-[#F3F4F6] disabled:text-[#9CA3AF] text-white py-4 text-sm font-medium tracking-widest uppercase transition-all shadow-sm"
+                      class="flex-1 bg-[#c11252] hover:bg-[#a00f45] disabled:bg-[#e5e7eb] disabled:text-[#9CA3AF] text-white py-4 text-sm font-semibold rounded-xl transition-all"
                     >
                       Continuar al Pago
                     </button>
                   </div>
                   
-                  <div class="flex items-center justify-center gap-6 mt-6 text-xs text-[#6B7280]">
+                  <div class="hidden lg:flex items-center justify-center gap-6 mt-5 text-xs text-[#9CA3AF]">
                     <div class="flex items-center gap-1.5">
                       <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
@@ -468,107 +526,101 @@
               <!-- ═══════════════════════════════════════════════════════════ -->
               <!-- PASO 3: Método de Pago                                       -->
               <!-- ═══════════════════════════════════════════════════════════ -->
+              <!-- PASO 3: Método de Pago - Diseño fluid retail                  -->
+              <!-- ═══════════════════════════════════════════════════════════ -->
               <div v-show="currentStep === 3">
-                <div class="px-8 py-6 border-b border-[#E5E7EB]">
-                  <h2 class="font-luxury text-xl text-[#1A1A1A]">Método de Pago</h2>
-                  <p class="text-sm text-[#7A7A7A] mt-1">Selecciona cómo deseas pagar</p>
+                <!-- Header de sección -->
+                <div class="px-5 lg:px-8 py-5 lg:py-6 lg:border-b lg:border-[#f0f0f0]">
+                  <h2 class="text-lg font-semibold text-[#1A1A1A] tracking-tight">Método de Pago</h2>
+                  <p class="text-sm text-[#9CA3AF] mt-1">Selecciona cómo deseas pagar</p>
                 </div>
                 
-                <!-- Banner informativo para clientes con datos guardados -->
-                <div v-if="clienteConDatosCompletos" class="mx-8 mt-6 mb-2 bg-gradient-to-r from-[#FDF2F8] to-[#FCE7F3] border border-[#F9A8D4] rounded-lg p-4">
-                  <div class="flex items-start gap-3">
-                    <div class="flex-shrink-0 w-8 h-8 bg-[#D81B60] rounded-full flex items-center justify-center">
-                      <svg class="w-4 h-4 text-white" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
-                      </svg>
+                <!-- Banner informativo para clientes recurrentes (sutil) -->
+                <div v-if="clienteConDatosCompletos" class="mx-5 lg:mx-8 mb-4 flex items-center gap-2 text-sm text-[#c11252]">
+                  <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" />
+                  </svg>
+                  <span>¡Hola de nuevo! Ya tenemos tu información guardada.</span>
+                </div>
+                
+                <!-- Resumen de datos - SIN TARJETA, texto limpio con enlaces -->
+                <div class="px-5 lg:px-8 space-y-3 mb-6">
+                  <div class="flex items-center justify-between py-2 border-b border-[#f0f0f0]">
+                    <div class="flex-1 min-w-0">
+                      <span class="text-xs text-[#9CA3AF] uppercase tracking-wider">Contacto</span>
+                      <p class="text-sm text-[#1A1A1A] mt-0.5 truncate">{{ form.email }}</p>
                     </div>
-                    <div class="flex-1">
-                      <p class="text-sm font-medium text-[#831843]">¡Hola de nuevo! 💕</p>
-                      <p class="text-xs text-[#9D174D] mt-1">
-                        Ya tenemos tu información guardada. Solo elige cómo pagar y listo.
-                      </p>
+                    <button @click="goToStep(1)" class="text-xs text-[#c11252] hover:underline ml-4">Editar</button>
+                  </div>
+                  <div class="flex items-center justify-between py-2">
+                    <div class="flex-1 min-w-0">
+                      <span class="text-xs text-[#9CA3AF] uppercase tracking-wider">Envío a</span>
+                      <p class="text-sm text-[#1A1A1A] mt-0.5 truncate">{{ getFullAddress() }}</p>
                     </div>
+                    <button @click="goToStep(2)" class="text-xs text-[#c11252] hover:underline ml-4">Editar</button>
                   </div>
                 </div>
                 
-                <!-- Resumen de datos -->
-                <div class="mx-8 my-6 border border-[#E5E7EB] divide-y divide-[#E5E7EB]">
-                  <div class="flex items-center justify-between px-5 py-4">
-                    <div class="flex gap-4">
-                      <span class="text-xs text-[#6B7280] uppercase tracking-wider w-14">Contacto</span>
-                      <span class="text-sm text-[#4A4A4A]">{{ form.email }}</span>
-                    </div>
-                    <button @click="goToStep(1)" class="text-xs text-[#D81B60] hover:underline">Cambiar</button>
-                  </div>
-                  <div class="flex items-center justify-between px-5 py-4">
-                    <div class="flex gap-4">
-                      <span class="text-xs text-[#6B7280] uppercase tracking-wider w-14">Envío</span>
-                      <span class="text-sm text-[#4A4A4A]">{{ getFullAddress() }}</span>
-                    </div>
-                    <button @click="goToStep(2)" class="text-xs text-[#D81B60] hover:underline">Cambiar</button>
-                  </div>
-                </div>
+                <!-- Separador -->
+                <div class="border-t border-[#f0f0f0] mx-5 lg:mx-8 mb-5"></div>
                 
-                <!-- Opciones de Pago -->
-                <div class="px-8 pb-8 space-y-4">
-                  <!-- Opción Wompi - DESACTIVADA TEMPORALMENTE
+                <!-- Opciones de Pago - Diseño limpio -->
+                <div class="px-5 lg:px-8 pb-6 space-y-3">
+                  <!-- Opción Wompi -->
                   <div 
                     @click="selectedPayment = 'wompi'"
                     :class="[
-                      'cursor-pointer border-2 p-5 transition-all',
+                      'cursor-pointer rounded-xl p-4 transition-all',
                       selectedPayment === 'wompi' 
-                        ? 'border-[#D81B60] bg-[#FDF2F8]' 
-                        : 'border-[#E5E7EB] hover:border-[#9CA3AF]'
+                        ? 'border-2 border-[#c11252] bg-[#fef7f9]' 
+                        : 'border border-[#e5e7eb] hover:border-[#c11252]/30'
                     ]"
                   >
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-3">
                       <div :class="[
-                        'w-5 h-5 rounded-full border-2 flex items-center justify-center',
-                        selectedPayment === 'wompi' ? 'border-[#D81B60]' : 'border-[#D1D5DB]'
+                        'w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0',
+                        selectedPayment === 'wompi' ? 'border-[#c11252]' : 'border-[#d1d5db]'
                       ]">
-                        <div :class="['w-2.5 h-2.5 rounded-full', selectedPayment === 'wompi' ? 'bg-[#D81B60]' : '']"></div>
+                        <div :class="['w-2.5 h-2.5 rounded-full transition-all', selectedPayment === 'wompi' ? 'bg-[#c11252]' : '']"></div>
                       </div>
-                      <div class="flex-1">
-                        <p class="font-medium text-[#1A1A1A]">Pago Seguro Inmediato</p>
-                        <p class="text-xs text-[#7A7A7A] mt-0.5">Tarjeta, PSE, Nequi, Daviplata, Bancolombia</p>
+                      <div class="flex-1 min-w-0">
+                        <p class="text-sm font-medium text-[#1A1A1A]">Pago Seguro Inmediato</p>
+                        <p class="text-xs text-[#9CA3AF] mt-0.5">Tarjeta, PSE, Nequi, Daviplata</p>
                       </div>
-                      <div class="flex items-center gap-2">
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" class="h-4" />
-                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="MC" class="h-5" />
-                        <div class="h-5 px-2 bg-gradient-to-r from-[#00D4AA] to-[#00A3E0] rounded text-white text-[10px] font-bold flex items-center">
-                          Wompi
-                        </div>
+                      <div class="flex items-center gap-1.5 flex-shrink-0">
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/5/5e/Visa_Inc._logo.svg" alt="Visa" class="h-3 opacity-60" />
+                        <img src="https://upload.wikimedia.org/wikipedia/commons/2/2a/Mastercard-logo.svg" alt="MC" class="h-4 opacity-60" />
                       </div>
                     </div>
                   </div>
-                  FIN Opción Wompi -->
                   
-                  <!-- Opción Asesora -->
+                  <!-- Opción Asesora - Con badge elegante inline -->
                   <div 
                     @click="selectedPayment = 'asesor'"
                     :class="[
-                      'cursor-pointer border-2 p-5 transition-all relative',
+                      'cursor-pointer rounded-xl p-4 transition-all',
                       selectedPayment === 'asesor' 
-                        ? 'border-[#D81B60] bg-[#FDF2F8]' 
-                        : 'border-[#E5E7EB] hover:border-[#9CA3AF]'
+                        ? 'border-2 border-[#c11252] bg-[#fef7f9]' 
+                        : 'border border-[#e5e7eb] hover:border-[#c11252]/30'
                     ]"
                   >
-                    <div class="absolute -top-2.5 left-4 px-2 py-0.5 bg-[#C9A962] text-white text-[10px] tracking-wider uppercase font-medium">
-                      Recomendado
-                    </div>
-                    <div class="flex items-center gap-4">
+                    <div class="flex items-center gap-3">
                       <div :class="[
-                        'w-5 h-5 rounded-full border-2 flex items-center justify-center',
-                        selectedPayment === 'asesor' ? 'border-[#D81B60]' : 'border-[#D1D5DB]'
+                        'w-5 h-5 rounded-full border-2 flex items-center justify-center flex-shrink-0',
+                        selectedPayment === 'asesor' ? 'border-[#c11252]' : 'border-[#d1d5db]'
                       ]">
-                        <div :class="['w-2.5 h-2.5 rounded-full', selectedPayment === 'asesor' ? 'bg-[#D81B60]' : '']"></div>
+                        <div :class="['w-2.5 h-2.5 rounded-full transition-all', selectedPayment === 'asesor' ? 'bg-[#c11252]' : '']"></div>
                       </div>
-                      <div class="flex-1">
-                        <p class="font-medium text-[#1A1A1A]">Finalizar con Asesora</p>
-                        <p class="text-xs text-[#7A7A7A] mt-0.5">Atención personalizada por WhatsApp</p>
+                      <div class="flex-1 min-w-0">
+                        <div class="flex items-center gap-2">
+                          <p class="text-sm font-medium text-[#1A1A1A]">Finalizar con Asesora</p>
+                          <span class="text-[10px] text-[#c11252] font-medium">Recomendado</span>
+                        </div>
+                        <p class="text-xs text-[#9CA3AF] mt-0.5">Atención personalizada por WhatsApp</p>
                       </div>
-                      <div class="w-9 h-9 rounded-full bg-[#25D366]/10 flex items-center justify-center">
-                        <svg class="w-5 h-5 text-[#25D366]" fill="currentColor" viewBox="0 0 24 24">
+                      <!-- Icono WhatsApp armonizado (monocromático) -->
+                      <div class="w-8 h-8 rounded-full bg-[#f3f4f6] flex items-center justify-center flex-shrink-0">
+                        <svg class="w-4 h-4 text-[#6B7280]" fill="currentColor" viewBox="0 0 24 24">
                           <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
                         </svg>
                       </div>
@@ -576,62 +628,65 @@
                   </div>
                 </div>
                 
-                <div class="px-8 py-6 bg-[#FAFAFA] border-t border-[#E5E7EB]">
-                  <div class="flex gap-4">
-                    <button 
-                      @click="prevStep"
-                      class="px-8 py-4 border border-[#F5AEC8] text-[#4A4A4A] text-sm font-medium tracking-widest uppercase hover:border-[#D81B60] hover:bg-[#FEF7FA] transition-all"
-                    >
-                      Volver
-                    </button>
-                    <button 
-                      @click="processPayment"
-                      :disabled="!selectedPayment || processing"
-                      class="flex-1 bg-gradient-to-r from-[#D81B60] to-[#C2185B] hover:from-[#C2185B] hover:to-[#AD1457] disabled:bg-[#F3F4F6] disabled:text-[#9CA3AF] text-white py-4 text-sm font-medium tracking-widest uppercase transition-all shadow-sm flex items-center justify-center gap-2"
-                    >
-                      <svg v-if="processing" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
-                        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
-                      </svg>
-                      <span v-if="processing">Conectando con pasarela...</span>
-                      <span v-else>{{ selectedPayment === 'asesor' ? 'Continuar por WhatsApp' : 'Pagar Ahora' }}</span>
-                    </button>
-                  </div>
+                <!-- Footer con CTA - fluid y touch-friendly -->
+                <div class="px-5 lg:px-8 py-6 lg:bg-[#FAFAFA] lg:border-t lg:border-[#f0f0f0]">
+                  <button 
+                    @click="processPayment"
+                    :disabled="!selectedPayment || processing"
+                    class="w-full bg-[#c11252] hover:bg-[#a00f45] disabled:bg-[#e5e7eb] disabled:text-[#9CA3AF] text-white py-4 text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2"
+                  >
+                    <svg v-if="processing" class="w-5 h-5 animate-spin" fill="none" viewBox="0 0 24 24">
+                      <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                      <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"></path>
+                    </svg>
+                    <span v-if="processing">Procesando...</span>
+                    <span v-else>{{ selectedPayment === 'asesor' ? 'Continuar con Asesora' : 'Pagar Ahora' }}</span>
+                  </button>
                   
-                  <div class="flex items-center justify-center gap-2 mt-6 text-xs text-[#6B7280]">
+                  <div class="flex items-center justify-center gap-2 mt-5 text-xs text-[#9CA3AF]">
                     <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
                     </svg>
-                    <span>Transacción protegida con encriptación SSL de 256 bits</span>
+                    <span>Conexión segura SSL</span>
                   </div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- COLUMNA DERECHA: Resumen del Pedido -->
-          <div class="w-full lg:w-[400px] xl:w-[420px]">
-            <div class="bg-white rounded-lg border border-[#E5E7EB] overflow-hidden lg:sticky lg:top-6">
+          <!-- COLUMNA DERECHA: Resumen del Pedido - fluid en móvil -->
+          <!-- En móvil: solo visible si mobileShowForm es false -->
+          <!-- En desktop (lg:): siempre visible -->
+          <div class="lg:col-span-4 order-1 lg:order-2" :class="{ 'hidden lg:block': mobileShowForm }">
+            <div class="bg-white lg:rounded-xl lg:border lg:border-[#e5e7eb] overflow-hidden lg:sticky lg:top-6">
               
-              <div class="px-6 py-5 border-b border-[#E5E7EB]">
-                <h3 class="font-medium text-[#1A1A1A]">Resumen de Compra</h3>
+              <!-- Header del resumen -->
+              <div class="px-5 lg:px-6 py-5 lg:py-4 lg:border-b lg:border-[#f0f0f0]">
+                <!-- Móvil: título grande -->
+                <div class="lg:hidden">
+                  <h2 class="text-xl font-semibold text-[#1A1A1A] tracking-tight">Tu carrito</h2>
+                  <p class="text-sm text-[#9CA3AF] mt-1">{{ cartItems.length }} {{ cartItems.length === 1 ? 'producto' : 'productos' }}</p>
+                </div>
+                <!-- Desktop: título compacto -->
+                <h3 class="hidden lg:block font-semibold text-base text-[#1A1A1A]">Resumen de compra</h3>
               </div>
               
-              <div class="divide-y divide-[#E5E7EB]">
+              <!-- Productos -->
+              <div class="divide-y divide-[#f0f0f0]">
                 <div 
                   v-for="item in cartItems" 
                   :key="item.producto_id"
-                  class="flex gap-4 px-6 py-5"
+                  class="flex gap-3 px-5 lg:px-6 py-4"
                 >
-                  <div class="w-20 h-20 bg-white rounded border border-[#E5E7EB] overflow-hidden flex-shrink-0">
+                  <div class="w-14 h-14 bg-[#f9f9f9] rounded-lg overflow-hidden flex-shrink-0">
                     <img 
                       v-if="getCartMediaUrl(item)" 
                       :src="getCartMediaUrl(item)" 
                       :alt="item.nombre"
                       class="w-full h-full object-cover"
                     />
-                    <div v-else class="w-full h-full flex items-center justify-center bg-[#FAF5F2]">
-                      <svg class="w-8 h-8 text-[#D1D5DB]" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                    <div v-else class="w-full h-full flex items-center justify-center bg-[#f3f4f6]">
+                      <svg class="w-5 h-5 text-[#D1D5DB]" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
                       </svg>
                     </div>
@@ -639,81 +694,80 @@
                   
                   <div class="flex-1 min-w-0">
                     <p class="text-sm font-medium text-[#1A1A1A] line-clamp-2">{{ item.nombre || 'Producto' }}</p>
-                    <p v-if="item.color || item.largo" class="text-[11px] text-[#9CA3AF] mt-1">
-                      <span v-if="item.color">Color: {{ formatColorLabel(item.color) }}</span>
+                    <p v-if="item.color || item.largo" class="text-xs text-[#9CA3AF] mt-0.5">
+                      <span v-if="item.color">{{ formatColorLabel(item.color) }}</span>
                       <span v-if="item.color && item.largo"> · </span>
-                      <span v-if="item.largo">Largo: {{ item.largo }}</span>
+                      <span v-if="item.largo">{{ item.largo }}</span>
                     </p>
-                    <p class="text-xs text-[#7A7A7A] mt-1">Cantidad: {{ item.cantidad || 1 }}</p>
+                    <p class="text-xs text-[#9CA3AF] mt-0.5">Cantidad: {{ item.cantidad || 1 }}</p>
                   </div>
                   
-                  <div class="text-sm font-medium text-[#1A1A1A]">
+                  <div class="text-sm font-semibold text-[#1A1A1A]">
                     ${{ formatPrice(getItemPrice(item)) }}
                   </div>
                 </div>
               </div>
               
-              <div class="px-6 py-5 border-t border-[#E5E7EB]">
-                <div class="flex gap-3">
+              <!-- Cupón -->
+              <div class="px-5 lg:px-6 py-4 border-t border-[#f0f0f0]">
+                <div class="flex gap-2">
                   <input 
                     type="text" 
                     v-model="cupon"
-                    class="flex-1 px-4 py-3 bg-white border border-[#E5E7EB] text-sm focus:outline-none focus:border-[#D81B60] focus:shadow-[0_0_0_3px_rgba(216,27,96,0.08)] placeholder:text-[#9CA3AF] transition-all"
+                    class="flex-1 px-3 py-2.5 bg-[#f3f4f6] border border-transparent rounded-lg text-sm focus:outline-none focus:bg-white focus:border-[#c11252] placeholder:text-[#9CA3AF] transition-all"
                     placeholder="Código de descuento"
                   />
-                  <button class="px-5 py-3 bg-gradient-to-r from-[#D81B60] to-[#C2185B] text-white text-sm font-medium hover:from-[#C2185B] hover:to-[#AD1457] transition-all shadow-sm">
+                  <button class="px-4 py-2.5 bg-[#c11252] hover:bg-[#a00f45] text-white text-sm font-medium rounded-lg transition-all">
                     Aplicar
                   </button>
                 </div>
               </div>
               
-              <div class="px-6 py-5 border-t border-[#E5E7EB] space-y-3">
+              <!-- Totales -->
+              <div class="px-5 lg:px-6 py-4 border-t border-[#f0f0f0] space-y-3">
                 <div class="flex justify-between text-sm">
-                  <span class="text-[#7A7A7A]">Subtotal</span>
-                  <span class="text-[#4A4A4A]">${{ formatPrice(getSubtotal()) }}</span>
+                  <span class="text-[#9CA3AF]">Subtotal</span>
+                  <span class="text-[#1A1A1A] font-medium">${{ formatPrice(getSubtotal()) }}</span>
                 </div>
                 <div class="flex justify-between text-sm">
-                  <span class="text-[#7A7A7A]">Envío</span>
-                  <span :class="envioGratis ? 'text-green-600' : 'text-[#4A4A4A]'">
+                  <span class="text-[#9CA3AF]">Envío</span>
+                  <span :class="envioGratis ? 'text-green-600 font-semibold' : 'text-[#1A1A1A]'">
                     {{ envioGratis ? 'Gratis' : '$' + formatPrice(costoEnvio) }}
                   </span>
                 </div>
                 
-                <div class="border-t-2 border-[#F5AEC8] my-4"></div>
+                <div class="border-t border-[#f0f0f0] pt-3"></div>
                 
                 <div class="flex justify-between items-baseline">
-                  <span class="font-luxury text-lg text-[#1A1A1A]">Total</span>
+                  <span class="text-base font-medium text-[#1A1A1A]">Total</span>
                   <div class="text-right">
-                    <span class="font-luxury text-2xl lg:text-3xl text-[#D81B60]">${{ formatPrice(getTotal()) }}</span>
-                    <span class="text-xs text-[#7A7A7A] ml-1">COP</span>
+                    <span class="text-2xl font-bold text-[#c11252]">${{ formatPrice(getTotal()) }}</span>
+                    <span class="text-xs text-[#9CA3AF] ml-1">COP</span>
                   </div>
                 </div>
                 
-                <p class="text-xs text-[#6B7280] text-right">Incluye impuestos</p>
+                <p class="text-[10px] sm:text-xs text-[#9CA3AF] text-right">Incluye impuestos</p>
               </div>
               
-              <div v-if="!envioGratis" class="px-6 py-4 bg-gradient-to-br from-[#FEF7FA] to-[#FAF5F2] border-t border-[#F5EBE5]">
-                <div class="flex items-center gap-2 text-xs text-[#6B7280] mb-3">
-                  <svg class="w-4 h-4 text-[#D81B60]" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M8.25 18.75a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h6m-9 0H3.375a1.125 1.125 0 01-1.125-1.125V14.25m17.25 4.5a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m3 0h1.125c.621 0 1.129-.504 1.09-1.124a17.902 17.902 0 00-3.213-9.193 2.056 2.056 0 00-1.58-.86H14.25M16.5 18.75h-2.25m0-11.177v-.958c0-.568-.422-1.048-.987-1.106a48.554 48.554 0 00-10.026 0 1.106 1.106 0 00-.987 1.106v7.635m12-6.677v6.677m0 4.5v-4.5m0 0h-12" />
-                  </svg>
-                  <span class="font-medium text-[#4A4A4A]">¡Estás cerca! Agrega ${{ formatPrice(300000 - getSubtotal()) }} más para envío gratis</span>
-                </div>
-                <div class="w-full h-1.5 bg-white rounded-full overflow-hidden shadow-inner mb-3">
-                  <div 
-                    class="h-full bg-gradient-to-r from-[#D81B60] to-[#C9A962] transition-all shadow-sm"
-                    :style="{ width: Math.min((getSubtotal() / 300000) * 100, 100) + '%' }"
-                  ></div>
-                </div>
-                <router-link 
-                  to="/"
-                  class="w-full flex items-center justify-center gap-2 px-4 py-2.5 border border-[#D81B60] text-[#D81B60] text-xs font-medium tracking-wide uppercase hover:bg-[#D81B60] hover:text-white transition-all"
+              <!-- Banner envío gratis - Solo si no es gratis -->
+              <!-- Envío gratis progress -->
+              <div v-if="!envioGratis" class="px-5 lg:px-6 py-3 bg-[#fef7f9]">
+                <p class="text-xs text-[#c11252] font-medium text-center">
+                  ¡Agrega ${{ formatPrice(300000 - getSubtotal()) }} más para envío gratis!
+                </p>
+              </div>
+              
+              <!-- CTA Móvil - Ir al formulario -->
+              <div class="lg:hidden px-5 py-5 border-t border-[#f0f0f0]">
+                <button 
+                  @click="showMobileForm"
+                  class="w-full py-4 bg-[#c11252] hover:bg-[#a00f45] text-white text-sm font-semibold rounded-xl transition-all flex items-center justify-center gap-2"
                 >
+                  <span>Completar mis datos</span>
                   <svg class="w-4 h-4" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M15.75 10.5V6a3.75 3.75 0 10-7.5 0v4.5m11.356-1.993l1.263 12c.07.665-.45 1.243-1.119 1.243H4.25a1.125 1.125 0 01-1.12-1.243l1.264-12A1.125 1.125 0 015.513 7.5h12.974c.576 0 1.059.435 1.119 1.007zM8.625 10.5a.375.375 0 11-.75 0 .375.375 0 01.75 0zm7.5 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5L21 12m0 0l-7.5 7.5M21 12H3" />
                   </svg>
-                  Seguir Comprando
-                </router-link>
+                </button>
               </div>
             </div>
           </div>
@@ -722,13 +776,13 @@
     </main>
 
     <!-- FOOTER -->
-    <footer class="bg-white border-t border-[#E5E7EB] py-6 mt-auto">
-      <div class="max-w-7xl mx-auto px-6 flex flex-wrap items-center justify-center gap-4 text-xs text-[#6B7280]">
-        <a href="#" class="hover:text-[#1A1A1A] transition-colors">Política de Privacidad</a>
-        <span class="text-[#D1D5DB]">·</span>
-        <a href="#" class="hover:text-[#1A1A1A] transition-colors">Términos del Servicio</a>
-        <span class="text-[#D1D5DB]">·</span>
-        <a href="#" class="hover:text-[#1A1A1A] transition-colors">Política de Devoluciones</a>
+    <footer class="bg-white border-t border-[#f0f0f0] py-5 mt-auto">
+      <div class="max-w-7xl mx-auto px-5 lg:px-6 flex flex-wrap items-center justify-center gap-4 text-xs text-[#9CA3AF]">
+        <a href="#" class="hover:text-[#1A1A1A] transition-colors">Privacidad</a>
+        <span class="text-[#e5e7eb]">·</span>
+        <a href="#" class="hover:text-[#1A1A1A] transition-colors">Términos</a>
+        <span class="text-[#e5e7eb]">·</span>
+        <a href="#" class="hover:text-[#1A1A1A] transition-colors">Devoluciones</a>
       </div>
     </footer>
 
@@ -816,7 +870,7 @@
           
           <button 
             @click="showStockModal = false"
-            class="w-full bg-[#1A1A1A] hover:bg-black text-white py-3 px-6 rounded-sm text-sm font-medium tracking-wide uppercase transition-all"
+            class="w-full bg-[#D81B60] hover:bg-[#C2185B] text-white py-3 px-6 rounded-lg text-sm font-medium tracking-wide uppercase transition-all"
           >
             Entendido
           </button>
@@ -895,7 +949,7 @@ export default {
       tipoDocumento: 'CC',
       numeroDocumento: '',
       newsletter: false,
-      pais: '',
+      pais: 'CO', // Colombia por defecto
       departamento: '',
       departamentoId: null, // ID numérico para la API de Colombia
       municipio: '',
@@ -1057,6 +1111,9 @@ export default {
     const cartItems = ref([])
     const costoEnvio = ref(30000)
     const envioGratis = computed(() => getSubtotal() >= 300000)
+    
+    // Mobile: controla si muestra resumen (false) o formulario (true)
+    const mobileShowForm = ref(false)
     
     const stepperProgress = computed(() => {
       if (currentStep.value === 1) return '0%'
@@ -1460,6 +1517,18 @@ export default {
       if (indicacionesRural) parts.push(`Indicaciones: ${indicacionesRural}`)
       
       return parts.length > 0 ? parts.join('%0A') : 'Sin dirección registrada'
+    }
+    
+    // Móvil: mostrar formulario (oculta resumen)
+    const showMobileForm = () => {
+      mobileShowForm.value = true
+      window.scrollTo({ top: 0, behavior: 'smooth' })
+    }
+    
+    // Móvil: volver al resumen
+    const showMobileSummary = () => {
+      mobileShowForm.value = false
+      window.scrollTo({ top: 0, behavior: 'smooth' })
     }
     
     // Navigation
@@ -2002,6 +2071,7 @@ export default {
     return {
       currentStep, maxStep, selectedPayment, processing, cupon, form,
       cartItems, costoEnvio, envioGratis, stepperProgress,
+      mobileShowForm, showMobileForm, showMobileSummary,
       departamentos, departamentosFiltrados, municipiosFiltrados,
       loadingDepartamentos, loadingMunicipios,
       dropdowns, searchDep, searchMun,
@@ -2022,44 +2092,60 @@ export default {
 </script>
 
 <style scoped>
+/* =================================================================
+   ESTILOS PREMIUM CHECKOUT - Diseño Luxury Minimalista
+   ================================================================= */
+
 .input-group {
   display: flex;
   flex-direction: column;
-  gap: 0.5rem;
+  gap: 0.375rem; /* 6px entre label e input */
 }
 
+/* Labels premium: pequeños, elegantes */
 .input-group label {
-  font-size: 0.75rem;
+  font-size: 0.75rem; /* 12px */
   font-weight: 500;
-  color: #7A7A7A;
-  text-transform: uppercase;
-  letter-spacing: 0.05em;
+  color: #6b7280;
+  letter-spacing: 0.01em;
 }
 
+/* Inputs premium: fondo blanco, bordes finos elegantes */
 .input-group input,
 .input-group select,
 .input-group textarea {
   width: 100%;
-  padding: 0.875rem 1rem;
-  background-color: white;
-  border: 1px solid #E5E7EB;
-  font-size: 0.875rem;
+  padding: 0.9375rem 1rem; /* 15px vertical */
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem; /* 8px */
+  font-size: 0.9375rem;
   color: #1A1A1A;
   transition: all 0.2s ease;
-  height: 50px;
+  height: 52px;
 }
 
 .input-group textarea {
   height: auto;
-  min-height: 80px;
+  min-height: 100px;
+  border-radius: 0.5rem;
+  resize: vertical;
 }
 
+/* Focus: borde magenta con glow sutil */
 .input-group input:focus,
 .input-group select:focus,
 .input-group textarea:focus {
   outline: none;
-  border-color: #D81B60;
-  box-shadow: 0 0 0 3px rgba(216, 27, 96, 0.08);
+  border-color: #c11252;
+  box-shadow: 0 0 0 3px rgba(193, 18, 82, 0.06);
+}
+
+/* Hover sutil */
+.input-group input:hover:not(:focus),
+.input-group select:hover:not(:focus),
+.input-group textarea:hover:not(:focus) {
+  border-color: #d1d5db;
 }
 
 .input-group input::placeholder,
@@ -2111,7 +2197,7 @@ export default {
   pointer-events: none;
 }
 
-/* Custom Dropdown */
+/* Custom Dropdown - Diseño Premium */
 .custom-dropdown {
   position: relative;
   width: 100%;
@@ -2122,32 +2208,33 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.875rem 1rem;
-  background-color: white;
-  border: 1px solid #E5E7EB;
-  font-size: 0.875rem;
+  padding: 0.9375rem 1rem;
+  background-color: #ffffff;
+  border: 1px solid #e0e0e0;
+  border-radius: 0.5rem;
+  font-size: 0.9375rem;
   color: #1A1A1A;
-  height: 50px;
+  height: 52px;
   cursor: pointer;
   transition: all 0.2s ease;
   text-align: left;
 }
 
 .dropdown-trigger:hover {
-  border-color: #F5AEC8;
-  background-color: #FEFBFC;
+  border-color: #d1d5db;
 }
 
 .dropdown-trigger:focus {
   outline: none;
-  border-color: #D81B60;
-  box-shadow: 0 0 0 3px rgba(216, 27, 96, 0.08);
+  border-color: #c11252;
+  box-shadow: 0 0 0 3px rgba(193, 18, 82, 0.06);
 }
 
 .dropdown-trigger:disabled {
-  background-color: #F9FAFB;
+  background-color: #fafafa;
   color: #9CA3AF;
   cursor: not-allowed;
+  border-color: #e5e7eb;
 }
 
 .dropdown-panel {
@@ -2156,17 +2243,28 @@ export default {
   left: 0;
   right: 0;
   background: white;
-  border: 1px solid #E5E7EB;
+  border: 1px solid #e5e7eb;
+  border-radius: 0.75rem;
   box-shadow: 0 10px 40px -10px rgba(0, 0, 0, 0.15);
   z-index: 100;
   max-height: 360px;
   display: flex;
   flex-direction: column;
+  overflow: hidden;
 }
 
 @media (max-width: 640px) {
   .dropdown-panel {
-    max-height: 320px;
+    position: fixed;
+    top: auto;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    max-height: 70vh;
+    border-radius: 1rem 1rem 0 0;
+    border: none;
+    box-shadow: 0 -10px 40px rgba(0, 0, 0, 0.2);
+    z-index: 200;
   }
 }
 
@@ -2175,15 +2273,15 @@ export default {
   align-items: center;
   gap: 0.5rem;
   padding: 0.75rem 1rem;
-  border-bottom: 1px solid #E5E7EB;
-  background: #FAFAFA;
+  border-bottom: 1px solid #f0f0f0;
+  background: #fafafa;
 }
 
 .dropdown-search input {
   flex: 1;
   border: none;
   background: transparent;
-  font-size: 0.875rem;
+  font-size: 0.9375rem;
   color: #1A1A1A;
   outline: none;
   height: auto;
@@ -2206,20 +2304,20 @@ export default {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0.75rem 1rem;
-  font-size: 0.875rem;
+  padding: 0.875rem 1rem;
+  font-size: 0.9375rem;
   color: #4A4A4A;
   cursor: pointer;
   transition: background 0.15s;
 }
 
 .dropdown-list li:hover {
-  background: #FEF7FA;
+  background: #fef7f9;
 }
 
 .dropdown-list li.selected {
-  background: linear-gradient(to right, #FEF7FA, #FAF5F2);
-  color: #D81B60;
+  background: #fef7f9;
+  color: #c11252;
   font-weight: 500;
 }
 
