@@ -887,6 +887,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import apiClient, { getImageUrl, API_BASE_URL } from '@/services/api'
 import { formatColorLabel } from '@/utils/colorLabels'
+import { buildCheckoutUrl } from '@/services/wompi'
 
 // API de Colombia - Datos oficiales de departamentos y municipios
 const COLOMBIA_API = {
@@ -932,12 +933,6 @@ export default {
     // Cache de posters para videos en carrito
     const videoPosters = ref({})
     
-    // Configuración Wompi
-    const WOMPI_CONFIG = {
-      publicKey: import.meta.env.VITE_WOMPI_PUBLIC_KEY || 'pub_test_ZVH2hPZRCY7iVcPAyCCh53E5cS2SUFmW',
-      currency: 'COP',
-      amountInCents: true // Wompi requiere montos en centavos
-    }
     const whatsappNumber = import.meta.env.VITE_WHATSAPP_NUMBER || '4796657763'
     
     // Form con nuevos campos
@@ -1971,18 +1966,15 @@ export default {
             email: form.value.email
           })
           
-          // Construir URL de checkout de Wompi (método redirect)
-          const redirectUrl = encodeURIComponent(`${window.location.origin}/pago-exitoso`)
-          const wompiCheckoutUrl = `https://checkout.wompi.co/l/${WOMPI_CONFIG.publicKey}?` + new URLSearchParams({
-            'currency': 'COP',
-            'amount-in-cents': amountInCents.toString(),
-            'reference': reference,
-            'redirect-url': `${window.location.origin}/pago-exitoso`,
-            'customer-data:email': form.value.email,
-            'customer-data:full-name': `${form.value.nombre} ${form.value.apellido}`.trim(),
-            'customer-data:phone-number': cleanPhone,
-            'customer-data:phone-number-prefix': '57'
-          }).toString()
+          // Construir URL de checkout de Wompi usando servicio centralizado
+          const wompiCheckoutUrl = await buildCheckoutUrl({
+            amountInCents,
+            reference,
+            redirectUrl: `${window.location.origin}/pago-exitoso`,
+            email: form.value.email,
+            fullName: `${form.value.nombre} ${form.value.apellido}`.trim(),
+            phone: cleanPhone
+          })
           
           console.log('🔗 URL Wompi:', wompiCheckoutUrl)
           
