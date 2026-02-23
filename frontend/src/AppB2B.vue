@@ -27,42 +27,39 @@
       </div>
     </transition>
 
-    <!-- Botón Flotante Instalar PWA -->
-    <transition name="slide-up">
+    <!-- Banner PWA Instalar - Top bar estilo smart banner -->
+    <transition name="slide-down">
       <div 
         v-if="showFloater"
-        class="fixed bottom-6 left-6 z-[9000] flex flex-col items-start gap-2"
+        class="w-full bg-[#1A1A1A] border-b border-[#C9A962]/20 px-4 py-2.5 z-[9000] relative"
         role="alert"
       >
-        <div class="bg-[#1A1A1A] border border-[#C9A962]/30 rounded-xl shadow-2xl p-4 max-w-sm backdrop-blur-md bg-opacity-95 text-left">
-          <div class="flex items-start justify-between gap-4">
-            <div class="flex items-center gap-3">
-              <div class="w-10 h-10 bg-white/10 rounded-lg flex items-center justify-center p-1.5">
-                <img src="/logo-kharis.png" alt="Icon" class="w-full h-full object-contain" />
-              </div>
-              <div>
-                <h3 class="text-[#C9A962] font-semibold text-sm">Instalar App Mayorista</h3>
-                <p class="text-white/60 text-xs mt-0.5">Acceso rápido desde tu inicio</p>
-              </div>
-            </div>
-            <button 
-              @click="dismissInstallPrompt" 
-              class="text-white/40 hover:text-white transition-colors"
-              aria-label="Cerrar"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            </button>
+        <div class="flex items-center gap-3 max-w-screen-xl mx-auto">
+          <!-- Logo -->
+          <div class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center p-1.5 flex-shrink-0">
+            <img src="/logo-kharis.png" alt="Icon" class="w-full h-full object-contain" />
           </div>
+          <!-- Texto -->
+          <div class="flex-1 min-w-0">
+            <p class="text-white text-[13px] font-medium leading-tight">Kharis Pro</p>
+            <p class="text-white/50 text-[11px] leading-tight">Instala la app para acceso rápido</p>
+          </div>
+          <!-- Botón instalar -->
           <button 
             @click="installApp"
-            class="mt-3 w-full py-2 bg-[#C9A962] hover:bg-[#D4AF6A] text-[#1A1A1A] text-sm font-semibold rounded-lg transition-colors flex items-center justify-center gap-2"
+            class="flex-shrink-0 px-4 py-1.5 bg-[#C9A962] hover:bg-[#D4AF6A] text-[#1A1A1A] text-xs font-bold rounded-full transition-colors"
+          >
+            Instalar
+          </button>
+          <!-- Cerrar -->
+          <button 
+            @click="dismissInstallPrompt" 
+            class="flex-shrink-0 text-white/30 hover:text-white/70 transition-colors p-1"
+            aria-label="Cerrar"
           >
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
             </svg>
-            Instalar
           </button>
         </div>
       </div>
@@ -188,6 +185,17 @@ export default {
 .slide-up-enter-from,
 .slide-up-leave-to {
   transform: translateY(20px);
+  opacity: 0;
+}
+
+.slide-down-enter-active,
+.slide-down-leave-active {
+  transition: all 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.slide-down-enter-from,
+.slide-down-leave-to {
+  transform: translateY(-100%);
   opacity: 0;
 }
 </style>

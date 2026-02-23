@@ -690,52 +690,52 @@
         </div>
         
         <!-- Contenido real -->
-        <div v-else-if="featuredProducts.length > 0" class="grid grid-cols-1 lg:grid-cols-[minmax(300px,1fr)_2fr] gap-4">
+        <div v-else-if="offerProducts.length > 0" class="grid grid-cols-1 lg:grid-cols-[280px_1fr] gap-4">
           
           <!-- ============ OFERTA DEL DÍA (Izquierda) ============ -->
           <router-link 
-            :to="`/portal/producto/${featuredProducts[0].id}`"
-            class="bg-white rounded-md shadow-sm p-5 sm:p-6 flex flex-col"
+            :to="`/portal/producto/${offerProducts[0].id}`"
+            class="bg-white rounded-md shadow-sm p-4 sm:p-5 flex flex-col"
           >
-            <h3 class="font-bold text-xl text-gray-900 mb-5">Oferta del día</h3>
+            <h3 class="font-bold text-lg text-gray-900 mb-3">Oferta del día</h3>
             
-            <!-- Imagen centrada -->
-            <div class="flex-1 flex items-center justify-center px-4 mb-5">
+            <!-- Imagen -->
+            <div class="w-full aspect-[4/5] overflow-hidden rounded-lg bg-gray-50 mb-3">
               <video
-                v-if="isVideoUrl(featuredProducts[0].image) && !hasMediaError(featuredProducts[0])"
-                :src="featuredProducts[0].image"
-                class="max-w-full max-h-[280px] object-contain"
+                v-if="isVideoUrl(offerProducts[0].image) && !hasMediaError(offerProducts[0])"
+                :src="offerProducts[0].image"
+                class="w-full h-full object-cover"
                 muted
                 playsinline
                 loop
                 autoplay
-                @error="handleVideoError(featuredProducts[0])"
+                @error="handleVideoError(offerProducts[0])"
               ></video>
               <img
                 v-else
-                :src="getDisplayImage(featuredProducts[0])"
-                :alt="featuredProducts[0].name"
-                class="max-w-full max-h-[280px] object-contain"
-                @error="handleProductImageError($event, featuredProducts[0])"
+                :src="getDisplayImage(offerProducts[0])"
+                :alt="offerProducts[0].name"
+                class="w-full h-full object-cover"
+                @error="handleProductImageError($event, offerProducts[0])"
                 loading="lazy"
               />
             </div>
             
             <!-- Info -->
-            <p class="text-gray-800 text-sm leading-snug mb-2 line-clamp-2">
-              {{ featuredProducts[0].name }}
+            <p class="text-gray-800 text-sm leading-snug mb-1.5 line-clamp-2">
+              {{ offerProducts[0].name }}
             </p>
             
-            <p v-if="featuredProducts[0]?.originalPrice && featuredProducts[0].originalPrice > featuredProducts[0].price" class="text-gray-400 text-sm line-through">
-              ${{ (featuredProducts[0]?.originalPrice || 0).toLocaleString() }}
+            <p v-if="offerProducts[0]?.originalPrice && offerProducts[0].originalPrice > offerProducts[0].price" class="text-gray-400 text-xs line-through">
+              ${{ (offerProducts[0]?.originalPrice || 0).toLocaleString() }}
             </p>
             
-            <div class="flex items-baseline gap-2.5 mb-1">
-              <span class="text-[28px] font-light text-gray-900">
-                ${{ (featuredProducts[0]?.price || 0).toLocaleString() }}
+            <div class="flex items-baseline gap-2 mb-1">
+              <span class="text-2xl font-light text-gray-900">
+                ${{ (offerProducts[0]?.price || 0).toLocaleString() }}
               </span>
-              <span v-if="featuredProducts[0]?.discount" class="text-emerald-600 text-sm font-semibold">
-                {{ featuredProducts[0].discount }}% OFF
+              <span v-if="offerProducts[0]?.discount" class="text-emerald-600 text-sm font-semibold">
+                {{ offerProducts[0].discount }}% OFF
               </span>
             </div>
             
@@ -743,10 +743,10 @@
           </router-link>
           
           <!-- ============ OFERTAS CARRUSEL (Derecha) ============ -->
-          <div class="bg-white rounded-md shadow-sm p-5 sm:p-6 flex flex-col">
+          <div class="bg-white rounded-md shadow-sm p-4 sm:p-5 flex flex-col min-w-0 overflow-hidden">
             <!-- Header -->
-            <div class="flex items-baseline gap-3 mb-5">
-              <h3 class="font-bold text-xl text-gray-900">Ofertas</h3>
+            <div class="flex items-baseline gap-3 mb-3">
+              <h3 class="font-bold text-lg text-gray-900">Ofertas</h3>
               <router-link 
                 to="/portal/catalogo?orden=nuevo"
                 class="text-[#007185] hover:text-[#C7511F] hover:underline text-sm font-medium"
@@ -756,14 +756,14 @@
             </div>
             
             <!-- Carrusel -->
-            <div class="relative flex-1">
+            <div class="relative flex-1 flex items-start">
               <!-- Flecha izquierda -->
               <button 
                 v-show="canScrollOffersLeft"
                 @click="scrollOffers(-1)"
-                class="absolute left-0 top-1/3 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                class="absolute left-0 top-1/3 -translate-y-1/2 z-10 w-9 h-9 bg-white/95 rounded-full shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
               >
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7" />
                 </svg>
               </button>
@@ -772,21 +772,21 @@
               <div 
                 ref="offersContainer"
                 @scroll="onOffersScroll"
-                class="flex gap-4 overflow-x-auto scrollbar-hide scroll-smooth"
+                class="flex gap-3 overflow-x-auto scrollbar-hide scroll-smooth w-full"
                 style="-ms-overflow-style: none; scrollbar-width: none;"
               >
                 <router-link 
-                  v-for="product in featuredProducts.slice(1)" 
+                  v-for="product in offerProducts.slice(1)" 
                   :key="product.id"
                   :to="`/portal/producto/${product.id}`"
-                  class="flex-shrink-0 w-[140px] sm:w-[170px]"
+                  class="flex-shrink-0 w-[150px] sm:w-[180px] lg:w-[190px]"
                 >
                   <!-- Imagen -->
-                  <div class="w-full aspect-[3/4] overflow-hidden rounded bg-gray-50 mb-2.5">
+                  <div class="w-full aspect-[4/5] overflow-hidden rounded-lg bg-gray-50 mb-2">
                     <video
                       v-if="isVideoUrl(product.image) && !hasMediaError(product)"
                       :src="product.image"
-                      class="w-full h-full object-contain"
+                      class="w-full h-full object-cover"
                       muted
                       playsinline
                       loop
@@ -797,14 +797,14 @@
                       v-else
                       :src="getDisplayImage(product)"
                       :alt="product.name"
-                      class="w-full h-full object-contain"
+                      class="w-full h-full object-cover"
                       @error="handleProductImageError($event, product)"
                       loading="lazy"
                     />
                   </div>
                   
                   <!-- Nombre -->
-                  <p class="text-gray-800 text-[13px] line-clamp-2 leading-snug mb-2">
+                  <p class="text-gray-800 text-[13px] line-clamp-2 leading-snug mb-1.5">
                     {{ product.name }}
                   </p>
                   
@@ -815,7 +815,7 @@
                   
                   <!-- Precio + descuento -->
                   <div class="flex items-baseline gap-1.5 flex-wrap">
-                    <span class="text-[22px] font-light text-gray-900">
+                    <span class="text-xl font-light text-gray-900">
                       ${{ (product?.price || 0).toLocaleString() }}
                     </span>
                     <span v-if="product?.discount" class="text-emerald-600 text-xs font-semibold">
@@ -823,7 +823,7 @@
                     </span>
                   </div>
                   
-                  <span class="text-emerald-600 text-[12px] font-medium mt-1 block">Envío gratis</span>
+                  <span class="text-emerald-600 text-[12px] font-medium mt-0.5 block">Envío gratis</span>
                 </router-link>
               </div>
               
@@ -831,9 +831,9 @@
               <button 
                 v-show="canScrollOffersRight"
                 @click="scrollOffers(1)"
-                class="absolute right-0 top-1/3 -translate-y-1/2 z-10 w-10 h-10 bg-white rounded-full shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
+                class="absolute right-0 top-1/3 -translate-y-1/2 z-10 w-9 h-9 bg-white/95 rounded-full shadow-lg border border-gray-200 flex items-center justify-center hover:bg-gray-50 transition-colors"
               >
-                <svg class="w-5 h-5 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg class="w-4 h-4 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
                 </svg>
               </button>
@@ -848,7 +848,7 @@
         </div>
         
         <!-- Botón explorar -->
-        <div v-if="featuredProducts.length > 0" class="text-center mt-8">
+        <div v-if="offerProducts.length > 0" class="text-center mt-8">
           <router-link 
             to="/portal/catalogo"
             class="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white text-sm font-medium rounded-lg transition-colors"
@@ -960,6 +960,11 @@ export default {
     // Computed para verificar si tiene historial de compras
     const hasOrderHistory = computed(() => {
       return frequentProducts.value.length > 0 && frequentProducts.value[0]?.lastQty
+    })
+
+    // Solo productos que realmente tienen descuento (ofertas reales)
+    const offerProducts = computed(() => {
+      return featuredProducts.value.filter(p => p.discount && p.discount > 0)
     })
 
     // =========================================================================
@@ -1323,6 +1328,7 @@ export default {
       hasOrderHistory,
       frequentProducts,
       featuredProducts,
+      offerProducts,
       offersContainer,
       offersScrollPos,
       canScrollOffersLeft,

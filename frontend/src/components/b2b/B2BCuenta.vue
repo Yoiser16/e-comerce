@@ -1,8 +1,8 @@
 <template>
-  <div class="flex min-h-[calc(100vh-106px)] lg:min-h-[calc(100vh-106px)]">
+  <div class="flex min-h-[calc(100vh-106px)] lg:min-h-[calc(100vh-106px)] bg-[#EBEBEB]">
 
     <!-- ==================== MOBILE VIEW (estilo Mercado Libre) ==================== -->
-    <div class="lg:hidden w-full bg-[#FAFAFA]">
+    <div class="lg:hidden w-full bg-[#EBEBEB]">
       
       <!-- Header con avatar centrado - SOLO en vista principal -->
       <div v-if="activeTab === 'profile'" class="bg-gradient-to-b from-[#C9A962] to-[#D4B574] pt-8 pb-12 px-4">
@@ -16,7 +16,7 @@
       </div>
       
       <!-- Contenido -->
-      <div :class="activeTab === 'profile' ? 'bg-white -mt-4 rounded-t-2xl min-h-[60vh]' : 'bg-white min-h-[80vh] pt-6'">
+      <div :class="activeTab === 'profile' ? 'bg-white -mt-4 rounded-t-2xl min-h-[60vh]' : 'bg-[#EBEBEB] min-h-[80vh] pt-6'">
         
         <!-- Vista principal: Lista de opciones -->
         <div v-if="activeTab === 'profile'" class="py-2">
@@ -384,8 +384,8 @@
             <div 
               v-for="order in orders" 
               :key="order.id" 
-              class="bg-white rounded-xl border overflow-hidden transition-all duration-200"
-              :class="expandedOrderId === order.id ? 'border-[#C9A962]/30 shadow-sm' : 'border-gray-100'"
+              class="bg-white rounded-xl border overflow-hidden transition-all duration-200 shadow-sm"
+              :class="expandedOrderId === order.id ? 'border-[#C9A962]/30 shadow-md' : 'border-gray-100/80'"
             >
               <!-- Order Header (clickable) -->
               <div 
@@ -636,7 +636,7 @@
     </aside>
 
     <!-- ==================== MAIN CONTENT AREA (DESKTOP ONLY) ==================== -->
-    <div class="hidden lg:block flex-1 min-w-0">
+    <div class="hidden lg:block flex-1 min-w-0 bg-[#EBEBEB]">
       <div class="max-w-[960px] mx-auto px-5 sm:px-8 py-6 lg:py-8">
 
         <!-- Avatar + Name (like MercadoLibre - circular) -->
