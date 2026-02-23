@@ -3,7 +3,7 @@
 // Modo: Sandbox/Test
 // =============================================================================
 
-const WOMPI_CONFIG = {
+export const WOMPI_CONFIG = {
   publicKey: import.meta.env.VITE_WOMPI_PUBLIC_KEY || 'pub_test_ZVH2hPZRCY7iVcPAyCCh53E5cS2SUFmW',
   environment: import.meta.env.VITE_WOMPI_ENVIRONMENT || 'sandbox',
   currency: 'COP',
@@ -109,13 +109,24 @@ export async function buildCheckoutUrl({
   // codifique los ":" en los nombres de parámetros customer-data:xxx
   const cleanPhone = phone.replace(/\D/g, '').slice(-10)
   
+  // IMPORTANTE: Wompi (CloudFront WAF) bloquea redirect-url con "localhost".
+  // En desarrollo local, usar la URL de producción como redirect.
+  // El pago se procesa igual; al volver de Wompi, se usa el webhook o 
+  // se consulta el estado de la transacción por referencia.
+  let safeRedirectUrl = redirectUrl
+  if (safeRedirectUrl.includes('localhost') || safeRedirectUrl.includes('127.0.0.1')) {
+    const productionUrl = import.meta.env.VITE_PRODUCTION_URL || 'https://demostracion.store'
+    safeRedirectUrl = `${productionUrl}/pago-exitoso`
+    console.warn('⚠️ Wompi no acepta localhost como redirect. Usando URL de producción:', safeRedirectUrl)
+  }
+  
   const params = [
     `public-key=${encodeURIComponent(WOMPI_CONFIG.publicKey)}`,
     `currency=${WOMPI_CONFIG.currency}`,
     `amount-in-cents=${amountInCents}`,
     `reference=${encodeURIComponent(reference)}`,
     `signature:integrity=${signature}`,
-    `redirect-url=${encodeURIComponent(redirectUrl)}`,
+    `redirect-url=${encodeURIComponent(safeRedirectUrl)}`,
     `customer-data:email=${encodeURIComponent(email)}`,
     `customer-data:full-name=${encodeURIComponent(fullName)}`,
     `customer-data:phone-number=${cleanPhone}`,

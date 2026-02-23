@@ -887,7 +887,7 @@ import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter } from 'vue-router'
 import apiClient, { getImageUrl, API_BASE_URL } from '@/services/api'
 import { formatColorLabel } from '@/utils/colorLabels'
-import { buildCheckoutUrl } from '@/services/wompi'
+import { buildCheckoutUrl, getIntegritySignature, WOMPI_CONFIG } from '@/services/wompi'
 
 // API de Colombia - Datos oficiales de departamentos y municipios
 const COLOMBIA_API = {
@@ -1802,6 +1802,9 @@ export default {
           // Usar URL completa para evitar problemas de proxy
           const apiUrl = `${API_BASE_URL}/api/v1/ordenes`
           
+          console.log('🚀 Enviando orden a:', apiUrl)
+          console.log('📦 Items del carrito:', ordenData.items)
+          
           const response = await fetch(apiUrl, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -1810,8 +1813,23 @@ export default {
           
           if (!response.ok) {
             const errorData = await response.text()
-            console.error('Error API:', response.status, errorData)
-            throw new Error(`Error al crear la orden: ${response.status}`)
+            console.error('❌ Error API:', response.status, errorData)
+            
+            // Parsear mensaje de error para mejor feedback
+            let errorMsg = `Error ${response.status}`
+            try {
+              const errorJson = JSON.parse(errorData)
+              errorMsg = errorJson.detail || errorJson.message || errorMsg
+            } catch { 
+              errorMsg = errorData || errorMsg
+            }
+            
+            // Error 403 específico (CloudFront/WAF bloqueando)
+            if (response.status === 403) {
+              throw new Error('403: Acceso bloqueado. Intenta actualizar la página o contacta soporte.')
+            }
+            
+            throw new Error(errorMsg)
           }
           
           const orden = await response.json()
@@ -1910,21 +1928,38 @@ export default {
           
           // Diferenciar entre errores de stock y otros errores
           const errorMsg = e.message || String(e)
+          
+          // Error de stock
           if (errorMsg.includes('409') || errorMsg.includes('Stock insuficiente')) {
-            // Error de stock - mostrar modal amigable
             stockModalMessage.value = 'Alguien más compró los últimos productos mientras completabas tu compra.'
             stockModalProducts.value = []
             showStockModal.value = true
             return
           }
           
-          alert('No se pudo registrar la orden. Verifica tu carrito y vuelve a intentarlo.')
+          // Error 403 (CloudFront/WAF)
+          if (errorMsg.includes('403')) {
+            alert('Error de conexión (403). Por favor actualiza la página e intenta de nuevo. Si persiste, contacta a soporte.')
+            return
+          }
+          
+          // Error de producto no encontrado
+          if (errorMsg.includes('Producto no encontrado') || errorMsg.includes('Variante no encontrada')) {
+            alert('Uno o más productos de tu carrito ya no están disponibles. Por favor actualiza tu carrito.')
+            // Redirigir al catálogo
+            window.location.href = '/catalogo'
+            return
+          }
+          
+          // Error genérico - mostrar mensaje del backend si existe
+          const userFriendlyMsg = errorMsg.includes('Error') ? errorMsg : 'No se pudo registrar la orden. Verifica tu carrito y vuelve a intentarlo.'
+          alert(userFriendlyMsg)
           return
         } finally {
           processing.value = false
         }
       } else {
-        // Pago con Wompi - Usar Link de Checkout (redirect) en lugar de widget embebido
+        // Pago con Wompi
         processing.value = true
         try {
           const reference = generateWompiReference()
@@ -1933,9 +1968,6 @@ export default {
           // Limpiar teléfono (solo dígitos, sin +57)
           const rawPhone = form.value.telefono || ''
           const cleanPhone = rawPhone.replace(/\D/g, '').slice(-10)
-          
-          console.log('📱 Teléfono raw:', rawPhone)
-          console.log('📱 Teléfono limpio:', cleanPhone)
           
           // Validar teléfono
           if (!cleanPhone || cleanPhone.length < 10) {
@@ -1960,26 +1992,75 @@ export default {
           }
           localStorage.setItem('kharis_pending_order', JSON.stringify(orderData))
           
-          console.log('🔧 Redirigiendo a Wompi con:', {
-            reference,
-            amountInCents,
-            email: form.value.email
-          })
+          const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
           
-          // Construir URL de checkout de Wompi usando servicio centralizado
-          const wompiCheckoutUrl = await buildCheckoutUrl({
-            amountInCents,
-            reference,
-            redirectUrl: `${window.location.origin}/pago-exitoso`,
-            email: form.value.email,
-            fullName: `${form.value.nombre} ${form.value.apellido}`.trim(),
-            phone: cleanPhone
-          })
-          
-          console.log('🔗 URL Wompi:', wompiCheckoutUrl)
-          
-          // Redirigir a Wompi
-          window.location.href = wompiCheckoutUrl
+          if (isLocalhost) {
+            // ─── LOCALHOST: Usar Widget (popup) en vez de redirect ───
+            // Wompi bloquea redirect-url con localhost, así que usamos el Widget
+            console.log('🏠 Modo local detectado - Usando Wompi Widget (popup)')
+            
+            // Obtener firma de integridad
+            const signature = await getIntegritySignature(reference, amountInCents, 'COP')
+            
+            // Esperar a que el SDK esté cargado
+            await loadWompiSDK()
+            
+            if (!window.WidgetCheckout) {
+              throw new Error('No se pudo cargar el Widget de Wompi')
+            }
+            
+            const checkout = new window.WidgetCheckout({
+              currency: 'COP',
+              amountInCents: amountInCents,
+              reference: reference,
+              publicKey: WOMPI_CONFIG.publicKey,
+              'signature:integrity': signature,
+              redirectUrl: `${window.location.origin}/pago-exitoso`,
+              customerData: {
+                email: form.value.email,
+                fullName: `${form.value.nombre} ${form.value.apellido}`.trim(),
+                phoneNumber: cleanPhone,
+                phoneNumberPrefix: '57'
+              }
+            })
+            
+            checkout.open(function(result) {
+              const transaction = result.transaction
+              console.log('💳 Resultado Wompi Widget:', transaction)
+              
+              if (transaction) {
+                // Redirigir a pago-exitoso con los datos de la transacción
+                const params = new URLSearchParams({
+                  id: transaction.id || '',
+                  ref: transaction.reference || reference,
+                  status: (transaction.status || '').toLowerCase()
+                })
+                window.location.href = `/pago-exitoso?${params.toString()}`
+              } else {
+                // Widget cerrado sin completar
+                processing.value = false
+              }
+            })
+            
+            // No hacer processing = false aquí, el widget está abierto
+            return
+            
+          } else {
+            // ─── PRODUCCIÓN: Usar redirect checkout ───
+            console.log('🌐 Modo producción - Redirigiendo a Wompi checkout')
+            
+            const wompiCheckoutUrl = await buildCheckoutUrl({
+              amountInCents,
+              reference,
+              redirectUrl: `${window.location.origin}/pago-exitoso`,
+              email: form.value.email,
+              fullName: `${form.value.nombre} ${form.value.apellido}`.trim(),
+              phone: cleanPhone
+            })
+            
+            console.log('🔗 URL Wompi:', wompiCheckoutUrl)
+            window.location.href = wompiCheckoutUrl
+          }
           
         } catch (e) {
           console.error('Error con Wompi:', e)

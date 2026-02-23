@@ -460,6 +460,7 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
                     raise Exception(f"Producto no encontrado: {producto_id}")
         
         # 1. Obtener o crear cliente
+        # Buscar primero por email
         cliente = ClienteModel.objects.filter(email=data.email).first()
     
         tipo_doc = data.tipo_documento or None
@@ -475,6 +476,14 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
             numero_doc = f"AUTO-{uuid4().hex[:8].upper()}"
         if not tipo_doc:
             tipo_doc = 'CC'
+
+        # Si no encontramos por email, buscar por número de documento
+        if not cliente and numero_doc and not numero_doc.startswith('AUTO-'):
+            cliente = ClienteModel.objects.filter(numero_documento=numero_doc).first()
+            if cliente:
+                # Actualizar email del cliente existente
+                cliente.email = data.email
+                cliente.save()
 
         if not cliente:
             cliente = ClienteModel.objects.create(
