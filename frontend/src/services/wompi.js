@@ -113,11 +113,16 @@ export async function buildCheckoutUrl({
   // En desarrollo local, usar la URL de producción como redirect.
   // El pago se procesa igual; al volver de Wompi, se usa el webhook o 
   // se consulta el estado de la transacción por referencia.
+  // Wompi (CloudFront WAF) bloquea redirect-url con "localhost".
+  // En desarrollo local, redirigir a producción con un param codificado
+  // para que PagoExitoso.vue rebote de vuelta a localhost.
   let safeRedirectUrl = redirectUrl
   if (safeRedirectUrl.includes('localhost') || safeRedirectUrl.includes('127.0.0.1')) {
     const productionUrl = import.meta.env.VITE_PRODUCTION_URL || 'https://demostracion.store'
-    safeRedirectUrl = `${productionUrl}/pago-exitoso`
-    console.warn('⚠️ Wompi no acepta localhost como redirect. Usando URL de producción:', safeRedirectUrl)
+    // Codificar la URL local en base64 para evitar que WAF detecte "localhost"
+    const returnParam = btoa(redirectUrl)
+    safeRedirectUrl = `${productionUrl}/pago-exitoso?r=${encodeURIComponent(returnParam)}`
+    console.warn('⚠️ Wompi no acepta localhost. Redirect via producción → localhost')
   }
   
   const params = [

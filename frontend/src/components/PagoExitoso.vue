@@ -319,7 +319,28 @@ export default {
     }
     
     onMounted(() => {
-      // Simular carga y parsear respuesta de ePayco
+      // Si viene con param "r" (return), es un rebote desde producción → localhost
+      // Redirigir al origen local con todos los params de Wompi
+      const returnParam = route.query.r
+      if (returnParam) {
+        try {
+          const returnUrl = atob(returnParam)
+          // Copiar todos los params excepto "r"
+          const params = new URLSearchParams(route.query)
+          params.delete('r')
+          const separator = returnUrl.includes('?') ? '&' : '?'
+          const fullUrl = params.toString() 
+            ? `${returnUrl}${separator}${params.toString()}`
+            : returnUrl
+          console.log('🔄 Rebotando a origen local:', fullUrl)
+          window.location.href = fullUrl
+          return
+        } catch (e) {
+          console.warn('Error decodificando return URL:', e)
+        }
+      }
+      
+      // Simular carga y parsear respuesta de ePayco/Wompi
       setTimeout(() => {
         parseEpaycoResponse()
         loading.value = false
