@@ -761,3 +761,390 @@ body::after {
     background: transparent;
   }
 }
+
+/* ========================================
+   CART DRAWER - Mobile-First Boutique Style
+   ======================================== */
+
+/* Panel principal del carrito */
+.cart-drawer-panel {
+  box-shadow: -12px 0 40px -8px rgba(0, 0, 0, 0.12);
+}
+
+/* Header compacto móvil */
+.cart-drawer-header {
+  padding: 0.875rem 1rem;
+}
+
+@media (min-width: 640px) {
+  .cart-drawer-header {
+    padding: 1.25rem 1.5rem;
+  }
+}
+
+/* Título del carrito - más delicado */
+.cart-drawer-title {
+  font-size: 1rem;
+  font-weight: 400;
+  letter-spacing: 0.02em;
+}
+
+@media (min-width: 640px) {
+  .cart-drawer-title {
+    font-size: 1.125rem;
+  }
+}
+
+/* Barra de envío gratis - más compacta */
+.cart-shipping-bar {
+  padding: 0.625rem 1rem;
+}
+
+@media (min-width: 640px) {
+  .cart-shipping-bar {
+    padding: 0.875rem 1.5rem;
+  }
+}
+
+/* Item del carrito - compacto y delicado */
+.cart-item {
+  padding: 0.625rem;
+  gap: 0.625rem;
+  border-radius: 0.625rem;
+  border: 1px solid rgba(245, 235, 229, 0.6);
+}
+
+.cart-item:hover {
+  border-color: rgba(245, 235, 229, 1);
+}
+
+@media (min-width: 640px) {
+  .cart-item {
+    padding: 0.75rem;
+    gap: 0.875rem;
+    border-radius: 0.75rem;
+  }
+}
+
+/* Imagen del producto - más pequeña en móvil */
+.cart-item-image {
+  width: 64px;
+  height: 64px;
+  border-radius: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .cart-item-image {
+    width: 80px;
+    height: 80px;
+    border-radius: 0.625rem;
+  }
+}
+
+/* Nombre del producto - tipografía ligera */
+.cart-item-name {
+  font-size: 0.8125rem;
+  font-weight: 400;
+  line-height: 1.3;
+  color: var(--color-text-dark);
+}
+
+@media (min-width: 640px) {
+  .cart-item-name {
+    font-size: 0.875rem;
+  }
+}
+
+/* Variante info - muy sutil */
+.cart-item-variant {
+  font-size: 0.6875rem;
+  color: var(--color-text-light);
+  margin-top: 0.125rem;
+}
+
+/* Selector de cantidad - boutique style */
+.cart-qty-selector {
+  display: inline-flex;
+  align-items: center;
+  border: 1px solid rgba(245, 235, 229, 0.8);
+  border-radius: 9999px;
+  background: rgba(253, 252, 251, 0.5);
+}
+
+.cart-qty-btn {
+  width: 1.375rem;
+  height: 1.375rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--color-text-medium);
+  transition: color 0.15s ease;
+}
+
+.cart-qty-btn:hover:not(:disabled) {
+  color: var(--color-text-dark);
+}
+
+.cart-qty-btn:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.cart-qty-btn svg {
+  width: 0.625rem;
+  height: 0.625rem;
+}
+
+.cart-qty-value {
+  width: 1.5rem;
+  text-align: center;
+  font-size: 0.75rem;
+  font-weight: 500;
+  color: var(--color-text-dark);
+}
+
+@media (min-width: 640px) {
+  .cart-qty-btn {
+    width: 1.625rem;
+    height: 1.625rem;
+  }
+  
+  .cart-qty-btn svg {
+    width: 0.75rem;
+    height: 0.75rem;
+  }
+  
+  .cart-qty-value {
+    width: 1.75rem;
+    font-size: 0.8125rem;
+  }
+}
+
+/* Precio del item - elegante */
+.cart-item-price {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-dark);
+}
+
+@media (min-width: 640px) {
+  .cart-item-price {
+    font-size: 0.875rem;
+  }
+}
+
+/* Botón eliminar - rosado suave */
+.cart-remove-btn {
+  width: 1.625rem;
+  height: 1.625rem;
+  border-radius: 9999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: var(--color-brand-50);
+  transition: background-color 0.15s ease;
+}
+
+.cart-remove-btn:hover {
+  background: var(--color-brand-100);
+}
+
+.cart-remove-btn svg {
+  width: 0.8125rem;
+  height: 0.8125rem;
+  color: var(--color-brand-400);
+  transition: color 0.15s ease;
+}
+
+.cart-remove-btn:hover svg {
+  color: var(--color-brand-600);
+}
+
+@media (min-width: 640px) {
+  .cart-remove-btn {
+    width: 1.875rem;
+    height: 1.875rem;
+  }
+  
+  .cart-remove-btn svg {
+    width: 0.875rem;
+    height: 0.875rem;
+  }
+}
+
+/* Footer del carrito - compacto */
+.cart-footer {
+  background: linear-gradient(to bottom, #FDFBF7, #FAF9F7);
+  border-top: 1px solid rgba(245, 235, 229, 0.5);
+}
+
+.cart-footer-summary {
+  padding: 0.75rem 1rem;
+}
+
+@media (min-width: 640px) {
+  .cart-footer-summary {
+    padding: 1rem 1.5rem;
+  }
+}
+
+.cart-summary-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 0.75rem;
+}
+
+.cart-summary-row span:first-child {
+  color: var(--color-text-medium);
+}
+
+.cart-summary-row span:last-child {
+  color: var(--color-text-dark);
+}
+
+@media (min-width: 640px) {
+  .cart-summary-row {
+    font-size: 0.8125rem;
+  }
+}
+
+/* Total - elegante pero no invasivo */
+.cart-total-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 0.625rem;
+  margin-top: 0.5rem;
+  border-top: 1px solid rgba(245, 235, 229, 0.6);
+}
+
+.cart-total-label {
+  font-size: 0.8125rem;
+  font-weight: 500;
+  color: var(--color-text-dark);
+}
+
+.cart-total-value {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: var(--color-text-dark);
+}
+
+@media (min-width: 640px) {
+  .cart-total-label {
+    font-size: 0.875rem;
+  }
+  
+  .cart-total-value {
+    font-size: 1.25rem;
+  }
+}
+
+/* Botón CTA - refinado y femenino */
+.cart-checkout-btn {
+  width: 100%;
+  background: var(--color-brand-600);
+  color: white;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  padding: 0.875rem 1.5rem;
+  border-radius: 9999px;
+  transition: all 0.2s ease;
+}
+
+.cart-checkout-btn:hover {
+  background: var(--color-brand-700);
+  box-shadow: 0 8px 24px -4px rgba(216, 27, 96, 0.25);
+}
+
+@media (min-width: 640px) {
+  .cart-checkout-btn {
+    font-size: 0.8125rem;
+    padding: 1rem 2rem;
+  }
+}
+
+/* Botón secundario - seguir comprando */
+.cart-continue-btn {
+  width: 100%;
+  font-size: 0.75rem;
+  color: var(--color-text-medium);
+  padding: 0.5rem;
+  transition: color 0.15s ease;
+}
+
+.cart-continue-btn:hover {
+  color: var(--color-text-dark);
+}
+
+/* Contenedor de acciones */
+.cart-actions {
+  padding: 0.75rem 1rem 1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+@media (min-width: 640px) {
+  .cart-actions {
+    padding: 1rem 1.5rem 1.25rem;
+    gap: 0.625rem;
+  }
+}
+
+/* Estado vacío - más compacto */
+.cart-empty {
+  padding: 2rem 1rem;
+}
+
+.cart-empty-icon {
+  width: 4rem;
+  height: 4rem;
+  margin-bottom: 1rem;
+}
+
+.cart-empty-title {
+  font-size: 1rem;
+  font-weight: 400;
+  margin-bottom: 0.375rem;
+}
+
+.cart-empty-text {
+  font-size: 0.8125rem;
+  color: var(--color-text-medium);
+  margin-bottom: 1.25rem;
+}
+
+.cart-empty-btn {
+  font-size: 0.8125rem;
+  padding: 0.625rem 1.5rem;
+}
+
+@media (min-width: 640px) {
+  .cart-empty {
+    padding: 3rem 1.5rem;
+  }
+  
+  .cart-empty-icon {
+    width: 5rem;
+    height: 5rem;
+    margin-bottom: 1.25rem;
+  }
+  
+  .cart-empty-title {
+    font-size: 1.125rem;
+  }
+  
+  .cart-empty-text {
+    font-size: 0.875rem;
+    margin-bottom: 1.5rem;
+  }
+  
+  .cart-empty-btn {
+    font-size: 0.875rem;
+    padding: 0.75rem 2rem;
+  }
+}

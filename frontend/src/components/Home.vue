@@ -1777,80 +1777,79 @@
     >
       <div 
         v-if="showCartDrawer"
-        class="fixed top-0 right-0 h-full w-full sm:w-[400px] bg-white z-[60] flex flex-col"
-        style="box-shadow: -20px 0 60px -15px rgba(0, 0, 0, 0.15);"
+        class="fixed top-0 right-0 h-full w-full sm:w-[380px] bg-white z-[60] flex flex-col cart-drawer-panel"
         @click.stop
       >
         <!-- Header - Elegante con Serif -->
-        <div class="flex items-center justify-between px-6 py-5 border-b border-nude-200/50">
-          <h2 class="font-luxury text-xl text-text-dark tracking-wide">Tu Selección</h2>
+        <div class="flex items-center justify-between border-b border-nude-200/40 cart-drawer-header">
+          <h2 class="font-luxury text-text-dark cart-drawer-title">Tu Selección</h2>
           <button 
             @click="closeCartDrawer"
-            class="w-8 h-8 rounded-full flex items-center justify-center hover:bg-nude-100 transition-colors"
+            class="w-7 h-7 rounded-full flex items-center justify-center hover:bg-nude-100 transition-colors"
           >
-            <svg class="w-4 h-4 text-text-medium" fill="none" stroke="currentColor" stroke-width="1.2" viewBox="0 0 24 24">
+            <svg class="w-3.5 h-3.5 text-text-medium" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
 
         <!-- Barra de Progreso Envío Gratis - Minimalista -->
-        <div v-if="getCartSubtotal() < 300000" class="px-6 py-4 bg-gradient-to-r from-nude-50 to-white">
-          <div class="flex items-center justify-between mb-2">
-            <span class="text-xs text-text-medium">
+        <div v-if="getCartSubtotal() < 300000" class="bg-gradient-to-r from-nude-50 to-white cart-shipping-bar">
+          <div class="flex items-center justify-between mb-1.5">
+            <span class="text-[0.6875rem] text-text-medium">
               Te faltan ${{ formatPrice(300000 - getCartSubtotal()) }} para envío gratis
             </span>
-            <span class="text-xs text-brand-600 font-medium">{{ Math.min(100, Math.round((getCartSubtotal() / 300000) * 100)) }}%</span>
+            <span class="text-[0.6875rem] text-brand-600 font-medium">{{ Math.min(100, Math.round((getCartSubtotal() / 300000) * 100)) }}%</span>
           </div>
-          <div class="h-1 bg-nude-200 rounded-full overflow-hidden">
+          <div class="h-0.5 bg-nude-200 rounded-full overflow-hidden">
             <div 
               class="h-full bg-gradient-to-r from-brand-500 to-brand-600 rounded-full transition-all duration-500"
               :style="{ width: Math.min(100, (getCartSubtotal() / 300000) * 100) + '%' }"
             ></div>
           </div>
         </div>
-        <div v-else class="px-6 py-4 bg-gradient-to-r from-green-50 to-white">
-          <div class="flex items-center justify-center gap-2">
-            <svg class="w-4 h-4 text-green-600" fill="currentColor" viewBox="0 0 20 20">
+        <div v-else class="bg-gradient-to-r from-green-50 to-white cart-shipping-bar">
+          <div class="flex items-center justify-center gap-1.5">
+            <svg class="w-3.5 h-3.5 text-green-600" fill="currentColor" viewBox="0 0 20 20">
               <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
             </svg>
-            <span class="text-sm text-green-700 font-medium">Envío gratis aplicado</span>
+            <span class="text-xs text-green-700 font-medium">Envío gratis aplicado</span>
           </div>
         </div>
         
         <!-- Contenido del Carrito -->
-        <div class="flex-1 overflow-y-auto px-4">
+        <div class="flex-1 overflow-y-auto px-3 sm:px-4">
           <!-- Loading -->
-          <div v-if="cartLoading" class="flex items-center justify-center h-32">
-            <div class="w-8 h-8 border-2 border-brand-400 border-t-transparent rounded-full animate-spin"></div>
+          <div v-if="cartLoading" class="flex items-center justify-center h-28">
+            <div class="w-6 h-6 border-2 border-brand-400 border-t-transparent rounded-full animate-spin"></div>
           </div>
           
           <!-- Carrito vacío - Femenino -->
-          <div v-else-if="cartItems.length === 0" class="flex flex-col items-center justify-center h-72 text-center px-4">
-            <div class="w-24 h-24 rounded-full bg-gradient-to-br from-nude-100 to-nude-200 flex items-center justify-center mb-5">
-              <svg class="w-10 h-10 text-brand-400" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+          <div v-else-if="cartItems.length === 0" class="flex flex-col items-center justify-center text-center cart-empty">
+            <div class="rounded-full bg-gradient-to-br from-nude-100 to-nude-200 flex items-center justify-center cart-empty-icon">
+              <svg class="w-8 h-8 sm:w-9 sm:h-9 text-brand-400" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
               </svg>
             </div>
-            <h3 class="font-luxury text-lg text-text-dark mb-2">Tu selección está vacía</h3>
-            <p class="text-text-medium text-sm mb-6">Descubre productos increíbles para ti</p>
+            <h3 class="font-luxury text-text-dark cart-empty-title">Tu selección está vacía</h3>
+            <p class="cart-empty-text">Descubre productos increíbles para ti</p>
             <button 
               @click="closeCartDrawer"
-              class="bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm px-8 py-3 rounded-full transition-all hover:shadow-lg hover:shadow-brand-600/25"
+              class="bg-brand-600 hover:bg-brand-700 text-white font-medium rounded-full transition-all hover:shadow-lg hover:shadow-brand-600/20 cart-empty-btn"
             >
               Explorar colección
             </button>
           </div>
           
           <!-- Items del carrito - Soft Beauty -->
-          <div v-else class="py-4 space-y-4">
+          <div v-else class="py-3 space-y-2.5">
             <div 
               v-for="item in cartItems" 
               :key="item.variante_id || item.producto_id"
-              class="flex gap-4 p-3 bg-white rounded-xl border border-nude-100 hover:border-nude-200 transition-colors"
+              class="flex bg-white transition-colors cart-item"
             >
-              <!-- Imagen del producto - Más grande y redondeada -->
-              <div class="w-[90px] h-[90px] bg-gradient-to-br from-nude-50 to-nude-100 rounded-xl flex-shrink-0 overflow-hidden flex items-center justify-center relative">
+              <!-- Imagen del producto -->
+              <div class="bg-gradient-to-br from-nude-50 to-nude-100 flex-shrink-0 overflow-hidden flex items-center justify-center cart-item-image">
                 <img 
                   v-if="getCartMediaUrl(item)" 
                   :src="getCartMediaUrl(item)" 
@@ -1859,45 +1858,45 @@
                   @error="handleImageError"
                 />
                 <div v-if="getCartMediaUrl(item) && isVideo(getCartSourceUrl(item))" class="absolute inset-0 flex items-center justify-center bg-black/25">
-                  <svg class="w-5 h-5 text-white" fill="currentColor" viewBox="0 0 20 20">
+                  <svg class="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                     <path d="M6.3 2.841A1.5 1.5 0 004 4.11V15.89a1.5 1.5 0 002.3 1.269l9.344-5.89a1.5 1.5 0 000-2.538L6.3 2.84z" />
                   </svg>
                 </div>
-                <svg v-else class="w-8 h-8 text-nude-300" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                <svg v-else class="w-6 h-6 text-nude-300" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
                 </svg>
               </div>
               
               <!-- Info del producto -->
-              <div class="flex-1 min-w-0 flex flex-col justify-between py-1">
+              <div class="flex-1 min-w-0 flex flex-col justify-between py-0.5">
                 <div>
-                  <h3 class="text-sm font-medium text-text-dark leading-snug line-clamp-2 mb-1">
+                  <h3 class="line-clamp-2 cart-item-name">
                     {{ item.nombre || 'Producto' }}
                   </h3>
-                  <p v-if="item.color || item.largo" class="text-xs text-text-light">
-                    <span v-if="item.color">Color: {{ formatColorLabel(item.color) }}</span>
+                  <p v-if="item.color || item.largo" class="cart-item-variant">
+                    <span v-if="item.color">{{ formatColorLabel(item.color) }}</span>
                     <span v-if="item.color && item.largo"> · </span>
-                    <span v-if="item.largo">Largo: {{ item.largo }}</span>
+                    <span v-if="item.largo">{{ item.largo }}</span>
                   </p>
                   
-                  <!-- Selector de Cantidad - Estilo Píldora -->
-                  <div class="flex items-center gap-2 mt-2">
-                    <div class="inline-flex items-center border border-nude-200 rounded-full">
+                  <!-- Selector de Cantidad - Boutique Style -->
+                  <div class="flex items-center mt-1.5">
+                    <div class="cart-qty-selector">
                       <button 
                         @click="updateQuantity(item.variante_id || item.producto_id, (item.cantidad || 1) - 1)"
-                        class="w-7 h-7 flex items-center justify-center text-text-medium hover:text-text-dark transition-colors"
+                        class="cart-qty-btn"
                         :disabled="(item.cantidad || 1) <= 1"
                       >
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                           <path stroke-linecap="round" d="M5 12h14" />
                         </svg>
                       </button>
-                      <span class="w-8 text-center text-sm font-medium text-text-dark">{{ item.cantidad || 1 }}</span>
+                      <span class="cart-qty-value">{{ item.cantidad || 1 }}</span>
                       <button 
                         @click="updateQuantity(item.variante_id || item.producto_id, (item.cantidad || 1) + 1)"
-                        class="w-7 h-7 flex items-center justify-center text-text-medium hover:text-text-dark transition-colors"
+                        class="cart-qty-btn"
                       >
-                        <svg class="w-3 h-3" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                        <svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                           <path stroke-linecap="round" d="M12 5v14m-7-7h14" />
                         </svg>
                       </button>
@@ -1906,56 +1905,54 @@
                 </div>
                 
                 <!-- Precio -->
-                <p class="text-base font-semibold text-text-dark mt-1">
+                <p class="cart-item-price mt-1">
                   ${{ formatPrice(getItemPrice(item)) }}
                 </p>
               </div>
               
-              <!-- Eliminar - Más visible -->
+              <!-- Eliminar - Rosado suave -->
               <button 
                 @click.stop="removeFromCart(item.variante_id || item.producto_id)"
-                class="self-start mt-1 w-8 h-8 rounded-full flex items-center justify-center bg-red-50 hover:bg-red-100 transition-colors group"
-                title="Eliminar producto"
+                class="self-start cart-remove-btn"
+                title="Eliminar"
               >
-                <svg class="w-4 h-4 text-red-400 group-hover:text-red-600" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
+                <svg fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
                 </svg>
               </button>
             </div>
-            
-            <!-- Espacio adicional al final de la lista -->
           </div>
         </div>
         
-        <!-- Footer - Fondo Nude, Botón Pill con Glow -->
-        <div v-if="cartItems.length > 0" class="border-t border-nude-200" style="background: #FDFBF7;">
+        <!-- Footer - Fondo Nude, Botón Pill -->
+        <div v-if="cartItems.length > 0" class="cart-footer">
           <!-- Resumen de precios -->
-          <div class="px-6 py-4 space-y-2">
-            <div class="flex items-center justify-between text-sm">
-              <span class="text-text-medium">Subtotal</span>
-              <span class="text-text-dark">${{ formatPrice(getCartSubtotal()) }}</span>
+          <div class="cart-footer-summary space-y-1.5">
+            <div class="cart-summary-row">
+              <span>Subtotal</span>
+              <span>${{ formatPrice(getCartSubtotal()) }}</span>
             </div>
-            <div class="flex items-center justify-between text-sm">
-              <span class="text-text-medium">Envío</span>
-              <span class="text-text-medium italic">Por calcular</span>
+            <div class="cart-summary-row">
+              <span>Envío</span>
+              <span class="italic">Por calcular</span>
             </div>
-            <div class="flex items-center justify-between pt-3 border-t border-nude-200">
-              <span class="text-text-dark font-medium">Total</span>
-              <span class="font-luxury text-2xl font-bold text-text-dark">${{ formatPrice(getCartSubtotal()) }}</span>
+            <div class="cart-total-row">
+              <span class="cart-total-label">Total</span>
+              <span class="cart-total-value">${{ formatPrice(getCartSubtotal()) }}</span>
             </div>
           </div>
           
           <!-- Botones -->
-          <div class="px-6 pb-6 space-y-3">
+          <div class="cart-actions">
             <button 
               @click="irACheckout"
-              class="w-full bg-brand-600 hover:bg-brand-700 text-white font-medium text-sm py-4 rounded-full transition-all uppercase tracking-wider hover:shadow-xl hover:shadow-brand-600/30"
+              class="cart-checkout-btn"
             >
               Finalizar Compra
             </button>
             <button 
               @click="closeCartDrawer"
-              class="w-full text-sm text-text-medium hover:text-text-dark transition-colors py-2"
+              class="cart-continue-btn"
             >
               Seguir comprando
             </button>
@@ -2267,15 +2264,41 @@ export default {
     const loadCartItems = async () => {
       cartLoading.value = true
       
-      // Primero cargar desde cache local para respuesta inmediata
-      const cachedCart = loadCartFromLocal()
-      if (cachedCart && cachedCart.items.length > 0) {
-        cartItems.value = cachedCart.items
-        cartTotal.value = cachedCart.total
-        cartCount.value = cachedCart.count || cachedCart.items.reduce((sum, item) => sum + item.cantidad, 0)
+      // Cargar items del localStorage SIN restricción de tiempo
+      // (consistente con Catalogo.vue y ProductoDetalle.vue)
+      try {
+        const cached = localStorage.getItem(CART_STORAGE_KEY)
+        if (cached) {
+          const data = JSON.parse(cached)
+          const rawItems = Array.isArray(data) ? data : (data?.items || [])
+          const items = rawItems.map((item) => {
+            const productoId = item?.producto_id ?? item?.id
+            const varianteId = item?.variante_id ?? null
+            return {
+              ...item,
+              producto_id: productoId,
+              variante_id: varianteId
+            }
+          })
+          
+          if (items.length > 0) {
+            cartItems.value = items
+            cartTotal.value = typeof data?.total === 'number'
+              ? data.total
+              : items.reduce((acc, item) => {
+                  const unit = item?.precio_unitario ?? item?.precio_monto ?? item?.precio ?? 0
+                  const qty = item?.cantidad ?? 1
+                  const subtotal = item?.subtotal
+                  return acc + (typeof subtotal === 'number' ? subtotal : unit * qty)
+                }, 0)
+            cartCount.value = items.reduce((sum, item) => sum + (item.cantidad || 1), 0)
+          }
+        }
+      } catch (e) {
+        console.warn('Error leyendo carrito de localStorage:', e)
       }
       
-      // Si no está logueado, solo usar cache
+      // Si no está logueado, solo usar cache local
       if (!isLoggedIn.value) {
         cartLoading.value = false
         return
@@ -2917,13 +2940,21 @@ export default {
     }
 
     const cargarResumenCarrito = async () => {
-      // Primero cargar desde cache local para respuesta inmediata
-      const cachedCart = loadCartFromLocal()
-      if (cachedCart && cachedCart.count > 0) {
-        cartCount.value = cachedCart.count
+      // PRIMERO: Leer el count directamente del localStorage (sin restricción de tiempo)
+      // Esto mantiene consistencia con Catalogo.vue y ProductoDetalle.vue
+      try {
+        const storedCount = localStorage.getItem(CART_COUNT_KEY)
+        if (storedCount) {
+          const parsedCount = parseInt(storedCount, 10)
+          if (!isNaN(parsedCount) && parsedCount > 0) {
+            cartCount.value = parsedCount
+          }
+        }
+      } catch (e) {
+        console.warn('Error leyendo cart count:', e)
       }
       
-      // Si no está logueado, no intentar cargar del servidor
+      // Si no está logueado, usar solo el valor de localStorage
       if (!isLoggedIn.value) {
         return
       }
