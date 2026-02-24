@@ -31,7 +31,7 @@
     <transition name="slide-down">
       <div 
         v-if="showFloater"
-        class="w-full bg-[#1A1A1A] border-b border-[#C9A962]/20 px-4 py-2.5 z-[9000] relative"
+        class="fixed top-0 left-0 right-0 bg-[#1A1A1A] border-b border-[#C9A962]/20 px-4 py-2.5 z-[9999] shadow-lg"
         role="alert"
       >
         <div class="flex items-center gap-3 max-w-screen-xl mx-auto">

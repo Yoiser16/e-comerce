@@ -1,34 +1,49 @@
 <template>
-  <div class="h-screen flex flex-col lg:flex-row overflow-hidden">
+  <div class="b2b-login-screen h-screen flex flex-col lg:flex-row overflow-hidden">
     <!-- =========================================================================
          LADO IZQUIERDO - Hero Image con Branding
-         En móvil: aparece arriba como banner compacto
+         En móvil: Header estilo app con branding elegante
          En desktop: mitad izquierda de la pantalla
     ========================================================================== -->
-    <div class="relative lg:w-1/2 h-28 sm:h-40 lg:h-screen overflow-hidden">
-      <!-- Imagen de fondo -->
+    <div class="relative lg:w-1/2 lg:h-screen overflow-hidden">
+      <!-- Imagen de fondo (solo desktop) -->
       <img 
         src="https://images.unsplash.com/photo-1560066984-138dadb4c035?w=800&h=1200&fit=crop&q=80" 
         alt="Fondo salón de belleza" 
-        class="absolute inset-0 w-full h-full object-cover"
+        class="absolute inset-0 w-full h-full object-cover hidden lg:block"
       />
       
-      <!-- Gradient de fondo (overlay para asegurar legibilidad) -->
-      <div class="absolute inset-0 bg-gradient-to-br from-black/80 via-black/60 to-black/80"></div>
+      <!-- Gradient mobile: femenino y elegante / Desktop: oscuro profesional -->
+      <div class="absolute inset-0 bg-gradient-to-b from-[#F5EBE5] via-[#FAF5F2] to-[#FDF8F6] lg:bg-gradient-to-br lg:from-black/80 lg:via-black/60 lg:to-black/80"></div>
       
-      <!-- Patrón decorativo (opcional, reducimos opacidad) -->
-      <div class="absolute inset-0 opacity-10 mix-blend-overlay">
+      <!-- Patrón decorativo (solo desktop) -->
+      <div class="absolute inset-0 opacity-10 mix-blend-overlay hidden lg:block">
         <div class="absolute inset-0" style="background-image: url('data:image/svg+xml,%3Csvg width=\'60\' height=\'60\' viewBox=\'0 0 60 60\' xmlns=\'http://www.w3.org/2000/svg\'%3E%3Cg fill=\'none\' fill-rule=\'evenodd\'%3E%3Cg fill=\'%23C9A962\' fill-opacity=\'0.4\'%3E%3Cpath d=\'M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z\'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E');"></div>
       </div>
       
-      <!-- Overlay oscuro -->
-      <div class="absolute inset-0 bg-black/40"></div>
+      <!-- Overlay oscuro (solo desktop) -->
+      <div class="absolute inset-0 bg-black/40 hidden lg:block"></div>
       
       <!-- Contenido sobre la imagen -->
-      <div class="relative z-10 h-full flex flex-col justify-between p-4 sm:p-6 lg:p-12">
-        <!-- Logo -->
-        <div class="flex items-center gap-2 lg:gap-3">
-          <div class="w-8 h-8 lg:w-12 lg:h-12 rounded-full bg-white/10 p-1.5 lg:p-2 flex items-center justify-center">
+      <div class="relative z-10 h-full flex flex-col justify-between p-5 pb-6 lg:p-12">
+        <!-- Logo móvil: centrado, estilo app femenino -->
+        <div class="flex flex-col items-center gap-3 pt-3 lg:hidden">
+          <div class="w-[72px] h-[72px] rounded-[22px] bg-white/90 shadow-md shadow-[#D4B29E]/15 p-3.5 flex items-center justify-center">
+            <img 
+              src="/logo-kharis.png" 
+              alt="Kharis" 
+              class="w-full h-full object-contain"
+            />
+          </div>
+          <div class="text-center">
+            <span class="text-[#3D3229] font-luxury text-lg tracking-[0.15em] block">KHARIS</span>
+            <span class="text-[#A69783] text-[11px] tracking-[0.3em] uppercase">Portal Mayoristas</span>
+          </div>
+        </div>
+
+        <!-- Logo desktop: esquina superior izquierda -->
+        <div class="hidden lg:flex items-center gap-3">
+          <div class="w-12 h-12 rounded-full bg-white/10 p-2 flex items-center justify-center">
             <img 
               src="/logo-kharis.png" 
               alt="Kharis" 
@@ -36,8 +51,8 @@
             />
           </div>
           <div>
-            <span class="text-[#C9A962] font-luxury text-base lg:text-xl tracking-wider">KHARIS</span>
-            <span class="text-white/60 text-[10px] lg:text-sm block -mt-0.5 lg:-mt-1">PRO</span>
+            <span class="text-[#C9A962] font-luxury text-xl tracking-wider">KHARIS</span>
+            <span class="text-white/60 text-sm block -mt-1">PRO</span>
           </div>
         </div>
         
@@ -80,15 +95,22 @@
 
     <!-- =========================================================================
          LADO DERECHO - Formulario de Login
+         En móvil: card flotante con bordes redondeados que sube sobre el header
+         En desktop: mitad derecha normal
     ========================================================================== -->
-    <div class="flex-1 lg:w-1/2 flex items-start lg:items-center justify-center bg-[#FAFAFA] px-5 py-6 sm:p-6 lg:p-12 overflow-y-auto">
+    <div class="flex-1 lg:w-1/2 flex items-start lg:items-center justify-center bg-white lg:bg-[#FAFAFA] -mt-5 lg:mt-0 rounded-t-[28px] lg:rounded-none relative z-20 px-5 pt-7 pb-8 sm:p-6 lg:p-12 overflow-y-auto hide-scrollbar">
       <div class="w-full max-w-md">
+        <!-- Pill indicator móvil (estilo app sheet) -->
+        <div class="flex justify-center mb-5 lg:hidden">
+          <div class="w-10 h-1 rounded-full bg-[#E2C9B8]/60"></div>
+        </div>
+
         <!-- Header del formulario -->
-        <div class="text-center lg:text-left mb-5 lg:mb-8">
-          <h2 class="text-xl lg:text-3xl font-luxury text-text-dark mb-1 lg:mb-2">
+        <div class="text-center lg:text-left mb-6 lg:mb-8">
+          <h2 class="text-[22px] lg:text-3xl font-luxury text-[#3D3229] lg:text-text-dark mb-1.5 lg:mb-2">
             Bienvenido de nuevo
           </h2>
-          <p class="text-text-light text-sm lg:text-base">
+          <p class="text-[#A69783] lg:text-text-light text-[13px] lg:text-base">
             Ingresa tus credenciales para acceder al portal
           </p>
         </div>
@@ -99,10 +121,10 @@
         <transition name="fade">
           <div 
             v-if="error" 
-            class="mb-6 p-4 rounded-lg flex items-start gap-3"
+            class="mb-5 p-3.5 rounded-2xl flex items-start gap-3"
             :class="errorType === 'warning' 
-              ? 'bg-amber-50 border border-amber-200' 
-              : 'bg-red-50 border border-red-200'"
+              ? 'bg-amber-50 border border-amber-200/60' 
+              : 'bg-red-50 border border-red-200/60'"
           >
             <div 
               class="shrink-0 w-5 h-5 rounded-full flex items-center justify-center mt-0.5"
@@ -129,7 +151,7 @@
                 {{ errorTitle }}
               </p>
               <p 
-                class="text-sm mt-0.5"
+                class="text-[13px] mt-0.5"
                 :class="errorType === 'warning' ? 'text-amber-700' : 'text-red-600'"
               >
                 {{ error }}
@@ -139,10 +161,10 @@
         </transition>
 
         <!-- ===== Formulario ===== -->
-        <form @submit.prevent="handleLogin" class="space-y-3 lg:space-y-5">
+        <form @submit.prevent="handleLogin" class="space-y-4 lg:space-y-5">
           <!-- Email -->
           <div>
-            <label for="email" class="block text-xs lg:text-sm font-medium text-text-dark mb-1">
+            <label for="email" class="block text-[13px] lg:text-sm font-medium text-[#3D3229] lg:text-text-dark mb-1.5">
               Correo electrónico
             </label>
             <div class="relative">
@@ -154,33 +176,34 @@
                 autocomplete="email"
                 placeholder="tu@empresa.com"
                 :disabled="loading"
-                class="w-full px-3 py-2.5 lg:px-4 lg:py-3.5 pl-9 lg:pl-11 text-sm lg:text-base bg-white border border-gray-200 rounded-lg 
-                       focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962] 
+                class="w-full px-4 py-3.5 lg:py-3.5 pl-11 text-[15px] lg:text-base text-[#3D3229] lg:text-text-dark bg-[#FDFCFA] lg:bg-white border border-[#E8DDD3] lg:border-gray-200 rounded-2xl lg:rounded-lg
+                       placeholder-[#C4B5A4]
+                       focus:ring-2 focus:ring-[#3D3229]/10 focus:border-[#3D3229]/30 
                        transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 :class="{ 'border-red-300': fieldErrors.email }"
               />
               <svg 
-                class="absolute left-3 lg:left-4 top-1/2 -translate-y-1/2 w-4 h-4 lg:w-5 lg:h-5 text-gray-400" 
+                class="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] lg:w-5 lg:h-5 text-[#C4B5A4] lg:text-gray-400" 
                 fill="none" stroke="currentColor" viewBox="0 0 24 24"
               >
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
               </svg>
             </div>
-            <p v-if="fieldErrors.email" class="mt-1 text-sm text-red-500">
+            <p v-if="fieldErrors.email" class="mt-1 text-[13px] text-red-500">
               {{ fieldErrors.email }}
             </p>
           </div>
 
           <!-- Password -->
           <div>
-            <div class="flex items-center justify-between mb-1">
-              <label for="password" class="block text-xs lg:text-sm font-medium text-text-dark">
+            <div class="flex items-center justify-between mb-1.5">
+              <label for="password" class="block text-[13px] lg:text-sm font-medium text-[#3D3229] lg:text-text-dark">
                 Contraseña
               </label>
               <button 
                 type="button"
                 @click="showForgotPassword = true"
-                class="text-xs lg:text-sm text-[#C9A962] hover:text-[#B8944F] transition-colors"
+                class="text-[12px] lg:text-sm text-[#7A6B5D] hover:text-[#3D3229] font-medium transition-colors"
               >
                 ¿Olvidaste tu contraseña?
               </button>
@@ -194,13 +217,14 @@
                 autocomplete="current-password"
                 placeholder="••••••••"
                 :disabled="loading"
-                class="w-full px-3 py-2.5 lg:px-4 lg:py-3.5 pl-9 lg:pl-11 pr-10 lg:pr-12 text-sm lg:text-base bg-white border border-gray-200 rounded-lg 
-                       focus:ring-2 focus:ring-[#C9A962]/20 focus:border-[#C9A962] 
+                class="w-full px-4 py-3.5 lg:py-3.5 pl-11 pr-12 text-[15px] lg:text-base text-[#3D3229] lg:text-text-dark bg-[#FDFCFA] lg:bg-white border border-[#E8DDD3] lg:border-gray-200 rounded-2xl lg:rounded-lg
+                       placeholder-[#C4B5A4]
+                       focus:ring-2 focus:ring-[#3D3229]/10 focus:border-[#3D3229]/30 
                        transition-all outline-none disabled:opacity-50 disabled:cursor-not-allowed"
                 :class="{ 'border-red-300': fieldErrors.password }"
               />
               <svg 
-                class="absolute left-3 lg:left-4 top-1/2 -translate-y-1/2 w-4 h-4 lg:w-5 lg:h-5 text-gray-400" 
+                class="absolute left-4 top-1/2 -translate-y-1/2 w-[18px] h-[18px] lg:w-5 lg:h-5 text-[#C4B5A4] lg:text-gray-400" 
                 fill="none" stroke="currentColor" viewBox="0 0 24 24"
               >
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
@@ -209,18 +233,18 @@
               <button 
                 type="button"
                 @click="showPassword = !showPassword"
-                class="absolute right-3 lg:right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                class="absolute right-4 top-1/2 -translate-y-1/2 text-[#C4B5A4] lg:text-gray-400 hover:text-[#8B7355] lg:hover:text-gray-600 p-0.5"
               >
-                <svg v-if="showPassword" class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-if="showPassword" class="w-[18px] h-[18px] lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l3.59 3.59m0 0A9.953 9.953 0 0112 5c4.478 0 8.268 2.943 9.543 7a10.025 10.025 0 01-4.132 5.411m0 0L21 21" />
                 </svg>
-                <svg v-else class="w-4 h-4 lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg v-else class="w-[18px] h-[18px] lg:w-5 lg:h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                 </svg>
               </button>
             </div>
-            <p v-if="fieldErrors.password" class="mt-1 text-sm text-red-500">
+            <p v-if="fieldErrors.password" class="mt-1 text-[13px] text-red-500">
               {{ fieldErrors.password }}
             </p>
           </div>
@@ -231,10 +255,10 @@
               id="remember"
               v-model="form.remember" 
               type="checkbox" 
-              class="w-3.5 h-3.5 lg:w-4 lg:h-4 text-[#C9A962] bg-white border-gray-300 rounded 
-                     focus:ring-[#C9A962] focus:ring-2 cursor-pointer"
+              class="w-4 h-4 text-[#3D3229] bg-[#FDFCFA] lg:bg-white border-[#E8DDD3] lg:border-gray-300 rounded 
+                     focus:ring-[#3D3229]/20 focus:ring-2 cursor-pointer"
             />
-            <label for="remember" class="ml-2 text-xs lg:text-sm text-text-medium cursor-pointer">
+            <label for="remember" class="ml-2.5 text-[13px] lg:text-sm text-[#7A6B5D] lg:text-text-medium cursor-pointer">
               Mantener sesión iniciada
             </label>
           </div>
@@ -243,13 +267,14 @@
           <button
             type="submit"
             :disabled="loading || !isFormValid"
-            class="w-full py-3 lg:py-4 bg-[#1A1A1A] hover:bg-black text-white text-sm lg:text-base font-medium rounded-lg
-                   transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed
-                   flex items-center justify-center gap-2 group"
+            class="w-full py-4 lg:py-4 bg-[#2C2420] hover:bg-[#1A1612] text-white text-[15px] lg:text-base font-semibold rounded-2xl lg:rounded-lg
+                   shadow-lg shadow-[#2C2420]/25
+                   transition-all duration-200 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed
+                   flex items-center justify-center gap-2.5 group"
           >
             <svg 
               v-if="loading" 
-              class="w-4 h-4 lg:w-5 lg:h-5 animate-spin" 
+              class="w-5 h-5 animate-spin" 
               fill="none" viewBox="0 0 24 24"
             >
               <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
@@ -258,7 +283,7 @@
             <span>{{ loading ? 'Verificando...' : 'Ingresar al Portal' }}</span>
             <svg 
               v-if="!loading"
-              class="w-4 h-4 lg:w-5 lg:h-5 transform group-hover:translate-x-1 transition-transform" 
+              class="w-5 h-5 transform group-hover:translate-x-1 transition-transform" 
               fill="none" stroke="currentColor" viewBox="0 0 24 24"
             >
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
@@ -267,26 +292,26 @@
         </form>
 
         <!-- ===== Divider ===== -->
-        <div class="mt-8 mb-5 lg:my-8 flex items-center gap-3">
-          <div class="flex-1 h-px bg-gray-200"></div>
-          <span class="text-text-light text-xs lg:text-sm">¿Nuevo distribuidor?</span>
-          <div class="flex-1 h-px bg-gray-200"></div>
+        <div class="mt-7 mb-5 lg:my-8 flex items-center gap-3">
+          <div class="flex-1 h-px bg-[#E8DDD3]/60 lg:bg-gray-200/80"></div>
+          <span class="text-[#A69783] lg:text-text-light text-[12px] lg:text-sm">¿Nuevo distribuidor?</span>
+          <div class="flex-1 h-px bg-[#E8DDD3]/60 lg:bg-gray-200/80"></div>
         </div>
 
         <!-- ===== CTA Registro ===== -->
         <div class="text-center">
-          <p class="text-text-medium text-xs lg:text-sm mb-2.5 lg:mb-4">
+          <p class="text-[#7A6B5D] lg:text-text-medium text-[12px] lg:text-sm mb-3 lg:mb-4 leading-relaxed">
             Únete a nuestra red de distribuidores y accede a beneficios exclusivos
           </p>
           <router-link 
             to="/portal/registro"
-            class="inline-flex items-center justify-center w-full py-2.5 lg:py-3.5 px-4 lg:px-6 text-sm lg:text-base
-                   border-2 border-[#C9A962] text-[#C9A962] font-medium rounded-lg
-                   hover:bg-[#C9A962] hover:text-white transition-all duration-200 group"
+            class="inline-flex items-center justify-center w-full py-3.5 lg:py-3.5 px-5 lg:px-6 text-[14px] lg:text-base
+                   border border-[#D4C5B5] text-[#3D3229] lg:border-[#C9A962] lg:text-[#C9A962] font-medium rounded-2xl lg:rounded-lg
+                   hover:bg-[#3D3229] hover:text-white hover:border-[#3D3229] lg:hover:bg-[#C9A962] lg:hover:text-white active:scale-[0.98] transition-all duration-200 group"
           >
             <span>Solicita tu cuenta aquí</span>
             <svg 
-              class="w-3.5 h-3.5 lg:w-4 lg:h-4 ml-2 transform group-hover:translate-x-1 transition-transform" 
+              class="w-4 h-4 ml-2 transform group-hover:translate-x-1 transition-transform" 
               fill="none" stroke="currentColor" viewBox="0 0 24 24"
             >
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
@@ -295,19 +320,19 @@
         </div>
 
         <!-- ===== Footer Links ===== -->
-        <div class="mt-6 lg:mt-8 pt-4 lg:pt-6 border-t border-gray-100 text-center">
-          <p class="text-text-light text-[11px] lg:text-xs">
+        <div class="mt-6 lg:mt-8 pt-5 lg:pt-6 border-t border-[#E8DDD3]/40 lg:border-gray-200/60 text-center">
+          <p class="text-[#A69783] lg:text-text-light text-[12px] lg:text-xs">
             ¿Eres cliente particular? 
-            <a :href="retailUrl" class="text-[#C9A962] hover:underline">
+            <a :href="retailUrl" class="text-[#3D3229] hover:text-[#2C2420] hover:underline font-medium">
               Visita nuestra tienda
             </a>
           </p>
-          <p class="text-text-light text-[11px] lg:text-xs mt-1.5 lg:mt-2">
-            <a href="#" class="hover:text-text-medium">Términos</a>
-            <span class="mx-1.5 lg:mx-2">·</span>
-            <a href="#" class="hover:text-text-medium">Privacidad</a>
-            <span class="mx-1.5 lg:mx-2">·</span>
-            <a href="#" class="hover:text-text-medium">Contacto</a>
+          <p class="text-[#C4B5A4] lg:text-text-light/70 text-[11px] lg:text-xs mt-2">
+            <a href="#" class="hover:text-[#7A6B5D] lg:hover:text-text-medium">Términos</a>
+            <span class="mx-2">·</span>
+            <a href="#" class="hover:text-[#7A6B5D] lg:hover:text-text-medium">Privacidad</a>
+            <span class="mx-2">·</span>
+            <a href="#" class="hover:text-[#7A6B5D] lg:hover:text-text-medium">Contacto</a>
           </p>
         </div>
       </div>
@@ -1250,7 +1275,33 @@ export default {
 /* Estilos para el checkbox personalizado */
 input[type="checkbox"]:checked {
   background-image: url("data:image/svg+xml,%3csvg viewBox='0 0 16 16' fill='white' xmlns='http://www.w3.org/2000/svg'%3e%3cpath d='M12.207 4.793a1 1 0 010 1.414l-5 5a1 1 0 01-1.414 0l-2-2a1 1 0 011.414-1.414L6.5 9.086l4.293-4.293a1 1 0 011.414 0z'/%3e%3c/svg%3e");
-  background-color: #C9A962;
-  border-color: #C9A962;
+  background-color: #3D3229;
+  border-color: #3D3229;
+}
+
+/* ===== Mobile App-like login ===== */
+@media (max-width: 1023px) {
+  .b2b-login-screen {
+    background: #FAF5F2;
+  }
+}
+
+/* ===== Ocultar scrollbar en móvil (scroll funcional sin barra visible) ===== */
+.hide-scrollbar {
+  -ms-overflow-style: none;  /* IE y Edge */
+  scrollbar-width: none;     /* Firefox */
+}
+.hide-scrollbar::-webkit-scrollbar {
+  display: none;             /* Chrome, Safari, Opera */
+}
+
+/* ===== Safe area para dispositivos con notch ===== */
+@supports (padding-top: env(safe-area-inset-top)) {
+  .b2b-login-screen > div:first-child > div:last-child {
+    padding-top: calc(env(safe-area-inset-top) + 0.75rem);
+  }
+  .b2b-login-screen > div:nth-child(2) {
+    padding-bottom: calc(env(safe-area-inset-bottom) + 2rem);
+  }
 }
 </style>
