@@ -52,6 +52,14 @@ export const ordenesService = {
   },
 
   /**
+   * Guardar datos de rastreo (guía y link) SIN cambiar estado
+   */
+  async guardarRastreo(ordenId, trackingData = {}) {
+    const response = await apiClient.post(`/ordenes/${ordenId}/guardar-rastreo`, trackingData)
+    return response.data
+  },
+
+  /**
    * Obtener detalles de una orden
    * NOTA: Si ya tienes los datos del listado con include_items=true,
    * no necesitas llamar este endpoint

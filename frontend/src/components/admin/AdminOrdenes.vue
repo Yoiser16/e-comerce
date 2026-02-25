@@ -552,7 +552,8 @@ const filteredOrdenes = computed(() => {
 })
 
 const canEditTracking = computed(() => {
-  return selectedOrder.value?.estado_envio === 'ENVIADO' || selectedOrder.value?.estado_envio === 'ENTREGADO'
+  // Permitir editar rastreo en estados "NO_ENVIADO" o "ENVIADO" o "ENTREGADO"
+  return selectedOrder.value?.estado_envio === 'NO_ENVIADO' || selectedOrder.value?.estado_envio === 'ENVIADO' || selectedOrder.value?.estado_envio === 'ENTREGADO'
 })
 
 // Mapear estados
@@ -870,11 +871,18 @@ const updateEstadoEnvio = async () => {
   
   // Si no hay cambio real, no hacer nada
   if (nuevoEstado === estadoAnterior) return
+
+  // Validar que si intenta cambiar a "ENVIADO" tenga al menos número de guía
+  if (nuevoEstado === 'ENVIADO' && !selectedOrder.value.guia_envio?.trim()) {
+    openModal('error', 'Falta información', 'Debes ingresar el número de guía antes de marcar como ENVIADO.')
+    selectedOrder.value.estado_envio = estadoAnterior
+    return
+  }
   
   // Mensaje de confirmación
   const mensajes = {
     'NO_ENVIADO': '¿Marcar como NO ENVIADO?',
-    'ENVIADO': '📦 ¿Confirmar que el pedido fue ENVIADO?',
+    'ENVIADO': `📦 ¿Confirmar que el pedido fue ENVIADO con guía ${selectedOrder.value.guia_envio}?`,
     'ENTREGADO': '✅ ¿Confirmar que el pedido fue ENTREGADO?'
   }
   
@@ -914,7 +922,7 @@ const updateEstadoEnvio = async () => {
       ordenes.value[idx].link_rastreo = selectedOrder.value.link_rastreo || ''
     }
     
-    openModal('success', '¡Listo!', 'Estado de envío actualizado')
+    openModal('success', '¡Listo!', 'Estado de envío actualizado y email enviado al cliente.')
   } catch (error) {
     console.error('Error:', error)
     
@@ -938,13 +946,19 @@ const updateEstadoEnvio = async () => {
 
 const saveTrackingInfo = async () => {
   if (!selectedOrder.value || !canEditTracking.value) return
+  
+  // Validar que al menos tenga guía
+  if (!selectedOrder.value.guia_envio?.trim()) {
+    openModal('error', 'Falta información', 'Debes ingresar el número de guía.')
+    return
+  }
+  
   loadingEstadoChange.value = true
 
   try {
-    const estadoMap = { 'NO_ENVIADO': 'no_enviado', 'ENVIADO': 'enviado', 'ENTREGADO': 'entregado' }
-    await ordenesService.actualizarEstadoEnvio(
+    // Usar el nuevo endpoint que solo guarda rastreo sin cambiar estado
+    await ordenesService.guardarRastreo(
       selectedOrder.value.id,
-      estadoMap[selectedOrder.value.estado_envio],
       {
         guia_envio: selectedOrder.value.guia_envio || '',
         link_rastreo: selectedOrder.value.link_rastreo || ''
@@ -957,7 +971,7 @@ const saveTrackingInfo = async () => {
       ordenes.value[idx].link_rastreo = selectedOrder.value.link_rastreo || ''
     }
 
-    openModal('success', '¡Listo!', 'Datos de rastreo guardados')
+    openModal('success', '¡Listo!', 'Datos de rastreo guardados. Ahora cambia el estado a ENVIADO para notificar al cliente.')
   } catch (error) {
     console.error('Error:', error)
     openModal('error', 'Error', 'No se pudieron guardar los datos de rastreo')

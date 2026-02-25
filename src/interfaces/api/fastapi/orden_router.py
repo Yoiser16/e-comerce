@@ -775,6 +775,32 @@ def _obtener_orden_sync(orden_id: str) -> dict:
     }
 
 
+def _guardar_rastreo_sync(
+    orden_id: str,
+    guia_envio: Optional[str] = None,
+    link_rastreo: Optional[str] = None
+) -> dict:
+    """Guarda solo guía y link de rastreo SIN cambiar estado ni enviar email."""
+    from django.db import transaction
+
+    with transaction.atomic():
+        orden = OrdenModel.objects.select_for_update().get(id=orden_id)
+        if orden.estado_pago != 'pagado':
+            raise ValueError("No se puede actualizar rastreo si el pago no está confirmado")
+
+        if guia_envio is not None:
+            orden.guia_envio = guia_envio or ''
+        if link_rastreo is not None:
+            orden.link_rastreo = link_rastreo or ''
+        orden.save()
+
+    return {
+        "mensaje": "Datos de rastreo guardados",
+        "guia_envio": orden.guia_envio or '',
+        "link_rastreo": orden.link_rastreo or ''
+    }
+
+
 def _enviar_email_estado(orden: OrdenModel, estado_nuevo: str) -> None:
     try:
         if not orden.cliente:
@@ -894,7 +920,8 @@ def _actualizar_estado_envio_sync(
     orden_id: str,
     estado_envio: str,
     guia_envio: Optional[str] = None,
-    link_rastreo: Optional[str] = None
+    link_rastreo: Optional[str] = None,
+    enviar_email: bool = True  # Por defecto envía email al cambiar estado
 ) -> dict:
     from django.db import transaction
 
@@ -908,6 +935,9 @@ def _actualizar_estado_envio_sync(
         if orden.estado_pago != 'pagado':
             raise ValueError("No se puede actualizar envío si el pago no está confirmado")
 
+        # Guardar el estado anterior para saber si cambió
+        estado_anterior = orden.estado_envio
+        
         orden.estado_envio = estado_nuevo
         if guia_envio is not None:
             orden.guia_envio = guia_envio or ''
@@ -919,7 +949,9 @@ def _actualizar_estado_envio_sync(
         orden.estado = _legacy_estado_from_states(orden.estado_pago, orden.estado_envio)
         orden.save()
 
-        _enviar_email_estado(orden, orden.estado)
+        # Solo enviar email si: 1) Cambió el estado Y 2) enviar_email es True
+        if enviar_email and estado_anterior != estado_nuevo:
+            _enviar_email_estado(orden, orden.estado)
 
     return {"mensaje": "Estado de envío actualizado", "estado_envio": estado_nuevo.upper()}
 
@@ -1181,6 +1213,34 @@ async def confirmar_orden(orden_id: str):
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Error al confirmar orden: {str(e)}"
+        )
+
+
+@router.post("/{orden_id}/guardar-rastreo")
+async def guardar_rastreo(orden_id: str, data: CambiarEstadoInput):
+    """
+    Guarda datos de rastreo (guía y link) SIN cambiar el estado de envío.
+    No envía email automáticamente. Útil para guardar info antes de cambiar a "ENVIADO".
+    
+    Body:
+    - guia_envio: Número de guía
+    - link_rastreo: Link de rastreo
+    """
+    try:
+        resultado = await sync_to_async(_guardar_rastreo_sync)(
+            orden_id,
+            data.guia_envio,
+            data.link_rastreo
+        )
+        return resultado
+    except OrdenModel.DoesNotExist:
+        raise HTTPException(status_code=404, detail="Orden no encontrada")
+    except ValueError as e:
+        raise HTTPException(status_code=400, detail=str(e))
+    except Exception as e:
+        raise HTTPException(
+            status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
+            detail=f"Error al guardar rastreo: {str(e)}"
         )
 
 
