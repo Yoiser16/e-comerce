@@ -281,10 +281,6 @@ def _build_recovery_body(nombre: str, codigo: str) -> tuple[str, str]:
     </head>
     <body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #F3F4F6;">
         <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
-            <div style="text-align: center; margin-bottom: 30px;">
-                 <img src="https://i.ibb.co/wzr84d1c/kharis-logo-placeholder.png" alt="Kharis Distribuidora" style="width: 120px; height: auto;" />
-            </div>
-            
             <div style="background: #ffffff; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);">
                 <h2 style="color: #111; margin: 0 0 20px; text-align: center;">Recuperación de Contraseña</h2>
                 
