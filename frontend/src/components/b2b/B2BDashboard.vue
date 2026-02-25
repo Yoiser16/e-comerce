@@ -354,103 +354,98 @@
     <section class="relative z-20 -mt-6 lg:-mt-24 pb-6">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         
-        <div class="grid grid-cols-2 lg:grid-cols-5 gap-4 sm:gap-5">
+        <div class="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4">
           
           <!-- Card 1: Pelucas Naturales -->
           <router-link 
             to="/portal/catalogo?categoria=pelucas"
-            class="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100"
+            class="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100"
           >
-            <div class="aspect-square overflow-hidden">
+            <div class="aspect-[4/3] overflow-hidden">
               <img 
                 src="https://images.unsplash.com/photo-1595476108010-b4d1f102b1b1?q=80&w=600&auto=format&fit=crop" 
                 alt="Pelucas naturales"
-                class="w-full h-full object-cover"
+                class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
               />
             </div>
-            <div class="p-4 sm:p-5">
-              <h3 class="font-bold text-gray-900 text-base sm:text-lg mb-1">Pelucas Naturales</h3>
-              <p class="text-gray-500 text-sm mb-3">100% cabello humano</p>
-              <span class="text-[#2874A6] text-sm font-medium ">Ver más</span>
+            <div class="px-3 py-2.5">
+              <h3 class="font-semibold text-gray-900 text-sm leading-tight">Pelucas Naturales</h3>
+              <p class="text-gray-400 text-[11px] mt-0.5 leading-tight">100% cabello humano</p>
             </div>
           </router-link>
           
           <!-- Card 2: Extensiones Premium -->
           <router-link 
             to="/portal/catalogo?categoria=extensiones"
-            class="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100"
+            class="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100"
           >
-            <div class="aspect-square overflow-hidden">
+            <div class="aspect-[4/3] overflow-hidden">
               <img 
                 src="https://images.unsplash.com/photo-1519699047748-de8e457a634e?q=80&w=600&auto=format&fit=crop" 
                 alt="Extensiones premium"
-                class="w-full h-full object-cover"
+                class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
               />
             </div>
-            <div class="p-4 sm:p-5">
-              <h3 class="font-bold text-gray-900 text-base sm:text-lg mb-1">Extensiones Premium</h3>
-              <p class="text-gray-500 text-sm mb-3">Técnicas profesionales y más</p>
-              <span class="text-[#2874A6] text-sm font-medium ">Ver más</span>
+            <div class="px-3 py-2.5">
+              <h3 class="font-semibold text-gray-900 text-sm leading-tight">Extensiones Premium</h3>
+              <p class="text-gray-400 text-[11px] mt-0.5 leading-tight">Técnicas profesionales</p>
             </div>
           </router-link>
           
           <!-- Card 3: Sistemas Capilares -->
           <router-link 
             to="/portal/catalogo?categoria=sistemas-capilares"
-            class="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100"
+            class="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100"
           >
-            <div class="aspect-square overflow-hidden">
+            <div class="aspect-[4/3] overflow-hidden">
               <img 
                 src="https://images.unsplash.com/photo-1621605815971-fbc98d665033?q=80&w=600&auto=format&fit=crop" 
                 alt="Sistemas capilares"
-                class="w-full h-full object-cover"
+                class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
               />
             </div>
-            <div class="p-4 sm:p-5">
-              <h3 class="font-bold text-gray-900 text-base sm:text-lg mb-1">Sistemas Capilares</h3>
-              <p class="text-gray-500 text-sm mb-3">Soluciones profesionales</p>
-              <span class="text-[#2874A6] text-sm font-medium ">Ver más</span>
+            <div class="px-3 py-2.5">
+              <h3 class="font-semibold text-gray-900 text-sm leading-tight">Sistemas Capilares</h3>
+              <p class="text-gray-400 text-[11px] mt-0.5 leading-tight">Soluciones profesionales</p>
             </div>
           </router-link>
           
           <!-- Card 4: Accesorios -->
           <router-link 
             to="/portal/catalogo?categoria=accesorios"
-            class="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100"
+            class="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100"
           >
-            <div class="aspect-square overflow-hidden">
+            <div class="aspect-[4/3] overflow-hidden">
               <img 
                 src="https://images.unsplash.com/photo-1522337660859-02fbefca4702?q=80&w=600&auto=format&fit=crop" 
                 alt="Accesorios"
-                class="w-full h-full object-cover"
+                class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
               />
             </div>
-            <div class="p-4 sm:p-5">
-              <h3 class="font-bold text-gray-900 text-base sm:text-lg mb-1">Accesorios</h3>
-              <p class="text-gray-500 text-sm mb-3">Cuidado & estilizado</p>
-              <span class="text-[#2874A6] text-sm font-medium ">Ver más</span>
+            <div class="px-3 py-2.5">
+              <h3 class="font-semibold text-gray-900 text-sm leading-tight">Accesorios</h3>
+              <p class="text-gray-400 text-[11px] mt-0.5 leading-tight">Cuidado & estilizado</p>
             </div>
           </router-link>
           
           <!-- Card 5: Ofertas -->
           <router-link 
             to="/portal/catalogo?oferta=true"
-            class="bg-white rounded-xl overflow-hidden shadow-lg border border-gray-100 col-span-2 lg:col-span-1"
+            class="bg-white rounded-xl overflow-hidden shadow-md border border-gray-100 col-span-2 lg:col-span-1"
           >
-            <div class="aspect-square overflow-hidden relative">
+            <div class="aspect-[4/3] overflow-hidden relative">
               <img 
                 :src="ofertaCardImage" 
                 alt="Ofertas especiales"
-                class="w-full h-full object-cover"
+                class="w-full h-full object-cover transition-transform duration-300 hover:scale-105"
               />
-              <div class="absolute top-3 right-3 bg-[#CC0C39] text-white text-[10px] sm:text-xs font-bold px-2.5 py-1 rounded-md shadow">
+              <div class="absolute top-2 right-2 bg-[#CC0C39] text-white text-[10px] font-bold px-2 py-0.5 rounded-md shadow">
                 Hasta 50% dto.
               </div>
             </div>
-            <div class="p-4 sm:p-5">
-              <h3 class="font-bold text-gray-900 text-base sm:text-lg mb-1">Ofertas Especiales</h3>
-              <p class="text-gray-500 text-sm mb-3">Descuentos exclusivos</p>
-              <span class="text-[#2874A6] text-sm font-medium ">Ver ofertas</span>
+            <div class="px-3 py-2.5">
+              <h3 class="font-semibold text-gray-900 text-sm leading-tight">Ofertas Especiales</h3>
+              <p class="text-gray-400 text-[11px] mt-0.5 leading-tight">Descuentos exclusivos</p>
             </div>
           </router-link>
           
@@ -1367,6 +1362,7 @@ export default {
 .line-clamp-2 {
   display: -webkit-box;
   -webkit-line-clamp: 2;
+  line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
 }
