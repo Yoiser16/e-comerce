@@ -384,6 +384,7 @@
                     type="text"
                     required
                     inputmode="numeric"
+                    :maxlength="documentMaxLength"
                     :placeholder="form.tipoDocumento === 'NIT' ? '900123456' : (form.tipoDocumento === 'PASAPORTE' ? '1234567890' : '12345678')"
                     class="flex-1 px-4 py-3.5 lg:px-4 lg:py-3 text-[15px] lg:text-base text-[#3D3229] lg:text-text-dark bg-[#FDFCFA] lg:bg-white border rounded-xl lg:rounded-lg outline-none transition-all placeholder-[#C4B5A4] focus:ring-2 focus:ring-[#3D3229]/10 focus:border-[#3D3229]/30"
                     :class="form.numeroDocumento && !documentoValidation.longitudValida ? 'border-red-300' : 'border-[#E8DDD3] lg:border-gray-200'"
@@ -431,106 +432,33 @@
                 <p v-if="errors.numeroDocumento" class="mt-1 text-xs text-red-500">{{ errors.numeroDocumento }}</p>
               </div>
 
-              <!-- Foto Cédula -->
+              <!-- Confirmar Cédula -->
               <div>
                 <label class="block text-[13px] lg:text-sm font-medium text-[#3D3229] lg:text-text-dark mb-1.5">
-                  Foto del Documento <span class="text-red-400">*</span>
-                  <span class="text-[#A69783] font-normal ml-1">(frente)</span>
+                  Confirmar número de documento <span class="text-red-400">*</span>
                 </label>
-                <div
-                  @click="$refs.cedulaInput.click()"
-                  @dragover.prevent
-                  @drop.prevent="e => { form.fotoCedula = e.dataTransfer.files[0] }"
-                  class="relative cursor-pointer border-2 border-dashed rounded-2xl p-5 flex flex-col items-center gap-2 transition-all"
-                  :class="errors.fotoCedula ? 'border-red-300 bg-red-50/30' : form.fotoCedula ? 'border-[#3D3229]/40 bg-[#FAF5F2]' : 'border-[#D4C5B5] bg-[#FDFCFA] hover:border-[#3D3229]/30 hover:bg-[#FAF5F2]'"
-                >
-                  <input
-                    ref="cedulaInput"
-                    type="file"
-                    accept="image/*"
-                    class="hidden"
-                    @change="e => { form.fotoCedula = e.target.files[0] }"
-                  />
-                  
-                  <!-- Preview si ya hay archivo -->
-                  <template v-if="form.fotoCedula">
-                    <div class="flex items-center gap-3 w-full">
-                      <div class="w-10 h-10 rounded-xl bg-[#3D3229]/10 flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5 text-[#3D3229]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <p class="text-[13px] font-medium text-[#3D3229] truncate">{{ form.fotoCedula.name }}</p>
-                        <p class="text-[11px] text-[#A69783]">{{ (form.fotoCedula.size / 1024).toFixed(0) }} KB &middot; Toca para cambiar</p>
-                      </div>
-                      <svg class="w-4 h-4 text-green-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                      </svg>
-                    </div>
-                  </template>
-                  
-                  <!-- Estado vacío -->
-                  <template v-else>
-                    <div class="w-10 h-10 rounded-full bg-[#E8DDD3] flex items-center justify-center">
-                      <svg class="w-5 h-5 text-[#7A6B5D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <p class="text-[13px] font-medium text-[#3D3229]">Subir foto de la cédula</p>
-                    <p class="text-[11px] text-[#A69783]">JPG, PNG o PDF &middot; Máx. 5MB</p>
-                  </template>
+                <input
+                  v-model="form.numeroDocumentoConfirm"
+                  type="text"
+                  required
+                  inputmode="numeric"
+                  :maxlength="documentMaxLength"
+                  placeholder="Repite tu número de documento"
+                  class="w-full px-4 py-3.5 lg:px-4 lg:py-3 text-[15px] lg:text-base text-[#3D3229] lg:text-text-dark bg-[#FDFCFA] lg:bg-white border rounded-2xl lg:rounded-lg outline-none transition-all placeholder-[#C4B5A4] focus:ring-2 focus:ring-[#3D3229]/10 focus:border-[#3D3229]/30"
+                  :class="form.numeroDocumentoConfirm && !documentoMatch ? 'border-red-300' : 'border-[#E8DDD3] lg:border-gray-200'"
+                />
+                <div v-if="form.numeroDocumentoConfirm" class="mt-2 flex items-center gap-2 text-xs">
+                  <svg v-if="documentoMatch" class="w-3.5 h-3.5 text-green-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
+                  </svg>
+                  <svg v-else class="w-3.5 h-3.5 text-red-500" fill="currentColor" viewBox="0 0 20 20">
+                    <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />
+                  </svg>
+                  <span :class="documentoMatch ? 'text-green-600' : 'text-red-600'">
+                    {{ documentoMatch ? 'Los numeros coinciden' : 'Los numeros no coinciden' }}
+                  </span>
                 </div>
-                <p v-if="errors.fotoCedula" class="mt-1 text-xs text-red-500">{{ errors.fotoCedula }}</p>
-              </div>
-
-              <!-- Foto Cédula Trasera -->
-              <div>
-                <label class="block text-[13px] lg:text-sm font-medium text-[#3D3229] lg:text-text-dark mb-1.5">
-                  Foto del Documento <span class="text-red-400">*</span>
-                  <span class="text-[#A69783] font-normal ml-1">(trasera)</span>
-                </label>
-                <div
-                  @click="$refs.cedulaTraseraInput.click()"
-                  @dragover.prevent
-                  @drop.prevent="e => { form.fotoCedulaTrasera = e.dataTransfer.files[0] }"
-                  class="relative cursor-pointer border-2 border-dashed rounded-2xl p-5 flex flex-col items-center gap-2 transition-all"
-                  :class="errors.fotoCedulaTrasera ? 'border-red-300 bg-red-50/30' : form.fotoCedulaTrasera ? 'border-[#3D3229]/40 bg-[#FAF5F2]' : 'border-[#D4C5B5] bg-[#FDFCFA] hover:border-[#3D3229]/30 hover:bg-[#FAF5F2]'"
-                >
-                  <input
-                    ref="cedulaTraseraInput"
-                    type="file"
-                    accept="image/*"
-                    class="hidden"
-                    @change="e => { form.fotoCedulaTrasera = e.target.files[0] }"
-                  />
-                  <template v-if="form.fotoCedulaTrasera">
-                    <div class="flex items-center gap-3 w-full">
-                      <div class="w-10 h-10 rounded-xl bg-[#3D3229]/10 flex items-center justify-center shrink-0">
-                        <svg class="w-5 h-5 text-[#3D3229]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                        </svg>
-                      </div>
-                      <div class="flex-1 min-w-0">
-                        <p class="text-[13px] font-medium text-[#3D3229] truncate">{{ form.fotoCedulaTrasera.name }}</p>
-                        <p class="text-[11px] text-[#A69783]">{{ (form.fotoCedulaTrasera.size / 1024).toFixed(0) }} KB &middot; Toca para cambiar</p>
-                      </div>
-                      <svg class="w-4 h-4 text-green-500 shrink-0" fill="currentColor" viewBox="0 0 20 20">
-                        <path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clip-rule="evenodd" />
-                      </svg>
-                    </div>
-                  </template>
-                  <template v-else>
-                    <div class="w-10 h-10 rounded-full bg-[#E8DDD3] flex items-center justify-center">
-                      <svg class="w-5 h-5 text-[#7A6B5D]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                      </svg>
-                    </div>
-                    <p class="text-[13px] font-medium text-[#3D3229]">Subir foto trasera</p>
-                    <p class="text-[11px] text-[#A69783]">JPG, PNG o PDF &middot; Máx. 5MB</p>
-                  </template>
-                </div>
-                <p v-if="errors.fotoCedulaTrasera" class="mt-1 text-xs text-red-500">{{ errors.fotoCedulaTrasera }}</p>
+                <p v-if="errors.numeroDocumentoConfirm" class="mt-1 text-xs text-red-500">{{ errors.numeroDocumentoConfirm }}</p>
               </div>
 
               <div>
@@ -699,7 +627,7 @@
 </template>
 
 <script>
-import { ref, reactive, watch } from 'vue'
+import { ref, reactive, watch, computed } from 'vue'
 import { useRouter } from 'vue-router'
 
 export default {
@@ -737,8 +665,7 @@ export default {
       // Paso 2
       tipoDocumento: 'CC',
       numeroDocumento: '',
-      fotoCedula: null,
-      fotoCedulaTrasera: null,
+      numeroDocumentoConfirm: '',
       nombreEmpresa: '',
       aceptaTerminos: false
     })
@@ -778,6 +705,10 @@ export default {
         documentoValidation.longitudValida = longitud >= 10 && longitud <= 13
       }
     })
+
+    watch(() => form.numeroDocumentoConfirm, (newVal) => {
+      form.numeroDocumentoConfirm = newVal.replace(/[^0-9]/g, '')
+    })
     
     watch(() => form.password, (newVal) => {
       passwordValidation.minimo8 = newVal.length >= 8
@@ -798,6 +729,21 @@ export default {
       } else if (form.tipoDocumento === 'PASAPORTE') {
         documentoValidation.longitudValida = longitud >= 10 && longitud <= 13
       }
+    })
+
+    const documentMaxLength = computed(() => {
+      if (form.tipoDocumento === 'PASAPORTE') {
+        return 13
+      } else if (form.tipoDocumento === 'NIT') {
+        return 9
+      } else {
+        // CC o CE
+        return 10
+      }
+    })
+
+    const documentoMatch = computed(() => {
+      return !!form.numeroDocumentoConfirm && form.numeroDocumentoConfirm === form.numeroDocumento
     })
     
     // =========================================================================
@@ -885,14 +831,12 @@ export default {
         errors.numeroDocumento = 'El número de documento no es válido'
         isValid = false
       }
-      
-      if (!form.fotoCedula) {
-        errors.fotoCedula = 'Debes subir una foto de tu documento de identidad'
-        isValid = false
-      }
 
-      if (!form.fotoCedulaTrasera) {
-        errors.fotoCedulaTrasera = 'Debes subir la foto trasera del documento'
+      if (!form.numeroDocumentoConfirm.trim()) {
+        errors.numeroDocumentoConfirm = 'Confirma tu número de documento'
+        isValid = false
+      } else if (!documentoMatch.value) {
+        errors.numeroDocumentoConfirm = 'Los números no coinciden'
         isValid = false
       }
       
@@ -972,12 +916,6 @@ export default {
         formData.append('numero_documento', form.numeroDocumento)
         formData.append('nombre_empresa', form.nombreEmpresa)
         formData.append('nit_empresa', form.nitEmpresa || '')
-        if (form.fotoCedula) {
-          formData.append('foto_cedula', form.fotoCedula)
-        }
-        if (form.fotoCedulaTrasera) {
-          formData.append('foto_cedula_trasera', form.fotoCedulaTrasera)
-        }
         
         // Enviar datos al backend (sin Content-Type, el browser lo pone automáticamente)
         const response = await fetch(`${API_BASE}/api/v1/mayoristas/registro`, {
@@ -1016,6 +954,8 @@ export default {
       errors,
       statusModal,
       documentoValidation,
+      documentMaxLength,
+      documentoMatch,
       passwordValidation,
       nextStep,
       prevStep,

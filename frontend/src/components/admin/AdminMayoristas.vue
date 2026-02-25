@@ -1,65 +1,95 @@
 <template>
-  <div class="p-6 lg:p-8">
-    <!-- Header -->
-    <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-      <div>
-        <h1 class="text-2xl font-semibold text-text-dark">Solicitudes Mayoristas</h1>
-        <p class="text-text-light mt-1">Gestiona las solicitudes de cuentas mayoristas</p>
+  <div class="p-6 lg:p-8 bg-gradient-to-br from-[#FAFAF A] to-[#F5F5F0]">
+    <!-- Header Premium -->
+    <div class="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-6 mb-8">
+      <div class="max-w-2xl">
+        <p class="text-[#C9A962] text-xs font-semibold tracking-[0.2em] uppercase mb-2">Gestión Interna</p>
+        <h1 class="text-3xl sm:text-4xl font-luxury text-[#1A1A1A] mb-2">Solicitudes Mayoristas</h1>
+        <p class="text-text-light">Revisa y gestiona todas las solicitudes de registro para cuentas de distribuidoras y mayoristas</p>
+      </div>
+    </div>
+
+    <!-- Stats Cards -->
+    <div class="grid sm:grid-cols-3 gap-4 mb-8">
+      <div class="bg-white rounded-2xl border border-[#E8DDD3] p-6 hover:shadow-lg transition-all">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-[#A69783] text-sm font-medium">Pendientes de Revisar</p>
+            <p class="text-3xl font-luxury text-[#D81B60] mt-2">{{ pendingCount }}</p>
+          </div>
+          <div class="w-14 h-14 rounded-full bg-red-50/50 flex items-center justify-center">
+            <svg class="w-7 h-7 text-[#D81B60]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
+        </div>
       </div>
       
-      <!-- Stats rápidas -->
-      <div class="flex items-center gap-4">
-        <div class="px-4 py-2 bg-amber-50 border border-amber-200 rounded-lg">
-          <span class="text-amber-700 font-semibold">{{ pendingCount }}</span>
-          <span class="text-amber-600 text-sm ml-1">pendientes</span>
+      <div class="bg-white rounded-2xl border border-[#E8DDD3] p-6 hover:shadow-lg transition-all">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-[#A69783] text-sm font-medium">Aprobadas</p>
+            <p class="text-3xl font-luxury text-green-600 mt-2">{{ approvedCount }}</p>
+          </div>
+          <div class="w-14 h-14 rounded-full bg-green-50/50 flex items-center justify-center">
+            <svg class="w-7 h-7 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+          </div>
         </div>
-        <div class="px-4 py-2 bg-green-50 border border-green-200 rounded-lg">
-          <span class="text-green-700 font-semibold">{{ approvedCount }}</span>
-          <span class="text-green-600 text-sm ml-1">aprobados</span>
+      </div>
+
+      <div class="bg-white rounded-2xl border border-[#E8DDD3] p-6 hover:shadow-lg transition-all">
+        <div class="flex items-center justify-between">
+          <div>
+            <p class="text-[#A69783] text-sm font-medium">Total Solicitudes</p>
+            <p class="text-3xl font-luxury text-[#1A1A1A] mt-2">{{ solicitudes.length }}</p>
+          </div>
+          <div class="w-14 h-14 rounded-full bg-gray-50 flex items-center justify-center">
+            <svg class="w-7 h-7 text-[#1A1A1A]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.856-1.487M15 6a3 3 0 11-6 0 3 3 0 016 0zM16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+            </svg>
+          </div>
         </div>
       </div>
     </div>
 
-    <!-- Filtros -->
-    <div class="bg-white rounded-xl border border-gray-200 p-4 mb-6">
-      <div class="flex flex-wrap items-center gap-4">
-        <!-- Tabs de estado -->
-        <div class="flex bg-gray-100 rounded-lg p-1">
+    <!-- Filtros y búsqueda -->
+    <div class="bg-white rounded-2xl border border-[#E8DDD3] p-6 mb-6 shadow-sm">
+      <div class="flex flex-col sm:flex-row gap-4 items-start sm:items-center">
+        <!-- Tabs de estado con diseño luxury -->
+        <div class="flex bg-[#F5F5F0] rounded-2xl p-1 gap-1">
           <button
             v-for="tab in statusTabs"
             :key="tab.value"
             @click="activeTab = tab.value"
             :class="[
-              'px-4 py-2 text-sm font-medium rounded-md transition-all',
+              'px-5 py-2.5 text-sm font-semibold rounded-xl transition-all duration-200',
               activeTab === tab.value 
-                ? 'bg-white text-text-dark shadow-sm' 
+                ? 'bg-white text-[#D81B60] shadow-md border border-[#D81B60]/20' 
                 : 'text-text-light hover:text-text-dark'
             ]"
           >
             {{ tab.label }}
-            <span 
-              v-if="tab.count > 0"
-              :class="[
-                'ml-1.5 px-1.5 py-0.5 text-xs rounded-full',
-                activeTab === tab.value ? 'bg-brand-100 text-brand-600' : 'bg-gray-200 text-gray-600'
-              ]"
-            >
+            <span v-if="tab.count > 0" class="ml-2 px-2.5 py-1 text-xs rounded-full" :class="[
+              activeTab === tab.value ? 'bg-[#D81B60]/10 text-[#D81B60]' : 'bg-gray-200 text-gray-600'
+            ]">
               {{ tab.count }}
             </span>
           </button>
         </div>
 
         <!-- Búsqueda -->
-        <div class="flex-1 min-w-[200px]">
+        <div class="flex-1 min-w-[280px]">
           <div class="relative">
-            <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg class="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-[#A69783]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
             </svg>
             <input
               v-model="searchQuery"
               type="text"
               placeholder="Buscar por nombre, email, empresa..."
-              class="w-full pl-10 pr-4 py-2.5 border border-gray-200 rounded-lg focus:ring-2 focus:ring-brand-500/20 focus:border-brand-500 outline-none"
+              class="w-full pl-12 pr-4 py-3 border border-[#E8DDD3] rounded-2xl focus:ring-2 focus:ring-[#D81B60]/20 focus:border-[#D81B60] outline-none transition-all placeholder-[#A69783]"
             />
           </div>
         </div>
@@ -68,7 +98,8 @@
         <button 
           @click="fetchSolicitudes"
           :disabled="loading"
-          class="p-2.5 text-gray-500 hover:text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
+          class="p-3 text-[#A69783] hover:text-[#3D3229] hover:bg-[#F5F5F0] rounded-xl transition-colors"
+          title="Actualizar"
         >
           <svg :class="['w-5 h-5', loading && 'animate-spin']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
@@ -95,55 +126,59 @@
       </p>
     </div>
 
-    <!-- Tabla de Solicitudes -->
-    <div v-else class="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <!-- Tabla premium -->
+    <div v-else class="bg-white rounded-2xl border border-[#E8DDD3] overflow-hidden shadow-sm">
       <div class="overflow-x-auto">
         <table class="w-full">
-          <thead class="bg-gray-50 border-b border-gray-200">
+          <thead class="bg-[#F5F5F0] border-b border-[#E8DDD3]">
             <tr>
-              <th class="text-left px-6 py-4 text-xs font-semibold text-text-light uppercase tracking-wider">Solicitante</th>
-              <th class="text-left px-6 py-4 text-xs font-semibold text-text-light uppercase tracking-wider">Empresa</th>
-              <th class="text-left px-6 py-4 text-xs font-semibold text-text-light uppercase tracking-wider">Documento</th>
-              <th class="text-left px-6 py-4 text-xs font-semibold text-text-light uppercase tracking-wider">Fecha</th>
-              <th class="text-left px-6 py-4 text-xs font-semibold text-text-light uppercase tracking-wider">Estado</th>
-              <th class="text-right px-6 py-4 text-xs font-semibold text-text-light uppercase tracking-wider">Acciones</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-[#A69783] uppercase tracking-wider">Solicitante</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-[#A69783] uppercase tracking-wider">Empresa</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-[#A69783] uppercase tracking-wider">Documento</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-[#A69783] uppercase tracking-wider">Solicitud</th>
+              <th class="text-left px-6 py-4 text-xs font-semibold text-[#A69783] uppercase tracking-wider">Estado</th>
+              <th class="text-right px-6 py-4 text-xs font-semibold text-[#A69783] uppercase tracking-wider">Acciones</th>
             </tr>
           </thead>
-          <tbody class="divide-y divide-gray-100">
+          <tbody class="divide-y divide-[#E8DDD3]">
             <tr 
               v-for="solicitud in filteredSolicitudes" 
               :key="solicitud.id"
-              class="hover:bg-gray-50 transition-colors"
+              class="hover:bg-[#FAFAF A]/50 transition-colors"
             >
               <!-- Solicitante -->
               <td class="px-6 py-4">
                 <div class="flex items-center gap-3">
-                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-brand-400 to-brand-600 flex items-center justify-center text-white font-medium">
+                  <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#D81B60] to-[#A5004D] flex items-center justify-center text-white font-medium text-sm">
                     {{ getInitials(solicitud.nombre, solicitud.apellido) }}
                   </div>
                   <div>
-                    <p class="font-medium text-text-dark">{{ solicitud.nombre }} {{ solicitud.apellido }}</p>
-                    <p class="text-sm text-text-light">{{ solicitud.email }}</p>
+                    <p class="font-semibold text-[#1A1A1A]">{{ solicitud.nombre }} {{ solicitud.apellido }}</p>
+                    <p class="text-xs text-[#A69783]">{{ solicitud.email }}</p>
                   </div>
                 </div>
               </td>
 
               <!-- Empresa -->
               <td class="px-6 py-4">
-                <p class="text-text-dark">{{ solicitud.nombre_empresa || '—' }}</p>
-                <p class="text-sm text-text-light">{{ solicitud.telefono }}</p>
+                <p class="font-medium text-[#1A1A1A]">{{ solicitud.nombre_empresa || '—' }}</p>
+                <p class="text-xs text-[#A69783]">{{ solicitud.telefono }}</p>
               </td>
 
               <!-- Documento -->
               <td class="px-6 py-4">
-                <p class="text-text-dark">{{ solicitud.tipo_documento }}</p>
-                <p class="text-sm text-text-light font-mono">{{ solicitud.numero_documento }}</p>
+                <div>
+                  <p class="font-medium text-[#3D3229]">{{ solicitud.tipo_documento }}</p>
+                  <p class="text-xs text-[#A69783] font-mono">{{ solicitud.numero_documento }}</p>
+                </div>
               </td>
 
-              <!-- Fecha -->
+              <!-- Fecha de Solicitud -->
               <td class="px-6 py-4">
-                <p class="text-text-dark">{{ formatDate(solicitud.date_joined) }}</p>
-                <p class="text-sm text-text-light">{{ formatTime(solicitud.date_joined) }}</p>
+                <div>
+                  <p class="text-sm font-medium text-[#1A1A1A]">{{ formatDate(solicitud.date_joined) }}</p>
+                  <p class="text-xs text-[#A69783]">{{ formatTime(solicitud.date_joined) }}</p>
+                </div>
               </td>
 
               <!-- Estado -->
@@ -155,12 +190,12 @@
 
               <!-- Acciones -->
               <td class="px-6 py-4">
-                <div class="flex items-center justify-end gap-2">
-                  <!-- Ver documentos -->
+                <div class="flex items-center justify-end gap-1.5">
+                  <!-- Ver detalles -->
                   <button 
                     @click="openDocuments(solicitud)"
-                    class="p-2 text-gray-500 hover:text-brand-600 hover:bg-brand-50 rounded-lg transition-colors"
-                    title="Ver documentos"
+                    class="p-2.5 text-[#A69783] hover:text-[#D81B60] hover:bg-[#F5F5F0] rounded-xl transition-all"
+                    title="Ver detalles"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -168,12 +203,12 @@
                     </svg>
                   </button>
 
-                  <!-- Aprobar (solo si está pendiente) -->
+                  <!-- Aprobar -->
                   <button 
                     v-if="solicitud.estado_mayorista === 'PENDIENTE' || solicitud.estado_mayorista === 'EN_REVISION'"
                     @click="aprobar(solicitud)"
                     :disabled="actionLoading === solicitud.id"
-                    class="p-2 text-green-600 hover:bg-green-50 rounded-lg transition-colors disabled:opacity-50"
+                    class="p-2.5 text-green-600 hover:bg-green-50 rounded-xl transition-all disabled:opacity-50"
                     title="Aprobar"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -181,12 +216,12 @@
                     </svg>
                   </button>
 
-                  <!-- Rechazar (solo si está pendiente) -->
+                  <!-- Rechazar -->
                   <button 
                     v-if="solicitud.estado_mayorista === 'PENDIENTE' || solicitud.estado_mayorista === 'EN_REVISION'"
                     @click="openRejectModal(solicitud)"
                     :disabled="actionLoading === solicitud.id"
-                    class="p-2 text-red-600 hover:bg-red-50 rounded-lg transition-colors disabled:opacity-50"
+                    class="p-2.5 text-red-600 hover:bg-red-50 rounded-xl transition-all disabled:opacity-50"
                     title="Rechazar"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -194,12 +229,12 @@
                     </svg>
                   </button>
 
-                  <!-- Suspender (solo si está aprobado) -->
+                  <!-- Suspender -->
                   <button 
                     v-if="solicitud.estado_mayorista === 'APROBADO'"
                     @click="suspender(solicitud)"
                     :disabled="actionLoading === solicitud.id"
-                    class="p-2 text-amber-600 hover:bg-amber-50 rounded-lg transition-colors disabled:opacity-50"
+                    class="p-2.5 text-amber-600 hover:bg-amber-50 rounded-xl transition-all disabled:opacity-50"
                     title="Suspender"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -207,12 +242,12 @@
                     </svg>
                   </button>
 
-                  <!-- Reactivar (si está suspendido o rechazado) -->
+                  <!-- Reactivar -->
                   <button 
                     v-if="solicitud.estado_mayorista === 'SUSPENDIDO' || solicitud.estado_mayorista === 'RECHAZADO'"
                     @click="aprobar(solicitud)"
                     :disabled="actionLoading === solicitud.id"
-                    class="p-2 text-blue-600 hover:bg-blue-50 rounded-lg transition-colors disabled:opacity-50"
+                    class="p-2.5 text-blue-600 hover:bg-blue-50 rounded-xl transition-all disabled:opacity-50"
                     title="Reactivar"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,7 +259,7 @@
                   <button 
                     @click="openPasswordModal(solicitud)"
                     :disabled="actionLoading === solicitud.id"
-                    class="p-2 text-purple-600 hover:bg-purple-50 rounded-lg transition-colors disabled:opacity-50"
+                    class="p-2.5 text-purple-600 hover:bg-purple-50 rounded-xl transition-all disabled:opacity-50"
                     title="Cambiar contraseña"
                   >
                     <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -284,45 +319,14 @@
             </div>
           </div>
 
-          <!-- Imágenes de cédula -->
-          <div class="grid sm:grid-cols-2 gap-6">
-            <div>
-              <p class="text-sm font-medium text-text-dark mb-3">Cédula / RUT (Frente)</p>
-              <div class="aspect-[3/2] bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
-                <img 
-                  v-if="selectedSolicitud?.cedula_frente && !imageErrors.frente"
-                  :src="getImageUrl(selectedSolicitud.cedula_frente)"
-                  alt="Cédula Frente"
-                  class="w-full h-full object-contain cursor-pointer hover:opacity-90"
-                  @click="openFullImage(selectedSolicitud.cedula_frente)"
-                  @error="imageErrors.frente = true"
-                />
-                <div v-else class="w-full h-full flex flex-col items-center justify-center text-gray-400 gap-2">
-                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <span class="text-sm">{{ imageErrors.frente ? 'Imagen no disponible' : 'No subida' }}</span>
-                </div>
-              </div>
-            </div>
-            <div>
-              <p class="text-sm font-medium text-text-dark mb-3">Cédula / RUT (Dorso)</p>
-              <div class="aspect-[3/2] bg-gray-100 rounded-xl overflow-hidden border border-gray-200">
-                <img 
-                  v-if="selectedSolicitud?.cedula_dorso && !imageErrors.dorso"
-                  :src="getImageUrl(selectedSolicitud.cedula_dorso)"
-                  alt="Cédula Dorso"
-                  class="w-full h-full object-contain cursor-pointer hover:opacity-90"
-                  @click="openFullImage(selectedSolicitud.cedula_dorso)"
-                  @error="imageErrors.dorso = true"
-                />
-                <div v-else class="w-full h-full flex flex-col items-center justify-center text-gray-400 gap-2">
-                  <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                  </svg>
-                  <span class="text-sm">{{ imageErrors.dorso ? 'Imagen no disponible' : 'No subida' }}</span>
-                </div>
-              </div>
+          <!-- Imágenes de cédula - ELIMINADAS -->
+          <!-- Los documentos ya no se cargan como fotos, solo se valida el número -->
+          <div class="p-4 bg-blue-50 border border-blue-200 rounded-xl mb-6">
+            <div class="flex gap-3">
+              <svg class="w-5 h-5 text-blue-600 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <p class="text-sm text-blue-700"><strong>Cambio de validación:</strong> A partir de ahora, la verificación de identidad se realiza únicamente con el número de documento confirmado, sin necesidad de subir fotos.</p>
             </div>
           </div>
 
@@ -539,7 +543,6 @@ export default {
     
     const showDocumentsModal = ref(false)
     const selectedSolicitud = ref(null)
-    const imageErrors = ref({ frente: false, dorso: false })
     
     const showRejectModal = ref(false)
     const rejectingSolicitud = ref(null)
@@ -694,7 +697,6 @@ export default {
 
     function openDocuments(solicitud) {
       selectedSolicitud.value = solicitud
-      imageErrors.value = { frente: false, dorso: false } // Reset errores de imagen
       showDocumentsModal.value = true
     }
 
@@ -740,10 +742,6 @@ export default {
       } finally {
         actionLoading.value = null
       }
-    }
-
-    function openFullImage(url) {
-      window.open(getImageUrl(url), '_blank')
     }
 
     function getImageUrl(path) {
@@ -826,7 +824,6 @@ export default {
       filteredSolicitudes,
       showDocumentsModal,
       selectedSolicitud,
-      imageErrors,
       showRejectModal,
       rejectingSolicitud,
       rejectReason,
@@ -845,7 +842,6 @@ export default {
       showAdminNewPassword,
       passwordError,
       submitPasswordChange,
-      openFullImage,
       getImageUrl,
       getInitials,
       getStatusLabel,
