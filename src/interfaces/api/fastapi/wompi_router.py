@@ -271,14 +271,30 @@ async def process_approved_transaction(transaction: dict):
                         from infrastructure.persistence.django.models import LineaOrdenModel
 
                         if orden.cliente:
+                            # Formatear atributo: negro_natural -> Negro Natural
+                            def _fmt(val): return val.replace('_', ' ').title() if val else val
+                            
                             lineas_orden = LineaOrdenModel.objects.filter(orden=orden).select_related('producto').prefetch_related('producto__imagenes')
                             productos_email = []
                             for linea in lineas_orden:
+                                # Construir nombre con variantes si existen
+                                nombre_base = linea.producto.nombre if linea.producto else 'Producto'
+                                atributos = []
+                                if linea.color_snapshot:
+                                    atributos.append(f"Color: {_fmt(linea.color_snapshot)}")
+                                if linea.largo_snapshot:
+                                    atributos.append(f"Largo: {linea.largo_snapshot}")
+                                nombre_completo = nombre_base
+                                if atributos:
+                                    nombre_completo += f" ({', '.join(atributos)})"
+                                    
                                 producto_data = {
-                                    'nombre': linea.producto.nombre if linea.producto else 'Producto',
+                                    'nombre': nombre_completo,
                                     'cantidad': linea.cantidad,
                                     'precio_unitario': float(linea.precio_unitario_monto),
-                                    'imagen': ''
+                                    'imagen': '',
+                                    'color': _fmt(linea.color_snapshot) if linea.color_snapshot else '',
+                                    'largo': linea.largo_snapshot or ''
                                 }
                                 if linea.producto:
                                     primera_imagen_obj = linea.producto.imagenes.filter(es_principal=True).first()

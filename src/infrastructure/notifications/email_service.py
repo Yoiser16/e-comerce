@@ -93,12 +93,27 @@ def _build_body(
             cantidad = p.get('cantidad', 1)
             precio_unit = p.get('precio_unitario', 0)
             precio_fmt = f"${precio_unit:,.0f}" if precio_unit else "$-"
+            color = p.get('color', '')
+            largo = p.get('largo', '')
+            
+            # Formatear: negro_natural -> Negro Natural
+            def _fmt(val): return val.replace('_', ' ').title() if val else val
+            
+            # Construir subtítulo con atributos de variante
+            variante_info = ""
+            if color or largo:
+                detalles = []
+                if color:
+                    detalles.append(_fmt(color))
+                if largo:
+                    detalles.append(f"{largo}\"")
+                variante_info = f'<div style="font-size: 12px; color: #888; margin-top: 2px;">{", ".join(detalles)}</div>'
             
             filas_productos += f"""
             <tr>
-                <td style="padding: 12px 0; border-bottom: 1px solid #eee; color: #333;">{nombre}</td>
-                <td style="padding: 12px 0; border-bottom: 1px solid #eee; color: #333; text-align: center;">{cantidad}</td>
-                <td style="padding: 12px 0; border-bottom: 1px solid #eee; color: #333; text-align: right;">{precio_fmt}</td>
+                <td style="padding: 12px 0; border-bottom: 1px solid #eee; color: #333;">{nombre}{variante_info}</td>
+                <td style="padding: 12px 0; border-bottom: 1px solid #eee; color: #333; text-align: center; vertical-align: top;">{cantidad}</td>
+                <td style="padding: 12px 0; border-bottom: 1px solid #eee; color: #333; text-align: right; vertical-align: top;">{precio_fmt}</td>
             </tr>
             """
 

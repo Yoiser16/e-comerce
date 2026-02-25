@@ -628,19 +628,37 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
                 'largo': item.largo or (variante.largo or '' if variante else '')
             })
     
-    # Preparar datos de productos para el email (con imágenes)
+    # Formatear atributo: negro_natural -> Negro Natural
+    def _fmt(val): return val.replace('_', ' ').title() if val else val
+    
+    # Preparar datos de productos para el email (con imágenes y variantes)
     productos_email = []
     for item in data.items:
+        nombre_base = item.nombre or 'Producto'
+        atributos = []
+        if item.color:
+            atributos.append(f"Color: {_fmt(item.color)}")
+        if item.largo:
+            atributos.append(f"Largo: {item.largo}")
+        nombre_completo = nombre_base
+        if atributos:
+            nombre_completo += f" ({', '.join(atributos)})"
+            
         producto_data = {
-            'nombre': item.nombre or 'Producto',
+            'nombre': nombre_completo,
             'cantidad': item.cantidad,
             'precio_unitario': float(item.precio_unitario),
-            'imagen': ''
+            'imagen': '',
+            'color': _fmt(item.color) if item.color else '',
+            'largo': item.largo or ''
         }
         if item.producto_id and item.producto_id != '00000000-0000-0000-0000-000000000000':
             try:
                 producto_obj = ProductoModel.objects.get(id=item.producto_id)
                 producto_data['nombre'] = producto_obj.nombre
+                # Re-construir nombre completo con nombre real del producto
+                if atributos:
+                    producto_data['nombre'] += f" ({', '.join(atributos)})"
                 # Obtener URL de la primera imagen si existe (imagenes es ForeignKey related_name)
                 primera_imagen_obj = producto_obj.imagenes.filter(es_principal=True).first()
                 if not primera_imagen_obj:
@@ -806,14 +824,30 @@ def _enviar_email_estado(orden: OrdenModel, estado_nuevo: str) -> None:
         if not orden.cliente:
             return
 
+        # Formatear atributo: negro_natural -> Negro Natural
+        def _fmt(val): return val.replace('_', ' ').title() if val else val
+        
         lineas_orden = LineaOrdenModel.objects.filter(orden=orden).select_related('producto').prefetch_related('producto__imagenes')
         productos_email = []
         for linea in lineas_orden:
+            # Construir nombre con variantes si existen
+            nombre_base = linea.producto.nombre if linea.producto else 'Producto'
+            atributos = []
+            if linea.color_snapshot:
+                atributos.append(f"Color: {_fmt(linea.color_snapshot)}")
+            if linea.largo_snapshot:
+                atributos.append(f"Largo: {linea.largo_snapshot}")
+            nombre_completo = nombre_base
+            if atributos:
+                nombre_completo += f" ({', '.join(atributos)})"
+                
             producto_data = {
-                'nombre': linea.producto.nombre if linea.producto else 'Producto',
+                'nombre': nombre_completo,
                 'cantidad': linea.cantidad,
                 'precio_unitario': float(linea.precio_unitario_monto),
-                'imagen': ''
+                'imagen': '',
+                'color': _fmt(linea.color_snapshot) if linea.color_snapshot else '',
+                'largo': linea.largo_snapshot or ''
             }
             if linea.producto:
                 primera_imagen_obj = linea.producto.imagenes.filter(es_principal=True).first()
