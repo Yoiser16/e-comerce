@@ -11,6 +11,40 @@ const apiClient = axios.create({
 })
 
 /**
+ * Verifica si hay un token de acceso válido (no expirado)
+ * @returns {boolean} true si hay token válido
+ */
+export const hasValidToken = () => {
+  const token = localStorage.getItem('access_token') || localStorage.getItem('b2b_access_token')
+  if (!token) return false
+  
+  try {
+    // Decodificar payload del JWT (sin verificar firma)
+    const payload = JSON.parse(atob(token.split('.')[1]))
+    const exp = payload.exp
+    if (!exp) return false
+    
+    // Verificar si expiró (con 30 segundos de margen)
+    const now = Math.floor(Date.now() / 1000)
+    return exp > (now + 30)
+  } catch {
+    return false
+  }
+}
+
+/**
+ * Limpia todos los tokens y datos de sesión
+ */
+export const clearSession = () => {
+  localStorage.removeItem('access_token')
+  localStorage.removeItem('refresh_token')
+  localStorage.removeItem('b2b_access_token')
+  localStorage.removeItem('b2b_refresh_token')
+  localStorage.removeItem('user')
+  localStorage.removeItem('b2b_user')
+}
+
+/**
  * Convierte una URL relativa de imagen a URL absoluta del backend
  * @param {string} url - URL de la imagen (puede ser relativa o absoluta)
  * @returns {string} URL absoluta
@@ -84,22 +118,15 @@ apiClient.interceptors.response.use(
 
     // Solo intentar refresh si es 401, no es un retry, y hay refresh token
     if (error.response?.status === 401 && !originalRequest._retry && !isRefreshing) {
-      // IMPORTANTE: El endpoint /favoritos/ no soporta autenticación B2B
-      // No intentar refresh ni limpiar tokens en este caso
-      if (originalRequest.url?.includes('/favoritos')) {
-        return Promise.reject(error)
-      }
-      
       // Buscar refresh token en ambas ubicaciones (B2C y B2B)
       const refreshToken = localStorage.getItem('refresh_token') || localStorage.getItem('b2b_refresh_token')
       const isB2B = !!localStorage.getItem('b2b_refresh_token')
       
-      // Si no hay refresh token, limpiar todo y rechazar
+      // Si no hay refresh token, limpiar sesión y rechazar silenciosamente
       if (!refreshToken) {
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
-        localStorage.removeItem('b2b_access_token')
-        localStorage.removeItem('b2b_refresh_token')
+        clearSession()
+        // Emitir evento de sesión expirada (los componentes pueden escuchar esto)
+        window.dispatchEvent(new CustomEvent('session-expired'))
         return Promise.reject(error)
       }
 
@@ -127,11 +154,10 @@ apiClient.interceptors.response.use(
       } catch (refreshError) {
         isRefreshing = false
         
-        // Limpiar TODOS los tokens (B2C y B2B)
-        localStorage.removeItem('access_token')
-        localStorage.removeItem('refresh_token')
-        localStorage.removeItem('b2b_access_token')
-        localStorage.removeItem('b2b_refresh_token')
+        // Refresh falló - limpiar sesión
+        clearSession()
+        // Emitir evento de sesión expirada
+        window.dispatchEvent(new CustomEvent('session-expired'))
         
         return Promise.reject(refreshError)
       }

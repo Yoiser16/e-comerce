@@ -65,23 +65,29 @@ def listar_favoritos(
 
         favoritos = FavoritoModel.objects.filter(
             usuario_id=usuario_id
-        ).select_related('producto')
+        ).select_related('producto', 'producto__categoria')
         
         resultado = []
         for fav in favoritos:
-            resultado.append(FavoritoDTO(
-                id=fav.id,
-                producto_id=fav.producto.id,
-                nombre=fav.producto.nombre,
-                imagen_principal=fav.producto.imagen_principal,
-                precio_monto=float(fav.producto.monto_precio),
-                precio_moneda=fav.producto.moneda_precio,
-                precio_mayorista=calcular_precio_mayorista(fav.producto),
-                sku=fav.producto.sku,
-                stock_actual=fav.producto.stock_actual,
-                categoria_nombre=fav.producto.categoria.nombre if fav.producto.categoria else None,
-                fecha_agregado=fav.fecha_agregado
-            ))
+            try:
+                if not fav.producto:
+                    continue
+                    
+                resultado.append(FavoritoDTO(
+                    id=fav.id,
+                    producto_id=fav.producto.id,
+                    nombre=fav.producto.nombre,
+                    imagen_principal=fav.producto.imagen_principal,
+                    precio_monto=float(fav.producto.monto_precio or 0),
+                    precio_moneda=fav.producto.moneda_precio or 'COP',
+                    precio_mayorista=calcular_precio_mayorista(fav.producto),
+                    sku=fav.producto.sku,
+                    stock_actual=fav.producto.stock_actual or 0,
+                    categoria_nombre=fav.producto.categoria.nombre if fav.producto.categoria else None,
+                    fecha_agregado=fav.fecha_agregado
+                ))
+            except Exception:
+                continue
         
         return resultado
     except Exception as e:

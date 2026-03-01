@@ -333,7 +333,14 @@ def _listar_ordenes_por_email_sync(email: str) -> List[dict]:
             'subtotal': float(orden.subtotal_monto),
             'envio': float(orden.envio_monto),
             'items': items,
-            'metodo_pago': orden.metodo_pago or 'whatsapp'
+            'metodo_pago': orden.metodo_pago or 'whatsapp',
+            'guia_envio': orden.guia_envio or '',
+            'link_rastreo': orden.link_rastreo or '',
+            'direccion_envio': orden.direccion_envio or '',
+            'departamento': orden.departamento or '',
+            'municipio': orden.municipio or '',
+            'barrio': orden.barrio or '',
+            'notas_envio': orden.notas_envio or ''
         })
     
     return resultado
@@ -494,6 +501,10 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
                 telefono=data.telefono,
                 tipo_documento=tipo_doc,
                 numero_documento=numero_doc,
+                direccion=data.direccion,
+                departamento=data.departamento,
+                municipio=data.municipio,
+                barrio=data.barrio or '',
                 activo=True
             )
         else:
@@ -514,6 +525,19 @@ def _crear_orden_sync(data: CrearOrdenInput) -> dict:
                 actualizado = True
             if tipo_doc and not cliente.tipo_documento:
                 cliente.tipo_documento = tipo_doc
+                actualizado = True
+            # Actualizar datos de envío (siempre con los más recientes)
+            if data.direccion:
+                cliente.direccion = data.direccion
+                actualizado = True
+            if data.departamento:
+                cliente.departamento = data.departamento
+                actualizado = True
+            if data.municipio:
+                cliente.municipio = data.municipio
+                actualizado = True
+            if data.barrio:
+                cliente.barrio = data.barrio
                 actualizado = True
             if actualizado:
                 cliente.save()

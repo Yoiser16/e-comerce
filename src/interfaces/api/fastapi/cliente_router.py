@@ -165,6 +165,44 @@ def listar_clientes(
         raise HTTPException(status_code=500, detail=f"Error al listar clientes: {str(e)}")
 
 
+@router.get("/by-email/{email}", response_model=ClienteDTO)
+def obtener_cliente_por_email(
+    email: str,
+    repo: ClienteRepository = Depends(get_cliente_repository)
+):
+    """
+    Obtiene un cliente por email.
+    Usado para cargar datos en "Mis Datos" cuando el usuario ya hizo compras.
+    """
+    try:
+        from infrastructure.persistence.django.models import ClienteModel
+        cliente = ClienteModel.objects.filter(email=email).first()
+        
+        if not cliente:
+            raise HTTPException(status_code=404, detail="Cliente no encontrado")
+        
+        return ClienteDTO(
+            id=str(cliente.id),
+            nombre=cliente.nombre or "",
+            apellido=cliente.apellido or "",
+            email=cliente.email or "",
+            telefono=cliente.telefono or "",
+            tipo_documento=cliente.tipo_documento,
+            numero_documento=cliente.numero_documento,
+            direccion=cliente.direccion or "",
+            departamento=cliente.departamento or "",
+            municipio=cliente.municipio or "",
+            barrio=cliente.barrio or "",
+            fecha_creacion=cliente.fecha_creacion,
+            fecha_modificacion=cliente.fecha_modificacion,
+            activo=cliente.activo
+        )
+    except HTTPException:
+        raise
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
 @router.get("/{cliente_id}", response_model=ClienteDTO)
 def obtener_cliente(
     cliente_id: UUID,
