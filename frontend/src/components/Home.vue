@@ -1341,83 +1341,64 @@
     </section>
 
     <!-- ========================================
-         GUÍA RÁPIDA - Elección Premium
+         PLAN EMPRENDEDOR - Paquete de Productos
          ======================================== -->
-    <section class="relative bg-gradient-to-br from-[#FDFBFA] via-[#FAF7F5] to-[#FDFBFA] overflow-hidden py-12 sm:py-20 lg:py-28">
-      <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4B9A9]/30 to-transparent"></div>
-      <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#D4B9A9]/30 to-transparent"></div>
+    <section class="relative bg-gradient-to-br from-[#1A1A1A] via-[#2D2D2D] to-[#1A1A1A] overflow-hidden py-14 sm:py-20 lg:py-28">
+      <!-- Decoración dorada sutil -->
+      <div class="absolute top-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C9A962]/40 to-transparent"></div>
+      <div class="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-transparent via-[#C9A962]/40 to-transparent"></div>
+      
+      <!-- Patrón de fondo sutil -->
+      <div class="absolute inset-0 opacity-5">
+        <div class="absolute top-10 left-10 w-32 h-32 border border-[#C9A962] rounded-full"></div>
+        <div class="absolute bottom-10 right-10 w-48 h-48 border border-[#C9A962] rounded-full"></div>
+        <div class="absolute top-1/2 left-1/4 w-20 h-20 border border-[#C9A962] rounded-full"></div>
+      </div>
 
-      <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
-        <div class="grid lg:grid-cols-2 gap-10 lg:gap-16 items-center">
-          <div class="order-2 lg:order-1">
-            <div class="grid grid-cols-2 gap-4">
-              <div class="bg-white rounded-2xl p-5 border border-nude-200 shadow-soft hover:shadow-luxury transition-all">
-                <p class="text-xs uppercase tracking-[0.2em] text-text-light mb-2">Objetivo</p>
-                <p class="text-base font-semibold text-text-dark">Volumen inmediato</p>
-                <p class="text-xs text-text-medium mt-2">Extensiones listas para usar.</p>
-              </div>
-              <div class="bg-white rounded-2xl p-5 border border-nude-200 shadow-soft hover:shadow-luxury transition-all">
-                <p class="text-xs uppercase tracking-[0.2em] text-text-light mb-2">Estilo</p>
-                <p class="text-base font-semibold text-text-dark">Look natural</p>
-                <p class="text-xs text-text-medium mt-2">Frontales y closures con acabado invisible.</p>
-              </div>
-              <div class="bg-white rounded-2xl p-5 border border-nude-200 shadow-soft hover:shadow-luxury transition-all">
-                <p class="text-xs uppercase tracking-[0.2em] text-text-light mb-2">Textura</p>
-                <p class="text-base font-semibold text-text-dark">Rizo o liso</p>
-                <p class="text-xs text-text-medium mt-2">Encuentra la textura perfecta para ti.</p>
-              </div>
-              <div class="bg-white rounded-2xl p-5 border border-nude-200 shadow-soft hover:shadow-luxury transition-all">
-                <p class="text-xs uppercase tracking-[0.2em] text-text-light mb-2">Color</p>
-                <p class="text-base font-semibold text-text-dark">Tonos favoritos</p>
-                <p class="text-xs text-text-medium mt-2">Guias de color para un match exacto.</p>
-              </div>
-            </div>
-          </div>
-
-          <div class="order-1 lg:order-2 lg:pl-4">
-            <div class="inline-flex items-center gap-2 border border-[#C9A962]/50 rounded-sm px-4 py-1.5 mb-8">
-              <span class="w-1.5 h-1.5 bg-[#C9A962] rounded-full"></span>
-              <span class="text-[10px] tracking-[0.25em] uppercase text-[#8B7355] font-medium">GUIA RAPIDA</span>
-            </div>
-
-            <h2 class="font-luxury text-4xl sm:text-5xl lg:text-6xl text-text-dark leading-[1.1] mb-5">
-              Elige tu <span class="text-brand-600">look</span><br>
-              <span class="font-luxury italic font-normal">en minutos</span>
-            </h2>
-
-            <p class="text-text-medium text-base sm:text-lg mb-8 leading-relaxed max-w-md">
-              Responde en segundos y descubre la pieza ideal segun tu objetivo, textura y tono.
-            </p>
-
-            <div class="flex flex-col sm:flex-row sm:items-center gap-4 sm:gap-6">
-              <router-link
-                to="/catalogo"
-                class="inline-flex items-center justify-center gap-3 bg-text-dark hover:bg-black text-white font-medium text-[13px] sm:text-sm uppercase tracking-[0.1em] px-8 py-3.5 sm:py-4 rounded-sm transition-all hover:shadow-lg touch-target"
-              >
-                IR A LA GUIA
-                <svg class="w-3.5 h-3.5 sm:w-4 sm:h-4" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-                </svg>
-              </router-link>
-              <router-link
-                to="/catalogo"
-                class="inline-flex items-center justify-center gap-1.5 text-text-medium hover:text-text-dark text-xs sm:text-sm tracking-wide transition-colors group"
-              >
-                Ver todo el catálogo
-                <svg class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" fill="none" stroke="currentColor" stroke-width="1.5" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" d="M17.25 8.25L21 12m0 0l-3.75 3.75M21 12H3" />
-                </svg>
-              </router-link>
-            </div>
-          </div>
+      <div class="max-w-3xl mx-auto px-5 sm:px-8 lg:px-12 relative z-10 text-center">
+        <div class="inline-flex items-center gap-2 border border-[#C9A962]/60 rounded-sm px-4 py-1.5 mb-6">
+          <svg class="w-4 h-4 text-[#C9A962]" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+          </svg>
+          <span class="text-[10px] tracking-[0.25em] uppercase text-[#C9A962] font-medium">OPORTUNIDAD EXCLUSIVA</span>
         </div>
+
+        <h2 class="font-luxury text-3xl sm:text-4xl lg:text-5xl xl:text-6xl text-white leading-[1.1] mb-5">
+          Plan <span class="text-[#C9A962]">Emprendedor</span>
+        </h2>
+
+        <p class="text-white/70 text-base sm:text-lg mb-6 leading-relaxed max-w-md mx-auto">
+          Inicia tu negocio de extensiones y pelucas con un paquete completo a precio mayorista.
+        </p>
+
+        <!-- Precio destacado -->
+        <div class="mb-8">
+          <div class="inline-flex items-baseline gap-2">
+            <span class="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#C9A962]">$1.730.000</span>
+            <span class="text-white/50 text-sm">COP</span>
+          </div>
+          <p class="text-white/60 text-sm mt-2">Paquete completo para iniciar</p>
+        </div>
+
+        <!-- CTA WhatsApp -->
+        <a
+          href="https://wa.me/4796657763?text=Hola%2C%20quiero%20información%20sobre%20el%20Plan%20Emprendedor%20de%20%241.730.000.%20%C2%BFQué%20incluye%3F"
+          target="_blank"
+          rel="noopener noreferrer"
+          class="inline-flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#20BD5A] text-white font-semibold text-sm sm:text-base px-7 py-3.5 sm:py-4 rounded-full transition-all hover:scale-105 hover:shadow-xl shadow-lg touch-target"
+        >
+          <svg class="w-5 h-5 sm:w-6 sm:h-6" fill="currentColor" viewBox="0 0 24 24">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/>
+          </svg>
+          ¿Qué incluye? Pregúntanos
+        </a>
       </div>
     </section>
 
     <!-- ========================================
-         TESTIMONIOS - Prueba Social
+         TESTIMONIOS - Prueba Social (Oculto en móvil)
          ======================================== -->
-    <section id="testimonios" class="py-20 lg:py-28 bg-[#FAFAFA]">
+    <section id="testimonios" class="hidden sm:block py-20 lg:py-28 bg-[#FAFAFA]">
       <div class="max-w-7xl mx-auto px-5 sm:px-8 lg:px-12">
         <!-- Section Header -->
         <div class="text-center mb-14">
@@ -1522,18 +1503,6 @@
               </div>
             </div>
 
-            <!-- Links -->
-            <div>
-              <h3 class="font-semibold mb-6 text-white/90">Productos</h3>
-              <ul class="space-y-3">
-                <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Extensiones premium</a></li>
-                <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Extensiones Tape</a></li>
-                <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Pelucas de encaje frontal</a></li>
-                <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Accesorios</a></li>
-                <li><a href="#" class="text-white/60 hover:text-white transition-colors text-sm">Novedades</a></li>
-              </ul>
-            </div>
-
             <div>
               <h3 class="font-semibold mb-6 text-white/90">Empresa</h3>
               <ul class="space-y-3">
@@ -1573,13 +1542,14 @@
 
         <!-- Bottom Bar -->
         <div class="border-t border-white/10 py-6">
-          <div class="flex flex-col md:flex-row items-center justify-between gap-4">
+          <div class="flex flex-col items-center gap-3 text-center">
             <p class="text-white/50 text-sm">© 2026 Kharis Distribuidora. Todos los derechos reservados.</p>
-            <div class="flex items-center gap-6">
-              <a href="#" class="text-white/50 hover:text-white text-sm transition-colors">Privacidad</a>
-              <a href="#" class="text-white/50 hover:text-white text-sm transition-colors">Términos</a>
-              <a href="#" class="text-white/50 hover:text-white text-sm transition-colors">Cookies</a>
-            </div>
+            <p class="text-white/40 text-xs">
+              Desarrollado por 
+              <a href="https://105code.cloud" target="_blank" rel="noopener noreferrer" class="text-white/60 hover:text-white font-medium transition-colors">105 Code</a>
+              &amp;
+              <span class="text-white/60 font-medium">Websarrollab</span>
+            </p>
           </div>
         </div>
       </div>
@@ -1619,22 +1589,7 @@
       </span>
     </a>
 
-    <!-- ========================================
-         SCROLL TO TOP BUTTON (Left Side) - Compacto en móvil
-         ======================================== -->
-    <button 
-      v-show="showFloatingBtns"
-      @click="scrollToTop"
-      class="fixed bottom-4 sm:bottom-6 left-4 sm:left-6 w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-brand-600 hover:bg-brand-700 text-white rounded-full flex items-center justify-center shadow-xl hover:scale-110 transition-all duration-300 z-40 group touch-target"
-    >
-      <svg class="w-4 h-4 sm:w-5 sm:h-5 lg:w-6 lg:h-6" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" d="M4.5 15.75l7.5-7.5 7.5 7.5" />
-      </svg>
-      <!-- Tooltip - Solo desktop -->
-      <span class="hidden lg:block absolute left-full ml-3 bg-white text-text-dark text-sm font-medium px-4 py-2 rounded-xl shadow-lg whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity">
-        Subir
-      </span>
-    </button>
+
 
     <!-- ========================================
          TOAST NOTIFICATION - Estilo Premium Shopping (tipo Instagram)
