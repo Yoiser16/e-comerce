@@ -319,6 +319,53 @@ def _build_recovery_body(nombre: str, codigo: str) -> tuple[str, str]:
     return text, html
 
 
+def _build_login_code_body(nombre: str, codigo: str) -> tuple[str, str]:
+    """Genera el cuerpo del email para código de acceso (login sin contraseña)."""
+    text = (
+        f"Hola {nombre},\n\n"
+        f"Tu código de acceso para Kharis Distribuidora es: {codigo}\n\n"
+        "Este código expira en 10 minutos.\n"
+        "Si no solicitaste este acceso, puedes ignorar este correo."
+    )
+    
+    html = f"""
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <meta charset="utf-8">
+    </head>
+    <body style="margin: 0; padding: 0; font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #FAFAFA;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 40px 20px;">
+            <div style="background: #ffffff; border-radius: 16px; padding: 40px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);">
+                <div style="text-align: center; margin-bottom: 30px;">
+                    <h2 style="color: #1A1A1A; margin: 0; font-weight: 500;">Código de Acceso</h2>
+                </div>
+                
+                <p style="color: #4A4A4A; font-size: 16px; line-height: 1.6; margin-bottom: 25px; text-align: center;">
+                    Hola <strong>{nombre}</strong>,<br>
+                    Usa este código para ingresar a tu cuenta:
+                </p>
+                
+                <div style="background-color: #FAF5F2; border-radius: 12px; padding: 25px; text-align: center; margin: 30px 0;">
+                    <span style="font-size: 36px; font-weight: bold; letter-spacing: 8px; color: #D81B60;">{codigo}</span>
+                </div>
+                
+                <p style="color: #7A7A7A; font-size: 13px; text-align: center; margin-top: 20px;">
+                    Este código expira en 10 minutos.<br>
+                    Si no solicitaste este acceso, ignora este correo.
+                </p>
+                
+                <div style="border-top: 1px solid #eee; margin-top: 30px; padding-top: 20px; text-align: center;">
+                    <p style="color: #aaa; font-size: 12px; margin: 0;">Kharis Distribuidora</p>
+                </div>
+            </div>
+        </div>
+    </body>
+    </html>
+    """
+    return text, html
+
+
 def _build_welcome_body(nombre: str) -> tuple[str, str]:
     """Genera el cuerpo del email de bienvenida."""
     text = (
@@ -448,6 +495,23 @@ def send_password_reset_code(
         return _send_email_base(email, subject, text_body, html_body)
     except Exception as exc:
         _log_error(f"Fallo enviando código a {email}", exc)
+        return None
+
+
+def send_login_code_email(
+    *,
+    email: str,
+    nombre: str,
+    codigo: str
+) -> Optional[str]:
+    """Envía código de acceso para login sin contraseña."""
+    if not email: return None
+    try:
+        subject = "Tu código de acceso - Kharis"
+        text_body, html_body = _build_login_code_body(nombre, codigo)
+        return _send_email_base(email, subject, text_body, html_body)
+    except Exception as exc:
+        _log_error(f"Fallo enviando código de login a {email}", exc)
         return None
 
 

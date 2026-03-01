@@ -403,3 +403,128 @@ async def register(request: RegisterRequest):
             status_code=500,
             detail="No pudimos crear tu cuenta. Intenta de nuevo."
         )
+
+
+# ===== LOGIN CON CÓDIGO DE ACCESO (Passwordless) =====
+
+class SendLoginCodeRequest(BaseModel):
+    email: EmailStr
+
+class VerifyLoginCodeRequest(BaseModel):
+    email: EmailStr
+    codigo: str
+
+@router.post("/send-login-code")
+async def send_login_code(request: SendLoginCodeRequest):
+    """
+    Envía un código de acceso al email del usuario para login sin contraseña.
+    Si el usuario no existe, lo crea automáticamente.
+    """
+    import logging
+    logger = logging.getLogger("auth.login_code")
+    
+    from infrastructure.auth.models import Usuario
+    from django.utils import timezone
+    import random
+    from datetime import timedelta
+    
+    try:
+        # Buscar o crear usuario
+        try:
+            user = await sync_to_async(Usuario.objects.get)(email=request.email.lower())
+        except Usuario.DoesNotExist:
+            # Crear usuario nuevo sin contraseña
+            def create_user():
+                return Usuario.objects.create(
+                    email=request.email.lower(),
+                    nombre=request.email.split('@')[0].title(),
+                    rol='LECTURA',
+                    is_active=True
+                )
+            user = await sync_to_async(create_user)()
+            logger.info(f"Nuevo usuario creado: {user.email}")
+        
+        # Generar código de 6 dígitos
+        code = ''.join([str(random.randint(0, 9)) for _ in range(6)])
+        
+        def save_code():
+            user.reset_code = code
+            user.reset_code_expires = timezone.now() + timedelta(minutes=10)
+            user.save(update_fields=['reset_code', 'reset_code_expires'])
+            
+        await sync_to_async(save_code)()
+        
+        # Enviar email con el código
+        def do_send_email():
+            from infrastructure.notifications.email_service import send_login_code_email
+            send_login_code_email(
+                email=user.email,
+                nombre=user.nombre,
+                codigo=code
+            )
+        
+        await sync_to_async(do_send_email)()
+        logger.info(f"Código de acceso enviado a {user.email}")
+        
+        return {"message": "Te enviamos un código de acceso a tu correo.", "sent": True}
+        
+    except Exception as e:
+        logger.error(f"Error enviando código de login: {type(e).__name__}: {e}", exc_info=True)
+        raise HTTPException(status_code=500, detail="Error al enviar el código")
+
+
+@router.post("/verify-login-code", response_model=LoginResponse)
+async def verify_login_code(request: VerifyLoginCodeRequest):
+    """
+    Verifica el código de acceso y devuelve tokens JWT.
+    """
+    import logging
+    logger = logging.getLogger("auth.login_code")
+    
+    from infrastructure.auth.models import Usuario
+    from rest_framework_simplejwt.tokens import RefreshToken
+    from django.utils import timezone
+    
+    try:
+        user = await sync_to_async(Usuario.objects.get)(email=request.email.lower())
+    except Usuario.DoesNotExist:
+        raise HTTPException(status_code=401, detail="Código inválido")
+    
+    # Verificar código
+    def verify():
+        if not user.reset_code or user.reset_code != request.codigo:
+            return False, "Código inválido"
+        if not user.reset_code_expires or user.reset_code_expires < timezone.now():
+            return False, "El código ha expirado"
+        # Limpiar código después de usar
+        user.reset_code = None
+        user.reset_code_expires = None
+        user.save(update_fields=['reset_code', 'reset_code_expires'])
+        return True, None
+    
+    valid, error_msg = await sync_to_async(verify)()
+    if not valid:
+        raise HTTPException(status_code=401, detail=error_msg)
+    
+    # Generar tokens
+    def create_tokens():
+        refresh = RefreshToken.for_user(user)
+        access = refresh.access_token
+        access['email'] = user.email
+        access['nombre'] = user.nombre
+        access['rol'] = user.rol
+        
+        return {
+            'access': str(access),
+            'refresh': str(refresh),
+            'user': {
+                'id': str(user.id),
+                'email': user.email,
+                'nombre': user.nombre,
+                'rol': user.rol
+            }
+        }
+    
+    tokens = await sync_to_async(create_tokens)()
+    logger.info(f"Login exitoso con código para {user.email}")
+    return tokens
