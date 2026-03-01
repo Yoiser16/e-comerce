@@ -1977,16 +1977,39 @@ export default {
           }
           
           // Guardar datos de la orden en localStorage para recuperar después del pago
+          // Obtener nombres de departamento y municipio (no IDs)
+          const depNombre = getDepName.value || form.value.departamento || ''
+          const munNombre = getMunName.value || form.value.municipio || ''
+          
           const orderData = {
             reference,
-            items: cartItems.value,
+            items: cartItems.value.map(item => ({
+              id: item.id || item.producto_id,
+              producto_id: item.id || item.producto_id,
+              variante_id: item.variante_id || null,
+              variante_sku: item.variante_sku || '',
+              color: item.color || '',
+              largo: item.largo || '',
+              cantidad: item.cantidad || 1,
+              precio_unitario: item.precio_unitario || item.precio || 0,
+              precio: item.precio_unitario || item.precio || 0,
+              nombre: item.nombre || 'Producto',
+              imagen_url: item.imagen_url || item.imagen_principal || ''
+            })),
+            subtotal: getSubtotal(),
+            envio: envioGratis.value ? 0 : costoEnvio.value,
             total: getTotal(),
             customer: {
               email: form.value.email,
               nombre: form.value.nombre,
-              apellido: form.value.apellido,
+              apellido: form.value.apellido || '',
               telefono: cleanPhone,
-              direccion: getFullAddress()
+              tipo_documento: form.value.tipoDocumento || 'CC',
+              numero_documento: form.value.numeroDocumento || '',
+              direccion: form.value.direccion,
+              departamento: depNombre,
+              municipio: munNombre,
+              barrio: form.value.barrio || ''
             },
             createdAt: new Date().toISOString()
           }

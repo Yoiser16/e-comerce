@@ -52,8 +52,12 @@
                 <span class="font-semibold text-green-800">Detalles de tu pedido</span>
               </div>
               <div class="space-y-2 text-sm">
+                <div class="flex justify-between" v-if="orderCode">
+                  <span class="text-green-700">Número de pedido:</span>
+                  <span class="font-mono font-semibold text-green-900">{{ orderCode }}</span>
+                </div>
                 <div class="flex justify-between">
-                  <span class="text-green-700">Referencia:</span>
+                  <span class="text-green-700">Referencia Wompi:</span>
                   <span class="font-mono font-semibold text-green-900">{{ transactionRef }}</span>
                 </div>
                 <div class="flex justify-between" v-if="transactionAmount">
@@ -67,6 +71,13 @@
             <div class="bg-brand-50 rounded-xl p-4 mb-6 text-left">
               <p class="text-sm text-brand-700">
                 <span class="font-semibold">📧 Próximo paso:</span> Recibirás un correo con los detalles de envío y seguimiento de tu pedido.
+              </p>
+            </div>
+            
+            <!-- Error al crear orden -->
+            <div v-if="orderError" class="bg-amber-50 rounded-xl p-4 mb-6 text-left border border-amber-200">
+              <p class="text-sm text-amber-700">
+                <span class="font-semibold">⚠️ Aviso:</span> {{ orderError }}
               </p>
             </div>
           </template>
@@ -152,6 +163,9 @@
 import { ref, onMounted, computed } from 'vue'
 import { useRoute } from 'vue-router'
 
+// Consistente con api.js - eliminar /api/v1 si viene en VITE_API_URL
+const API_BASE_URL = (import.meta.env.VITE_API_URL || 'http://localhost:8000').replace('/api/v1', '')
+
 export default {
   name: 'PagoExitoso',
   setup() {
@@ -161,11 +175,15 @@ export default {
     const transactionRef = ref('')
     const transactionAmount = ref(0)
     const transactionMessage = ref('')
+    const orderCode = ref('') // Código de orden creada en nuestro sistema
+    const orderCreated = ref(false)
+    const orderError = ref('') // Para mostrar errores al usuario
     
     const whatsappNumber = '4796657763'
     
     const whatsappLink = computed(() => {
-      const mensaje = `Hola, tengo una consulta sobre mi pedido con referencia: ${transactionRef.value}`
+      const codigo = orderCode.value || transactionRef.value
+      const mensaje = `Hola, tengo una consulta sobre mi pedido con referencia: ${codigo}`
       return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(mensaje)}`
     })
     
@@ -182,13 +200,106 @@ export default {
       }
     }
     
-    const parseEpaycoResponse = () => {
+    // Crear la orden en el backend después del pago exitoso
+    const createOrderFromPendingData = async (wompiTransactionId) => {
+      try {
+        // Leer datos guardados antes del pago
+        const pendingOrderStr = localStorage.getItem('kharis_pending_order')
+        if (!pendingOrderStr) {
+          console.warn('⚠️ No hay datos de orden pendiente en localStorage')
+          orderError.value = 'No se encontraron datos de la orden. Por favor contacta soporte con tu referencia de pago.'
+          return false
+        }
+        
+        const pendingOrder = JSON.parse(pendingOrderStr)
+        console.log('📦 Creando orden desde datos pendientes:', pendingOrder)
+        
+        // Validar que tenemos los datos mínimos
+        if (!pendingOrder.items || pendingOrder.items.length === 0) {
+          orderError.value = 'No hay productos en la orden. Por favor contacta soporte.'
+          return false
+        }
+        
+        if (!pendingOrder.customer?.email) {
+          orderError.value = 'Falta el email del cliente. Por favor contacta soporte.'
+          return false
+        }
+        
+        // Preparar datos para la API de órdenes
+        const ordenData = {
+          email: pendingOrder.customer?.email || '',
+          nombre: pendingOrder.customer?.nombre || '',
+          apellido: pendingOrder.customer?.apellido || '',
+          telefono: pendingOrder.customer?.telefono || '',
+          tipo_documento: pendingOrder.customer?.tipo_documento || 'CC',
+          numero_documento: pendingOrder.customer?.numero_documento || '',
+          direccion: pendingOrder.customer?.direccion || '',
+          departamento: pendingOrder.customer?.departamento || '',
+          municipio: pendingOrder.customer?.municipio || '',
+          barrio: pendingOrder.customer?.barrio || '',
+          notas: `Wompi TX: ${wompiTransactionId || transactionRef.value}`,
+          items: (pendingOrder.items || []).map(item => ({
+            producto_id: item.id || item.producto_id || '00000000-0000-0000-0000-000000000000',
+            variante_id: item.variante_id || null,
+            variante_sku: item.variante_sku || '',
+            color: item.color || '',
+            largo: item.largo || '',
+            cantidad: item.cantidad || 1,
+            precio_unitario: item.precio_unitario || item.precio || 0,
+            nombre: item.nombre || 'Producto'
+          })),
+          subtotal: pendingOrder.subtotal || pendingOrder.total || 0,
+          envio: pendingOrder.envio || 0,
+          total: pendingOrder.total || 0,
+          metodo_pago: 'wompi'
+        }
+        
+        console.log('🚀 Enviando orden al backend:', ordenData)
+        
+        // API_BASE_URL es la raíz (ej: http://localhost:8000)
+        const apiUrl = `${API_BASE_URL}/api/v1/ordenes`
+        console.log('🔗 URL:', apiUrl)
+        
+        const response = await fetch(apiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(ordenData)
+        })
+        
+        if (!response.ok) {
+          const errorText = await response.text()
+          console.error('❌ Error creando orden:', response.status, errorText)
+          orderError.value = `Error al registrar orden (${response.status}). Tu pago fue procesado. Contacta soporte con referencia: ${transactionRef.value}`
+          return false
+        }
+        
+        const orden = await response.json()
+        console.log('✅ Orden creada exitosamente:', orden)
+        
+        orderCode.value = orden.codigo || ''
+        orderCreated.value = true
+        orderError.value = ''
+        
+        // Limpiar datos pendientes
+        localStorage.removeItem('kharis_pending_order')
+        localStorage.removeItem('kharis_cart_cache')
+        localStorage.removeItem('kharis_cart_count')
+        
+        return true
+      } catch (error) {
+        console.error('❌ Error al crear orden:', error)
+        orderError.value = `Error de conexión: ${error.message}. Tu pago fue procesado. Contacta soporte con referencia: ${transactionRef.value}`
+        return false
+      }
+    }
+    
+    const parseEpaycoResponse = async () => {
       // Wompi y otros proveedores envían parámetros en la URL
       const params = route.query
       
       // Primero verificar si viene de Wompi
       if (params.ref || params.id) {
-        parseWompiResponse(params)
+        await parseWompiResponse(params)
         return
       }
       
@@ -271,6 +382,7 @@ export default {
     // Parser específico para respuestas de Wompi
     const parseWompiResponse = async (params) => {
       transactionRef.value = params.ref || params.id || `KH-${Date.now()}`
+      let wompiTransactionId = params.id || ''
       
       // Si Wompi redirecciona con ID de transacción, consultar estado
       if (params.id) {
@@ -283,10 +395,14 @@ export default {
             const transaction = data.data
             transactionRef.value = transaction.reference || params.ref || transactionRef.value
             transactionAmount.value = (transaction.amount_in_cents || 0) / 100
+            wompiTransactionId = transaction.id || params.id
             
             switch (transaction.status) {
               case 'APPROVED':
                 paymentStatus.value = 'approved'
+                // Crear la orden en nuestro sistema
+                console.log('✅ Pago aprobado, creando orden en el sistema...')
+                await createOrderFromPendingData(wompiTransactionId)
                 break
               case 'PENDING':
                 paymentStatus.value = 'pending'
@@ -305,17 +421,18 @@ export default {
           console.warn('Error consultando transacción Wompi:', e)
           // En caso de error, usar los parámetros de la URL
           paymentStatus.value = params.status === 'approved' ? 'approved' : 'pending'
+          if (paymentStatus.value === 'approved') {
+            await createOrderFromPendingData(wompiTransactionId)
+          }
         }
       } else {
         // Sin ID de transacción, usar status de la URL
         paymentStatus.value = 'approved'
+        await createOrderFromPendingData(wompiTransactionId)
       }
       
-      // Limpiar carrito
-      if (paymentStatus.value === 'approved' || paymentStatus.value === 'pending') {
-        localStorage.removeItem('kharis_cart_cache')
-        localStorage.removeItem('kharis_cart_count')
-      }
+      // Limpiar carrito solo si la orden se creó exitosamente
+      // (ya se limpia en createOrderFromPendingData si es exitoso)
     }
     
     onMounted(() => {
@@ -340,11 +457,15 @@ export default {
         }
       }
       
-      // Simular carga y parsear respuesta de ePayco/Wompi
-      setTimeout(() => {
-        parseEpaycoResponse()
+      // Parsear respuesta de ePayco/Wompi (async)
+      const processPaymentResponse = async () => {
+        // Pequeño delay para mejor UX
+        await new Promise(resolve => setTimeout(resolve, 1000))
+        await parseEpaycoResponse()
         loading.value = false
-      }, 1500)
+      }
+      
+      processPaymentResponse()
     })
     
     return {
@@ -353,6 +474,8 @@ export default {
       transactionRef,
       transactionAmount,
       transactionMessage,
+      orderCode,
+      orderError,
       whatsappLink,
       formatPrice,
       getConfettiStyle
