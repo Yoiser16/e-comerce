@@ -354,9 +354,12 @@ class BuscarProductosUseCase(CasoUsoBase[BusquedaProductoRequestDTO, ResultadoBu
 
 class AutocompletarBusquedaUseCase(CasoUsoBase[str, AutocompletadoResponseDTO]):
     """
-    Caso de uso: Autocompletado de búsqueda.
+    Caso de uso: Autocompletado de búsqueda AVANZADO.
     
-    Retorna sugerencias mientras el usuario escribe.
+    Características:
+    - Búsqueda con sinónimos expandidos
+    - Ranking por relevancia
+    - Sugerencias de productos con preview
     """
     
     def __init__(self, producto_repository: ProductoRepository):
@@ -368,7 +371,8 @@ class AutocompletarBusquedaUseCase(CasoUsoBase[str, AutocompletadoResponseDTO]):
         
         # Obtener sugerencias del repositorio
         sugerencias = self._repo.obtener_sugerencias_busqueda(texto, limite=8)
-        productos_rapidos = self._repo.buscar_productos_rapido(texto, limite=4)
+        # Usar búsqueda rápida avanzada con sinónimos y ranking
+        productos_rapidos = self._repo.buscar_productos_rapido(texto, limite=6)
         
         return AutocompletadoResponseDTO(
             sugerencias=[

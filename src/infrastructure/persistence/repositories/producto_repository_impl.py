@@ -4,8 +4,11 @@ Implementación del Repositorio de Producto con Django ORM
 from typing import Optional, List, Tuple, Dict, Any
 from uuid import UUID
 from decimal import Decimal
+import unicodedata
+import re
 
-from django.db.models import Q, Count, Min, Max, F
+from django.db.models import Q, Count, Min, Max, F, Case, When, Value, IntegerField
+from django.db.models.functions import Lower
 
 from domain.repositories.producto_repository import ProductoRepository
 from domain.entities.producto import Producto
@@ -16,6 +19,7 @@ from domain.value_objects.criterios_busqueda import CriteriosBusqueda
 from infrastructure.persistence.django.models import ProductoModel, ImagenProductoModel, ProductoVarianteModel
 from infrastructure.auditing.servicio_auditoria import ServicioAuditoria
 from infrastructure.logging.logger_service import LoggerService
+from infrastructure.search.search_engine import search_engine
 from shared.enums.atributos_producto import OrdenProducto
 
 
@@ -556,14 +560,24 @@ class ProductoRepositoryImpl(ProductoRepository):
         if filtros.solo_con_stock:
             queryset = queryset.filter(variantes__stock_actual__gt=0, variantes__activo=True)
         
-        # Filtro de texto (búsqueda en nombre y descripción)
+        # Filtro de texto AVANZADO con sinónimos y normalización
         if filtros.texto_busqueda:
             texto = filtros.texto_busqueda
-            queryset = queryset.filter(
-                Q(nombre__icontains=texto) |
-                Q(descripcion__icontains=texto) |
-                Q(codigo__icontains=texto)
-            )
+            # Obtener tokens expandidos con sinónimos
+            tokens = search_engine.tokenizar(texto, incluir_sinonimos=True)
+            
+            if tokens:
+                q_texto = Q()
+                for token in tokens:
+                    token_norm = search_engine.normalizar_texto(token)
+                    q_texto |= (
+                        Q(nombre__icontains=token_norm) |
+                        Q(descripcion__icontains=token_norm) |
+                        Q(codigo__icontains=token_norm) |
+                        Q(categoria__nombre__icontains=token_norm) |
+                        Q(metodo__icontains=token_norm)
+                    )
+                queryset = queryset.filter(q_texto)
         
         # Filtros por atributos de cabello
         if filtros.colores:
@@ -765,17 +779,152 @@ class ProductoRepositoryImpl(ProductoRepository):
         
         return sugerencias[:limite]
     
-    def buscar_productos_rapido(self, texto: str, limite: int = 4) -> List[Producto]:
+    def buscar_productos_rapido(self, texto: str, limite: int = 6) -> List[Producto]:
         """
-        Búsqueda rápida para autocompletado con preview de productos.
+        Búsqueda rápida avanzada para autocompletado con preview de productos.
+        
+        Características:
+        - Normalización de texto (sin acentos)
+        - Expansión con sinónimos del dominio belleza/cabello
+        - Búsqueda en múltiples campos con pesos
+        - Ranking por relevancia + popularidad
+        - Tolerancia a errores tipográficos
         """
-        modelos = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').filter(
-            Q(nombre__icontains=texto) | Q(codigo__icontains=texto),
-            activo=True,
-            stock_actual__gt=0
-        ).order_by('-total_vendidos')[:limite]
+        if not texto or len(texto.strip()) < 2:
+            return []
+        
+        # Obtener tokens expandidos con sinónimos
+        tokens = search_engine.tokenizar(texto, incluir_sinonimos=True)
+        tokens_originales = search_engine.tokenizar(texto, incluir_sinonimos=False)
+        
+        if not tokens:
+            return []
+        
+        self._logger.info(
+            "Búsqueda rápida avanzada",
+            texto_original=texto,
+            tokens_originales=tokens_originales,
+            tokens_expandidos=len(tokens)
+        )
+        
+        # Construir query con OR para todos los tokens (incluye sinónimos)
+        q_objects = Q()
+        for token in tokens:
+            # Normalizar el token para la búsqueda
+            token_norm = search_engine.normalizar_texto(token)
+            q_objects |= (
+                Q(nombre__icontains=token_norm) |
+                Q(codigo__icontains=token_norm) |
+                Q(categoria__nombre__icontains=token_norm) |
+                Q(metodo__icontains=token_norm)
+            )
+        
+        # Base queryset
+        queryset = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').filter(
+            q_objects,
+            activo=True
+        )
+        
+        # Crear anotaciones de relevancia para ordenamiento inteligente
+        # Priorizar: match en nombre > código > categoría > método
+        relevancia_cases = []
+        
+        for token in tokens_originales[:3]:  # Solo primeros tokens originales
+            token_norm = search_engine.normalizar_texto(token)
+            relevancia_cases.extend([
+                # Match exacto en nombre (máxima prioridad)
+                When(nombre__iexact=token_norm, then=Value(100)),
+                # Nombre empieza con el token
+                When(nombre__istartswith=token_norm, then=Value(80)),
+                # Nombre contiene el token
+                When(nombre__icontains=token_norm, then=Value(60)),
+                # Código exacto
+                When(codigo__iexact=token_norm, then=Value(70)),
+                # Código contiene
+                When(codigo__icontains=token_norm, then=Value(50)),
+                # Categoría contiene
+                When(categoria__nombre__icontains=token_norm, then=Value(40)),
+                # Método contiene
+                When(metodo__icontains=token_norm, then=Value(30)),
+            ])
+        
+        if relevancia_cases:
+            queryset = queryset.annotate(
+                relevancia=Case(
+                    *relevancia_cases,
+                    default=Value(10),
+                    output_field=IntegerField()
+                )
+            ).order_by('-relevancia', '-total_vendidos', '-destacado')
+        else:
+            queryset = queryset.order_by('-total_vendidos', '-destacado')
+        
+        # Obtener resultados únicos
+        modelos = queryset.distinct()[:limite]
         
         return [self._to_domain(m) for m in modelos]
+    
+    def buscar_texto_avanzado(self, texto: str, limite: int = 20, offset: int = 0) -> Tuple[List[Producto], int]:
+        """
+        Búsqueda avanzada de texto completa para página de resultados.
+        Similar a buscar_productos_rapido pero con paginación y más resultados.
+        """
+        if not texto or len(texto.strip()) < 2:
+            return [], 0
+        
+        tokens = search_engine.tokenizar(texto, incluir_sinonimos=True)
+        tokens_originales = search_engine.tokenizar(texto, incluir_sinonimos=False)
+        
+        if not tokens:
+            return [], 0
+        
+        # Construir query
+        q_objects = Q()
+        for token in tokens:
+            token_norm = search_engine.normalizar_texto(token)
+            q_objects |= (
+                Q(nombre__icontains=token_norm) |
+                Q(codigo__icontains=token_norm) |
+                Q(descripcion__icontains=token_norm) |
+                Q(categoria__nombre__icontains=token_norm) |
+                Q(metodo__icontains=token_norm)
+            )
+        
+        queryset = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').filter(
+            q_objects,
+            activo=True
+        )
+        
+        # Relevancia
+        relevancia_cases = []
+        for token in tokens_originales[:3]:
+            token_norm = search_engine.normalizar_texto(token)
+            relevancia_cases.extend([
+                When(nombre__iexact=token_norm, then=Value(100)),
+                When(nombre__istartswith=token_norm, then=Value(80)),
+                When(nombre__icontains=token_norm, then=Value(60)),
+                When(codigo__iexact=token_norm, then=Value(70)),
+                When(categoria__nombre__icontains=token_norm, then=Value(40)),
+            ])
+        
+        if relevancia_cases:
+            queryset = queryset.annotate(
+                relevancia=Case(
+                    *relevancia_cases,
+                    default=Value(10),
+                    output_field=IntegerField()
+                )
+            ).order_by('-relevancia', '-total_vendidos', '-destacado')
+        else:
+            queryset = queryset.order_by('-total_vendidos', '-destacado')
+        
+        # Contar total
+        total = queryset.distinct().count()
+        
+        # Paginar
+        modelos = queryset.distinct()[offset:offset + limite]
+        
+        return [self._to_domain(m) for m in modelos], total
     
     def obtener_destacados(self, limite: int = 8) -> List[Producto]:
         """Obtiene productos destacados"""
