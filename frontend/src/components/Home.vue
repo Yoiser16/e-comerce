@@ -679,16 +679,38 @@
       
       <!-- ===== BACKGROUND CAROUSEL ===== -->
       <div class="absolute inset-0 z-0">
-        <!-- Carousel Images -->
+        <!-- Carousel Images/Videos -->
         <transition-group name="hero-slide" tag="div" class="absolute inset-0">
-          <img 
-            v-for="(slide, index) in activeHeroSlides"
-            :key="index"
-            v-show="currentSlide === index"
-            :src="slide.image" 
-            :alt="slide.alt" 
-            class="absolute inset-0 w-full h-full object-cover object-top sm:object-top hero-image-mobile"
-          />
+          <template v-for="(slide, index) in activeHeroSlides" :key="index">
+            <!-- Video Slide con overlay sutil -->
+            <div
+              v-if="slide.video && currentSlide === index"
+              v-show="currentSlide === index"
+              class="absolute inset-0"
+            >
+              <video
+                :src="slide.video"
+                :alt="slide.alt"
+                class="absolute inset-0 w-full h-full object-cover object-center"
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="auto"
+              ></video>
+              <!-- Overlay sutil para suavizar calidad + gradiente inferior -->
+              <div class="absolute inset-0 bg-black/20"></div>
+              <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-black/10 to-transparent"></div>
+            </div>
+            <!-- Image Slide -->
+            <img 
+              v-else-if="slide.image"
+              v-show="currentSlide === index"
+              :src="slide.image" 
+              :alt="slide.alt" 
+              class="absolute inset-0 w-full h-full object-cover object-top sm:object-top hero-image-mobile"
+            />
+          </template>
         </transition-group>
         <!-- Gradients for readability - Desktop -->
         <div class="hidden sm:block absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent z-10"></div>
@@ -1059,32 +1081,26 @@
         </div>
 
         <!-- Products Grid -->
-        <div v-else-if="productos.length > 0" class="product-grid-mobile grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-[10px] sm:gap-6 lg:gap-8">
-          <div
+        <!-- Products Grid - Retail Premium -->
+        <div v-else-if="productos.length > 0" class="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6 lg:gap-8">
+          <!-- Product Card - Minimalista, 100% clickeable -->
+          <article
             v-for="producto in productos"
             :key="producto.id"
             :data-producto-id="producto.id"
-            :data-producto-nombre="producto.nombre"
             @click="irADetalle(producto.id)"
-            class="group cursor-pointer product-card-mobile"
+            class="group cursor-pointer"
           >
-            <div class="relative bg-white rounded-none sm:rounded-3xl overflow-hidden shadow-soft sm:hover-lift mb-2 sm:mb-5">
-              <!-- Badge - Sutil en móvil, oculto si no es necesario -->
-              <div class="absolute top-2 sm:top-4 left-2 sm:left-4 z-10">
-                <span class="product-badge-mobile bg-white/90 sm:bg-white/90 sm:backdrop-blur-sm text-text-dark text-[9px] sm:text-xs font-medium px-1.5 sm:px-3 py-0.5 sm:py-1.5 rounded-full shadow-sm">
-                  {{ producto.categoria || 'Premium' }}
-                </span>
-              </div>
-              
-              <!-- Wishlist Button - SOLO en desktop sobre la imagen -->
+            <!-- Imagen Container -->
+            <div class="relative aspect-[3/4] rounded-xl sm:rounded-2xl overflow-hidden bg-gray-50">
+              <!-- Wishlist Button - Sobre la imagen -->
               <button 
                 @click.stop="toggleFavorito(producto)"
-                class="product-fav-image hidden sm:flex absolute top-4 right-4 z-10 w-10 h-10 rounded-full items-center justify-center shadow-sm transition-colors touch-target"
-                :class="isInWishlist(producto.id) ? 'bg-brand-50' : 'bg-white/90 backdrop-blur-sm hover:bg-brand-50'"
+                class="absolute top-2 right-2 sm:top-3 sm:right-3 z-10 w-8 h-8 sm:w-9 sm:h-9 bg-white rounded-full flex items-center justify-center shadow-sm transition-all hover:shadow-md active:scale-95"
               >
                 <svg 
-                  class="w-5 h-5 transition-colors" 
-                  :class="isInWishlist(producto.id) ? 'text-brand-600' : 'text-text-light hover:text-brand-600'"
+                  class="w-4 h-4 sm:w-[18px] sm:h-[18px] transition-colors" 
+                  :class="isInWishlist(producto.id) ? 'text-[#D81B60]' : 'text-gray-400'"
                   :fill="isInWishlist(producto.id) ? 'currentColor' : 'none'" 
                   stroke="currentColor" 
                   stroke-width="1.5" 
@@ -1094,69 +1110,39 @@
                 </svg>
               </button>
 
-              <!-- Image / Video - Toque directo navega al detalle -->
-              <div class="aspect-[3/4] overflow-hidden bg-nude-100">
-                <video
-                  v-if="isVideo(getProductoMediaUrl(producto))"
-                  :src="getProductoMediaUrl(producto)"
-                  class="w-full h-full object-cover"
-                  autoplay
-                  muted
-                  loop
-                  playsinline
-                  preload="metadata"
-                ></video>
-                <img
-                  v-else-if="getProductoMediaUrl(producto)"
-                  :src="getProductoMediaUrl(producto)"
-                  :alt="producto.nombre"
-                  class="w-full h-full object-cover sm:img-zoom"
-                  @error="handleImageError"
-                >
-                <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-nude-100 to-nude-200">
-                  <svg class="w-16 h-16 sm:w-24 sm:h-24 text-nude-400" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09zM18.259 8.715L18 9.75l-.259-1.035a3.375 3.375 0 00-2.455-2.456L14.25 6l1.036-.259a3.375 3.375 0 002.455-2.456L18 2.25l.259 1.035a3.375 3.375 0 002.456 2.456L21.75 6l-1.035.259a3.375 3.375 0 00-2.456 2.456z" />
-                  </svg>
-                </div>
-              </div>
-
-              <!-- Quick Add - OCULTO en móvil, solo visible en hover desktop -->
-              <button
-                @click.stop="agregarAlCarrito(producto)"
-                class="product-quick-add-desktop absolute bottom-4 left-4 right-4 bg-brand-600 text-white font-semibold py-3 px-6 rounded-2xl opacity-0 group-hover:opacity-100 transform translate-y-2 group-hover:translate-y-0 transition-all duration-300 shadow-lg hover:bg-brand-700 touch-target"
+              <!-- Image / Video -->
+              <video
+                v-if="isVideo(getProductoMediaUrl(producto))"
+                :src="getProductoMediaUrl(producto)"
+                class="w-full h-full object-cover"
+                autoplay
+                muted
+                loop
+                playsinline
+                preload="metadata"
+              ></video>
+              <img
+                v-else-if="getProductoMediaUrl(producto)"
+                :src="getProductoMediaUrl(producto)"
+                :alt="producto.nombre"
+                class="w-full h-full object-cover sm:group-hover:scale-105 transition-transform duration-500"
+                @error="handleImageError"
               >
-                Agregar al carrito
-              </button>
-            </div>
-
-            <!-- Product Info - Jerarquía tipográfica mejorada -->
-            <div class="px-1 sm:px-1">
-              <p class="text-[9px] sm:text-xs text-text-light uppercase tracking-wider mb-0 sm:mb-1 leading-tight">{{ producto.categoria || producto.metodo || 'Extensiones' }}</p>
-              <h3 class="font-medium text-[13px] leading-[1.3] sm:text-base text-text-dark mb-1.5 sm:mb-2 line-clamp-2 group-hover:text-brand-600 transition-colors">{{ producto.nombre }}</h3>
-              
-              <!-- Fila inferior: Precio (izq) + Corazón (der) -->
-              <div class="flex items-center justify-between">
-                <p class="text-[15px] sm:text-lg font-bold text-text-dark sm:text-brand-600 leading-tight">${{ formatPrice(producto.precio_monto || producto.precio) }} <span class="text-[9px] sm:text-xs text-text-light font-normal">{{ producto.precio_moneda || 'COP' }}</span></p>
-                
-                <!-- Corazón móvil - sutil, sin fondo -->
-                <button 
-                  @click.stop="toggleFavorito(producto)"
-                  class="product-fav-inline sm:hidden flex items-center justify-center w-6 h-6 flex-shrink-0 ml-2 transition-colors"
-                >
-                  <svg 
-                    class="w-[18px] h-[18px] transition-all" 
-                    :class="isInWishlist(producto.id) ? 'text-brand-600 scale-110' : 'text-text-light/40'"
-                    :fill="isInWishlist(producto.id) ? 'currentColor' : 'none'" 
-                    stroke="currentColor" 
-                    stroke-width="1.5" 
-                    viewBox="0 0 24 24"
-                  >
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M21 8.25c0-2.485-2.099-4.5-4.688-4.5-1.935 0-3.597 1.126-4.312 2.733-.715-1.607-2.377-2.733-4.313-2.733C5.1 3.75 3 5.765 3 8.25c0 7.22 9 12 9 12s9-4.78 9-12z" />
-                  </svg>
-                </button>
+              <div v-else class="w-full h-full flex items-center justify-center bg-gradient-to-br from-gray-100 to-gray-50">
+                <svg class="w-10 h-10 text-gray-200" fill="none" stroke="currentColor" stroke-width="1" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909m-18 3.75h16.5a1.5 1.5 0 001.5-1.5V6a1.5 1.5 0 00-1.5-1.5H3.75A1.5 1.5 0 002.25 6v12a1.5 1.5 0 001.5 1.5zm10.5-11.25h.008v.008h-.008V8.25zm.375 0a.375.375 0 11-.75 0 .375.375 0 01.75 0z" />
+                </svg>
               </div>
             </div>
-          </div>
+
+            <!-- Product Info - Solo título y precio, alineado izquierda -->
+            <div class="mt-2.5 sm:mt-3">
+              <h3 class="font-medium text-[13px] sm:text-sm text-gray-900 leading-tight line-clamp-2 min-h-[2.6em] sm:group-hover:text-[#D81B60] transition-colors">{{ producto.nombre }}</h3>
+              <p class="mt-1.5 text-[15px] sm:text-base font-bold text-gray-900 leading-none">
+                ${{ formatPrice(producto.precio_monto || producto.precio) }}<span class="text-[9px] sm:text-[10px] text-gray-400 font-normal ml-0.5">{{ producto.precio_moneda || 'COP' }}</span>
+              </p>
+            </div>
+          </article>
         </div>
 
         <!-- Error State -->
@@ -2411,15 +2397,19 @@ export default {
         alt: 'Kanekalon - Fibras de cabello premium'
       },
       {
-        image: '/images/hero b2c/1.jpeg',
+        video: '/images/hero%20b2c/VID-20260213-WA0003.mp4',
+        alt: 'Video promocional - Belleza profesional'
+      },
+      {
+        image: '/images/hero%20b2c/1.jpeg',
         alt: 'Belleza profesional - Extensiones premium'
       },
       {
-        image: '/images/hero b2c/2.jpeg',
+        image: '/images/hero%20b2c/2.jpeg',
         alt: 'Cabello natural de alta calidad'
       },
       {
-        image: '/images/hero b2c/3.jpeg',
+        image: '/images/hero%20b2c/3.jpeg',
         alt: 'Estilo y elegancia profesional'
       }
     ])
@@ -2467,11 +2457,25 @@ export default {
     }
 
     const startSlideshow = () => {
-      slideInterval = setInterval(nextSlide, 6000) // Cambio cada 6 segundos - más lento para mejor UX móvil
+      // Duración dinámica: 11s para videos, 6s para imágenes
+      const getCurrentSlideDuration = () => {
+        const currentSlideData = activeHeroSlides.value[currentSlide.value]
+        return currentSlideData?.video ? 11000 : 6000
+      }
+      
+      const scheduleNextSlide = () => {
+        if (slideInterval) clearTimeout(slideInterval)
+        slideInterval = setTimeout(() => {
+          nextSlide()
+          scheduleNextSlide()
+        }, getCurrentSlideDuration())
+      }
+      
+      scheduleNextSlide()
     }
 
     const resetSlideInterval = () => {
-      if (slideInterval) clearInterval(slideInterval)
+      if (slideInterval) clearTimeout(slideInterval)
       startSlideshow()
     }
 
@@ -3030,7 +3034,7 @@ export default {
       window.removeEventListener('user-logged-in', handleUserLoggedIn)
       document.removeEventListener('click', handleClickOutside)
       document.removeEventListener('click', handleClickOutsideSearch)
-      if (slideInterval) clearInterval(slideInterval)
+      if (slideInterval) clearTimeout(slideInterval)
       if (announcementInterval) clearInterval(announcementInterval)
     })
 
@@ -3128,68 +3132,6 @@ export default {
   line-clamp: 2;
   -webkit-box-orient: vertical;
   overflow: hidden;
-}
-
-/* ==========================================
-   PRODUCTOS DESTACADOS - MOBILE OPTIMIZADO
-   ========================================== */
-
-/* Ocultar botón "Agregar al carrito" y corazón sobre imagen en móvil */
-@media (max-width: 767px) {
-  .product-quick-add-desktop {
-    display: none !important;
-  }
-
-  /* Corazón sobre imagen: oculto en móvil (se reubica abajo) */
-  .product-fav-image {
-    display: none !important;
-  }
-
-  /* Badge más sutil en móvil */
-  .product-badge-mobile {
-    font-size: 9px;
-    padding: 2px 6px;
-    background: rgba(255, 255, 255, 0.85);
-    backdrop-filter: none;
-    letter-spacing: 0.02em;
-  }
-
-  /* Corazón inline (junto al precio) */
-  .product-fav-inline {
-    background: none;
-    border: none;
-    padding: 0;
-  }
-  .product-fav-inline:active svg {
-    color: #D81B60;
-    fill: #D81B60;
-    transform: scale(1.15);
-  }
-
-  /* Desactivar img-zoom en móvil (evitar hover fantasma) */
-  .product-card-mobile .img-zoom {
-    transform: none !important;
-    transition: none !important;
-  }
-
-  /* Quitar hover-lift en móvil */
-  .product-card-mobile .hover-lift {
-    transform: none !important;
-    transition: none !important;
-  }
-}
-
-/* Desktop: mantener Quick Add con hover, ocultar corazón inline */
-@media (min-width: 768px) {
-  .product-quick-add-desktop {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .product-fav-inline {
-    display: none !important;
-  }
 }
 
 /* ==========================================
