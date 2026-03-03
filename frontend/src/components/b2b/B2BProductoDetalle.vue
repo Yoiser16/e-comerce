@@ -1285,9 +1285,10 @@ export default {
     })
 
     const largosDisponibles = computed(() => {
-      if (colorSeleccionado.value === BASE_VARIANTE_VALUE) return []
+      // Si BASE seleccionado Y hay opciones de color, no mostrar largos
+      if (colorSeleccionado.value === BASE_VARIANTE_VALUE && coloresDisponibles.value.length > 0) return []
       const largos = new Set()
-      const source = colorSeleccionado.value
+      const source = (colorSeleccionado.value && colorSeleccionado.value !== BASE_VARIANTE_VALUE)
         ? variantesDisponibles.value.filter(v => v.color === colorSeleccionado.value)
         : variantesDisponibles.value
       source.forEach((v) => {
@@ -1298,11 +1299,12 @@ export default {
 
     const variantesFiltradas = computed(() => {
       if (!tieneVariantes.value) return []
-      if (colorSeleccionado.value === BASE_VARIANTE_VALUE) {
+      // Solo devolver base si hay colores y el usuario eligió BASE
+      if (colorSeleccionado.value === BASE_VARIANTE_VALUE && coloresDisponibles.value.length > 0) {
         return varianteBase.value ? [varianteBase.value] : []
       }
       return variantesDisponibles.value.filter((v) => {
-        if (colorSeleccionado.value && v.color !== colorSeleccionado.value) return false
+        if (colorSeleccionado.value && colorSeleccionado.value !== BASE_VARIANTE_VALUE && v.color !== colorSeleccionado.value) return false
         if (largoSeleccionado.value && String(v.largo) !== String(largoSeleccionado.value)) return false
         return true
       })
@@ -1310,7 +1312,8 @@ export default {
 
     const varianteSeleccionada = computed(() => {
       if (!tieneVariantes.value) return null
-      if (colorSeleccionado.value === BASE_VARIANTE_VALUE) {
+      // BASE solo aplica cuando hay colores reales para elegir
+      if (colorSeleccionado.value === BASE_VARIANTE_VALUE && coloresDisponibles.value.length > 0) {
         return varianteBase.value || {
           id: null,
           sku: producto.value.sku || producto.value.codigo || '',
@@ -1326,6 +1329,10 @@ export default {
           activo: true,
           orden: 0
         }
+      }
+      // Si no hay colores disponibles, solo usar largo para seleccionar
+      if (!coloresDisponibles.value.length && largoSeleccionado.value) {
+        return variantesFiltradas.value.find(v => (v.stock_actual ?? 0) > 0) || variantesFiltradas.value[0] || null
       }
       if (!colorSeleccionado.value && !largoSeleccionado.value) return null
       return variantesFiltradas.value.find(v => (v.stock_actual ?? 0) > 0) || variantesFiltradas.value[0] || null
@@ -1671,6 +1678,31 @@ export default {
         const data = await obtenerProductoB2B(id)
         producto.value = data
 
+        // Inicializar selección de variantes
+        const variantes = Array.isArray(data.variantes) ? data.variantes.filter(v => v && v.activo !== false) : []
+        if (variantes.length > 0) {
+          const colores = variantes.filter(v => v.color).map(v => v.color)
+          const largos = variantes.filter(v => v.largo).map(v => v.largo)
+          const base = variantes.find(v => !v.color && !v.largo)
+          const primera = variantes[0]
+          if (colores.length > 0) {
+            // Hay colores: seleccionar el primero o BASE si existe
+            if (base) {
+              colorSeleccionado.value = BASE_VARIANTE_VALUE
+            } else {
+              colorSeleccionado.value = primera?.color || ''
+            }
+            largoSeleccionado.value = primera?.largo || ''
+          } else if (largos.length > 0) {
+            // Sin colores pero con largos: solo seleccionar largo
+            colorSeleccionado.value = ''
+            largoSeleccionado.value = largos.length === 1 ? largos[0] : ''
+          } else if (base) {
+            colorSeleccionado.value = BASE_VARIANTE_VALUE
+            largoSeleccionado.value = ''
+          }
+        }
+
         await cargarResumenResenas()
         await cargarResenasProducto()
         
@@ -1770,7 +1802,8 @@ export default {
 
     watch(coloresDisponibles, (colores) => {
       if (!tieneVariantes.value) return
-      if (!colorSeleccionado.value && varianteBase.value) {
+      // Solo auto-seleccionar BASE si hay colores reales para elegir
+      if (!colorSeleccionado.value && varianteBase.value && colores.length > 0) {
         colorSeleccionado.value = BASE_VARIANTE_VALUE
         return
       }
