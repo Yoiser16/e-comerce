@@ -1472,8 +1472,8 @@
             <!-- Brand -->
             <div class="lg:col-span-1">
               <div class="flex items-center gap-3 mb-6">
-                <div class="w-12 h-12 bg-gradient-to-br from-brand-500 to-brand-600 rounded-2xl flex items-center justify-center">
-                  <span class="text-white font-luxury font-bold text-xl">K</span>
+                <div class="w-12 h-12 rounded-2xl overflow-hidden shadow-lg">
+                  <img src="/logo-kharis.jpeg" alt="Kharis" class="w-full h-full object-cover" />
                 </div>
                 <div>
                   <h2 class="text-xl font-luxury font-semibold">Kharis</h2>

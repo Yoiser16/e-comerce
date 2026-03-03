@@ -4,10 +4,27 @@
     <!-- ═══════════════════════════════════════════════════════════════════ -->
     <!-- LOADING INICIAL - Mientras determina el paso correcto               -->
     <!-- ═══════════════════════════════════════════════════════════════════ -->
-    <div v-if="initialLoading" class="min-h-screen flex items-center justify-center bg-white">
-      <div class="text-center">
-        <div class="w-12 h-12 border-2 border-[#D81B60] border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
-        <p class="text-[#7A7A7A] text-sm">Preparando tu pedido...</p>
+    <div v-if="initialLoading" class="min-h-screen flex items-center justify-center" style="background: linear-gradient(145deg, #1A1A1A 0%, #0D0D0D 50%, #1A1A1A 100%);">
+      <!-- Destellos decorativos -->
+      <div class="absolute inset-0 overflow-hidden pointer-events-none">
+        <div class="absolute top-1/4 left-1/4 w-64 h-64 bg-brand-500/5 rounded-full blur-3xl animate-pulse"></div>
+        <div class="absolute bottom-1/3 right-1/4 w-48 h-48 bg-[#C9A962]/5 rounded-full blur-3xl animate-pulse" style="animation-delay: 0.5s;"></div>
+      </div>
+      <div class="relative flex flex-col items-center gap-6 text-center">
+        <div class="relative">
+          <div class="absolute inset-0 bg-brand-500/15 rounded-3xl blur-2xl scale-110 animate-pulse"></div>
+          <div class="relative w-24 h-24 sm:w-28 sm:h-28 rounded-3xl overflow-hidden shadow-2xl ring-1 ring-white/10">
+            <img src="/logo-kharis.jpeg" alt="Kharis Distribuidora" class="w-full h-full object-cover" />
+          </div>
+        </div>
+        <div class="flex flex-col items-center gap-1.5">
+          <span class="text-white/90 text-lg sm:text-xl font-semibold tracking-[0.2em] uppercase" style="font-family: 'Cormorant Garamond', 'Playfair Display', serif;">KHARIS</span>
+          <span class="text-[#C9A962] text-[9px] sm:text-[10px] tracking-[0.35em] uppercase font-medium">DISTRIBUIDORA</span>
+        </div>
+        <div class="w-24 h-[1.5px] bg-white/10 rounded-full overflow-hidden mt-1">
+          <div class="h-full bg-gradient-to-r from-brand-500 to-[#C9A962] rounded-full checkout-loading-bar"></div>
+        </div>
+        <p class="text-white/40 text-[11px] sm:text-xs tracking-widest uppercase">Preparando tu pedido</p>
       </div>
     </div>
     
@@ -2395,5 +2412,15 @@ export default {
 
 .animate-fade-in {
   animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes checkout-loading {
+  0% { width: 0; transform: translateX(0); }
+  50% { width: 100%; transform: translateX(0); }
+  100% { width: 0; transform: translateX(96px); }
+}
+
+.checkout-loading-bar {
+  animation: checkout-loading 1.4s ease-in-out infinite;
 }
 </style>
