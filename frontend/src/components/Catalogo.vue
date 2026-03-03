@@ -1412,17 +1412,17 @@
           </div>
 
           <!-- Barra de Progreso Envío Gratis -->
-          <div v-if="getCartSubtotal() < 300000 && carritoItems.length > 0" class="bg-gradient-to-r from-nude-50 to-white cart-shipping-bar">
+          <div v-if="getCartSubtotal() < 350000 && carritoItems.length > 0" class="bg-gradient-to-r from-nude-50 to-white cart-shipping-bar">
             <div class="flex items-center justify-between mb-1.5">
               <span class="text-[0.6875rem] text-text-medium">
-                Te faltan {{ formatearPrecio(300000 - getCartSubtotal()) }} para envío gratis
+                Te faltan {{ formatearPrecio(350000 - getCartSubtotal()) }} para envío gratis
               </span>
-              <span class="text-[0.6875rem] text-brand-600 font-medium">{{ Math.min(100, Math.round((getCartSubtotal() / 300000) * 100)) }}%</span>
+              <span class="text-[0.6875rem] text-brand-600 font-medium">{{ Math.min(100, Math.round((getCartSubtotal() / 350000) * 100)) }}%</span>
             </div>
             <div class="h-0.5 bg-nude-200 rounded-full overflow-hidden">
               <div 
                 class="h-full bg-gradient-to-r from-brand-500 to-brand-600 rounded-full transition-all duration-500"
-                :style="{ width: Math.min(100, (getCartSubtotal() / 300000) * 100) + '%' }"
+                :style="{ width: Math.min(100, (getCartSubtotal() / 350000) * 100) + '%' }"
               ></div>
             </div>
           </div>
@@ -1673,7 +1673,7 @@ const mostrarOrdenarMobile = ref(false)
 
 // Top Bar Announcements
 const announcements = ref([
-  'ENVÍO GRATIS EN COMPRAS SUPERIORES A $200.000',
+  'ENVÍO GRATIS EN COMPRAS SUPERIORES A $350.000',
   '5% OFF ADICIONAL PAGANDO CON TRANSFERENCIA',
   'NUEVA COLECCIÓN: EXTENSIONES REMY PREMIUM'
 ])

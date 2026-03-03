@@ -753,7 +753,7 @@
               <!-- Envío gratis progress -->
               <div v-if="!envioGratis" class="px-5 lg:px-6 py-3 bg-[#fef7f9]">
                 <p class="text-xs text-[#c11252] font-medium text-center">
-                  ¡Agrega ${{ formatPrice(300000 - getSubtotal()) }} más para envío gratis!
+                  ¡Agrega ${{ formatPrice(350000 - getSubtotal()) }} más para envío gratis!
                 </p>
               </div>
               
@@ -1105,7 +1105,7 @@ export default {
     // Cart
     const cartItems = ref([])
     const costoEnvio = ref(30000)
-    const envioGratis = computed(() => getSubtotal() >= 300000)
+    const envioGratis = computed(() => getSubtotal() >= 350000)
     
     // Mobile: controla si muestra resumen (false) o formulario (true)
     const mobileShowForm = ref(false)

@@ -1255,12 +1255,12 @@
               <div class="absolute bottom-6 left-6 right-6 bg-white/95 rounded-2xl shadow-xl p-6">
                 <div class="flex items-center justify-around gap-4">
                   <div class="text-center">
-                    <p class="text-3xl sm:text-4xl font-bold text-brand-600 mb-1">2K+</p>
+                    <p class="text-3xl sm:text-4xl font-bold text-brand-600 mb-1">200+</p>
                     <p class="text-xs text-text-medium uppercase tracking-wider font-medium">Mayoristas</p>
                   </div>
                   <div class="w-px h-12 bg-nude-300"></div>
                   <div class="text-center">
-                    <p class="text-3xl sm:text-4xl font-bold text-brand-600 mb-1">500+</p>
+                    <p class="text-3xl sm:text-4xl font-bold text-brand-600 mb-1">300+</p>
                     <p class="text-xs text-text-medium uppercase tracking-wider font-medium">Productos</p>
                   </div>
                 </div>
@@ -1282,7 +1282,7 @@
             </h2>
 
             <p class="text-text-medium text-sm sm:text-lg mb-6 sm:mb-8 max-w-xl leading-relaxed">
-              Únete a más de 2,000 profesionales que confían en Kharis para surtir sus salones, tiendas y negocios de belleza.
+              Únete a más de 200 profesionales que confían en Kharis para surtir sus salones, tiendas y negocios de belleza.
             </p>
 
             <!-- Benefits - Más compactos en móvil -->
@@ -1294,7 +1294,7 @@
                   </svg>
                 </div>
                 <div>
-                  <p class="text-text-dark font-semibold text-sm sm:text-base mb-0.5">Descuentos desde 25% en adelante</p>
+                  <p class="text-text-dark font-semibold text-sm sm:text-base mb-0.5">Descuentos desde 10% en adelante</p>
                   <p class="text-text-light text-xs sm:text-sm">Precios escalonados según volumen de compra</p>
                 </div>
               </li>
@@ -1316,7 +1316,7 @@
                   </svg>
                 </div>
                 <div>
-                  <p class="text-text-dark font-semibold text-sm sm:text-base mb-0.5">Envío gratis en pedidos +$50,000 COP</p>
+                  <p class="text-text-dark font-semibold text-sm sm:text-base mb-0.5">Envío gratis en pedidos +$350.000 COP</p>
                   <p class="text-text-light text-xs sm:text-sm">Entregas prioritarias a todo Colombia</p>
                 </div>
               </li>
@@ -1367,22 +1367,13 @@
           Plan <span class="text-[#C9A962]">Emprendedor</span>
         </h2>
 
-        <p class="text-white/70 text-base sm:text-lg mb-6 leading-relaxed max-w-md mx-auto">
+        <p class="text-white/70 text-base sm:text-lg mb-8 leading-relaxed max-w-md mx-auto">
           Inicia tu negocio de extensiones y pelucas con un paquete completo a precio mayorista.
         </p>
 
-        <!-- Precio destacado -->
-        <div class="mb-8">
-          <div class="inline-flex items-baseline gap-2">
-            <span class="text-4xl sm:text-5xl lg:text-6xl font-bold text-[#C9A962]">$1.730.000</span>
-            <span class="text-white/50 text-sm">COP</span>
-          </div>
-          <p class="text-white/60 text-sm mt-2">Paquete completo para iniciar</p>
-        </div>
-
         <!-- CTA WhatsApp -->
         <a
-          href="https://wa.me/4796657763?text=Hola%2C%20quiero%20información%20sobre%20el%20Plan%20Emprendedor%20de%20%241.730.000.%20%C2%BFQué%20incluye%3F"
+          href="https://wa.me/4796657763?text=Hola%2C%20me%20interesa%20el%20Plan%20Emprendedor.%20%C2%BFC%C3%B3mo%20puedo%20acceder%20a%20precios%20mayoristas%3F"
           target="_blank"
           rel="noopener noreferrer"
           class="inline-flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#20BD5A] text-white font-semibold text-sm sm:text-base px-7 py-3.5 sm:py-4 rounded-full transition-all hover:scale-105 hover:shadow-xl shadow-lg touch-target"
@@ -1643,16 +1634,16 @@
           </div>
           
           <!-- Barra de progreso envío gratis -->
-          <div v-if="getCartSubtotal() < 300000" class="px-4 pb-3">
+          <div v-if="getCartSubtotal() < 350000" class="px-4 pb-3">
             <div class="flex items-center gap-2">
               <div class="flex-1 h-1 bg-nude-100 rounded-full overflow-hidden">
                 <div 
                   class="h-full bg-gradient-to-r from-brand-400 to-brand-600 rounded-full transition-all duration-500"
-                  :style="{ width: Math.min(100, (getCartSubtotal() / 300000) * 100) + '%' }"
+                  :style="{ width: Math.min(100, (getCartSubtotal() / 350000) * 100) + '%' }"
                 ></div>
               </div>
               <span class="text-[10px] text-text-medium whitespace-nowrap">
-                ${{ formatPrice(300000 - getCartSubtotal()) }} para envío gratis
+                ${{ formatPrice(350000 - getCartSubtotal()) }} para envío gratis
               </span>
             </div>
           </div>
@@ -1735,17 +1726,17 @@
         </div>
 
         <!-- Barra de Progreso Envío Gratis - Minimalista -->
-        <div v-if="getCartSubtotal() < 300000" class="bg-gradient-to-r from-nude-50 to-white cart-shipping-bar">
+        <div v-if="getCartSubtotal() < 350000" class="bg-gradient-to-r from-nude-50 to-white cart-shipping-bar">
           <div class="flex items-center justify-between mb-1.5">
             <span class="text-[0.6875rem] text-text-medium">
-              Te faltan ${{ formatPrice(300000 - getCartSubtotal()) }} para envío gratis
+              Te faltan ${{ formatPrice(350000 - getCartSubtotal()) }} para envío gratis
             </span>
-            <span class="text-[0.6875rem] text-brand-600 font-medium">{{ Math.min(100, Math.round((getCartSubtotal() / 300000) * 100)) }}%</span>
+            <span class="text-[0.6875rem] text-brand-600 font-medium">{{ Math.min(100, Math.round((getCartSubtotal() / 350000) * 100)) }}%</span>
           </div>
           <div class="h-0.5 bg-nude-200 rounded-full overflow-hidden">
             <div 
               class="h-full bg-gradient-to-r from-brand-500 to-brand-600 rounded-full transition-all duration-500"
-              :style="{ width: Math.min(100, (getCartSubtotal() / 300000) * 100) + '%' }"
+              :style="{ width: Math.min(100, (getCartSubtotal() / 350000) * 100) + '%' }"
             ></div>
           </div>
         </div>
@@ -1790,7 +1781,7 @@
               class="flex bg-white transition-colors cart-item"
             >
               <!-- Imagen del producto -->
-              <div class="bg-gradient-to-br from-nude-50 to-nude-100 flex-shrink-0 overflow-hidden flex items-center justify-center cart-item-image">
+              <div class="relative bg-gradient-to-br from-nude-50 to-nude-100 flex-shrink-0 overflow-hidden flex items-center justify-center cart-item-image">
                 <img 
                   v-if="getCartMediaUrl(item)" 
                   :src="getCartMediaUrl(item)" 
@@ -1932,7 +1923,7 @@ export default {
 
     // Top Bar Announcements
     const announcements = ref([
-      'ENVÍO GRATIS EN COMPRAS SUPERIORES A $200.000',
+      'ENVÍO GRATIS EN COMPRAS SUPERIORES A $350.000',
       '5% OFF ADICIONAL PAGANDO CON TRANSFERENCIA',
       'NUEVA COLECCIÓN: EXTENSIONES REMY PREMIUM'
     ])
