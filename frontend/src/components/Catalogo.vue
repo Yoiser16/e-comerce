@@ -207,11 +207,13 @@
           <div class="flex items-center justify-between h-16">
             <!-- Logo -->
             <router-link to="/" class="flex-shrink-0">
-              <img 
-                src="/logo-kharis.png" 
-                alt="Kharis Distribuidora" 
-                class="h-12 w-auto object-contain hover:opacity-80 transition-opacity"
-              />
+              <div class="rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
+                <img 
+                  src="/logo-kharis.jpeg" 
+                  alt="Kharis Distribuidora" 
+                  class="h-11 w-auto object-cover"
+                />
+              </div>
             </router-link>
 
             <!-- Buscador Desktop -->
@@ -466,7 +468,9 @@
           
           <!-- Header del Sidebar -->
           <div class="flex items-center justify-between px-4 py-3.5 border-b border-black/5">
-            <img src="/logo-kharis.png" alt="Kharis" class="h-8 w-auto object-contain" />
+            <div class="rounded-lg overflow-hidden shadow-sm">
+              <img src="/logo-kharis.jpeg" alt="Kharis" class="h-8 w-auto object-cover" />
+            </div>
             <button 
               @click="mobileMenuOpen = false"
               class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-nude-100 active:bg-nude-200 transition-colors"

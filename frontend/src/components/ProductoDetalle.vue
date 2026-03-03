@@ -64,11 +64,13 @@
           <div class="flex items-center justify-between h-16">
             <!-- Logo -->
             <router-link to="/" class="flex-shrink-0">
-              <img 
-                src="/logo-kharis.png" 
-                alt="Kharis Distribuidora" 
-                class="h-12 w-auto object-contain hover:opacity-80 transition-opacity"
-              />
+              <div class="rounded-xl overflow-hidden shadow-md hover:shadow-lg transition-shadow duration-300">
+                <img 
+                  src="/logo-kharis.jpeg" 
+                  alt="Kharis Distribuidora" 
+                  class="h-11 w-auto object-cover"
+                />
+              </div>
             </router-link>
 
             <!-- Buscador Desktop -->
@@ -437,7 +439,9 @@
       >
         <nav v-if="mobileMenuOpen" class="fixed top-0 left-0 z-[9997] w-[52%] max-w-[220px] h-full bg-white lg:hidden flex flex-col">
           <div class="flex items-center justify-between px-4 py-3.5 border-b border-black/5">
-            <img src="/logo-kharis.png" alt="Kharis" class="h-8 w-auto object-contain" />
+            <div class="rounded-lg overflow-hidden shadow-sm">
+              <img src="/logo-kharis.jpeg" alt="Kharis" class="h-8 w-auto object-cover" />
+            </div>
             <button @click="mobileMenuOpen = false" class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-nude-100 active:bg-nude-200 transition-colors">
               <svg class="w-4 h-4 text-text-dark" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" d="M6 18L18 6M6 6l12 12" />

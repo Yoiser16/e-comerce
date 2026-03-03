@@ -6,11 +6,13 @@
         <div class="flex items-center justify-between h-16">
           <!-- Logo + Texto -->
           <router-link to="/" class="flex items-center gap-3 group">
-            <img 
-              src="/logo-kharis.png" 
-              alt="Kharis Distribuidora" 
-              class="h-12 w-auto object-contain group-hover:scale-105 transition-transform duration-300"
-            />
+            <div class="rounded-xl overflow-hidden shadow-md group-hover:shadow-lg transition-all duration-300">
+              <img 
+                src="/logo-kharis.jpeg" 
+                alt="Kharis Distribuidora" 
+                class="h-11 w-auto object-cover group-hover:scale-105 transition-transform duration-300"
+              />
+            </div>
             <span class="font-luxury text-xl tracking-wider text-text-dark hidden sm:inline-block">KHARIS</span>
           </router-link>
           

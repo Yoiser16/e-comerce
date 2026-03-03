@@ -44,7 +44,7 @@
                 <div class="flex items-center gap-3 mb-4">
                   <div class="w-10 h-10 rounded-full bg-gradient-to-br from-[#E91E63] to-[#AD1457] p-0.5">
                     <div class="w-full h-full rounded-full bg-[#1B1D21] flex items-center justify-center">
-                      <img src="/logo-kharis.png" alt="Kharis" class="w-6 h-6 object-contain brightness-0 invert" />
+                      <img src="/logo-kharis.jpeg" alt="Kharis" class="w-full h-full object-cover rounded-full" />
                     </div>
                   </div>
                   <div>

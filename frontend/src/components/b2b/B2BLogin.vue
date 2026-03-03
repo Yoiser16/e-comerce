@@ -28,11 +28,11 @@
       <div class="relative z-10 h-full flex flex-col justify-between p-5 pb-6 lg:p-12">
         <!-- Logo móvil: centrado, estilo app femenino -->
         <div class="flex flex-col items-center gap-3 pt-3 lg:hidden">
-          <div class="w-[72px] h-[72px] rounded-[22px] bg-white/90 shadow-md shadow-[#D4B29E]/15 p-3.5 flex items-center justify-center">
+          <div class="w-[72px] h-[72px] rounded-[22px] bg-white/90 shadow-md shadow-[#D4B29E]/15 overflow-hidden flex items-center justify-center">
             <img 
-              src="/logo-kharis.png" 
+              src="/logo-kharis.jpeg" 
               alt="Kharis" 
-              class="w-full h-full object-contain"
+              class="w-full h-full object-cover"
             />
           </div>
           <div class="text-center">
@@ -43,11 +43,11 @@
 
         <!-- Logo desktop: esquina superior izquierda -->
         <div class="hidden lg:flex items-center gap-3">
-          <div class="w-12 h-12 rounded-full bg-white/10 p-2 flex items-center justify-center">
+          <div class="w-12 h-12 rounded-xl overflow-hidden shadow-md">
             <img 
-              src="/logo-kharis.png" 
+              src="/logo-kharis.jpeg" 
               alt="Kharis" 
-              class="w-full h-full object-contain"
+              class="w-full h-full object-cover"
             />
           </div>
           <div>

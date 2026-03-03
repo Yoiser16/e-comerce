@@ -48,8 +48,9 @@
           </button>
 
           <!-- Center: Logo Wordmark -->
-          <a href="#" class="absolute left-1/2 -translate-x-1/2 flex items-center">
-            <span class="text-[22px] font-semibold tracking-[0.18em] text-[#111] uppercase" style="font-family: 'Cormorant Garamond', 'Playfair Display', serif;">KHARIS</span>
+          <a href="#" class="absolute left-1/2 -translate-x-1/2 flex flex-col items-center leading-none">
+            <span class="text-[19px] font-semibold tracking-[0.18em] uppercase kharis-wordmark" style="font-family: 'Cormorant Garamond', 'Playfair Display', serif;">KHARIS</span>
+            <span class="text-[7px] tracking-[0.28em] uppercase kharis-wordmark opacity-55 mt-px" style="font-family: 'Inter', sans-serif;">DISTRIBUIDORA</span>
           </a>
 
           <!-- Right: Search + Cart -->
@@ -83,17 +84,16 @@
         <div class="hidden lg:flex items-center justify-between">
           <!-- Logo -->
           <a href="#" class="flex items-center gap-3 group flex-shrink-0">
-            <div class="relative">
-              <!-- Glow sutil detrás del logo para mayor presencia -->
-              <div class="absolute inset-0 bg-gradient-to-r from-brand-500/5 via-brand-600/8 to-brand-500/5 blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 rounded-full scale-150"></div>
-              
-              <!-- Logo dinámico según scroll -->
+            <div class="relative rounded-xl overflow-hidden shadow-md group-hover:shadow-lg transition-all duration-300">
               <img 
-                :src="isScrolled ? '/logo-kharis.png' : '/logo blanco.png'" 
+                src="/logo-kharis.jpeg" 
                 alt="Kharis Distribuidora" 
-                class="relative h-12 sm:h-16 lg:h-20 w-auto object-contain group-hover:scale-105 drop-shadow-[0_2px_8px_rgba(216,27,96,0.15)] logo-transition"
-                style="filter: contrast(1.1) saturate(1.15);"
+                class="relative h-11 lg:h-14 w-auto object-cover group-hover:scale-105 logo-transition"
               />
+            </div>
+            <div class="flex flex-col leading-none">
+              <span class="text-[20px] font-semibold tracking-[0.18em] uppercase kharis-wordmark" style="font-family: 'Cormorant Garamond', 'Playfair Display', serif;">KHARIS</span>
+              <span class="text-[9px] tracking-[0.25em] uppercase kharis-wordmark opacity-60 mt-0.5" style="font-family: 'Inter', sans-serif;">DISTRIBUIDORA</span>
             </div>
           </a>
 
@@ -181,7 +181,7 @@
           </div>
 
           <!-- Navegación Desktop -->
-          <nav class="flex items-center gap-7">
+          <nav class="flex items-center gap-6">
             <router-link to="/catalogo" class="nav-link-luxury">CATÁLOGO</router-link>
             <a href="#categorias" class="nav-link-luxury">CATEGORÍAS</a>
             <a href="#productos" class="nav-link-luxury">PRODUCTOS</a>
@@ -191,7 +191,7 @@
           </nav>
 
           <!-- Acciones Desktop - Iconos -->
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-1 ml-5">
             
             <!-- Usuario con dropdown -->
             <div class="relative" ref="userMenuRef">
@@ -541,11 +541,13 @@
               
               <!-- Header del Sidebar -->
               <div class="flex items-center justify-between px-4 py-3.5 border-b border-black/5">
-                <img 
-                  src="/logo-kharis.png" 
-                  alt="Kharis" 
-                  class="h-8 w-auto object-contain"
-                />
+                <div class="rounded-lg overflow-hidden shadow-sm">
+                  <img 
+                    src="/logo-kharis.jpeg" 
+                    alt="Kharis" 
+                    class="h-8 w-auto object-cover"
+                  />
+                </div>
                 <button 
                   @click="closeMobileMenu"
                   class="w-8 h-8 flex items-center justify-center rounded-full hover:bg-nude-100 active:bg-nude-200 transition-colors"

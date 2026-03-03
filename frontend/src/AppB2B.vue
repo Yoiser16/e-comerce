@@ -8,11 +8,11 @@
         aria-label="Cargando Kharis Pro"
       >
         <div class="flex flex-col items-center gap-4 text-center">
-          <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-white/10 p-4">
+          <div class="w-24 h-24 sm:w-28 sm:h-28 rounded-2xl overflow-hidden shadow-lg">
             <img 
-              src="/logo-kharis.png" 
+              src="/logo-kharis.jpeg" 
               alt="Kharis Pro" 
-              class="w-full h-full object-contain"
+              class="w-full h-full object-cover"
             />
           </div>
           <div class="flex flex-col items-center gap-2">
@@ -36,8 +36,8 @@
       >
         <div class="flex items-center gap-3 max-w-screen-xl mx-auto">
           <!-- Logo -->
-          <div class="w-9 h-9 bg-white/10 rounded-lg flex items-center justify-center p-1.5 flex-shrink-0">
-            <img src="/logo-kharis.png" alt="Icon" class="w-full h-full object-contain" />
+          <div class="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0 shadow-sm">
+            <img src="/logo-kharis.jpeg" alt="Icon" class="w-full h-full object-cover" />
           </div>
           <!-- Texto -->
           <div class="flex-1 min-w-0">

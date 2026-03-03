@@ -5,11 +5,13 @@
     <header class="bg-white/80 border-b border-nude-100/50 py-5">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <router-link to="/" class="flex items-center gap-3 w-fit">
-          <img 
-            src="/logo-kharis.png" 
-            alt="Kharis" 
-            class="h-16 sm:h-20 w-auto"
-          />
+          <div class="rounded-xl overflow-hidden shadow-md">
+            <img 
+              src="/logo-kharis.jpeg" 
+              alt="Kharis" 
+              class="h-14 sm:h-16 w-auto object-cover"
+            />
+          </div>
         </router-link>
       </div>
     </header>

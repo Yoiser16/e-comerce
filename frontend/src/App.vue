@@ -7,11 +7,11 @@
         aria-label="Cargando Kharis Distribuidora"
       >
         <div class="flex flex-col items-center gap-4 text-center">
-          <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-full shadow-soft-lg overflow-hidden bg-white">
+          <div class="w-28 h-28 sm:w-32 sm:h-32 rounded-2xl shadow-soft-lg overflow-hidden">
             <img 
-              src="/logo-kharis.png" 
+              src="/logo-kharis.jpeg" 
               alt="Kharis Distribuidora" 
-              class="w-full h-full object-contain"
+              class="w-full h-full object-cover"
             />
           </div>
           <p class="text-text-dark text-sm sm:text-base tracking-wide">Preparando tu experiencia...</p>

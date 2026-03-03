@@ -16,8 +16,8 @@
           
           <!-- Logo -->
           <router-link to="/portal" class="flex items-center gap-2 lg:gap-3 group shrink-0">
-            <div class="w-8 h-8 lg:w-11 lg:h-11 rounded-lg lg:rounded-xl overflow-hidden bg-white flex items-center justify-center shadow-md">
-              <img src="/logo-kharis.png" alt="Kharis Pro" class="w-5 h-5 lg:w-8 lg:h-8 object-contain" />
+            <div class="w-8 h-8 lg:w-11 lg:h-11 rounded-lg lg:rounded-xl overflow-hidden shadow-md">
+              <img src="/logo-kharis.jpeg" alt="Kharis Pro" class="w-full h-full object-cover" />
             </div>
             <div class="hidden lg:block">
               <span class="text-white font-extrabold text-lg lg:text-xl tracking-wide leading-tight">KHARIS</span>

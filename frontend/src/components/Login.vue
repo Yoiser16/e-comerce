@@ -44,11 +44,13 @@
           <!-- Logo -->
           <div class="flex justify-center mb-10 md:mb-8">
             <router-link to="/" class="flex items-center gap-3">
-              <img 
-                src="/logo-kharis.png" 
-                alt="Kharis Distribuidora" 
-                class="h-24 md:h-20 w-auto object-contain"
-              />
+              <div class="rounded-2xl overflow-hidden shadow-lg">
+                <img 
+                  src="/logo-kharis.jpeg" 
+                  alt="Kharis Distribuidora" 
+                  class="h-24 md:h-20 w-auto object-cover"
+                />
+              </div>
             </router-link>
           </div>
 
