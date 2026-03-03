@@ -1417,7 +1417,25 @@ const coloresDisponibles = computed(() => {
 
 const largosDisponibles = computed(() => {
   const map = new Map()
-  variantesDisponibles.value.forEach((v) => {
+
+  // Si el producto base está seleccionado, mostrar solo el largo del producto base
+  if (colorSeleccionado.value === BASE_VARIANTE_VALUE) {
+    if (producto.value?.largo) {
+      map.set(producto.value.largo, {
+        value: producto.value.largo,
+        label: formatLargoLabel(producto.value.largo)
+      })
+    }
+    return Array.from(map.values())
+  }
+
+  // Filtrar variantes por el color seleccionado (si hay uno seleccionado)
+  let variantes = variantesDisponibles.value
+  if (colorSeleccionado.value) {
+    variantes = variantes.filter(v => v.color === colorSeleccionado.value)
+  }
+
+  variantes.forEach((v) => {
     if (!v.largo) return
     if (!map.has(v.largo)) {
       map.set(v.largo, {
@@ -1672,6 +1690,11 @@ const selectColor = (color) => {
     return
   }
   colorSeleccionado.value = color.value
+  // Reset largo al cambiar de color y auto-seleccionar si solo hay uno disponible
+  largoSeleccionado.value = ''
+  if (largosDisponibles.value.length === 1) {
+    largoSeleccionado.value = largosDisponibles.value[0].value
+  }
 }
 
 const selectLargo = (largo) => {
