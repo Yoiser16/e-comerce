@@ -1418,14 +1418,22 @@ const coloresDisponibles = computed(() => {
 const largosDisponibles = computed(() => {
   const map = new Map()
 
-  // Si el producto base está seleccionado, mostrar solo el largo del producto base
   if (colorSeleccionado.value === BASE_VARIANTE_VALUE) {
+    // BASE seleccionado: mostrar largo del producto base + largos de variantes SIN color
     if (producto.value?.largo) {
       map.set(producto.value.largo, {
         value: producto.value.largo,
         label: formatLargoLabel(producto.value.largo)
       })
     }
+    variantesDisponibles.value.forEach((v) => {
+      if (!v.color && v.largo && !map.has(v.largo)) {
+        map.set(v.largo, {
+          value: v.largo,
+          label: formatLargoLabel(v.largo)
+        })
+      }
+    })
     return Array.from(map.values())
   }
 
@@ -1699,7 +1707,14 @@ const selectColor = (color) => {
 
 const selectLargo = (largo) => {
   if (colorSeleccionado.value === BASE_VARIANTE_VALUE) {
-    colorSeleccionado.value = ''
+    // Verificar si este largo pertenece a una variante con color
+    const tieneColor = variantesDisponibles.value.some(v => v.largo === largo.value && v.color)
+    if (tieneColor) {
+      // Cambiar al color de esa variante
+      const varConColor = variantesDisponibles.value.find(v => v.largo === largo.value && v.color)
+      if (varConColor) colorSeleccionado.value = varConColor.color
+    }
+    // Si no tiene color, mantener BASE
   }
   largoSeleccionado.value = largo.value
 }
@@ -1708,7 +1723,13 @@ const varianteSeleccionada = computed(() => {
   const variantes = variantesDisponibles.value
   if (!variantes.length) return null
 
-  if (baseSeleccionada.value) return null
+  if (baseSeleccionada.value) {
+    // BASE: si hay largo seleccionado, buscar variante sin color con ese largo
+    if (largoSeleccionado.value) {
+      return variantes.find(v => !v.color && v.largo === largoSeleccionado.value) || null
+    }
+    return null
+  }
 
   const color = colorSeleccionado.value
   const largo = largoSeleccionado.value
@@ -1732,6 +1753,10 @@ const varianteSeleccionada = computed(() => {
 
 const precioUnitarioSeleccionado = computed(() => {
   if (baseSeleccionada.value) {
+    // Si hay variante seleccionada (BASE + largo), usar su precio
+    if (varianteSeleccionada.value) {
+      return Number(varianteSeleccionada.value.precio_monto ?? producto.value?.precio_monto ?? producto.value?.precio ?? 0)
+    }
     return Number(producto.value?.precio_monto ?? producto.value?.precio ?? 0)
   }
   return Number(
@@ -1741,6 +1766,10 @@ const precioUnitarioSeleccionado = computed(() => {
 
 const stockDisponible = computed(() => {
   if (baseSeleccionada.value) {
+    // Si hay variante seleccionada (BASE + largo), usar su stock
+    if (varianteSeleccionada.value) {
+      return Number(varianteSeleccionada.value.stock_actual ?? 0)
+    }
     const p = producto.value
     if (!p) return 0
     return Number(p.stock_actual ?? p.stock ?? p.stock_minimo ?? 0)
