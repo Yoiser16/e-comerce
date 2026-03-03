@@ -166,7 +166,7 @@ class ProductoRepositoryImpl(ProductoRepository):
     def obtener_disponibles(self) -> List[Producto]:
         self._logger.info("Obteniendo productos disponibles")
         from django.db.models import Q
-        models = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes').filter(
+        models = ProductoModel.objects.select_related('categoria').prefetch_related('imagenes', 'variantes').filter(
             activo=True
         ).filter(
             Q(stock_actual__gt=0) | Q(variantes__activo=True, variantes__stock_actual__gt=0)

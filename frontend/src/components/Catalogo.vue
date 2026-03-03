@@ -1687,10 +1687,36 @@ const wishlist = ref([])
 const showToast = ref(false)
 const toastMessage = ref('')
 
-// Opciones de filtros disponibles
-const coloresDisponibles = ref(['Negro', 'Castaño', 'Rubio', 'Rojo', 'Borgogña', 'Platino', 'Rubio Ceniza'])
+// Opciones de filtros disponibles (dinámicos desde productos + variantes)
 const tiposDisponibles = ref(['Liso', 'Ondulado', 'Rizado', 'Afro'])
-const largosDisponibles = ref(['8', '10', '12', '14', '16', '18', '20', '22', '24', '26', '28', '30', '32', '34', '36', '38', '40'])
+
+const coloresDisponibles = computed(() => {
+  const colorSet = new Set()
+  productos.value.forEach(p => {
+    if (p.color) colorSet.add(formatColorLabel(p.color))
+    if (p.variantes && p.variantes.length > 0) {
+      p.variantes.forEach(v => {
+        if (v.color) colorSet.add(formatColorLabel(v.color))
+      })
+    }
+  })
+  return Array.from(colorSet).sort()
+})
+
+const largosDisponibles = computed(() => {
+  const largoSet = new Set()
+  productos.value.forEach(p => {
+    const baseLargo = normalizeLargoValue(p.largo)
+    if (baseLargo) largoSet.add(baseLargo)
+    if (p.variantes && p.variantes.length > 0) {
+      p.variantes.forEach(v => {
+        const vLargo = normalizeLargoValue(v.largo)
+        if (vLargo) largoSet.add(vLargo)
+      })
+    }
+  })
+  return Array.from(largoSet).sort((a, b) => parseInt(a) - parseInt(b))
+})
 
 // Computed para usuario
 const userInitial = computed(() => {
@@ -1738,15 +1764,29 @@ const productosFiltrados = computed(() => {
     })
   }
 
-  // Filtro por precio (Range Slider)
+  // Filtro por precio (Range Slider) - incluye precios de variantes
   resultado = resultado.filter(p => {
-    const precio = p.precio_monto || 0
-    return precio >= precioRangoMin.value && precio <= precioRangoMax.value
+    const precioBase = p.precio_monto || 0
+    if (precioBase >= precioRangoMin.value && precioBase <= precioRangoMax.value) return true
+    if (p.variantes && p.variantes.length > 0) {
+      return p.variantes.some(v => {
+        const pv = v.precio_monto || 0
+        return pv >= precioRangoMin.value && pv <= precioRangoMax.value
+      })
+    }
+    return false
   })
 
-  // Filtro por color
+  // Filtro por color - busca en producto base Y variantes
   if (filtrosColor.value.length > 0) {
-    resultado = resultado.filter(p => filtrosColor.value.includes(p.color))
+    resultado = resultado.filter(p => {
+      const baseColorLabel = formatColorLabel(p.color)
+      if (filtrosColor.value.includes(baseColorLabel)) return true
+      if (p.variantes && p.variantes.length > 0) {
+        return p.variantes.some(v => filtrosColor.value.includes(formatColorLabel(v.color)))
+      }
+      return false
+    })
   }
 
   // Filtro por tipo
@@ -1754,9 +1794,15 @@ const productosFiltrados = computed(() => {
     resultado = resultado.filter(p => filtrosTipo.value.includes(p.tipo))
   }
 
-  // Filtro por largo
+  // Filtro por largo - busca en producto base Y variantes
   if (filtrosLargo.value.length > 0) {
-    resultado = resultado.filter(p => filtrosLargo.value.includes(normalizeLargoValue(p.largo)))
+    resultado = resultado.filter(p => {
+      if (filtrosLargo.value.includes(normalizeLargoValue(p.largo))) return true
+      if (p.variantes && p.variantes.length > 0) {
+        return p.variantes.some(v => filtrosLargo.value.includes(normalizeLargoValue(v.largo)))
+      }
+      return false
+    })
   }
 
   // Ordenar
@@ -1782,13 +1828,23 @@ const cargarProductos = async () => {
     const { data } = await axios.get(`${API_BASE_URL}/api/v1/productos/`)
     productos.value = data
     
-    // Calcular rango de precios disponibles
+    // Calcular rango de precios disponibles (incluye variantes)
     if (data.length > 0) {
-      const precios = data.map(p => p.precio_monto || 0).filter(p => p > 0)
-      precioMinDisponible.value = Math.min(...precios)
-      precioMaxDisponible.value = Math.max(...precios)
-      precioRangoMin.value = precioMinDisponible.value
-      precioRangoMax.value = precioMaxDisponible.value
+      const precios = []
+      data.forEach(p => {
+        if (p.precio_monto > 0) precios.push(p.precio_monto)
+        if (p.variantes && p.variantes.length > 0) {
+          p.variantes.forEach(v => {
+            if (v.precio_monto > 0) precios.push(v.precio_monto)
+          })
+        }
+      })
+      if (precios.length > 0) {
+        precioMinDisponible.value = Math.min(...precios)
+        precioMaxDisponible.value = Math.max(...precios)
+        precioRangoMin.value = precioMinDisponible.value
+        precioRangoMax.value = precioMaxDisponible.value
+      }
     }
   } catch (error) {
     console.error('Error cargando productos:', error)
@@ -2113,16 +2169,35 @@ const removeTipoFilter = (tipo) => {
 const getColorHex = (colorName) => {
   const colorMap = {
     'Negro': '#1a1a1a',
-    'Castaño': '#5D4037',
-    'Rubio': '#D4A76A',
-    'Rojo': '#8B0000',
-    'Borgogña': '#722F37',
-    'Borgoña': '#722F37',
-    'Platino': '#E5E4E2',
-    'Rubio Ceniza': '#B8A898',
     'Negro Natural': '#2d2d2d',
+    'Negro Azabache': '#0a0a0a',
+    'Castaño': '#5D4037',
     'Castaño Oscuro': '#3b2417',
-    'Castaño Claro': '#8b6b47'
+    'Castaño Medio': '#6B4226',
+    'Castaño Claro': '#8b6b47',
+    'Castaño Chocolate': '#4a2c0a',
+    'Rubio': '#D4A76A',
+    'Rubio Oscuro': '#B8860B',
+    'Rubio Medio': '#D4A76A',
+    'Rubio Claro': '#E8D5A3',
+    'Rubio Platino': '#E5E4E2',
+    'Rubio Cenizo': '#B8A898',
+    'Rubio Miel': '#D4A017',
+    'Rojo': '#8B0000',
+    'Pelirrojo': '#B7410E',
+    'Cobrizo': '#B87333',
+    'Borgoña': '#722F37',
+    'Borgogña': '#722F37',
+    'Platino': '#E5E4E2',
+    'Rosa': '#E91E63',
+    'Rosado': '#F48FB1',
+    'Azul': '#1565C0',
+    'Morado': '#7B1FA2',
+    'Verde': '#2E7D32',
+    'Gris': '#9E9E9E',
+    'Ombré': '#8D6E63',
+    'Balayage': '#A1887F',
+    'Highlights': '#FFD54F'
   }
   return colorMap[colorName] || '#9ca3af'
 }
