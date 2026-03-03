@@ -830,6 +830,10 @@ const addVariante = () => {
 
 const removeVariante = (index) => {
   form.value.variantes.splice(index, 1)
+  // Si no quedan variantes, cambiar automáticamente a modo simple
+  if (form.value.variantes.length === 0) {
+    modoProducto.value = 'simple'
+  }
 }
 
 const normalizeVariantes = () => {
@@ -870,9 +874,6 @@ const validarFormulario = () => {
 
   if (modoProducto.value === 'variantes') {
     const variantesNormalizadas = normalizeVariantes()
-    if (variantesNormalizadas.length === 0) {
-      return 'Agrega al menos una variante'
-    }
     for (let i = 0; i < variantesNormalizadas.length; i += 1) {
       const variante = variantesNormalizadas[i]
       if (!variante.color && !variante.largo) {
@@ -1012,7 +1013,8 @@ const loadProduct = async () => {
     const atributos = producto.atributos || {}
     
     const variantesPayload = Array.isArray(producto.variantes) ? producto.variantes : []
-    const variantesVisuales = variantesPayload.filter((v) => v?.color || v?.largo)
+    // Filtrar: solo variantes con atributos (color/largo) y que estén activas
+    const variantesVisuales = variantesPayload.filter((v) => (v?.color || v?.largo) && v?.activo !== false)
 
     form.value = {
       codigo: producto.codigo,

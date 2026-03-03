@@ -218,8 +218,15 @@ class ProductoRepositoryImpl(ProductoRepository):
         ids_recibidos = set()
 
         variantes_payload = list(variantes or [])
+
+        # Si la lista está vacía, eliminar todas las variantes no-base
         if not variantes_payload:
+            for var_id, var_model in existentes.items():
+                if var_model.color or var_model.largo:
+                    self._logger.info(f"Eliminando variante huérfana", variante_id=var_id)
+                    ProductoVarianteModel.objects.filter(id=var_model.id).delete()
             return
+
         base_existente = next((v for v in existentes.values() if not v.color and not v.largo), None)
 
         def _payload_dict(data):
@@ -269,9 +276,11 @@ class ProductoRepositoryImpl(ProductoRepository):
             else:
                 ProductoVarianteModel.objects.create(producto=producto_model, **defaults)
 
+        # Eliminar permanentemente las variantes que fueron quitadas por el usuario
         for var_id, var_model in existentes.items():
             if var_id not in ids_recibidos:
-                ProductoVarianteModel.objects.filter(id=var_model.id).update(activo=False)
+                self._logger.info(f"Eliminando variante quitada por usuario", variante_id=var_id, color=var_model.color)
+                ProductoVarianteModel.objects.filter(id=var_model.id).delete()
 
         self._actualizar_precio_y_stock_producto(producto_model)
 

@@ -417,8 +417,10 @@
 <script>
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue'
 import { useRouter, useRoute } from 'vue-router'
+import axios from 'axios'
 import RadioPlayer from './RadioPlayer.vue'
 import { ordenesService } from '@/services/ordenes'
+import { API_BASE_URL } from '@/services/api'
 
 export default {
   name: 'AdminLayout',
@@ -901,8 +903,9 @@ export default {
 
     const getMayoristasCount = async () => {
       try {
-        const response = await axios.get(`${API_BASE}/api/v1/mayoristas`, {
-          headers: { Authorization: `Bearer ${getToken()}` }
+        const token = localStorage.getItem('access_token')
+        const response = await axios.get(`${API_BASE_URL}/api/v1/mayoristas`, {
+          headers: { Authorization: `Bearer ${token}` }
         })
         const mayoristas = response.data.mayoristas || []
         mayoristasCount.value = mayoristas.filter(m => m.estado_mayorista === 'PENDIENTE').length

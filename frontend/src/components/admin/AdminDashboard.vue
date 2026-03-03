@@ -785,7 +785,7 @@ export default {
       stats, loading, chartLoading, error, selectedPeriod, recentOrders, topProducts, lowStockProducts,
       topProductsChartData, donutChartOptions, chartColors,
       categoryChartData, growthChartData, growthChartOptions, salesChartData, salesChartOptions,
-      saludInventario, exportReport,
+      saludInventario, exportReport, pStatusData,
       fechaActual, cargarDatos, cambiarPeriodo, formatNumber, getStatusClass, getStatusLabel
     }
   }
