@@ -71,6 +71,54 @@ class ProductoB2B(BaseModel):
     precio_mayorista: float
     stock: int
     cantidad_minima: int = 1
+    color: Optional[str] = None
+    tipo: Optional[str] = None
+    variantes_colores: List[str] = []
+
+
+# Mapeo de keys a labels (mismo que frontend colorLabels.js)
+_COLOR_KEY_TO_LABEL = {
+    'negro_natural': 'Negro Natural',
+    'negro_azabache': 'Negro Azabache',
+    'castano_oscuro': 'Castaño Oscuro',
+    'castano_medio': 'Castaño Medio',
+    'castano_claro': 'Castaño Claro',
+    'castano_chocolate': 'Castaño Chocolate',
+    'rubio_oscuro': 'Rubio Oscuro',
+    'rubio_medio': 'Rubio Medio',
+    'rubio_claro': 'Rubio Claro',
+    'rubio_platino': 'Rubio Platino',
+    'rubio_cenizo': 'Rubio Cenizo',
+    'rubio_miel': 'Rubio Miel',
+    'pelirrojo': 'Pelirrojo',
+    'cobrizo': 'Cobrizo',
+    'borgona': 'Borgoña',
+    'rosa': 'Rosa',
+    'azul': 'Azul',
+    'morado': 'Morado',
+    'verde': 'Verde',
+    'gris': 'Gris',
+    'ombre': 'Ombré',
+    'balayage': 'Balayage',
+    'highlights': 'Highlights',
+}
+
+def _format_color_label(color_value: str) -> str:
+    """Convierte un valor de color (key o display) a su label legible."""
+    if not color_value:
+        return ''
+    return _COLOR_KEY_TO_LABEL.get(color_value, color_value)
+
+
+class FiltroOpcion(BaseModel):
+    value: str
+    label: str
+    count: int
+
+class FiltrosB2BResponse(BaseModel):
+    categorias: List[FiltroOpcion] = []
+    colores: List[FiltroOpcion] = []
+    tipos: List[FiltroOpcion] = []
 
 
 def calcular_precio_mayorista(producto) -> float:
@@ -81,6 +129,99 @@ def calcular_precio_mayorista(producto) -> float:
         return precio_base
     pct_value = max(min(float(pct), 90.0), 0.0)
     return precio_base * (1.0 - (pct_value / 100.0))
+
+
+@router.get("/b2b/filtros", response_model=FiltrosB2BResponse)
+def obtener_filtros_b2b():
+    """
+    Devuelve categorías, colores y tipos reales con conteo de productos B2B activos.
+    """
+    close_old_connections()
+    try:
+        from infrastructure.persistence.django.models import ProductoModel, CategoriaModel, ProductoVarianteModel
+        from django.db.models import Count, Q
+
+        # Q para filtrar productos dentro de la relacion de CategoriaModel
+        productos_q = Q(
+            productos__activo=True,
+            productos__stock_actual__gt=0,
+            productos__disponible_b2b=True
+        )
+
+        # Q para filtrar directamente en ProductoModel
+        base_q = Q(activo=True, stock_actual__gt=0, disponible_b2b=True)
+
+        # Categorías reales con conteo
+        cats_qs = CategoriaModel.objects.filter(
+            activo=True
+        ).filter(productos_q).annotate(
+            count=Count('productos', filter=productos_q)
+        ).filter(count__gt=0).order_by('-count').distinct()
+
+        categorias = [
+            FiltroOpcion(value=c.nombre, label=c.nombre, count=c.count)
+            for c in cats_qs
+        ]
+
+        # ─── Colores: unificar producto base + variantes ───
+        color_counts = {}  # label -> count
+
+        # 1) Colores del producto base
+        base_colores = ProductoModel.objects.filter(
+            base_q, color__isnull=False
+        ).exclude(color='').values_list('color', flat=True)
+        for raw in base_colores:
+            label = _format_color_label(raw)
+            if label:
+                color_counts[label] = color_counts.get(label, 0) + 1
+
+        # 2) Colores de variantes activas de productos B2B
+        var_colores = ProductoVarianteModel.objects.filter(
+            producto__activo=True,
+            producto__disponible_b2b=True,
+            activo=True,
+            color__isnull=False
+        ).exclude(color='').values_list('color', 'producto_id')
+        # Contar productos únicos por color de variante (no repetir mismo producto)
+        var_color_productos = {}  # label -> set(producto_id)
+        for raw_color, prod_id in var_colores:
+            label = _format_color_label(raw_color)
+            if label:
+                if label not in var_color_productos:
+                    var_color_productos[label] = set()
+                var_color_productos[label].add(prod_id)
+
+        # Mergear: para variantes, sumar solo productos no contados en base
+        for label, prod_ids in var_color_productos.items():
+            # Contamos productos únicos que tienen este color en variantes
+            # Si el color ya existe del base, usamos el máximo entre ambos
+            color_counts[label] = max(color_counts.get(label, 0), len(prod_ids))
+
+        colores = sorted(
+            [FiltroOpcion(value=label, label=label, count=count) for label, count in color_counts.items()],
+            key=lambda x: -x.count
+        )
+
+        # Tipos reales con conteo
+        tipos_qs = ProductoModel.objects.filter(
+            base_q, tipo__isnull=False
+        ).exclude(tipo='').values('tipo').annotate(count=Count('id')).order_by('-count')
+
+        tipos = [
+            FiltroOpcion(
+                value=row['tipo'],
+                label=row['tipo'],
+                count=row['count']
+            )
+            for row in tipos_qs
+        ]
+
+        return FiltrosB2BResponse(categorias=categorias, colores=colores, tipos=tipos)
+    except Exception as e:
+        print(f"❌ Error al obtener filtros B2B: {e}")
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Error al cargar filtros: {str(e)}")
 
 
 @router.get("/b2b/productos", response_model=List[ProductoB2B])
@@ -133,6 +274,14 @@ def obtener_productos_b2b(
         
         result = []
         for p in productos:
+            # Recoger colores de variantes activas
+            var_colors = []
+            for v in p.variantes.filter(activo=True):
+                if v.color:
+                    lbl = _format_color_label(v.color)
+                    if lbl and lbl not in var_colors:
+                        var_colors.append(lbl)
+
             result.append(ProductoB2B(
                 id=str(p.id),
                 nombre=p.nombre,
@@ -142,7 +291,10 @@ def obtener_productos_b2b(
                 precio_retail=float(p.monto_precio_original or p.monto_precio),
                 precio_mayorista=calcular_precio_mayorista(p),
                 stock=p.stock_actual - p.stock_reservado,
-                cantidad_minima=int(p.cantidad_minima_mayorista or 1)
+                cantidad_minima=int(p.cantidad_minima_mayorista or 1),
+                color=p.color or None,
+                tipo=p.tipo or None,
+                variantes_colores=var_colors
             ))
         
         return result
@@ -174,6 +326,14 @@ def obtener_productos_destacados_b2b(
         
         result = []
         for p in productos:
+            # Recoger colores de variantes activas
+            var_colors = []
+            for v in p.variantes.filter(activo=True):
+                if v.color:
+                    lbl = _format_color_label(v.color)
+                    if lbl and lbl not in var_colors:
+                        var_colors.append(lbl)
+
             result.append(ProductoB2B(
                 id=str(p.id),
                 nombre=p.nombre,
@@ -183,7 +343,10 @@ def obtener_productos_destacados_b2b(
                 precio_retail=float(p.monto_precio_original or p.monto_precio),
                 precio_mayorista=calcular_precio_mayorista(p),
                 stock=p.stock_actual - p.stock_reservado,
-                cantidad_minima=int(p.cantidad_minima_mayorista or 1)
+                cantidad_minima=int(p.cantidad_minima_mayorista or 1),
+                color=p.color or None,
+                tipo=p.tipo or None,
+                variantes_colores=var_colors
             ))
         
         return result

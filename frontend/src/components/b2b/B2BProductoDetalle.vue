@@ -1285,10 +1285,16 @@ export default {
     })
 
     const largosDisponibles = computed(() => {
-      // Si BASE seleccionado Y hay opciones de color, no mostrar largos
-      if (colorSeleccionado.value === BASE_VARIANTE_VALUE && coloresDisponibles.value.length > 0) return []
+      if (colorSeleccionado.value === BASE_VARIANTE_VALUE) {
+        // BASE seleccionado: mostrar largos de variantes SIN color
+        const largos = new Set()
+        variantesDisponibles.value.forEach((v) => {
+          if (!v.color && v.largo) largos.add(v.largo)
+        })
+        return Array.from(largos)
+      }
       const largos = new Set()
-      const source = (colorSeleccionado.value && colorSeleccionado.value !== BASE_VARIANTE_VALUE)
+      const source = (colorSeleccionado.value)
         ? variantesDisponibles.value.filter(v => v.color === colorSeleccionado.value)
         : variantesDisponibles.value
       source.forEach((v) => {
@@ -1299,12 +1305,16 @@ export default {
 
     const variantesFiltradas = computed(() => {
       if (!tieneVariantes.value) return []
-      // Solo devolver base si hay colores y el usuario eligió BASE
-      if (colorSeleccionado.value === BASE_VARIANTE_VALUE && coloresDisponibles.value.length > 0) {
-        return varianteBase.value ? [varianteBase.value] : []
+      if (colorSeleccionado.value === BASE_VARIANTE_VALUE) {
+        // BASE: devolver variantes sin color (base + las que tengan largo sin color)
+        return variantesDisponibles.value.filter((v) => {
+          if (v.color) return false
+          if (largoSeleccionado.value && String(v.largo) !== String(largoSeleccionado.value)) return false
+          return true
+        })
       }
       return variantesDisponibles.value.filter((v) => {
-        if (colorSeleccionado.value && colorSeleccionado.value !== BASE_VARIANTE_VALUE && v.color !== colorSeleccionado.value) return false
+        if (colorSeleccionado.value && v.color !== colorSeleccionado.value) return false
         if (largoSeleccionado.value && String(v.largo) !== String(largoSeleccionado.value)) return false
         return true
       })
@@ -1312,8 +1322,15 @@ export default {
 
     const varianteSeleccionada = computed(() => {
       if (!tieneVariantes.value) return null
-      // BASE solo aplica cuando hay colores reales para elegir
-      if (colorSeleccionado.value === BASE_VARIANTE_VALUE && coloresDisponibles.value.length > 0) {
+      if (colorSeleccionado.value === BASE_VARIANTE_VALUE) {
+        // Verificar si hay variantes sin color pero con largo
+        const largosBase = variantesDisponibles.value.filter(v => !v.color && v.largo)
+        if (largosBase.length > 0) {
+          // Requiere selección de largo
+          if (!largoSeleccionado.value) return null
+          return variantesFiltradas.value.find(v => (v.stock_actual ?? 0) > 0) || variantesFiltradas.value[0] || null
+        }
+        // Sin largos base: usar variante base directa
         return varianteBase.value || {
           id: null,
           sku: producto.value.sku || producto.value.codigo || '',
@@ -1807,7 +1824,8 @@ export default {
         colorSeleccionado.value = BASE_VARIANTE_VALUE
         return
       }
-      if (colores.length === 1) {
+      // Auto-seleccionar solo si hay 1 color Y BASE no fue ya seleccionado
+      if (colores.length === 1 && colorSeleccionado.value !== BASE_VARIANTE_VALUE) {
         colorSeleccionado.value = colores[0]
       }
       if (

@@ -216,6 +216,28 @@ export async function obtenerOrden(ordenId) {
   }
 }
 
+/**
+ * Obtiene los filtros disponibles (categorías, colores, tipos) con conteo real
+ * @returns {Promise<{categorias: Array, colores: Array, tipos: Array}>}
+ */
+export async function obtenerFiltrosB2B() {
+  try {
+    const response = await fetch(`${API_BASE}/b2b/filtros`, {
+      method: 'GET',
+      headers: getAuthHeaders()
+    })
+
+    if (!response.ok) {
+      handleAuthError({ status: response.status })
+    }
+
+    return await response.json()
+  } catch (error) {
+    console.error('Error al obtener filtros B2B:', error)
+    throw error
+  }
+}
+
 export default {
   obtenerProductos,
   obtenerProductosDestacados,
@@ -223,5 +245,6 @@ export default {
   obtenerMisPedidos,
   crearOrden,
   validarStock,
-  obtenerOrden
+  obtenerOrden,
+  obtenerFiltrosB2B
 }

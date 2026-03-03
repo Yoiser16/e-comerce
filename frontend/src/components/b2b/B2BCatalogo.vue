@@ -61,6 +61,7 @@
                 <span class="text-sm text-gray-600 group-hover:text-gray-900">{{ cat.label }}</span>
                 <span class="ml-auto text-xs text-gray-400">({{ cat.count }})</span>
               </label>
+              <p v-if="!categories.length && !isLoadingFilters" class="text-xs text-gray-400 italic">Sin categorías</p>
             </div>
           </transition>
         </div>
@@ -108,7 +109,7 @@
           </transition>
         </div>
 
-        <!-- Stock -->
+        <!-- Disponibilidad -->
         <div class="bg-white rounded-xl border border-gray-100 p-4">
           <button 
             @click="toggleSection('stock')"
@@ -128,53 +129,68 @@
                   Solo en stock
                 </span>
               </label>
-              <label class="flex items-center gap-3 cursor-pointer group">
-                <input type="checkbox" v-model="filters.fastShipping" class="w-4 h-4 rounded border-gray-300 text-[#C9A962] focus:ring-[#C9A962]" />
-                <span class="text-sm text-gray-600 group-hover:text-gray-900 flex items-center gap-2">
-                  <svg class="w-4 h-4 text-[#C9A962]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
-                  </svg>
-                  Envío inmediato
-                </span>
+            </div>
+          </transition>
+        </div>
+
+        <!-- Color -->
+        <div v-if="colores.length" class="bg-white rounded-xl border border-gray-100 p-4">
+          <button 
+            @click="toggleSection('colors')"
+            class="flex items-center justify-between w-full text-left"
+          >
+            <span class="font-medium text-gray-900">Color</span>
+            <svg class="w-5 h-5 text-gray-400 transition-transform" :class="{ 'rotate-180': openSections.colors }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+            </svg>
+          </button>
+          <transition name="collapse">
+            <div v-if="openSections.colors" class="mt-3 space-y-2 max-h-48 overflow-y-auto">
+              <label 
+                v-for="color in colores" 
+                :key="color.value"
+                class="flex items-center gap-3 cursor-pointer group"
+              >
+                <input 
+                  type="checkbox" 
+                  :value="color.value"
+                  v-model="filters.colors"
+                  class="w-4 h-4 rounded border-gray-300 text-[#C9A962] focus:ring-[#C9A962]"
+                />
+                <span class="text-sm text-gray-600 group-hover:text-gray-900">{{ color.label }}</span>
+                <span class="ml-auto text-xs text-gray-400">({{ color.count }})</span>
               </label>
             </div>
           </transition>
         </div>
 
-        <!-- Marcas -->
-        <div class="bg-white rounded-xl border border-gray-100 p-4">
+        <!-- Tipo -->
+        <div v-if="tipos.length" class="bg-white rounded-xl border border-gray-100 p-4">
           <button 
-            @click="toggleSection('brands')"
+            @click="toggleSection('types')"
             class="flex items-center justify-between w-full text-left"
           >
-            <span class="font-medium text-gray-900">Marcas</span>
-            <svg class="w-5 h-5 text-gray-400 transition-transform" :class="{ 'rotate-180': openSections.brands }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <span class="font-medium text-gray-900">Tipo de Cabello</span>
+            <svg class="w-5 h-5 text-gray-400 transition-transform" :class="{ 'rotate-180': openSections.types }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
             </svg>
           </button>
           <transition name="collapse">
-            <div v-if="openSections.brands" class="mt-3">
-              <input 
-                v-model="brandSearch"
-                type="text"
-                placeholder="Buscar marca..."
-                class="w-full px-3 py-2 border border-gray-200 rounded-lg text-sm mb-3 focus:ring-2 focus:ring-[#C9A962]/30 focus:border-[#C9A962]"
-              />
-              <div class="space-y-2 max-h-48 overflow-y-auto">
-                <label 
-                  v-for="brand in filteredBrands" 
-                  :key="brand.value"
-                  class="flex items-center gap-3 cursor-pointer group"
-                >
-                  <input 
-                    type="checkbox" 
-                    :value="brand.value"
-                    v-model="filters.brands"
-                    class="w-4 h-4 rounded border-gray-300 text-[#C9A962] focus:ring-[#C9A962]"
-                  />
-                  <span class="text-sm text-gray-600 group-hover:text-gray-900">{{ brand.label }}</span>
-                </label>
-              </div>
+            <div v-if="openSections.types" class="mt-3 space-y-2">
+              <label 
+                v-for="tipo in tipos" 
+                :key="tipo.value"
+                class="flex items-center gap-3 cursor-pointer group"
+              >
+                <input 
+                  type="checkbox" 
+                  :value="tipo.value"
+                  v-model="filters.types"
+                  class="w-4 h-4 rounded border-gray-300 text-[#C9A962] focus:ring-[#C9A962]"
+                />
+                <span class="text-sm text-gray-600 group-hover:text-gray-900">{{ tipo.label }}</span>
+                <span class="ml-auto text-xs text-gray-400">({{ tipo.count }})</span>
+              </label>
             </div>
           </transition>
         </div>
@@ -329,7 +345,7 @@
           <div class="absolute inset-0 bg-black/50" @click="showMobileFilters = false"></div>
           <div class="absolute bottom-0 left-0 right-0 bg-white rounded-t-3xl max-h-[85vh] overflow-y-auto">
             <!-- Header -->
-            <div class="sticky top-0 bg-white border-b border-gray-100 px-4 py-4 flex items-center justify-between">
+            <div class="sticky top-0 bg-white border-b border-gray-100 px-4 py-4 flex items-center justify-between z-10">
               <h3 class="font-semibold text-gray-900">Filtros</h3>
               <button @click="showMobileFilters = false" class="p-2 hover:bg-gray-100 rounded-lg">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -337,9 +353,82 @@
                 </svg>
               </button>
             </div>
-            <!-- Filtros aquí (replicar sidebar) -->
+            <!-- Filtros móvil -->
             <div class="p-4 space-y-4">
-              <p class="text-center text-gray-500 py-8">Filtros móvil próximamente...</p>
+              <!-- Categorías -->
+              <div class="border-b border-gray-100 pb-4">
+                <button @click="toggleSection('m_categories')" class="flex items-center justify-between w-full text-left mb-2">
+                  <span class="font-medium text-gray-900 text-sm">Categorías</span>
+                  <svg class="w-4 h-4 text-gray-400 transition-transform" :class="{ 'rotate-180': openSections.m_categories }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div v-if="openSections.m_categories" class="space-y-2">
+                  <label v-for="cat in categories" :key="cat.value" class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" :value="cat.value" v-model="filters.categories" class="w-4 h-4 rounded border-gray-300 text-[#C9A962] focus:ring-[#C9A962]" />
+                    <span class="text-sm text-gray-600">{{ cat.label }}</span>
+                    <span class="ml-auto text-xs text-gray-400">({{ cat.count }})</span>
+                  </label>
+                </div>
+              </div>
+              <!-- Precio -->
+              <div class="border-b border-gray-100 pb-4">
+                <p class="font-medium text-gray-900 text-sm mb-2">Precio</p>
+                <div class="flex flex-wrap gap-2">
+                  <button 
+                    v-for="range in priceRanges" 
+                    :key="range.label"
+                    @click="setPriceRange(range)"
+                    class="px-3 py-1.5 text-xs font-medium rounded-full border transition-colors"
+                    :class="isPriceRangeActive(range) ? 'bg-[#C9A962] text-white border-[#C9A962]' : 'border-gray-200 text-gray-600 hover:border-[#C9A962]'"
+                  >
+                    {{ range.label }}
+                  </button>
+                </div>
+              </div>
+              <!-- Disponibilidad -->
+              <div class="border-b border-gray-100 pb-4">
+                <p class="font-medium text-gray-900 text-sm mb-2">Disponibilidad</p>
+                <label class="flex items-center gap-3 cursor-pointer">
+                  <input type="checkbox" v-model="filters.inStock" class="w-4 h-4 rounded border-gray-300 text-[#C9A962] focus:ring-[#C9A962]" />
+                  <span class="text-sm text-gray-600 flex items-center gap-2">
+                    <span class="w-2 h-2 bg-emerald-500 rounded-full"></span>
+                    Solo en stock
+                  </span>
+                </label>
+              </div>
+              <!-- Color -->
+              <div v-if="colores.length" class="border-b border-gray-100 pb-4">
+                <button @click="toggleSection('m_colors')" class="flex items-center justify-between w-full text-left mb-2">
+                  <span class="font-medium text-gray-900 text-sm">Color</span>
+                  <svg class="w-4 h-4 text-gray-400 transition-transform" :class="{ 'rotate-180': openSections.m_colors }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div v-if="openSections.m_colors" class="space-y-2 max-h-40 overflow-y-auto">
+                  <label v-for="color in colores" :key="color.value" class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" :value="color.value" v-model="filters.colors" class="w-4 h-4 rounded border-gray-300 text-[#C9A962] focus:ring-[#C9A962]" />
+                    <span class="text-sm text-gray-600">{{ color.label }}</span>
+                    <span class="ml-auto text-xs text-gray-400">({{ color.count }})</span>
+                  </label>
+                </div>
+              </div>
+              <!-- Tipo -->
+              <div v-if="tipos.length">
+                <button @click="toggleSection('m_types')" class="flex items-center justify-between w-full text-left mb-2">
+                  <span class="font-medium text-gray-900 text-sm">Tipo de Cabello</span>
+                  <svg class="w-4 h-4 text-gray-400 transition-transform" :class="{ 'rotate-180': openSections.m_types }" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
+                  </svg>
+                </button>
+                <div v-if="openSections.m_types" class="space-y-2">
+                  <label v-for="tipo in tipos" :key="tipo.value" class="flex items-center gap-3 cursor-pointer">
+                    <input type="checkbox" :value="tipo.value" v-model="filters.types" class="w-4 h-4 rounded border-gray-300 text-[#C9A962] focus:ring-[#C9A962]" />
+                    <span class="text-sm text-gray-600">{{ tipo.label }}</span>
+                    <span class="ml-auto text-xs text-gray-400">({{ tipo.count }})</span>
+                  </label>
+                </div>
+              </div>
             </div>
             <!-- Footer -->
             <div class="sticky bottom-0 bg-white border-t border-gray-100 p-4 flex gap-3">
@@ -353,7 +442,7 @@
                 @click="showMobileFilters = false"
                 class="flex-1 py-3 bg-[#1A1A1A] text-white font-medium rounded-xl hover:bg-black"
               >
-                Aplicar filtros
+                Ver {{ filteredProducts.length }} productos
               </button>
             </div>
           </div>
@@ -367,8 +456,9 @@
 <script>
 import { ref, computed, reactive, onMounted, watch } from 'vue'
 import { B2BProductCard, B2BEmptyState, useToast } from './ui'
-import { obtenerProductos } from '@/services/mayoristas'
+import { obtenerProductos, obtenerFiltrosB2B } from '@/services/mayoristas'
 import { getImageUrl } from '@/services/api'
+import { formatColorLabel } from '@/utils/colorLabels'
 import { useRouter, useRoute } from 'vue-router'
 
 export default {
@@ -386,17 +476,17 @@ export default {
     const currentPage = ref(1)
     const itemsPerPage = 20
     const showMobileFilters = ref(false)
-    const brandSearch = ref('')
     const isLoadingProducts = ref(true)
+    const isLoadingFilters = ref(true)
 
     // Filtros
     const filters = reactive({
       categories: [],
-      brands: [],
+      colors: [],
+      types: [],
       priceMin: null,
       priceMax: null,
       inStock: false,
-      fastShipping: false,
       isNew: false,
       isOnSale: false
     })
@@ -405,30 +495,18 @@ export default {
       categories: true,
       price: true,
       stock: true,
-      brands: true
+      colors: true,
+      types: true,
+      // Secciones móvil
+      m_categories: true,
+      m_colors: true,
+      m_types: true
     })
 
-    // Datos de ejemplo
-    const categories = ref([
-      { value: 'pelucas', label: 'Pelucas', count: 45 },
-      { value: 'extensiones', label: 'Extensiones', count: 142 },
-      { value: 'sistemas-capilares', label: 'Sistemas Capilares', count: 32 },
-      { value: 'tratamientos', label: 'Tratamientos', count: 89 },
-      { value: 'herramientas', label: 'Herramientas', count: 67 },
-      { value: 'coloracion', label: 'Coloración', count: 54 },
-      { value: 'maquillaje', label: 'Maquillaje', count: 128 },
-      { value: 'skincare', label: 'Skincare', count: 76 }
-    ])
-
-    const brands = ref([
-      { value: 'mac', label: 'MAC Cosmetics' },
-      { value: 'nars', label: 'NARS' },
-      { value: 'charlotte', label: 'Charlotte Tilbury' },
-      { value: 'fenty', label: 'Fenty Beauty' },
-      { value: 'kharis', label: 'Kharis Pro' },
-      { value: 'olaplex', label: 'Olaplex' },
-      { value: 'redken', label: 'Redken' }
-    ])
+    // Datos reales (cargados desde API)
+    const categories = ref([])
+    const colores = ref([])
+    const tipos = ref([])
 
     const priceRanges = [
       { label: 'Hasta $50K', min: 0, max: 50000 },
@@ -446,13 +524,8 @@ export default {
     function normalizarProducto(producto) {
       const retail = parseFloat(producto.precio_retail || producto.retailPrice || 0)
       const wholesale = parseFloat(producto.precio_mayorista || producto.wholesalePrice || 0)
-      
-      // Debug log para los primeros 3 productos
-      if (Math.random() < 0.1) {
-        console.log(`🔍 Prod: ${producto.nombre || producto.name} | R: ${retail} | W: ${wholesale} | OnSale: ${wholesale < retail}`)
-      }
 
-      // Normalización de imagen: prioriza imagen_principal, imagen, imagen_url
+      // Normalización de imagen
       let image = producto.imagen_principal || producto.imagen || producto.imagen_url || producto.image
       if (typeof image === 'string') {
         const cleaned = image.trim()
@@ -473,10 +546,19 @@ export default {
       } else {
         image = null
       }
+      // Normalizar color base (puede ser key o display name)
+      const baseColor = producto.color ? formatColorLabel(producto.color) : null
+
+      // Colores de variantes (ya vienen formateados del backend)
+      const variantesColores = producto.variantes_colores || []
+
       return {
         id: producto.id || producto.producto_id,
         name: producto.nombre || producto.name,
         category: producto.categoria || producto.category,
+        color: baseColor,
+        tipo: producto.tipo || null,
+        variantes_colores: variantesColores,
         sku: producto.sku || '',
         image,
         retailPrice: retail,
@@ -486,7 +568,38 @@ export default {
         inStock: (producto.stock || 0) > 0,
         isNew: producto.is_new || producto.isNew || false,
         isBestSeller: producto.is_bestseller || producto.isBestSeller || false,
-        isOnSale: wholesale < retail && wholesale > 0 // Asegurar que tenga precio válido
+        isOnSale: wholesale < retail && wholesale > 0
+      }
+    }
+
+    // =========================================================================
+    // CARGAR FILTROS DESDE API
+    // =========================================================================
+    async function cargarFiltros() {
+      try {
+        isLoadingFilters.value = true
+        const data = await obtenerFiltrosB2B()
+        if (data) {
+          categories.value = (data.categorias || []).map(c => ({
+            value: c.value,
+            label: c.label,
+            count: c.count
+          }))
+          colores.value = (data.colores || []).map(c => ({
+            value: c.value,
+            label: c.label,
+            count: c.count
+          }))
+          tipos.value = (data.tipos || []).map(t => ({
+            value: t.value,
+            label: t.label,
+            count: t.count
+          }))
+        }
+      } catch (error) {
+        console.error('Error al cargar filtros:', error)
+      } finally {
+        isLoadingFilters.value = false
       }
     }
 
@@ -496,8 +609,6 @@ export default {
     async function cargarProductos() {
       try {
         isLoadingProducts.value = true
-        // Pedimos más productos para asegurar que el filtrado cliente funcione bien
-        // Idealmente esto debería ser paginación servidor, pero para este fix rápido:
         const data = await obtenerProductos({ limite: 1000 })
         products.value = (Array.isArray(data) ? data : []).map(normalizarProducto)
       } catch (error) {
@@ -509,11 +620,6 @@ export default {
     }
 
     // Computed
-    const filteredBrands = computed(() => {
-      if (!brandSearch.value) return brands.value
-      return brands.value.filter(b => b.label.toLowerCase().includes(brandSearch.value.toLowerCase()))
-    })
-
     const filteredProducts = computed(() => {
       let result = [...products.value]
 
@@ -529,7 +635,28 @@ export default {
 
       // Filtro categorías
       if (filters.categories.length > 0) {
-        result = result.filter(p => filters.categories.includes(p.category?.toLowerCase()))
+        result = result.filter(p => {
+          const cat = (p.category || '').toLowerCase()
+          return filters.categories.some(fc => fc.toLowerCase() === cat)
+        })
+      }
+
+      // Filtro colores - busca en producto base Y variantes (como B2C)
+      if (filters.colors.length > 0) {
+        result = result.filter(p => {
+          // Buscar en color base
+          if (p.color && filters.colors.includes(p.color)) return true
+          // Buscar en colores de variantes
+          if (p.variantes_colores && p.variantes_colores.length > 0) {
+            return p.variantes_colores.some(vc => filters.colors.includes(vc))
+          }
+          return false
+        })
+      }
+
+      // Filtro tipos
+      if (filters.types.length > 0) {
+        result = result.filter(p => p.tipo && filters.types.includes(p.tipo))
       }
 
       // Filtro precio
@@ -572,25 +699,37 @@ export default {
 
     const hasActiveFilters = computed(() => {
       return filters.categories.length > 0 || 
-             filters.brands.length > 0 || 
+             filters.colors.length > 0 || 
+             filters.types.length > 0 || 
              filters.priceMin || 
              filters.priceMax ||
-             filters.inStock ||
-             filters.fastShipping
+             filters.inStock
     })
 
     const activeFilterCount = computed(() => {
-      let count = filters.categories.length + filters.brands.length
+      let count = filters.categories.length + filters.colors.length + filters.types.length
       if (filters.priceMin || filters.priceMax) count++
       if (filters.inStock) count++
-      if (filters.fastShipping) count++
       return count
     })
 
     const activeFilterTags = computed(() => {
       const tags = []
-      filters.categories.forEach(c => tags.push({ key: `cat-${c}`, label: categories.value.find(cat => cat.value === c)?.label || c }))
-      if (filters.priceMin || filters.priceMax) tags.push({ key: 'price', label: `$${(filters.priceMin || 0).toLocaleString()} - $${(filters.priceMax || '∞').toLocaleString()}` })
+      filters.categories.forEach(c => {
+        const cat = categories.value.find(cat => cat.value === c)
+        tags.push({ key: `cat-${c}`, label: cat?.label || c })
+      })
+      filters.colors.forEach(c => {
+        const color = colores.value.find(col => col.value === c)
+        tags.push({ key: `color-${c}`, label: color?.label || c })
+      })
+      filters.types.forEach(t => {
+        const tipo = tipos.value.find(tp => tp.value === t)
+        tags.push({ key: `type-${t}`, label: tipo?.label || t })
+      })
+      if (filters.priceMin || filters.priceMax) {
+        tags.push({ key: 'price', label: `$${(filters.priceMin || 0).toLocaleString()} - $${(filters.priceMax || '∞').toLocaleString()}` })
+      }
       if (filters.inStock) tags.push({ key: 'inStock', label: 'En stock' })
       return tags
     })
@@ -613,6 +752,12 @@ export default {
       if (key.startsWith('cat-')) {
         const cat = key.replace('cat-', '')
         filters.categories = filters.categories.filter(c => c !== cat)
+      } else if (key.startsWith('color-')) {
+        const color = key.replace('color-', '')
+        filters.colors = filters.colors.filter(c => c !== color)
+      } else if (key.startsWith('type-')) {
+        const tipo = key.replace('type-', '')
+        filters.types = filters.types.filter(t => t !== tipo)
       } else if (key === 'price') {
         filters.priceMin = null
         filters.priceMax = null
@@ -623,32 +768,29 @@ export default {
 
     function clearAllFilters() {
       filters.categories = []
-      filters.brands = []
+      filters.colors = []
+      filters.types = []
       filters.priceMin = null
       filters.priceMax = null
       filters.inStock = false
-      filters.fastShipping = false
       filters.isNew = false
       filters.isOnSale = false
       searchQuery.value = ''
     }
 
     function handleAddToCart({ product, quantity }) {
-      const CANTIDAD_MINIMA = 10 // Compra mínima para mayoristas
+      const CANTIDAD_MINIMA = 10
       
-      // Validar cantidad mínima
       if (quantity < CANTIDAD_MINIMA) {
         alert(`La compra mínima para mayoristas es de ${CANTIDAD_MINIMA} unidades por producto.`)
         return
       }
       
-      console.log('Agregando al carrito:', product.name, 'x', quantity)
       const cart = JSON.parse(localStorage.getItem('b2b_cart') || '{"items":[]}')
       const existing = cart.items.find(i => i.id === product.id)
       if (existing) {
         existing.quantity += quantity
       } else {
-        // Estructura completa con variante_id: null para productos sin variante
         cart.items.push({
           id: product.id,
           producto_id: product.id,
@@ -670,48 +812,48 @@ export default {
     }
 
     // =========================================================================
-    // LIFECYCLE
-    // =========================================================================
-    // =========================================================================
     // URL SYNC
     // =========================================================================
     function syncFiltersFromUrl() {
       const q = route.query
-      
-      // Limpiar filtros primero
       clearAllFilters()
       
       if (q.categoria) {
         filters.categories = [q.categoria]
       }
-      
+      if (q.color) {
+        filters.colors = [q.color]
+      }
+      if (q.tipo) {
+        filters.types = [q.tipo]
+      }
       if (q.nuevo === 'true') {
         filters.isNew = true
       }
-      
       if (q.oferta === 'true') {
         filters.isOnSale = true
       }
-
       if (q.q) {
         searchQuery.value = q.q
       }
     }
 
-    // Watchers para sincronizar URL
+    // Watchers
     watch(() => route.query, () => {
       syncFiltersFromUrl()
     })
 
     onMounted(() => {
+      cargarFiltros()
       cargarProductos()
       syncFiltersFromUrl()
     })
 
     return {
-      searchQuery, sortBy, viewMode, currentPage, itemsPerPage, showMobileFilters, brandSearch,
-      filters, openSections, categories, brands, priceRanges, products, isLoadingProducts,
-      filteredBrands, filteredProducts, totalProducts, totalPages,
+      searchQuery, sortBy, viewMode, currentPage, itemsPerPage, showMobileFilters,
+      filters, openSections, categories, colores, tipos, priceRanges, products,
+      isLoadingProducts, isLoadingFilters,
+      filteredProducts, totalProducts, totalPages,
       hasActiveFilters, activeFilterCount, activeFilterTags,
       toggleSection, setPriceRange, isPriceRangeActive, removeFilter, clearAllFilters, handleAddToCart
     }
